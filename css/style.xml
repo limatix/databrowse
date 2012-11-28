@@ -1,0 +1,50 @@
+<agwebstyle>  <!-- the agwebstyle tag surrounds the entire file -->
+
+<cssstyle> <!-- this contains any css style information needed -->
+  <!-- NOTE: comment within the <style> segment MUST 
+       be CSS comments, not xml comments (e..g /* */-->
+  <style type="text/css">
+
+
+
+  </style>
+
+  <!-- this script section modified from http://jumk.de/nospam/stopspam.html-->
+
+  <script type="text/javascript" src="js/uncryptmailto.js" defer="true"/> 
+
+</cssstyle>
+
+<titleprefix>Databrowse</titleprefix> <!-- The title tag of a page contains this prefix followed by the contents of the first h1 tag of the page -->
+
+<topbar>
+					<ul class="left">
+						<li><a href="http://cymail.iastate.edu/">CyMail</a></li>
+						<li><a href="http://exchange.iastate.edu/">Outlook</a></li>
+						<li><a href="http://bb.its.iastate.edu/">Blackboard</a></li>
+						<li><a href="http://accessplus.iastate.edu/">AccessPlus</a></li>
+					</ul>
+</topbar>
+<topbarright>
+					<ul class="right">
+						<li class="idx"><a href="/index/A/">A</a></li><li class="idx"><a href="/index/B/">B</a></li><li class="idx"><a href="/index/C/">C</a></li><li class="idx"><a href="/index/D/">D</a></li><li class="idx"><a href="/index/E/">E</a></li><li class="idx"><a href="/index/F/">F</a></li><li class="idx"><a href="/index/G/">G</a></li><li class="idx"><a href="/index/H/">H</a></li><li class="idx"><a href="/index/I/">I</a></li><li class="idx"><a href="/index/J/">J</a></li><li class="idx"><a href="/index/K/">K</a></li><li class="idx"><a href="/index/L/">L</a></li><li class="idx"><a href="/index/M/">M</a></li><li class="idx"><a href="/index/N/">N</a></li><li class="idx"><a href="/index/O/">O</a></li><li class="idx"><a href="/index/P/">P</a></li><li class="idx"><a href="/index/Q/">Q</a></li><li class="idx"><a href="/index/R/">R</a></li><li class="idx"><a href="/index/S/">S</a></li><li class="idx"><a href="/index/T/">T</a></li><li class="idx"><a href="/index/U/">U</a></li><li class="idx"><a href="/index/V/">V</a></li><li class="idx"><a href="/index/W/">W</a></li><li class="idx"><a href="/index/X/">X</a></li><li class="idx"><a href="/index/Y/">Y</a></li><li class="idx"><a href="/index/Z/">Z</a></li>
+						<li class="border first"><a href="http://info.iastate.edu/">Directory</a></li>
+						<li class="border"><a href="http://www.fpm.iastate.edu/maps/">Maps</a></li>
+						<li class="border last"><a href="/contact/">Contact Us</a></li>
+					</ul>
+
+</topbarright>
+
+<sitetitle><a href="/">Thermography Research Group - Databrowse</a></sitetitle>
+
+
+<footer>
+				<p>Thermography Research Group, 225 ASC II, 1915 Scholl Road, (515) 294-8659, <a href="mailto:sdh4@iastate.edu">sdh4@iastate.edu</a>
+				</p>
+				<p>
+					Copyright &#169; 1995-2012, Iowa State University of Science and Technology.
+					All rights reserved. 
+				</p>
+</footer>
+
+</agwebstyle>
