@@ -3,3 +3,5 @@ syntax: glob
 *.sublime-project
 *.sublime-workspace
 *~
+*.pyc
+web.conf

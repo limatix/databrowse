@@ -24,6 +24,12 @@ import sys
 import magic
 
 
+if not hasattr(magic,"Magic"): 
+    # old magic api
+    magicstore = magic.open(magic.MAGIC_NONE)
+    magicstore.load()
+
+
 class handler_support:
     """ Class to encapsulate handler plugin management """
 
@@ -58,8 +64,20 @@ class handler_support:
 
     def GetHandler(self, fullpath):
         """ Return the handler given a full path """
-        mime = magic.Magic(mime=True)
-        contenttype = mime.from_file(fullpath)
+        if hasattr(magic,"Magic"): 
+            # new python-magic API
+            mime = magic.Magic(mime=True)
+            contenttype = mime.from_file(fullpath)
+            pass
+        else :
+            contenttype =  magicstore.file(fullpath)            
+
+            pass
+
+        #logf=file("/tmp/junk","w")
+        #logf.write("fullpath=%s contenttype=%s\n" % (fullpath,contenttype))
+        #logf.close()
+
         extension = os.path.splitext(fullpath)[1][1:]
         handler = False
         for function in self._handlers:

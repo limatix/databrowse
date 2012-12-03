@@ -102,7 +102,7 @@ class web_support:
     """ Class containing support functionality for web operations """
     req = None                  # request class object
     req_filename = None         # requested filename
-    req_dir = None              # directory containing the requested file
+    webdir = None               # directory containing the requested file
     confstr = None              # string containing optional configuration file
     email_sendmail = None       # email:  sendmail location
     email_admin = None          # email:  admin email for alert reports, etc
@@ -110,6 +110,10 @@ class web_support:
     administrators = None       # dictionary containing administrator list
     sitetitle = None            # site title
     shorttitle = None           # abbreviated site title
+
+    dataroot = None             # Path to root of data directory
+    handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers) 
+    rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
 
     def __init__(self, environ, start_response):
         self.req = wsgi_req(environ, start_response)
@@ -126,6 +130,15 @@ class web_support:
             pass
 
         # Set Default Configuration Options
+
+        if self.handlerpath is None:
+            self.handlerpath = os.path.join(self.webdir,"plugins/handlers")
+            pass
+
+        if self.rendererpath is None:
+            self.rendererpath = os.path.join(self.webdir,"plugins/renderers")
+            pass
+
         if self.email_sendmail is None:
             self.email_sendmail = "/usr/lib/sendmail -i"
             pass
@@ -149,6 +162,8 @@ class web_support:
         if self.shorttitle is None:
             self.shorttitle = "databrowse"
             pass
+
+        assert(self.dataroot is not None)
 
         pass
 

@@ -25,11 +25,6 @@ import os
 import cgitb
 cgitb.enable()
 
-# Global Settings
-dataroot = '/sata2'                                                             # Path to root of data directory
-handlerpath = '/home/tylerl/Documents/Projects/databrowse/plugins/handlers'     # Path to root of handler plugin directory
-rendererpath = '/home/tylerl/Documents/Projects/databrowse/plugins/renderers'   # Path to root of renderer plugin directory
-
 
 def application(environ, start_response):
     """ Entry Point for WSGI Application """
@@ -37,26 +32,26 @@ def application(environ, start_response):
     # Add paths and import support modules
     sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
     sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
-    import web_support
+    import web_support as web_support_module
 
     # Set up web_support class with environment information
-    web_support = web_support.web_support(environ, start_response)
+    web_support = web_support_module.web_support(environ, start_response)
 
     # Determine Requested File/Folder Absolute Path and Path Relative to Dataroot
     if "path" not in web_support.req.form:
-        fullpath = dataroot
+        fullpath = web_support.dataroot
         relpath = '/'
         pass
     else:
-        fullpath = os.path.abspath(dataroot + '/' + web_support.req.form["path"].value)
-        if not fullpath.startswith(dataroot):
+        fullpath = os.path.abspath(web_support.dataroot + '/' + web_support.req.form["path"].value)
+        if not fullpath.startswith(web_support.dataroot):
             return web_support.req.return_error(403)
         if os.path.exists(fullpath):
-            if fullpath == dataroot:
+            if fullpath == web_support.dataroot:
                 relpath = '/'
                 pass
             else:
-                relpath = fullpath.replace(dataroot, '')
+                relpath = fullpath.replace(web_support.dataroot, '')
                 pass
             pass
         else:
@@ -64,12 +59,12 @@ def application(environ, start_response):
         pass
 
     # Determine handler for requested path
-    import handler_support
-    handler_support = handler_support.handler_support(handlerpath)
+    import handler_support as handler_support_module
+    handler_support = handler_support_module.handler_support(web_support.handlerpath)
     handler = handler_support.GetHandler(fullpath)
 
     # Complete request and output to page
-    sys.path.append(rendererpath)
+    sys.path.append(web_support.rendererpath)
     exec "import %s" % (handler)
     exec "renderer = %s.%s(relpath, fullpath, web_support, handler_support)" % (handler, handler)
     web_support.req.output = renderer.getContent()
