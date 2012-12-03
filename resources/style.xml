@@ -11,7 +11,7 @@
 
   <!-- this script section modified from http://jumk.de/nospam/stopspam.html-->
 
-  <script type="text/javascript" src="js/uncryptmailto.js" defer="true"/> 
+  <script type="text/javascript" src="resources/uncryptmailto.js" defer="true"/> 
 
 </cssstyle>
 

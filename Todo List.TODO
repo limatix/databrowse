@@ -1,0 +1,6 @@
+Compatability Stubs for simple_wsgi and sdh_web_wsgi
+Complete implementation of basic plugin architect (assembly of XSLT)
+Plugin for datacollect run files
+Plugin for .chx checklist files
+./dg_checklist checklists/vibro_setup.chx  (inside gui2)
+webdev

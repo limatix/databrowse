@@ -37,11 +37,11 @@ class dbr_default:
     _handler_support = None
 
     _getContent_transform = r"""<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="css/ag_web.xml"?>
+<?xml-stylesheet type="text/xsl" href="resources/ag_web.xml"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" encoding="utf-8"/>
     <xsl:template match="/">
-        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="css/ag_web.xml"</xsl:processing-instruction>
+        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="resources/ag_web.xml"</xsl:processing-instruction>
         <body>
             <table>
                 <tr><th colspan="2"><xsl:value-of select="file/filename"/></th></tr>
