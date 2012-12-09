@@ -114,11 +114,13 @@ class web_support:
     dataroot = None             # Path to root of data directory
     handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers) 
     rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
+    stderr = None               # filehandle to server error log
 
     def __init__(self, environ, start_response):
         self.req = wsgi_req(environ, start_response)
         self.reqfilename = self.req.filename
         self.webdir = os.path.dirname(self.reqfilename)
+        self.stderr = environ["wsgi.errors"]
 
         # Try to Load Optional Configuration File
         try:

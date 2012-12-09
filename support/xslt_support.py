@@ -68,12 +68,16 @@ _lf2p = r"""<xsl:template name="lf2p">
 def ApplyXSLTTransform(conf, xslt_transform, xmldoc, paramdict={}):
     """ Apply XSLT Transformation """
 
+    # xmldoc should be a string, filename, uri, etc... if xmldoc comes from treewriter, you must pass the result of the xml_encode() method instead
+
     # Prepare dictionary to be used by the transform
+
     pdcopy = {}
     pdcopy["xmlrecord"] = xmldoc
     pdcopy.update(conf.__dict__)
     pdcopy.update(paramdict)
 
     # Perform the transfrom using amara and return the result
-    result = amara.xslt.transform(xmldoc.xml_encode(), xslt_transform, params=pdcopy)
+    
+    result = amara.xslt.transform(xmldoc, xslt_transform, params=pdcopy)
     return result
