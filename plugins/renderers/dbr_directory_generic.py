@@ -20,64 +20,55 @@
 
 import os
 import os.path
-import amara.writers
-import amara.writers.treewriter
-import amara.writers.outputparameters
-import xslt_support
+from lxml import etree
+from renderer_support import renderer_class
 
 
-class dbr_directory_generic:
+class dbr_directory_generic(renderer_class):
     """ Default Folder Renderer - Basic Output for Any Folder """
 
-    _relpath = None
-    _fullpath = None
-    _web_support = None
-    _handler_support = None
+    _detailed_xml = None
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dir"
+    _namespace_local = "dir"
 
-    _getContent_transform = r"""<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="resources/ag_web.xml"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-    <xsl:output method="xml" encoding="utf-8"/>
-    <xsl:template match="/">
-        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="resources/ag_web.xml"</xsl:processing-instruction>
-        <body>
-            <b><xsl:value-of select="folder/@path"/></b><br/>
-            <xsl:apply-templates select="folder/item"/>
-        </body>
-    </xsl:template>
-    <xsl:template match="item">
-        <a>
-            <xsl:attribute name="href"><xsl:value-of select="./@href"/></xsl:attribute>
-            <xsl:value-of select="."/>
-        </a><br/>
-    </xsl:template>
-</xsl:stylesheet>
-"""
-
-    def __init__(self, relpath, fullpath, web_support, handler_support):
+    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode="title", style_mode="list", recursion_depth=2):
         """ Load all of the values provided by initialization """
-        self._relpath = relpath
-        self._fullpath = fullpath
-        self._web_support = web_support
-        self._handler_support = handler_support
+        super(dbr_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
+        etree.register_namespace("dir", "http://thermal.cnde.iastate.edu/databrowse/dir")
+        #if content_mode is "detailed":
+        dirlist = os.listdir(self._fullpath)
+        if caller == "databrowse":
+            uphref = os.path.abspath(self._relpath + '/../')
+            uphref = self._web_support.siteurl + uphref
+            xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/dir}dir', path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
+            pass
+        else:
+            link = self._web_support.siteurl + self._relpath
+            xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/dir}dir', name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
+            pass
+        style = {}
+        if recursion_depth is not 0:
+            for item in dirlist:
+                itemrelpath = os.path.join(self._relpath, item)
+                itemfullpath = os.path.join(self._fullpath, item)
+                handler = self._handler_support.GetHandler(itemfullpath)
+                print "--- Preparing to Load Handler %s ---" % handler
+                exec "import %s as %s_module" % (handler, handler)
+                exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller='dbr_directory_generic', content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                content = renderer.getContent()
+                xmlchild = etree.SubElement(xmlroot, "{http://thermal.cnde.iastate.edu/databrowse/dir}file", fullpath=itemfullpath, relpath=itemrelpath)
+                xmlchild.append(content)
+                pass
+            pass
+        self._detailed_xml = xmlroot
         pass
 
     def getContent(self):
-        """ Returns content when called by main application """
+        self.loadStyle()
+        if self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
+            return self._detailed_xml
+        else:
+            raise self.RendererException(1102)
+        pass
 
-        dirlist = os.listdir(self._fullpath)
-        xmldoc = amara.writers.treewriter.treewriter(output_parameters=amara.writers.outputparameters.outputparameters(), base_uri=None)
-        xmldoc.start_document()
-        xmldoc.start_element(u'folder')
-        xmldoc.attribute('path', self._fullpath)
-        for item in dirlist:
-            xmldoc.start_element(u'item')
-            xmldoc.attribute('href', '?path=' + (self._relpath if self._relpath is not '/' else '') + '/' + item)
-            xmldoc.text(item)
-            xmldoc.end_element(u'item')
-            pass
-        xmldoc.end_element(u'folder')
-        xmldoc.end_document()
-        return xslt_support.ApplyXSLTTransform(self._web_support, self._getContent_transform, xmldoc.get_result())
-
-    pass
+pass

@@ -25,10 +25,10 @@ with extcvt="true" to have a .xml extension transfomed to .html
 </xsl:choose>
 </xsl:variable>
 
-<xsl:variable name="rootdir">
+<xsl:variable name="resdir">
 <xsl:choose>
-<xsl:when test="string-length(body/@rootdir) = 0">.</xsl:when>
-<xsl:otherwise><xsl:value-of select="body/@rootdir"/></xsl:otherwise>
+<xsl:when test="string-length(body/@resdir) = 0">http://localhost/dbres/</xsl:when>
+<xsl:otherwise><xsl:value-of select="body/@resdir"/></xsl:otherwise>
 </xsl:choose>
 </xsl:variable>
  
@@ -50,12 +50,12 @@ with extcvt="true" to have a .xml extension transfomed to .html
 	<xsl:apply-templates select="body/style" mode="head"/>
 
 	<xsl:element name="link">
-          <xsl:attribute name="href"><xsl:value-of select="$rootdir"/>/resources/base.css?1.1</xsl:attribute>
+          <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
 	  <xsl:attribute name="media">all</xsl:attribute>
 	  <xsl:attribute name="rel">stylesheet</xsl:attribute>
         </xsl:element>
 	<xsl:element name="link">
-          <xsl:attribute name="href"><xsl:value-of select="$rootdir"/>/resources/sample.css?1.1</xsl:attribute>
+          <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.1</xsl:attribute>
 	  <xsl:attribute name="media">all</xsl:attribute>
 	  <xsl:attribute name="rel">stylesheet</xsl:attribute>
         </xsl:element>
@@ -91,7 +91,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 
 						  <xsl:element name="img">
 						    <xsl:attribute name="alt">Iowa State University</xsl:attribute>
-						    <xsl:attribute name="src"><xsl:value-of select="$rootdir"/>/resources/sprite.png</xsl:attribute>
+						    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
 						  </xsl:element>
 						</a>
 					</h1>
@@ -139,7 +139,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 				<a class="nameplate" href="/">
 						  <xsl:element name="img">
 						    <xsl:attribute name="alt">Iowa State University</xsl:attribute>
-						    <xsl:attribute name="src"><xsl:value-of select="$rootdir"/>/img/sprite.png</xsl:attribute>
+						    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
 						  </xsl:element>
 				</a>
 			</div>
@@ -156,7 +156,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 <!-- end overall template -->
 
 <xsl:template match="a" mode="anchors">
-<!-- stuff $rootdir into all the HREF links -->
+<!-- stuff $resdir into all the HREF links -->
 <xsl:element name="{name()}">
 <xsl:attribute name="class">navbaranchor</xsl:attribute> <!-- set all navigation bar anchors to have a CSS style of "navbaranchor" -->
 <xsl:for-each select="@*">
@@ -165,8 +165,8 @@ with extcvt="true" to have a .xml extension transfomed to .html
   <xsl:attribute name="{name()}"> 
   <xsl:choose>  
     <xsl:when test="not(starts-with(.,'/')) and not(contains(.,'://'))"> 
-      <!-- relative path. Should be relative to $rootdir -->
-      <xsl:value-of select="$rootdir"/>/<!-- replace .xml with .html if appropriate -->
+      <!-- relative path. Should be relative to $resdir -->
+      <xsl:value-of select="$resdir"/>/<!-- replace .xml with .html if appropriate -->
     </xsl:when>
   </xsl:choose>
   <xsl:choose>
@@ -343,18 +343,18 @@ of the xml file must match exactly. -->
 </xsl:element>
 </xsl:template>
 
-<!-- need to catch $$$rootdir in stylesheets! -->
+<!-- need to catch $$$resdir in stylesheets! -->
 <xsl:template match="text()" mode="head">
-<xsl:call-template name="subrootdir">
+<xsl:call-template name="subresdir">
 <xsl:with-param name="string" select="."/> 
 </xsl:call-template>
 </xsl:template>
 
-<xsl:template name="subrootdir">
+<xsl:template name="subresdir">
 <xsl:param name="string"/>
 <xsl:choose>
-  <xsl:when test="contains($string,'$$$rootdir')">
-    <xsl:value-of select="substring-before($string,'$$$rootdir')"/><xsl:value-of select="$rootdir"/><xsl:call-template name="subrootdir"><xsl:with-param name="string" select="substring-after($string,'$$$rootdir')"/></xsl:call-template>
+  <xsl:when test="contains($string,'$$$resdir')">
+    <xsl:value-of select="substring-before($string,'$$$resdir')"/><xsl:value-of select="$resdir"/><xsl:call-template name="subresdir"><xsl:with-param name="string" select="substring-after($string,'$$$resdir')"/></xsl:call-template>
   </xsl:when>  
   <xsl:otherwise>
     <xsl:value-of select="$string"/>
@@ -387,9 +387,9 @@ of the xml file must match exactly. -->
 <xsl:when test="name()='href' and ../@extcvt='true' and '.xml'=substring(.,string-length(.)-3) and $extcvt='true'">
 <xsl:attribute name="{name()}"><xsl:value-of select="substring(.,1,string-length(.)-4)"/>.html</xsl:attribute>
 </xsl:when>
-  <xsl:when test="contains(.,'$$$rootdir')">
+  <xsl:when test="contains(.,'$$$resdir')">
     <xsl:attribute name="{name()}">
-    <xsl:value-of select="substring-before(.,'$$$rootdir')"/><xsl:value-of select="$rootdir"/><xsl:value-of select="substring-after(.,'$$$rootdir')"/>
+    <xsl:value-of select="substring-before(.,'$$$resdir')"/><xsl:value-of select="$resdir"/><xsl:value-of select="substring-after(.,'$$$resdir')"/>
     </xsl:attribute>
   </xsl:when>  
 <xsl:otherwise>
@@ -440,9 +440,9 @@ of the xml file must match exactly. -->
 <xsl:element name="{name()}">
 <xsl:for-each select="@*">
 <xsl:choose>
-  <xsl:when test="contains(.,'$$$rootdir')">
+  <xsl:when test="contains(.,'$$$resdir')">
     <xsl:attribute name="{name()}">
-    <xsl:value-of select="substring-before(.,'$$$rootdir')"/><xsl:value-of select="$rootdir"/><xsl:value-of select="substring-after(.,'$$$rootdir')"/>
+    <xsl:value-of select="substring-before(.,'$$$resdir')"/><xsl:value-of select="$resdir"/><xsl:value-of select="substring-after(.,'$$$resdir')"/>
     </xsl:attribute>
   </xsl:when>  
   <xsl:otherwise>

@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/sbh_directory.py - Generic Directory Handler """
+""" plugins/handlers/dbh_directory.py - Generic Directory Handler """
 
 
 def dbh_directory(path, contenttype, extension):

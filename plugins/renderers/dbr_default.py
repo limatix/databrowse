@@ -22,93 +22,87 @@ import os
 import os.path
 import time
 from stat import *
-import amara.writers
-import amara.writers.treewriter
-import amara.writers.outputparameters
-import xslt_support
+from lxml import etree
+from renderer_support import renderer_class
+import magic
 
 
-class dbr_default:
+class dbr_default(renderer_class):
     """ Default Renderer - Basic Output for Any File """
 
-    _relpath = None
-    _fullpath = None
-    _web_support = None
-    _handler_support = None
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"
+    _namespace_local = "default"
 
-    _getContent_transform = r"""<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="resources/ag_web.xml"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-    <xsl:output method="xml" encoding="utf-8"/>
-    <xsl:template match="/">
-        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="resources/ag_web.xml"</xsl:processing-instruction>
-        <body>
-            <table>
-                <tr><th colspan="2"><xsl:value-of select="file/filename"/></th></tr>
-                <tr><td colspan="2"><xsl:value-of select="file/path"/></td></tr>
-                <tr><td>Size: </td><td><xsl:value-of select="file/size"/> bytes</td></tr>
-                <tr><td>Modified: </td><td><xsl:value-of select="file/mtime"/></td></tr>
-                <tr><td>Accessed: </td><td><xsl:value-of select="file/atime"/></td></tr>
-                <tr><td>Updated: </td><td><xsl:value-of select="file/ctime"/></td></tr>
-            </table>
-        </body>
-    </xsl:template>
-</xsl:stylesheet>
-"""
-
-    def __init__(self, relpath, fullpath, web_support, handler_support):
+    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode="detailed", style_mode="list", recursion_depth=2):
         """ Load all of the values provided by initialization """
-        self._relpath = relpath
-        self._fullpath = fullpath
-        self._web_support = web_support
-        self._handler_support = handler_support
+        super(dbr_default, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
+        etree.register_namespace("default", "http://thermal.cnde.iastate.edu/databrowse/default")
         pass
 
     def getContent(self):
-        """ Returns content when called by main application """
+        if self._content_mode == "detailed":
+            try:
+                st = os.stat(self._fullpath)
+            except IOError:
+                return "Failed To Get File Information: %s" % (self._fullpath)
+            else:
+                file_size = st[ST_SIZE]
+                file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
+                file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
+                file_atime = time.asctime(time.localtime(st[ST_ATIME]))
 
-        try:
-            st = os.stat(self._fullpath)
-        except IOError:
-            return "Failed To Get File Information: %s" % (self._fullpath)
+                xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default')
+
+                xmlchild = etree.SubElement(xmlroot, "filename")
+                xmlchild.text = os.path.basename(self._fullpath)
+
+                xmlchild = etree.SubElement(xmlroot, "path")
+                xmlchild.text = os.path.dirname(self._fullpath)
+
+                xmlchild = etree.SubElement(xmlroot, "size")
+                xmlchild.text = str(file_size)
+
+                xmlchild = etree.SubElement(xmlroot, "mtime")
+                xmlchild.text = file_mtime
+
+                xmlchild = etree.SubElement(xmlroot, "ctime")
+                xmlchild.text = file_ctime
+
+                xmlchild = etree.SubElement(xmlroot, "atime")
+                xmlchild.text = file_atime
+
+                self.loadStyle()
+
+                return xmlroot
+        elif self._content_mode == "summary" or self._content_mode == "title":
+            self.loadStyle()
+            link = self._web_support.siteurl + self._relpath
+            xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
+            return xmlroot
+        elif self._content_mode == "raw":
+            size = os.path.getsize(self._fullpath)
+            if hasattr(magic, "Magic"):
+                # new python-magic API
+                mime = magic.Magic(mime=True)
+                contenttype = mime.from_file(self._fullpath)
+                pass
+            else:
+                magicstore = magic.open(magic.MAGIC_NONE)
+                magicstore.load()
+                contenttype = magicstore.file(self._fullpath)
+                pass
+            f = open(self._fullpath, "rb")
+            self._web_support.req.response_headers['Content-Type'] = contenttype
+            self._web_support.req.response_headers['Content-Length'] = str(size)
+            self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
+            self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+            self._web_support.req.output_done = True
+            if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+            else:
+                return iter(lambda: f.read(1024))
         else:
-            file_size = st[ST_SIZE]
-            file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
-            file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
-            file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-
-            xmldoc = amara.writers.treewriter.treewriter(output_parameters=amara.writers.outputparameters.outputparameters(), base_uri=None)
-            xmldoc.start_document()
-            xmldoc.start_element(u'file')
-
-            xmldoc.start_element(u'filename')
-            xmldoc.text(os.path.basename(self._fullpath))
-            xmldoc.end_element(u'filename')
-
-            xmldoc.start_element(u'path')
-            xmldoc.text(os.path.dirname(self._fullpath))
-            xmldoc.end_element(u'path')
-
-            xmldoc.start_element(u'size')
-            xmldoc.text(str(file_size))
-            xmldoc.end_element(u'size')
-
-            xmldoc.start_element(u'mtime')
-            xmldoc.text(file_mtime)
-            xmldoc.end_element(u'mtime')
-
-            xmldoc.start_element(u'ctime')
-            xmldoc.text(file_ctime)
-            xmldoc.end_element(u'ctime')
-
-            xmldoc.start_element(u'atime')
-            xmldoc.text(file_atime)
-            xmldoc.end_element(u'atime')
-
-            xmldoc.end_element(u'file')
-            xmldoc.end_document()
-
-            return xslt_support.ApplyXSLTTransform(self._web_support, self._getContent_transform, xmldoc.get_result())
+            raise self.RendererException(1102)
         pass
 
     pass

@@ -24,12 +24,6 @@ import sys
 import magic
 
 
-if not hasattr(magic,"Magic"): 
-    # old magic api
-    magicstore = magic.open(magic.MAGIC_NONE)
-    magicstore.load()
-
-
 class handler_support:
     """ Class to encapsulate handler plugin management """
 
@@ -48,7 +42,7 @@ class handler_support:
                     exec "import %s" % modulename
                     exec "functions = dir(%s)" % modulename
                     for function in functions:
-                        if function.startswith("_"):
+                        if not function.startswith("dbh_"):                                 # Ignore all functions not starting with dbh_
                             pass
                         else:
                             exec "self._handlers.append(%s.%s)" % (modulename, function)
@@ -64,15 +58,9 @@ class handler_support:
 
     def GetHandler(self, fullpath):
         """ Return the handler given a full path """
-        if hasattr(magic,"Magic"): 
-            # new python-magic API
-            mime = magic.Magic(mime=True)
-            contenttype = mime.from_file(fullpath)
-            pass
-        else :
-            contenttype =  magicstore.file(fullpath)            
-
-            pass
+        magicstore = magic.open(magic.MAGIC_NONE)
+        magicstore.load()
+        contenttype = magicstore.file(fullpath)
 
         #logf=file("/tmp/junk","w")
         #logf.write("fullpath=%s contenttype=%s\n" % (fullpath,contenttype))

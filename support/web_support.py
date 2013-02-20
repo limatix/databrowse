@@ -48,7 +48,7 @@ class wsgi_req:
 
         self.status = '200 OK'
         self.response_headers = {}
-        self.response_headers['Content-Type'] = 'text/xml'
+        self.response_headers['Content-Type'] = 'text/html'
         self.output_done = False
 
         if "debug" in self.form:
@@ -63,7 +63,7 @@ class wsgi_req:
         self.response_headers['Content-Length'] = str(len(self.output))
         self.start_response(self.status, self.response_headers.items())
         self.output_done = True
-        return [self.output.encode('utf-8')]
+        return self.output
 
     def return_error(self, status=500):
         """ Return Error Message """
@@ -98,9 +98,45 @@ class wsgi_req:
     pass
 
 
+class style_support:
+    """ Class containing support functionality for xslt stylesheet compliation """
+
+    _style_dict = {}
+
+    class StyleException(Exception):
+        em = {1201: "Multiple stylesheets using the same namespace and mode exist"}
+        pass
+
+    def AddStyle(self, namespace, content):
+        if (namespace) in self._style_dict:
+            # Check to ensure new value is the same as the current value, otherwise throw error
+            if self._style_dict[namespace] != content:
+                print "Error!"
+                print "Style Dictionary:"
+                print self._style_dict
+                print "Adding Namesapce: %s" % namespace
+                print "Content:"
+                print content
+                raise self.StyleException(1201)
+        else:
+            self._style_dict[namespace] = content
+            pass
+        pass
+
+    def GetStyle(self):
+        stylestring = ""
+        for i in self._style_dict:
+            stylestring = stylestring + self._style_dict[i]
+            pass
+        return stylestring
+
+    pass
+
+
 class web_support:
     """ Class containing support functionality for web operations """
     req = None                  # request class object
+    style = None                # style class object
     req_filename = None         # requested filename
     webdir = None               # directory containing the requested file
     confstr = None              # string containing optional configuration file
@@ -110,9 +146,10 @@ class web_support:
     administrators = None       # dictionary containing administrator list
     sitetitle = None            # site title
     shorttitle = None           # abbreviated site title
-
+    siteurl = None              # URL to site root directory
+    resurl = None               # URL to resources directory
     dataroot = None             # Path to root of data directory
-    handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers) 
+    handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers)
     rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
     stderr = None               # filehandle to server error log
 
@@ -121,6 +158,7 @@ class web_support:
         self.reqfilename = self.req.filename
         self.webdir = os.path.dirname(self.reqfilename)
         self.stderr = environ["wsgi.errors"]
+        self.style = style_support()
 
         # Try to Load Optional Configuration File
         try:
@@ -133,12 +171,20 @@ class web_support:
 
         # Set Default Configuration Options
 
+        if self.siteurl is None:
+            self.siteurl = "http://localhost/databrowse"
+            pass
+
+        if self.resurl is None:
+            self.resurl = "http://localhost/dbres"
+            pass
+
         if self.handlerpath is None:
-            self.handlerpath = os.path.join(self.webdir,"plugins/handlers")
+            self.handlerpath = os.path.join(self.webdir, "plugins/handlers")
             pass
 
         if self.rendererpath is None:
-            self.rendererpath = os.path.join(self.webdir,"plugins/renderers")
+            self.rendererpath = os.path.join(self.webdir, "plugins/renderers")
             pass
 
         if self.email_sendmail is None:

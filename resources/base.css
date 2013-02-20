@@ -478,7 +478,7 @@ body.grid-layout-720 .hwrapper{
 }
 
 #ribbon form > input[type="submit"]{
-	background: #dfbd00 url(../img/sprite.png?1.0) no-repeat 0 -65px;
+	background: #dfbd00 url(/dbres/sprite.png?1.0) no-repeat 0 -65px;
 	border: 0;
 	cursor: pointer;
 	height: 22px;
@@ -759,7 +759,7 @@ body.grid-layout-720 .hwrapper{
 }
 
 #left-sidebar ul.navigation:after{
-	background: url(../img/sprite.png?1.0) no-repeat bottom right;
+	background: url(/dbres/sprite.png?1.0) no-repeat bottom right;
 	content: '';
 	display: block;
 	height: 150px;
