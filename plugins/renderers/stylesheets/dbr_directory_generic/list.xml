@@ -1,0 +1,168 @@
+<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="detailed">
+    <div>
+        <xsl:choose>
+            <xsl:when test="@root='True'">
+                <img>
+                    <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                </img>
+                <b><xsl:value-of select="@path"/></b>
+                <a>
+                    <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                    <img alt="Up" title="Go Up One Directory Level">
+                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
+                    </img>
+                </a><br/>
+            </xsl:when>
+            <xsl:otherwise>
+                <img>
+                    <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                </img>
+                <a>
+                    <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                    <b><xsl:value-of select="@path"/></b>
+                </a><br/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <table>
+            <xsl:for-each select="dir:file">
+                <tr>
+                    <td style="width:10px;"></td>
+                    <td>
+                        <xsl:apply-templates select="." mode="detailed"/>
+                    </td>
+                </tr>
+            </xsl:for-each>
+        </table>
+    </div>
+</xsl:template>
+<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="summary">
+    <div>
+        <xsl:choose>
+            <xsl:when test="@root='True'">
+                <img>
+                    <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                </img>
+                <b><xsl:value-of select="@path"/></b>
+                <a>
+                    <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                    <img alt="Up" title="Go Up One Directory Level">
+                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
+                    </img>
+                </a><br/>
+            </xsl:when>
+            <xsl:otherwise>
+                <img>
+                    <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                </img>
+                <a>
+                    <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                    <b><xsl:value-of select="@path"/></b>
+                </a><br/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <table>
+            <xsl:for-each select="dir:file">
+                <tr>
+                    <td style="width:10px;"></td>
+                    <td>
+                        <xsl:apply-templates select="." mode="summary"/>
+                    </td>
+                </tr>
+            </xsl:for-each>
+        </table>
+    </div>
+</xsl:template>
+<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="title">
+    <xsl:if test="@root='True'">
+        <script>
+            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/jquery-1.9.1.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript">
+            <xsl:text disable-output-escaping="yes">
+                $(document).ready(function() {
+                    $.ImgToggle = function(img, resurl) {
+                        if($(img).attr("src") == resurl + "/icons/folder-open.png") {
+                            $(img).attr("src", resurl + "/icons/folder.png");
+                        }
+                        else {
+                            $(img).attr("src", resurl + "/icons/folder-open.png");
+                        }
+                    };
+                }); 
+            </xsl:text>
+        </script>
+    </xsl:if>
+    <div>
+        <table>
+            <tr>
+                <th style="width:18px;">
+                    <xsl:choose>
+                        <xsl:when test="@root='True'">
+                            <img id="img{generate-id(.)}">
+                                <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                                <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                                <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.ImgToggle(&apos;#img{generate-id(.)}&apos;,&apos;{@resurl}&apos;);">
+                                <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                                <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                                <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                            </img>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </th>
+                <th style="text-align:left;">
+                    <xsl:choose>
+                        <xsl:when test="@root='True'">
+                            <b><xsl:value-of select="@path"/></b>&#160;
+                            <a>
+                                <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                                <img alt="Up" title="Go Up One Directory Level">
+                                    <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
+                                </img>
+                            </a>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <a>
+                                <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                                <b><xsl:value-of select="@name"/></b>
+                            </a>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </th>
+            </tr>
+            <tr id="{generate-id(.)}">
+                <xsl:choose>
+                    <xsl:when test="@root='True'">
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="style">display:none</xsl:attribute>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <td></td>
+                <td>
+                    <table>
+                    <xsl:for-each select="dir:file">
+                        <tr>
+                            <td>
+                                <xsl:apply-templates select="." mode="title"/>
+                            </td>
+                        </tr>
+                    </xsl:for-each>
+                    </table>
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+</xsl:template>

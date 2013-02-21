@@ -1,0 +1,22 @@
+Immediate Todo Items:
+☐ Shared Functionality Needed By All Plugins
+    ☐ Generating Links
+    ☐ Building Lists of Files
+        ☐ Filtering Items Out of Lists
+            ☐ Filter Monthly Report Backups
+    ☐ Menu Support
+☐ Standardize XML Schema/Style
+☐ AJAX Support
+☐ Enhance Style Support Functionality
+
+Items For Next Week:
+☐ Pequod Data Storage Available
+☐ Beta of Databrowse on Pequod
+☐ Monthly Reports Operable
+☐ Ability to View Reports
+☐ Ability to Run Checklist Files / Possibly View Them
+
+Long Term Items:
+☐ Plugin Development
+     ☐ Simple XML Plugin
+☐ File Operations
