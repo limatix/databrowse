@@ -44,7 +44,7 @@ class dbr_wsgi_generic(renderer_class):
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
             self.loadStyle()
-            link = self._web_support.siteurl + self._relpath
+            link = self.getURL(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/wsgigeneric}wsgigeneric', xmlns="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric", name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "raw":

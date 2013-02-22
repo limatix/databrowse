@@ -11,8 +11,13 @@
     </a>
 </xsl:template>
 <xsl:template xmlns:wsgigeneric="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric" match="wsgigeneric:wsgigeneric" mode="title">
-    <a>
-        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-        <xsl:value-of select="@name"/>
-    </a>
+    <div class="icon">
+        <img src="http://localhost/dbres/icons/unknown.png"/>
+    </div>
+    <div class="title">
+        <a>
+            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+            <xsl:value-of select="@name"/>
+        </a>
+    </div>
 </xsl:template>

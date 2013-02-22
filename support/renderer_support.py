@@ -65,6 +65,41 @@ class renderer_class(object):
     def getContentMode(self):
         return self._content_mode
 
+    def getURL(self, relpath, **kwargs):
+        if self._web_support.seo_urls is True:
+            url = self._web_support.siteurl + relpath
+            if len(kwargs) > 0:
+                url = url + '?'
+                z = 1
+                pass
+            for i in kwargs:
+                if z == 1:
+                    url = url + i + '=' + kwargs[i]
+                    z = 2
+                    pass
+                else:
+                    url = url + '&' + i + '=' + kwargs[i]
+                    pass
+                pass
+            pass
+        else:
+            url = self._web_support.siteurl + '/?path=' + relpath
+            for i in kwargs:
+                url = url + '&' + i + '=' + kwargs[i]
+                pass
+            pass
+        return url
+
+    def getURLToParent(self, relpath, **kwargs):
+        if relpath == "/":
+            return self.getURL(relpath, **kwargs)
+            pass
+        else:
+            relpath = os.path.abspath(relpath + '/../')
+            return self.getURL(relpath, **kwargs)
+            pass
+        pass
+
     def loadStyle(self):
         """ Look In Standard Places For the Appropriate Static Stylesheet """
         if os.path.isdir(self._fullpath):

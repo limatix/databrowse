@@ -38,12 +38,11 @@ class dbr_directory_generic(renderer_class):
         #if content_mode is "detailed":
         dirlist = os.listdir(self._fullpath)
         if caller == "databrowse":
-            uphref = os.path.abspath(self._relpath + '/../')
-            uphref = self._web_support.siteurl + uphref
+            uphref = self.getURLToParent(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/dir}dir', path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
             pass
         else:
-            link = self._web_support.siteurl + self._relpath
+            link = self.getURL(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/dir}dir', name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
             pass
         style = {}

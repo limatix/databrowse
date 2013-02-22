@@ -44,21 +44,16 @@ with extcvt="true" to have a .xml extension transfomed to .html
 <head>
 	<meta charset="utf-8"/>
 	<title><xsl:value-of select="document('style.xml')/agwebstyle/titleprefix"/> <xsl:value-of select="$title"/></title>
-	<xsl:apply-templates select="body/meta" mode="head"/>
-	<xsl:apply-templates select="body/link" mode="head"/>
-	<xsl:apply-templates select="document('style.xml')/agwebstyle/cssstyle" mode="head"/>
-	<xsl:apply-templates select="body/style" mode="head"/>
-
 	<xsl:element name="link">
-          <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
-	  <xsl:attribute name="media">all</xsl:attribute>
-	  <xsl:attribute name="rel">stylesheet</xsl:attribute>
-        </xsl:element>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
+	  	<xsl:attribute name="media">all</xsl:attribute>
+	  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+    </xsl:element>
 	<xsl:element name="link">
-          <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.1</xsl:attribute>
-	  <xsl:attribute name="media">all</xsl:attribute>
-	  <xsl:attribute name="rel">stylesheet</xsl:attribute>
-        </xsl:element>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.1</xsl:attribute>
+	  	<xsl:attribute name="media">all</xsl:attribute>
+	  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+    </xsl:element>
 	<!--[if lt IE 9]>
 		<style>
 			ul.left > li, ul.right > li{
@@ -69,6 +64,10 @@ with extcvt="true" to have a .xml extension transfomed to .html
 			}
 		</style>
 	<![endif]--> 
+	<xsl:apply-templates select="body/meta" mode="head"/>
+	<xsl:apply-templates select="body/link" mode="head"/>
+	<xsl:apply-templates select="document('style.xml')/agwebstyle/cssstyle" mode="head"/>
+	<xsl:apply-templates select="body/style" mode="head"/>
 </head>
 <body>
 	<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>

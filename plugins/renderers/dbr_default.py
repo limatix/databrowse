@@ -76,21 +76,14 @@ class dbr_default(renderer_class):
                 return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":
             self.loadStyle()
-            link = self._web_support.siteurl + self._relpath
+            link = self.getURL(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode == "raw":
             size = os.path.getsize(self._fullpath)
-            if hasattr(magic, "Magic"):
-                # new python-magic API
-                mime = magic.Magic(mime=True)
-                contenttype = mime.from_file(self._fullpath)
-                pass
-            else:
-                magicstore = magic.open(magic.MAGIC_NONE)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
-                pass
+            magicstore = magic.open(magic.MAGIC_NONE)
+            magicstore.load()
+            contenttype = magicstore.file(self._fullpath)
             f = open(self._fullpath, "rb")
             self._web_support.req.response_headers['Content-Type'] = contenttype
             self._web_support.req.response_headers['Content-Length'] = str(size)

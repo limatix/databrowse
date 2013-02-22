@@ -152,6 +152,7 @@ class web_support:
     handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers)
     rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
     stderr = None               # filehandle to server error log
+    seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
 
     def __init__(self, environ, start_response):
         self.req = wsgi_req(environ, start_response)
@@ -209,6 +210,10 @@ class web_support:
 
         if self.shorttitle is None:
             self.shorttitle = "databrowse"
+            pass
+
+        if self.seo_urls is None:
+            self.seo_urls = True
             pass
 
         assert(self.dataroot is not None)
