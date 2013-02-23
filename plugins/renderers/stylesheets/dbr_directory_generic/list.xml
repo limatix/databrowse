@@ -37,7 +37,7 @@
                 ul.tree, ul.tree ul {
                     list-style-type: none;
                     margin: 0px;
-                    padding: 0 18px;
+                    padding: 0 0px;
                     background: url('<xsl:value-of select="@resurl"/>/vline.png') repeat-y;
                 }
                 ul.root {
@@ -55,9 +55,9 @@
                 }
                 li.subdir {
                     margin: 0px;
-                    padding: 0 18px;
+                    padding: 0 0px;
                     line-height:20px;
-                    background: url('<xsl:value-of select="@resurl"/>/node.png'), url('<xsl:value-of select="@resurl"/>/vline.png');
+                    background: #fff;
                     background-repeat: no-repeat, repeat-y;
                 }
                 .item {
@@ -88,78 +88,79 @@
             </ul>
          </xsl:when>
          <xsl:otherwise>
-            <xsl:call-template name="treestructure">
-                <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
-            </xsl:call-template>
+            <ul class="tree root">
+                <xsl:call-template name="treestructure">
+                    <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
+                </xsl:call-template>
+            </ul>
          </xsl:otherwise>
     </xsl:choose>
 </xsl:template>
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="treestructure">
     <xsl:param name="mode"/>
-    <xsl:choose>
-        <xsl:when test="@root='True'">
-            <li class="rootdir">
-                <div class="icon">
-                    <img id="img{generate-id(.)}">
-                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
-                    </img>
-                </div>
-                <div class="title">
-                    <xsl:value-of select="@path"/>&#160;
-                    <a>
-                        <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
-                        <img alt="Up" title="Go Up One Directory Level">
-                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
-                        </img>
-                    </a>
-                </div>
-            </li>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:attribute name="class">tree</xsl:attribute>
-            <li class="subdir">
-                <div class="icon">
-                    <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.ImgToggle(&apos;#img{generate-id(.)}&apos;,&apos;{@resurl}&apos;);">
-                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
-                    </img>
-                </div>
-                <div class="title">
-                    <a>
-                        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-                        <xsl:value-of select="@name"/>
-                    </a>
-                </div>
-            </li>
-        </xsl:otherwise>
-    </xsl:choose>
-    <ul id="{generate-id(.)}">
+    <li>
         <xsl:choose>
             <xsl:when test="@root='True'">
                 <xsl:attribute name="class">rootdir</xsl:attribute>
+                    <div class="icon">
+                        <img id="img{generate-id(.)}">
+                            <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                            <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                        </img>
+                    </div>
+                    <div class="title">
+                        <xsl:value-of select="@path"/>&#160;
+                        <a>
+                            <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                            <img alt="Up" title="Go Up One Directory Level">
+                                <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
+                            </img>
+                        </a>
+                    </div>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:attribute name="class">subdir</xsl:attribute>
-                <xsl:attribute name="style">display:none</xsl:attribute>
+                    <div class="icon">
+                        <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.ImgToggle(&apos;#img{generate-id(.)}&apos;,&apos;{@resurl}&apos;);">
+                            <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                            <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                        </img>
+                    </div>
+                    <div class="title">
+                        <a>
+                            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                            <xsl:value-of select="@name"/>
+                        </a>
+                    </div>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:for-each select="dir:file">
-            <li  class="item">
-                <xsl:choose>
-                    <xsl:when test="$mode='title'">
-                        <xsl:apply-templates select="." mode="title"/>
-                    </xsl:when>
-                    <xsl:when test="$mode='summary'">
-                        <xsl:apply-templates select="." mode="summary"/>
-                    </xsl:when>
-                    <xsl:when test="$mode='detailed'">
-                        <xsl:apply-templates select="." mode="detailed"/>
-                    </xsl:when>
-                </xsl:choose>          
-            </li>
-        </xsl:for-each>
-    </ul>
+        <ul id="{generate-id(.)}">
+            <xsl:choose>
+                <xsl:when test="@root='True'">
+                    <xsl:attribute name="class">rootdir</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="class">subdir</xsl:attribute>
+                    <xsl:attribute name="style">display:none</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:for-each select="dir:file">
+                <li class="item">
+                    <xsl:choose>
+                        <xsl:when test="$mode='title'">
+                            <xsl:apply-templates select="." mode="title"/>
+                        </xsl:when>
+                        <xsl:when test="$mode='summary'">
+                            <xsl:apply-templates select="." mode="summary"/>
+                        </xsl:when>
+                        <xsl:when test="$mode='detailed'">
+                            <xsl:apply-templates select="." mode="detailed"/>
+                        </xsl:when>
+                    </xsl:choose>          
+                </li>
+            </xsl:for-each>
+        </ul>
+    </li>
 </xsl:template>
