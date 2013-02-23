@@ -95,7 +95,7 @@ class dbr_default(renderer_class):
             else:
                 return iter(lambda: f.read(1024))
         else:
-            raise self.RendererException(1102)
+            raise self.RendererException("Invalid Content Mode")
         pass
 
     pass

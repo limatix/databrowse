@@ -34,8 +34,6 @@ class renderer_class(object):
     _dynamic_style = None
 
     class RendererException(Exception):
-        em = {1101: "Unable to Locate Stylesheet", \
-              1102: "Invalid Content Mode"}
         pass
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode="detailed", style_mode="detailed", recursion_depth=2):
@@ -74,18 +72,18 @@ class renderer_class(object):
                 pass
             for i in kwargs:
                 if z == 1:
-                    url = url + i + '=' + kwargs[i]
+                    url = url + i + '=' + str(kwargs[i])
                     z = 2
                     pass
                 else:
-                    url = url + '&' + i + '=' + kwargs[i]
+                    url = url + '&' + i + '=' + str(kwargs[i])
                     pass
                 pass
             pass
         else:
             url = self._web_support.siteurl + '/?path=' + relpath
             for i in kwargs:
-                url = url + '&' + i + '=' + kwargs[i]
+                url = url + '&' + i + '=' + str(kwargs[i])
                 pass
             pass
         return url
@@ -157,7 +155,7 @@ class renderer_class(object):
                 self._web_support.style.AddStyle(self._namespace_uri, string)
             else:
                 # Unable to Find Stylesheet Anywhere - Return Error
-                raise self.RendererException(1101)
+                raise self.RendererException("Unable To Locate Stylesheet")
             pass
 
     pass

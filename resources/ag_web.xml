@@ -44,6 +44,9 @@ with extcvt="true" to have a .xml extension transfomed to .html
 <head>
 	<meta charset="utf-8"/>
 	<title><xsl:value-of select="document('style.xml')/agwebstyle/titleprefix"/> <xsl:value-of select="$title"/></title>
+	<link rel="shortcut icon" type="image/x-icon">
+		<xsl:attribute name="href"><xsl:value-of select="$resdir"/>favicon.ico</xsl:attribute>
+	</link>
 	<xsl:element name="link">
         <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
 	  	<xsl:attribute name="media">all</xsl:attribute>

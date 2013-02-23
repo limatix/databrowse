@@ -57,6 +57,6 @@ class dbr_wsgi_generic(renderer_class):
             #return output
             return output
         else:
-            raise self.RendererException(1102)
+            raise self.RendererException("Invalid Content Mode")
 
     pass

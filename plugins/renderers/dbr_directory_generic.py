@@ -35,7 +35,6 @@ class dbr_directory_generic(renderer_class):
         """ Load all of the values provided by initialization """
         super(dbr_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
         etree.register_namespace("dir", "http://thermal.cnde.iastate.edu/databrowse/dir")
-        #if content_mode is "detailed":
         dirlist = os.listdir(self._fullpath)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
@@ -45,19 +44,26 @@ class dbr_directory_generic(renderer_class):
             link = self.getURL(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/dir}dir', name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
             pass
+        if "ajax" in self._web_support.req.form:
+            xmlroot.set("ajaxreq", "True")
+            pass
         style = {}
         if recursion_depth is not 0:
             for item in dirlist:
                 itemrelpath = os.path.join(self._relpath, item)
                 itemfullpath = os.path.join(self._fullpath, item)
                 handler = self._handler_support.GetHandler(itemfullpath)
-                print "--- Preparing to Load Handler %s ---" % handler
                 exec "import %s as %s_module" % (handler, handler)
                 exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller='dbr_directory_generic', content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
                 xmlchild = etree.SubElement(xmlroot, "{http://thermal.cnde.iastate.edu/databrowse/dir}file", fullpath=itemfullpath, relpath=itemrelpath)
                 xmlchild.append(content)
                 pass
+            pass
+        else:
+            #ajax url and what not
+            xmlroot.set("ajax", "True")
+            xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, ajax=True, content_mode=self._content_mode, style_mode=self._style_mode))
             pass
         self._detailed_xml = xmlroot
         pass
@@ -67,7 +73,7 @@ class dbr_directory_generic(renderer_class):
         if self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
             return self._detailed_xml
         else:
-            raise self.RendererException(1102)
+            raise self.RendererException("Invalid Content Mode")
         pass
 
 pass

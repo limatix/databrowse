@@ -15,7 +15,7 @@
 </xsl:template>
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="directorytree">
     <xsl:param name="mode"/>
-    <xsl:if test="@root='True'">
+    <xsl:if test="@root='True' and not(@ajaxreq='True')">
         <script>
             <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/jquery-1.9.1.min.js</xsl:attribute>
         </script>
@@ -29,8 +29,28 @@
                             $(img).attr("src", resurl + "/icons/folder-open.png");
                         }
                     };
-
-
+                    $.AjaxRequest = function(id, img, requrl, resurl) {
+                        if($(img).attr("src") == resurl + "/icons/folder-open.png"){
+                            $(img).attr("src", resurl + "/icons/folder.png");
+                        }
+                        else if($(id).html() != "") { 
+                            $(img).attr("src", resurl + "/icons/folder-open.png");
+                        }
+                        else {
+                            $.ajax({
+                                url: requrl,
+                                beforeSend: function ( xhr ) {
+                                    xhr.overrideMimeType("text/plain; charset=x-user-defined");
+                                    $(img).attr("src", resurl + "/icons/loading.gif");
+                                }
+                            }).done(function ( data ) {
+                                obj = $('&lt;html /&gt;').html(data);
+                                text = $('ul.rootdir',obj).html();
+                                $(id).html(text);
+                                $(img).attr("src", resurl + "/icons/folder-open.png");
+                            });
+                        }
+                    };
                 }); 
         </script>
         <style>
@@ -39,6 +59,16 @@
                     margin: 0px;
                     padding: 0 0px;
                     background: url('<xsl:value-of select="@resurl"/>/vline.png') repeat-y;
+                }
+                .item {
+                    margin: 0px;
+                    padding: 0 18px;
+                    line-height:20px;
+                    background: url('<xsl:value-of select="@resurl"/>/node.png'), url('<xsl:value-of select="@resurl"/>/vline.png');
+                    background-repeat: no-repeat, repeat-y;
+                }
+                ul.tree li:last-child{
+                    background: #fff url('<xsl:value-of select="@resurl"/>/lastnode.png') no-repeat;
                 }
                 ul.root {
                     margin: 0px;
@@ -49,24 +79,16 @@
                 }
                 ul.tree ul.rootdir {
                     padding: 0 0px;
-                }
-                ul.tree li.last{
-                    background: url('<xsl:value-of select="@resurl"/>/lastnode.png') no-repeat;
-                }
+                }                
                 li.subdir {
                     margin: 0px;
                     padding: 0 0px;
                     line-height:20px;
-                    background: #fff;
-                    background-repeat: no-repeat, repeat-y;
+                    background: #fff none;
                 }
-                .item {
-                    margin: 0px;
-                    padding: 0 18px;
-                    line-height:20px;
-                    background: url('<xsl:value-of select="@resurl"/>/node.png'), url('<xsl:value-of select="@resurl"/>/vline.png');
-                    background-repeat: no-repeat, repeat-y;
-                }
+                ul.tree li.subdir {
+                    background: #fff none;
+                }                
                 .icon {
                     float: left;
                     display: block;
@@ -75,6 +97,9 @@
                 }
                 .title {
                     font-weight: bold;
+                }
+                ul.tree li.rootdir {
+                    background: #fff none;
                 }
         </style>
     </xsl:if>
@@ -102,38 +127,54 @@
         <xsl:choose>
             <xsl:when test="@root='True'">
                 <xsl:attribute name="class">rootdir</xsl:attribute>
-                    <div class="icon">
-                        <img id="img{generate-id(.)}">
-                            <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
-                            <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                <div class="icon">
+                    <img id="img{generate-id(.)}">
+                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                    </img>
+                </div>
+                <div class="title">
+                    <xsl:value-of select="@path"/>&#160;
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                        <img alt="Up" title="Go Up One Directory Level">
+                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
                         </img>
-                    </div>
-                    <div class="title">
-                        <xsl:value-of select="@path"/>&#160;
-                        <a>
-                            <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
-                            <img alt="Up" title="Go Up One Directory Level">
-                                <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/up.png</xsl:attribute>
-                            </img>
-                        </a>
-                    </div>
+                    </a>
+                </div>
+            </xsl:when>
+            <xsl:when test="@ajax='True'">
+                <xsl:attribute name="class">subdir</xsl:attribute>
+                <div class="icon">
+                    <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.AjaxRequest(&apos;#{generate-id(.)}&apos;,&apos;#img{generate-id(.)}&apos;,&apos;{@ajaxurl}&apos;,&apos;{@resurl}&apos;);">
+                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                    </img>
+                </div>
+                <div class="title">
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </div>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:attribute name="class">subdir</xsl:attribute>
-                    <div class="icon">
-                        <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.ImgToggle(&apos;#img{generate-id(.)}&apos;,&apos;{@resurl}&apos;);">
-                            <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
-                            <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                            <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
-                        </img>
-                    </div>
-                    <div class="title">
-                        <a>
-                            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-                            <xsl:value-of select="@name"/>
-                        </a>
-                    </div>
+                <div class="icon">
+                    <img id="img{generate-id(.)}" onclick="$(&apos;#{generate-id(.)}&apos;).toggle();$.ImgToggle(&apos;#img{generate-id(.)}&apos;,&apos;{@resurl}&apos;);">
+                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/folder.png</xsl:attribute>
+                    </img>
+                </div>
+                <div class="title">
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </div>
             </xsl:otherwise>
         </xsl:choose>
         <ul id="{generate-id(.)}">

@@ -104,7 +104,6 @@ class style_support:
     _style_dict = {}
 
     class StyleException(Exception):
-        em = {1201: "Multiple stylesheets using the same namespace and mode exist"}
         pass
 
     def AddStyle(self, namespace, content):
@@ -117,7 +116,7 @@ class style_support:
                 print "Adding Namesapce: %s" % namespace
                 print "Content:"
                 print content
-                raise self.StyleException(1201)
+                raise self.StyleException("Multiple stylesheets using the same namespace and mode exist")
         else:
             self._style_dict[namespace] = content
             pass
@@ -153,6 +152,7 @@ class web_support:
     rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
     stderr = None               # filehandle to server error log
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
+    debugging = None            # Boolean indicating whether debugging messages should be shown
 
     def __init__(self, environ, start_response):
         self.req = wsgi_req(environ, start_response)
@@ -214,6 +214,10 @@ class web_support:
 
         if self.seo_urls is None:
             self.seo_urls = True
+            pass
+
+        if self.debugging is None:
+            self.debugging = False
             pass
 
         assert(self.dataroot is not None)
