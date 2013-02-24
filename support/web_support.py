@@ -110,16 +110,17 @@ class style_support:
         if (namespace) in self._style_dict:
             # Check to ensure new value is the same as the current value, otherwise throw error
             if self._style_dict[namespace] != content:
-                print "Error!"
-                print "Style Dictionary:"
-                print self._style_dict
-                print "Adding Namesapce: %s" % namespace
-                print "Content:"
-                print content
                 raise self.StyleException("Multiple stylesheets using the same namespace and mode exist")
         else:
             self._style_dict[namespace] = content
             pass
+        pass
+
+    def IsStyleLoaded(self, namespace):
+        if (namespace) in self._style_dict:
+            return True
+        else:
+            return False
         pass
 
     def GetStyle(self):

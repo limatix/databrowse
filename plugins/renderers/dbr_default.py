@@ -32,12 +32,9 @@ class dbr_default(renderer_class):
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"
     _namespace_local = "default"
-
-    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode="detailed", style_mode="list", recursion_depth=2):
-        """ Load all of the values provided by initialization """
-        super(dbr_default, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
-        etree.register_namespace("default", "http://thermal.cnde.iastate.edu/databrowse/default")
-        pass
+    _default_content_mode = "detailed"
+    _default_style_mode = "list"
+    _default_recursion_depth = 2
 
     def getContent(self):
         if self._content_mode == "detailed":
@@ -51,7 +48,9 @@ class dbr_default(renderer_class):
                 file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                 file_atime = time.asctime(time.localtime(st[ST_ATIME]))
 
-                xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default')
+                link = self.getURL(self._relpath)
+
+                xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
 
                 xmlchild = etree.SubElement(xmlroot, "filename")
                 xmlchild.text = os.path.basename(self._fullpath)
@@ -71,11 +70,8 @@ class dbr_default(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "atime")
                 xmlchild.text = file_atime
 
-                self.loadStyle()
-
                 return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":
-            self.loadStyle()
             link = self.getURL(self._relpath)
             xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
             return xmlroot

@@ -28,33 +28,29 @@ from renderer_support import renderer_class
 class dbr_wsgi_generic(renderer_class):
     """ Default Renderer for WSGI Scripts - Simply Passes Everything Off To The Script """
 
-    _savedCWD = None
-    _tempCWD = None
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/wsgigeneric"
     _namespace_local = "wsgigeneric"
-
-    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode="raw", style_mode="list", recursion_depth=2):
-        """ Load all of the values provided by initialization """
-        super(dbr_wsgi_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
-        self._savedCWD = os.getcwd()
-        self._tempCWD = os.path.dirname(self._fullpath)
-        etree.register_namespace("wsgigeneric", "http://thermal.cnde.iastate.edu/databrowse/wsgigeneric")
-        pass
+    _default_content_mode = "raw"
+    _default_style_mode = "list"
+    _default_recursion_depth = 2
+    _disable_load_style = True
 
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
             self.loadStyle()
+            etree.register_namespace(self._namespace_local, self._namespace_uri)
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/wsgigeneric}wsgigeneric', xmlns="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric", name=os.path.basename(self._relpath), href=link)
+            xmlroot = etree.Element('{%s}wsgigeneric' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "raw":
-            os.chdir(self._tempCWD)
+            savedCWD = os.getcwd()
+            tempCWD = os.path.dirname(self._fullpath)
+            os.chdir(tempCWD)
             modulename = os.path.splitext(os.path.basename(self._fullpath))[0]
             module = imp.load_source(modulename, self._fullpath)
             output = module.application(self._web_support.req.environ, self._web_support.req.start_response)
-            os.chdir(self._savedCWD)
+            os.chdir(savedCWD)
             self._web_support.req.output_done = True
-            #return output
             return output
         else:
             raise self.RendererException("Invalid Content Mode")

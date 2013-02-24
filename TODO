@@ -1,15 +1,15 @@
 Immediate Todo Items:
 ☐ Shared Functionality Needed By All Plugins
     ✔ Generating Links @done (13-02-22 10:57)
-    ☐ Decision Making Functionality in Determining Content and Style Mode
+    ✔ Decision Making Functionality in Determining Content and Style Mode @done (13-02-24 16:04)
     ☐ Building Lists of Files
         ☐ Filtering Items Out of Lists
             ☐ Filter Monthly Report Backups
     ☐ Menu Support
 ✔ Proper Error Handling @done (13-02-23 13:50)
-☐ Standardize XML Schema/Style
+✔ Standardize XML Schema/Style @done (13-02-24 15:05)
 ✔ AJAX Support @done (13-02-22 21:03)
-☐ Enhance Style Support Functionality
+✔ Enhance Style Support Functionality @done (13-02-24 15:05)
 
 Items For Next Week:
 ☐ Pequod Data Storage Available

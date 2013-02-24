@@ -1,19 +1,19 @@
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="detailed">
-    <xsl:call-template name="directorytree">
+    <xsl:call-template name="dbr_directory_generic-directorytree">
         <xsl:with-param name="mode">detailed</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="summary">
-    <xsl:call-template name="directorytree">
+    <xsl:call-template name="dbr_directory_generic-directorytree">
         <xsl:with-param name="mode">summary</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="title">
-    <xsl:call-template name="directorytree">
+    <xsl:call-template name="dbr_directory_generic-directorytree">
         <xsl:with-param name="mode">title</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="directorytree">
+<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="dbr_directory_generic-directorytree">
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
         <script>
@@ -107,21 +107,21 @@
     <xsl:choose>
          <xsl:when test="@root='True'">
             <ul class="tree root" id="tree">
-                <xsl:call-template name="treestructure">
+                <xsl:call-template name="dbr_directory_generic-treestructure">
                     <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
                 </xsl:call-template>
             </ul>
          </xsl:when>
          <xsl:otherwise>
             <ul class="tree root">
-                <xsl:call-template name="treestructure">
+                <xsl:call-template name="dbr_directory_generic-treestructure">
                     <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
                 </xsl:call-template>
             </ul>
          </xsl:otherwise>
     </xsl:choose>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="treestructure">
+<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="dbr_directory_generic-treestructure">
     <xsl:param name="mode"/>
     <li>
         <xsl:choose>

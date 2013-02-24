@@ -143,7 +143,9 @@ def application(environ, start_response):
                 return [web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
+                print etree.tostring(xml, pretty_print=True)
                 style = localwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                print style
                 content = xml.xslt(etree.XML(style))
                 f = file('/home/tylerl/Documents/Projects/databrowse/resources/ag_web.xml')
                 template = etree.parse(f)
@@ -175,6 +177,8 @@ def application(environ, start_response):
         <pre style="overflow:auto">%s</pre>
         <strong>Request Variables:</strong>                                             <br/>
         <pre style="overflow:auto">%s</pre>
+        <strong>Dir()</strong>                                                          <br/>
+        <pre style="overflow:auto">%s</pre>
     </p>
 </body>'''
 
@@ -198,7 +202,7 @@ def application(environ, start_response):
             for key in form.keys():
                 inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
                 pass
-            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;")
+            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 
             # Get a Trace and Also Output a Copy of the Trace to the Server Log
             trace = StringIO.StringIO()
@@ -207,7 +211,7 @@ def application(environ, start_response):
             traceback.print_exception(exc_type, exc_value, exc_traceback)
             tracestring = trace.getvalue()
             trace.close()
-            tracestring = tracestring.replace('<', "&lt;").replace('>', "&gt;")
+            tracestring = tracestring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Get A List of Everything in Environ
             keystring = ""
@@ -216,9 +220,15 @@ def application(environ, start_response):
             for key in keys:
                 keystring = keystring + "%s:  %s \n" % (key, repr(environ[key]))
                 pass
-            keystring = keystring.replace('<', "&lt;").replace('>', "&gt;")
+            keystring = keystring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
+
+            # Get a list of everything in dir()
+            dirstring = ""
+            for name in dir():
+                dirstring = dirstring + "%s %s: %s \n" % (name, str(type(name)), repr(eval(name)))
+            dirstring = dirstring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Output Error Message
-            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro) + "-" + sys.version_info.releaselevel, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring)
+            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro) + "-" + sys.version_info.releaselevel, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring, dirstring)
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
