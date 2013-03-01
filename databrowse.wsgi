@@ -128,7 +128,9 @@ def application(environ, start_response):
                 web_support.req.output = etree.tostring(content, pretty_print=True)
                 return [web_support.req.return_page()]
             elif "localpagestyle" in web_support.req.form:
-                xml = etree.ElementTree(renderer.getContent())
+                xmlcontent = renderer.getContent()
+                xmlcontent.append(web_support.menu.GetMenu())
+                xml = etree.ElementTree(xmlcontent)
                 style = localwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style))
                 web_support.req.output = etree.tostring(content, pretty_print=True)
@@ -143,10 +145,10 @@ def application(environ, start_response):
                 return [web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                print etree.tostring(xml, pretty_print=True)
-                style = localwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
-                print style
+                style = serverwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style))
+                contentroot = content.getroot()
+                contentroot.append(web_support.menu.GetMenu())
                 f = file('/home/tylerl/Documents/Projects/databrowse/resources/ag_web.xml')
                 template = etree.parse(f)
                 f.close()

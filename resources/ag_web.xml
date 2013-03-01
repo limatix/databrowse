@@ -123,7 +123,12 @@ with extcvt="true" to have a .xml extension transfomed to .html
 		
 		<div class="grids-24">
 			<div class="grid-5 sidebar" id="left-sidebar"><ul class="navigation">
-<xsl:apply-templates select="document('navbar.xml')/navbar" mode="vert"/> <xsl:apply-templates select="document('style.xml')/agwebstyle/navbarfoot/*" mode="html"/>
+ <xsl:apply-templates select="document('navbar.xml')/navbar" mode="vert"/>
+ </ul>
+ <ul class="navigation">
+ <xsl:apply-templates select="body/navbar" mode="vert"/> </ul>
+ <ul class="navigation footer">
+ <xsl:apply-templates select="document('style.xml')/agwebstyle/navbarfoot/*" mode="html"/>
 </ul></div>
 			<div class="grid-19" id="content">
 				<div class="header gutter">
@@ -435,6 +440,8 @@ of the xml file must match exactly. -->
 <!-- filter out STYLE elements -->
 <xsl:template match="style" mode="html">
 </xsl:template>
+
+<xsl:template match="navbar" mode="html"/>
  
 
 <!-- fallthrough for unadjusted elements -->

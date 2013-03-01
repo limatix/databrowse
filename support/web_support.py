@@ -21,7 +21,7 @@
 import os
 import os.path
 import cgi
-
+from lxml import etree
 
 class wsgi_req:
     """ A simple wrapper for the wsgi request """
@@ -133,10 +133,37 @@ class style_support:
     pass
 
 
+class menu_support:
+    """ Class containing support functionality for xslt stylesheet compliation """
+
+    _menu = {}
+    test = '''\
+<?xml version="1.0" encoding="UTF-8"?>
+<navbar>
+    <navelem><a extcvt="true">Display Style</a>
+        <navdir alwaysopen="true">
+            <navelem><a extcvt="true" href="?style_mode=list">List</a></navelem>
+            <navelem><a extcvt="true" href="?style_mode=table">Table</a></navelem>
+        </navdir>
+    </navelem>
+</navbar>
+'''
+
+    class MenuException(Exception):
+        pass
+
+    def GetMenu(self):
+        menu = etree.XML(self.test)
+        return menu
+
+    pass
+
+
 class web_support:
     """ Class containing support functionality for web operations """
     req = None                  # request class object
     style = None                # style class object
+    menu = None                 # menu class object
     req_filename = None         # requested filename
     webdir = None               # directory containing the requested file
     confstr = None              # string containing optional configuration file
@@ -161,6 +188,7 @@ class web_support:
         self.webdir = os.path.dirname(self.reqfilename)
         self.stderr = environ["wsgi.errors"]
         self.style = style_support()
+        self.menu = menu_support()
 
         # Try to Load Optional Configuration File
         try:
