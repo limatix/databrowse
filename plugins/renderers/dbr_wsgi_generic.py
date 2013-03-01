@@ -38,7 +38,6 @@ class dbr_wsgi_generic(renderer_class):
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
             self.loadStyle()
-            etree.register_namespace(self._namespace_local, self._namespace_uri)
             link = self.getURL(self._relpath)
             xmlroot = etree.Element('{%s}wsgigeneric' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
