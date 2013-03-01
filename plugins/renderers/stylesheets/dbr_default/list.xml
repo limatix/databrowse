@@ -1,6 +1,6 @@
 <xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="detailed">
     <div class="icon">
-        <img src="http://localhost/dbres/icons/unknown.png"/>
+        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
     </div>
     <div class="title">
         <a>
@@ -24,7 +24,7 @@
 </xsl:template>
 <xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="title">
     <div class="icon">
-        <img src="http://localhost/dbres/icons/unknown.png"/>
+        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
     </div>
     <div class="title">
         <a>
