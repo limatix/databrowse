@@ -149,7 +149,7 @@ def application(environ, start_response):
                 content = xml.xslt(etree.XML(style))
                 contentroot = content.getroot()
                 contentroot.append(web_support.menu.GetMenu())
-                f = file('./resources/ag_web.xml')
+                f = file(os.path.join(web_support.webdir, "resources/ag_web.xml"))
                 template = etree.parse(f)
                 f.close()
                 web_support.req.output = str(content.xslt(template))
