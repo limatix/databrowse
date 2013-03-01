@@ -74,7 +74,10 @@ class renderer_class(object):
         # Try to Load Style
         if not self._disable_load_style:
             self.loadStyle()
-            etree.register_namespace(self._namespace_local, self._namespace_uri)
+            try:
+                etree.register_namespace(self._namespace_local, self._namespace_uri)
+            except AttributeError:
+                etree._namespace_map[self._namespace_uri] = self._namespace_local
             pass
 
         pass
