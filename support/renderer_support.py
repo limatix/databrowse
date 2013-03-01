@@ -77,7 +77,8 @@ class renderer_class(object):
             try:
                 etree.register_namespace(self._namespace_local, self._namespace_uri)
             except AttributeError:
-                etree._NamespaceRegistry[self._namespace_uri] = self._namespace_local
+                import xml.etree.ElementTree as cElementTree
+                cElementTree._namespace_map[self._namespace_uri] = self._namespace_local
             pass
 
         pass
