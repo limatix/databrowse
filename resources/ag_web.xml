@@ -27,7 +27,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 
 <xsl:variable name="resdir">
 <xsl:choose>
-<xsl:when test="string-length(body/@resdir) = 0">http://localhost/dbres/</xsl:when>
+<xsl:when test="string-length(body/@resdir) = 0">https://thermal.cnde.iastate.edu/dbres/</xsl:when>
 <xsl:otherwise><xsl:value-of select="body/@resdir"/></xsl:otherwise>
 </xsl:choose>
 </xsl:variable>
