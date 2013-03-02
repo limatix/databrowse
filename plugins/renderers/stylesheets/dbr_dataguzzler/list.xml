@@ -1,0 +1,20 @@
+<xsl:template xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*" mode="detailed">
+<div style="padding-left: 30px">
+   &lt;dg:<xsl:value-of select="local-name()"/>&gt;
+     <xsl:apply-templates mode="detailed"/>
+   &lt;/dg:<xsl:value-of select="local-name()"/>&gt;
+</div>
+</xsl:template>
+
+<xsl:template xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*" mode="title">
+    <div class="icon">
+        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
+    </div>
+    <div class="title">
+        <a>
+            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+            <xsl:value-of select="local-name()"/>
+
+        </a>
+    </div>
+</xsl:template>
