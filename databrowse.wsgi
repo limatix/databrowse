@@ -30,7 +30,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
-        <body>
+        <body resdir="%s">
             <xsl:apply-templates mode="%s"/>
         </body>
     </xsl:template>
@@ -42,7 +42,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
         <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/ag_web.xml"</xsl:processing-instruction>
-        <body>
+        <body resdir="%s">
             <xsl:apply-templates mode="%s"/>
         </body>
     </xsl:template>
@@ -94,7 +94,7 @@ def application(environ, start_response):
 
         # Determine handler for requested path
         import handler_support as handler_support_module
-        handler_support = handler_support_module.handler_support(web_support.handlerpath)
+        handler_support = handler_support_module.handler_support(web_support.handlerpath, web_support.icondbpath, web_support.hiddenfiledbpath)
         handler = handler_support.GetHandler(fullpath)
 
         # Get A Handle to The Rendering Plugin
@@ -113,7 +113,7 @@ def application(environ, start_response):
                 web_support.req.output = etree.tostring(xml, pretty_print=True)
                 return [web_support.req.return_page()]
             elif "styleonly" in web_support.req.form:
-                style = serverwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
                 web_support.req.response_headers['Content-Type'] = 'text/xml'
                 web_support.req.output = style
                 return [web_support.req.return_page()]
@@ -123,7 +123,7 @@ def application(environ, start_response):
             # If we want styling to be done by the browser or we don't want page styling
             if "nopagestyle" in web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style))
                 web_support.req.output = etree.tostring(content, pretty_print=True)
                 return [web_support.req.return_page()]
@@ -131,7 +131,7 @@ def application(environ, start_response):
                 xmlcontent = renderer.getContent()
                 xmlcontent.append(web_support.menu.GetMenu())
                 xml = etree.ElementTree(xmlcontent)
-                style = localwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                style = localwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style))
                 web_support.req.output = etree.tostring(content, pretty_print=True)
                 web_support.req.response_headers['Content-Type'] = 'text/xml'
@@ -145,7 +145,7 @@ def application(environ, start_response):
                 return [web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style))
                 contentroot = content.getroot()
                 contentroot.append(web_support.menu.GetMenu())
@@ -157,10 +157,9 @@ def application(environ, start_response):
         else:
             # We're outputting raw content, so pass it off to the plugin to do its thing
             return renderer.getContent()
-
-    except Exception, err:
+        pass
+    except Exception as err:
         # Something has gone terribly wrong, let's display some useful information to the user
-        
         # Error Page Template
         errormessage = '''\
 <?xml-stylesheet type="text/xsl" href="/dbres/ag_web.xml"?>
@@ -231,6 +230,7 @@ def application(environ, start_response):
             dirstring = dirstring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Output Error Message
-            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro) + "-" + sys.version_info.releaselevel, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring, dirstring)
+            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring, dirstring)
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
+        pass

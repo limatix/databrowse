@@ -21,6 +21,7 @@
 import imp
 import os
 import os.path
+import copy
 from lxml import etree
 from renderer_support import renderer_class
 
@@ -33,11 +34,9 @@ class dbr_wsgi_generic(renderer_class):
     _default_content_mode = "raw"
     _default_style_mode = "list"
     _default_recursion_depth = 2
-    _disable_load_style = True
 
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
-            self.loadStyle()
             link = self.getURL(self._relpath)
             xmlroot = etree.Element('{%s}wsgigeneric' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
@@ -47,7 +46,10 @@ class dbr_wsgi_generic(renderer_class):
             os.chdir(tempCWD)
             modulename = os.path.splitext(os.path.basename(self._fullpath))[0]
             module = imp.load_source(modulename, self._fullpath)
-            output = module.application(self._web_support.req.environ, self._web_support.req.start_response)
+            environcopy = copy.copy(self._web_support.req.environ)
+            environcopy['DATABROWSE_FILENAME'] = environcopy['SCRIPT_FILENAME']
+            environcopy['SCRIPT_FILENAME'] = self._fullpath
+            output = module.application(environcopy, self._web_support.req.start_response)
             os.chdir(savedCWD)
             self._web_support.req.output_done = True
             return output

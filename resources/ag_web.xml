@@ -28,7 +28,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 <xsl:variable name="resdir">
 <xsl:choose>
 <xsl:when test="string-length(body/@resdir) = 0">https://thermal.cnde.iastate.edu/dbres/</xsl:when>
-<xsl:otherwise><xsl:value-of select="body/@resdir"/></xsl:otherwise>
+<xsl:otherwise><xsl:value-of select="body/@resdir"/>/</xsl:otherwise>
 </xsl:choose>
 </xsl:variable>
  
@@ -43,7 +43,7 @@ with extcvt="true" to have a .xml extension transfomed to .html
 <html lang="en">
 <head>
 	<meta charset="utf-8"/>
-	<title><xsl:value-of select="document('style.xml')/agwebstyle/titleprefix"/> <xsl:value-of select="$title"/></title>
+	<title><xsl:if test="not($title='')"><xsl:value-of select="$title"/> - </xsl:if><xsl:value-of select="document('style.xml')/agwebstyle/titleprefix"/></title>
 	<link rel="shortcut icon" type="image/x-icon">
 		<xsl:attribute name="href"><xsl:value-of select="$resdir"/>favicon.ico</xsl:attribute>
 	</link>

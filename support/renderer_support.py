@@ -22,7 +22,9 @@ from lxml import etree
 import os.path
 import string
 import random
-
+import os
+import copy
+import fnmatch
 
 class renderer_class(object):
     """ Renderer Plugin Support - Encapsulation Class for Renderer Plugins """
@@ -74,11 +76,7 @@ class renderer_class(object):
         # Try to Load Style
         if not self._disable_load_style:
             self.loadStyle()
-            try:
-                etree.register_namespace(self._namespace_local, self._namespace_uri)
-            except AttributeError:
-                import xml.etree.ElementTree as cElementTree
-                cElementTree._namespace_map[self._namespace_uri] = self._namespace_local
+            etree.register_namespace(self._namespace_local, self._namespace_uri)
             pass
 
         pass
@@ -128,6 +126,24 @@ class renderer_class(object):
             relpath = os.path.abspath(relpath + '/../')
             return self.getURL(relpath, **kwargs)
             pass
+        pass
+
+    def getDirectoryList(self, fullpath, sort=None, order="asc"):
+        """ Build a Sorted List of Files with Appropriate Files Removed """
+        (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
+        reallist = os.listdir(fullpath)
+        removelist = copy.copy(reallist)
+        for item in hiddenlist:
+            removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
+            pass
+        addlist = []
+        for item in shownlist:
+            addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
+            pass
+        returnlist = list(set(removelist + addlist))
+        exec "returnlist.sort(%s%s)" % ("reverse=True" if order is "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        return returnlist
+
         pass
 
     def loadStyle(self):
@@ -184,8 +200,6 @@ class renderer_class(object):
             stylestring = f.read()
             f.close()
             pass
-
-        print stylestring
 
         # If we set the flag earlier, we need to change the namespace
         if override is True:

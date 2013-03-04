@@ -50,7 +50,7 @@ class dbr_default(renderer_class):
 
                 link = self.getURL(self._relpath)
 
-                xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
+                xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
 
                 xmlchild = etree.SubElement(xmlroot, "filename")
                 xmlchild.text = os.path.basename(self._fullpath)

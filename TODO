@@ -2,9 +2,9 @@ Immediate Todo Items:
 ☐ Shared Functionality Needed By All Plugins
     ✔ Generating Links @done (13-02-22 10:57)
     ✔ Decision Making Functionality in Determining Content and Style Mode @done (13-02-24 16:04)
-    ☐ Building Lists of Files
-        ☐ Filtering Items Out of Lists
-            ☐ Filter Monthly Report Backups
+    ✔ Building Lists of Files @done (13-03-03 22:08)
+        ✔ Filtering Items Out of Lists @done (13-03-03 22:08)
+            ✔ Filter Monthly Report Backups @done (13-03-03 22:08)
     ☐ Menu Support
 ✔ Proper Error Handling @done (13-02-23 13:50)
 ✔ Standardize XML Schema/Style @done (13-02-24 15:05)

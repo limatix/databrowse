@@ -178,6 +178,8 @@ class web_support:
     dataroot = None             # Path to root of data directory
     handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers)
     rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
+    icondbpath = None           # Path to icon db (default support/iconmap.conf)
+    hiddenfiledbpath = None     # Path to hidden file list (default support/hiddenfiles.conf)
     stderr = None               # filehandle to server error log
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
     debugging = None            # Boolean indicating whether debugging messages should be shown
@@ -215,6 +217,14 @@ class web_support:
 
         if self.rendererpath is None:
             self.rendererpath = os.path.join(self.webdir, "plugins/renderers")
+            pass
+
+        if self.icondbpath is None:
+            self.icondbpath = os.path.join(self.webdir, "support/iconmap.conf")
+            pass
+
+        if self.hiddenfiledbpath is None:
+            self.hiddenfiledbpath = os.path.join(self.webdir, "support/hiddenfiles.conf")
             pass
 
         if self.email_sendmail is None:

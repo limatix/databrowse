@@ -7,14 +7,7 @@
 </xsl:template>
 
 <xsl:template xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*" mode="title">
-    <div class="icon">
-        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
-    </div>
-    <div class="title">
-        <a>
-            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-            <xsl:value-of select="local-name()"/>
-
-        </a>
-    </div>
+	<span class="title">
+		<xsl:value-of select="local-name()"/>
+	</span>
 </xsl:template>

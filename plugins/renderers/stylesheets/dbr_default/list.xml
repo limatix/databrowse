@@ -1,13 +1,4 @@
 <xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="detailed">
-    <div class="icon">
-        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
-    </div>
-    <div class="title">
-        <a>
-            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-            <xsl:value-of select="@name"/>
-        </a>
-    </div>
     <table>
         <tr><td style="width:10px;"></td><td colspan="2"><xsl:value-of select="path"/></td></tr>
         <tr><td style="width:10px;"></td><td>Size: </td><td><xsl:value-of select="size"/> bytes</td></tr>
@@ -17,19 +8,6 @@
     </table>
 </xsl:template>
 <xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="summary">
-    <a>
-        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-        <xsl:value-of select="@name"/>
-    </a>
 </xsl:template>
 <xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="title">
-    <div class="icon">
-        <img src="https://thermal.cnde.iastate.edu/dbres/icons/unknown.png"/>
-    </div>
-    <div class="title">
-        <a>
-            <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
-            <xsl:value-of select="@name"/>
-        </a>
-    </div>
 </xsl:template>

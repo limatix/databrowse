@@ -22,15 +22,20 @@ import os
 import os.path
 import sys
 import magic
+import ConfigParser
 
 
 class handler_support:
     """ Class to encapsulate handler plugin management """
 
     _handlers = []
+    _icondb = None
+    _hiddenfiledb = None
 
-    def __init__(self, handlerpath):
-        """ Load up all of the handler plugins """
+    def __init__(self, handlerpath, icondbpath, hiddenfiledbpath):
+        """ Load up all of the handler plugins and icon database """
+
+        # Parse Handlers
         handlerlist = os.listdir(handlerpath)
         handlerlist.sort()
         sys.path.append(handlerpath)
@@ -54,6 +59,14 @@ class handler_support:
                 pass
             pass
 
+        # Load Icon Database
+        self._icondb = ConfigParser.ConfigParser()
+        self._icondb.read(icondbpath)
+
+        # Load Hidden File Database
+        self._hiddenfiledb = ConfigParser.ConfigParser()
+        self._hiddenfiledb.read(hiddenfiledbpath)
+
         pass
 
     def GetHandler(self, fullpath):
@@ -61,11 +74,6 @@ class handler_support:
         magicstore = magic.open(magic.MAGIC_NONE)
         magicstore.load()
         contenttype = magicstore.file(fullpath)
-
-        #logf=file("/tmp/junk","w")
-        #logf.write("fullpath=%s contenttype=%s\n" % (fullpath,contenttype))
-        #logf.close()
-
         extension = os.path.splitext(fullpath)[1][1:]
         handler = False
         for function in self._handlers:
@@ -73,5 +81,33 @@ class handler_support:
             handler = temp if temp else handler
             pass
         return handler
+
+    def GetHandlerAndIcon(self, fullpath):
+        """ Return the handler given a full path """
+        magicstore = magic.open(magic.MAGIC_NONE)
+        magicstore.load()
+        contenttype = magicstore.file(fullpath)
+        extension = os.path.splitext(fullpath)[1][1:]
+        handler = False
+        for function in self._handlers:
+            temp = function(fullpath, contenttype, extension)
+            handler = temp if temp else handler
+            pass
+        try:
+            iconname = self._icondb.get("Content-Type", contenttype)
+            pass
+        except ConfigParser.NoOptionError:
+            try:
+                iconname = self._icondb.get("Extension", extension)
+                pass
+            except:
+                iconname = "unknown.png"
+                pass
+            pass
+        return (handler, iconname)
+
+    def GetHiddenFileList(self):
+        """ Return the list of files marked to be hidden """
+        return (self._hiddenfiledb.items("Hidden"), self._hiddenfiledb.items("Shown"))
 
     pass
