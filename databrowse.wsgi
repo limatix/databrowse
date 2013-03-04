@@ -64,8 +64,6 @@ class FileResolver(etree.Resolver):
 
     def __init__(self, path):
         self._path = path
-        print "I have these paths:"
-        print repr(self._path)
         pass
 
     def resolve(self, url, pubid, context):
@@ -126,11 +124,13 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 web_support.req.response_headers['Content-Type'] = 'text/xml'
                 web_support.req.output = etree.tostring(xml, pretty_print=True)
+                #raise Exception("Testing in ?contentonly")
                 return [web_support.req.return_page()]
             elif "styleonly" in web_support.req.form:
                 style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
                 web_support.req.response_headers['Content-Type'] = 'text/xml'
                 web_support.req.output = style
+                #raise Exception("Testing in ?contentonly")
                 return [web_support.req.return_page()]
             else:
                 pass
@@ -170,6 +170,7 @@ def application(environ, start_response):
                 template = etree.parse(f)
                 f.close()
                 web_support.req.output = str(content.xslt(template))
+                #raise Exception("Testing")
                 return [web_support.req.return_page()]
         else:
             # We're outputting raw content, so pass it off to the plugin to do its thing

@@ -11,13 +11,5 @@
   <xsl:apply-templates mode="copy"/>
 </xsl:template>
 <xsl:template match="body" mode="full">
-  <xsl:apply-templates mode="update"/>
   <xsl:apply-templates mode="copy"/>
-</xsl:template>
-<xsl:template match="img" mode="update">
-	<img>
-		<xsl:attribute name="src">
-			<xsl:value-of select="@src"/>?content_mode=raw
-		</xsl:attribute>
-	</img>
 </xsl:template>
