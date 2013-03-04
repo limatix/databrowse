@@ -59,6 +59,21 @@ ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 </xsl:stylesheet>'''
 
 
+class FileResolver(etree.Resolver):
+    _path = None
+
+    def __init__(self, path):
+        self._path = path
+        print "I have these paths:"
+        print repr(self._path)
+        pass
+
+    def resolve(self, url, pubid, context):
+        return self.resolve_filename(os.path.abspath(self._path + '/' + url), context)
+
+    pass
+
+
 def application(environ, start_response):
     """ Entry Point for WSGI Application """
 
@@ -121,10 +136,12 @@ def application(environ, start_response):
                 pass
 
             # If we want styling to be done by the browser or we don't want page styling
+            parser = etree.XMLParser()
+            parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
             if "nopagestyle" in web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style))
+                content = xml.xslt(etree.XML(style, parser))
                 web_support.req.output = etree.tostring(content, pretty_print=True)
                 return [web_support.req.return_page()]
             elif "localpagestyle" in web_support.req.form:
@@ -132,21 +149,21 @@ def application(environ, start_response):
                 xmlcontent.append(web_support.menu.GetMenu())
                 xml = etree.ElementTree(xmlcontent)
                 style = localwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style))
+                content = xml.xslt(etree.XML(style, parser))
                 web_support.req.output = etree.tostring(content, pretty_print=True)
                 web_support.req.response_headers['Content-Type'] = 'text/xml'
                 return [web_support.req.return_page()]
             elif "ajax" in web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
                 style = ajaxwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style))
+                content = xml.xslt(etree.XML(style, parser))
                 web_support.req.output = str(content)
                 web_support.req.response_headers['Content-Type'] = 'text/html'
                 return [web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style))
+                content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 contentroot.append(web_support.menu.GetMenu())
                 f = file(os.path.join(web_support.webdir, "resources/ag_web.xml"))

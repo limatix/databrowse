@@ -1,0 +1,6 @@
+<xsl:template xmlns:monthlyrptxml="http://thermal.cnde.iastate.edu/databrowse/monthlyrptxml" match="monthlyrptxml:monthlyrptxml" mode="detailed">
+</xsl:template>
+<xsl:template xmlns:monthlyrptxml="http://thermal.cnde.iastate.edu/databrowse/monthlyrptxml" match="monthlyrptxml:monthlyrptxml" mode="summary">
+</xsl:template>
+<xsl:template xmlns:monthlyrptxml="http://thermal.cnde.iastate.edu/databrowse/monthlyrptxml" match="monthlyrptxml:monthlyrptxml" mode="title">
+</xsl:template>

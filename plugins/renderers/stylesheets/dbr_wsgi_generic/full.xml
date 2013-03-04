@@ -1,0 +1,18 @@
+<xsl:template xmlns:html="http://www.w3.org/1999/xhtml" match="html:html" mode="full">
+	<xsl:apply-templates mode="strip"/>
+</xsl:template>
+<xsl:template xmlns:html="http://www.w3.org/1999/xhtml" match="/|comment()|processing-instruction()" mode="strip">
+	<xsl:copy>
+    	<xsl:apply-templates/>
+    </xsl:copy>
+</xsl:template>
+<xsl:template xmlns:html="http://www.w3.org/1999/xhtml" match="html:body/*" mode="strip">
+	<xsl:element name="{local-name()}">
+    	<xsl:apply-templates select="@*|node()" mode="strip"/>
+	</xsl:element>
+</xsl:template>
+<xsl:template xmlns:html="http://www.w3.org/1999/xhtml" match="html:body/@*" mode="strip">
+   	<xsl:attribute name="{local-name()}">
+   		<xsl:value-of select="."/>
+	</xsl:attribute>
+</xsl:template>

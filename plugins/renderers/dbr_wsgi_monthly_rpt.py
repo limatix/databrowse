@@ -26,11 +26,11 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_wsgi_generic(renderer_class):
+class dbr_wsgi_monthly_rpt(renderer_class):
     """ Default Renderer for WSGI Scripts - Simply Passes Everything Off To The Script """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/wsgigeneric"
-    _namespace_local = "wsgigeneric"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/monthlyrpt"
+    _namespace_local = "monthlyrpt"
     _default_content_mode = "full"
     _default_style_mode = "full"
     _default_recursion_depth = 2
@@ -46,7 +46,7 @@ class dbr_wsgi_generic(renderer_class):
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{%s}wsgigeneric' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
+            xmlroot = etree.Element('{%s}monthlyrpt' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "full":
             savedCWD = os.getcwd()
@@ -59,6 +59,7 @@ class dbr_wsgi_generic(renderer_class):
             environcopy['SCRIPT_FILENAME'] = self._fullpath
             output = module.application(environcopy, self.dummy_start_response)
             os.chdir(savedCWD)
+            output = output.replace(' xmlns="http://www.w3.org/1999/xhtml"', "")
             return etree.XML(output)
         elif self._content_mode is "raw":
             savedCWD = os.getcwd()
