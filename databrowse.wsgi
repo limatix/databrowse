@@ -256,6 +256,8 @@ def application(environ, start_response):
             return [errormessage]
         pass
     finally:
+        del db_web_support.style
+        del db_web_support.req
         del db_web_support
         del handler_support
         del renderer
