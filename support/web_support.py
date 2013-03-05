@@ -71,7 +71,7 @@ class wsgi_req:
         self.filename = environ['SCRIPT_FILENAME']
         self.dirname = os.path.dirname(self.filename)
         self.unparse_uri = environ['REQUEST_URI']
-        fs = getattr(environ['wsgi.input'], 'cgi_FieldStorage', None)
+        fs = environ['wsgi.input'] if isinstance(environ['wsgi.input'], cgi.FieldStorage) else None
         if fs is None:
             self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
             self.environ['wsgi.input'] = self.form
