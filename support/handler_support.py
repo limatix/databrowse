@@ -105,6 +105,7 @@ class handler_support:
                 iconname = "unknown.png"
                 pass
             pass
+        print "Returning Handler Name:  %s" % handler
         return (handler, iconname)
 
     def GetHiddenFileList(self):

@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_wsgi_generic.py - Default Handler for WSGI Scripts """
+""" plugins/renderers/dbr_wsgi_monthly_rpt.py - Hanlder for Monthly Reports """
 
 import imp
 import os

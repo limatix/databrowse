@@ -23,6 +23,7 @@ import os.path
 import cgi
 from lxml import etree
 
+
 class wsgi_req:
     """ A simple wrapper for the wsgi request """
 
@@ -37,6 +38,32 @@ class wsgi_req:
     response_headers = None     # Dictionary of response headers
     output_done = None          # Flag: Have we generated output yet or not?
 
+#    def is_post_request(self):
+#        if self.environ['REQUEST_METHOD'].upper() != 'POST':
+#            return False
+#        content_type = self.environ.get('CONTENT_TYPE', 'application/x-www-form-urlencoded')
+#        return (content_type.startswith('application/x-www-form-urlencoded') or content_type.startswith('multipart/form-data'))
+#
+#    def get_post_form(self):
+#        assert self.is_post_request(self.environ)
+#        input = self.environ['wsgi.input']
+#        post_form = self.environ.get('wsgi.post_form')
+#        if (post_form is not None and post_form[0] is input):
+#            return post_form[2]
+#        # This must be done to avoid a bug in cgi.FieldStorage
+#        self.environ.setdefault('QUERY_STRING', '')
+#        fs = cgi.FieldStorage(fp=input, environ=self.environ, keep_blank_values=1)
+#        new_input = self.InputProcessed('')
+#        post_form = (new_input, input, fs)
+#        self.environ['wsgi.post_form'] = post_form
+#        self.environ['wsgi.input'] = new_input
+#        return fs
+#
+#    class InputProcessed(object):
+#        def read(self, *args):
+#            raise EOFError('The wsgi.input stream has already been consumed')
+#        readline = readlines = __iter__ = read
+
     def __init__(self, environ, start_response):
         """ Load Values from Request """
         self.environ = environ
@@ -44,7 +71,11 @@ class wsgi_req:
         self.filename = environ['SCRIPT_FILENAME']
         self.dirname = os.path.dirname(self.filename)
         self.unparse_uri = environ['REQUEST_URI']
-        self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
+        fs = getattr(environ['wsgi.input'], 'cgi_FieldStorage', None)
+        if fs is None:
+            self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
+            self.environ['wsgi.input'] = self.form
+            pass
 
         self.status = '200 OK'
         self.response_headers = {}

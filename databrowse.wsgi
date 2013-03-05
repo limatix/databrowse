@@ -93,6 +93,7 @@ def application(environ, start_response):
             pass
         else:
             fullpath = os.path.abspath(db_web_support.dataroot + '/' + db_web_support.req.form["path"].value)
+            print fullpath
             if not fullpath.startswith(db_web_support.dataroot):
                 return db_web_support.req.return_error(403)
             if os.path.exists(fullpath):
