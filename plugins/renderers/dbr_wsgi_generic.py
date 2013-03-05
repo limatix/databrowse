@@ -59,6 +59,8 @@ class dbr_wsgi_generic(renderer_class):
             environcopy['SCRIPT_FILENAME'] = self._fullpath
             output = module.application(environcopy, self.dummy_start_response)
             os.chdir(savedCWD)
+            del module
+            del environcopy
             return etree.XML(output)
         elif self._content_mode is "raw":
             savedCWD = os.getcwd()
@@ -72,6 +74,8 @@ class dbr_wsgi_generic(renderer_class):
             output = module.application(environcopy, self._web_support.req.start_response)
             os.chdir(savedCWD)
             self._web_support.req.output_done = True
+            del module
+            del environcopy
             return output
         else:
             raise self.RendererException("Invalid Content Mode")

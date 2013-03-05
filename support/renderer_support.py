@@ -49,6 +49,8 @@ class renderer_class(object):
         """ Default Initialization Function """
 
         # Set all of our argument variables
+        print "In RendererException.__init__".center(100, '=')
+        print "Setting Class Variables"
         self._relpath = relpath
         self._fullpath = fullpath
         self._web_support = web_support
@@ -73,27 +75,46 @@ class renderer_class(object):
             self._recursion_depth = recursion_depth
             pass
 
+        print "Class Variables Set - Here's a Summary"
+        print "self._relpath = " + repr(self._relpath)
+        print "self._fullpath = " + repr(self._fullpath)
+        print "self._web_support = " + repr(self._web_support)
+        print "self._web_support.req.filename = " + repr(self._web_support.req.filename)
+        print "self._web_support.req.dirname = " + repr(self._web_support.req.dirname)
+        print "self._web_support.req.unparsed_uri = " + repr(self._web_support.req.unparsed_uri)
+        print "self._handler_support = " + repr(self._handler_support)
+        print "self._caller = " + repr(self._caller)
+        print "self._content_mode = " + repr(self._content_mode)
+        print "self._style_mode = " + repr(self._style_mode)
+        print "self._recursion_depth = " + repr(self._recursion_depth)
+
         # Try to Load Style
         if not self._disable_load_style:
+            print "About to call self.loadStyle()"
             self.loadStyle()
+            print "About to call etree.register_namespace"
             etree.register_namespace(self._namespace_local, self._namespace_uri)
             pass
 
         pass
 
     def isRaw(self):
+        print "isRaw being called"
         if self._content_mode is "raw":
             return True
         else:
             return False
 
     def getStyleMode(self):
+        print "getStyleMode being called"
         return self._style_mode
 
     def getContentMode(self):
+        print "getContentMode being called"
         return self._content_mode
 
     def getURL(self, relpath, **kwargs):
+        print "getURL being called"
         if self._web_support.seo_urls is True:
             url = self._web_support.siteurl + relpath
             if len(kwargs) > 0:
@@ -119,6 +140,7 @@ class renderer_class(object):
         return url
 
     def getURLToParent(self, relpath, **kwargs):
+        print "getURLToParent being called"
         if relpath == "/":
             return self.getURL(relpath, **kwargs)
             pass
@@ -130,6 +152,7 @@ class renderer_class(object):
 
     def getDirectoryList(self, fullpath, sort=None, order="asc"):
         """ Build a Sorted List of Files with Appropriate Files Removed """
+        print "getDirectoryList being called"
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
         reallist = os.listdir(fullpath)
         removelist = copy.copy(reallist)
@@ -148,10 +171,13 @@ class renderer_class(object):
 
     def loadStyle(self):
         """ Safe Function Wrapper To Prevent Errors When Stylesheet Doesn't Exist """
+        print "loadStyle being called"
         try:
+            print "About to call loadStyleFunction"
             self.loadStyleFunction()
             pass
         except self.RendererException:
+            print "loadStyleFunction failed with error"
             if self._style_mode == self._default_style_mode:
                 raise
             else:
@@ -160,111 +186,38 @@ class renderer_class(object):
                 pass
         pass
 
-    def loadStyleFunction(self):
-        """ Look In Standard Places For the Appropriate Static Stylesheet """
-
-        # Get Variables Containing Search Locations Ready
-        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) + \
-            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
-        defaultpath = os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
-
-        # Look for Custom Stylesheets in a .databrowse folder relative to the current path
-        filename = custompath if os.path.exists(custompath) else None
-
-        # If we find one, see if its overriding the standard stylesheet and set a flag to remind us later
-        override = False
-        if filename is not None:
-            override = True if (os.path.exists(defaultpath) or hasattr(self, '_style_' + self._style_mode)) else False
-            pass
-
-        # Let's first check if we have already loaded the standard stylesheets
-        if filename is None:
-            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override is not True:
-                return
-            else:
-                # If not, let's look for normal stylesheets
-                filename = defaultpath if os.path.exists(defaultpath) else None
-                pass
-
-        # Let's check for a stylesheet in the current file
-        if filename is None:
-            if hasattr(self, '_style_' + self._style_mode):
-                stylestring = getattr(self, '_style_' + self._style_mode)
-                pass
-            else:
-                # Unable to Find Stylesheet Anywhere - Return Error
-                raise self.RendererException("Unable To Locate Stylesheet")
-        else:
-            # Lets load up whatever stylesheet we found
-            f = open(filename, 'r')
-            stylestring = f.read()
-            f.close()
-            pass
-
-        # If we set the flag earlier, we need to change the namespace
-        if override is True:
-            randomid = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
-            newnamespace = self._namespace_uri + randomid
-            newlocalns = self._namespace_local + randomid
-            newnamedtemplates = self.__class__.__name__ + '-' + randomid + '-'
-            stylestring = stylestring.replace(self._namespace_uri, newnamespace)
-            stylestring = stylestring.replace(self._namespace_local + ":", newlocalns + ":")
-            stylestring = stylestring.replace("xmlns:" + self._namespace_local, "xmlns:" + newlocalns)
-            stylestring = stylestring.replace(self.__class__.__name__ + '-', newnamedtemplates)
-            self._namespace_uri = newnamespace
-            self._namespace_local = newlocalns
-            pass
-
-        self._web_support.style.AddStyle(self._namespace_uri, stylestring)
-
-        pass
-
-### FOR DEBUGGING PURPOSES ###
-#    def loadStyle(self):
+#    def loadStyleFunction(self):
 #        """ Look In Standard Places For the Appropriate Static Stylesheet """
-#
 #        # Get Variables Containing Search Locations Ready
-#        print "In loadStyle()".center(80, '=')
-#        print "Path = " + self._fullpath
-#        print "Plugin = " + self.__class__.__name__
 #        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) + \
 #            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
 #        defaultpath = os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
-#        print "Custom Search Path = " + custompath
-#        print "Default Search Path = " + defaultpath
 #
 #        # Look for Custom Stylesheets in a .databrowse folder relative to the current path
 #        filename = custompath if os.path.exists(custompath) else None
-#        print "Looking For Custom File === Filename is now " + repr(filename)
 #
 #        # If we find one, see if its overriding the standard stylesheet and set a flag to remind us later
 #        override = False
 #        if filename is not None:
 #            override = True if (os.path.exists(defaultpath) or hasattr(self, '_style_' + self._style_mode)) else False
 #            pass
-#        print "Checking for Default Stylesheets === Override is now " + repr(override)
 #
 #        # Let's first check if we have already loaded the standard stylesheets
 #        if filename is None:
-#            print "Filename is still empty so let's see if we have loaded the default already"
 #            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override is not True:
-#                print "We have loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
 #                return
 #            else:
 #                # If not, let's look for normal stylesheets
-#                print "Not loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
 #                filename = defaultpath if os.path.exists(defaultpath) else None
 #                pass
 #
 #        # Let's check for a stylesheet in the current file
 #        if filename is None:
-#            print "Filename is still none = looking for variable"
 #            if hasattr(self, '_style_' + self._style_mode):
 #                stylestring = getattr(self, '_style_' + self._style_mode)
 #                pass
 #            else:
 #                # Unable to Find Stylesheet Anywhere - Return Error
-#                print "Unable to find stylesheet"
 #                raise self.RendererException("Unable To Locate Stylesheet")
 #        else:
 #            # Lets load up whatever stylesheet we found
@@ -273,32 +226,104 @@ class renderer_class(object):
 #            f.close()
 #            pass
 #
-#        print "Stylesheet Loaded Successfully:"
-#        print stylestring
-#
 #        # If we set the flag earlier, we need to change the namespace
 #        if override is True:
-#            print "Override is True = Lets Modify Our Stylesheet"
 #            randomid = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
-#            print "Random ID is " + randomid
 #            newnamespace = self._namespace_uri + randomid
 #            newlocalns = self._namespace_local + randomid
-#            print "New namespace is " + newnamespace
 #            newnamedtemplates = self.__class__.__name__ + '-' + randomid + '-'
-#            print "Named templates are now prefixed " + newnamedtemplates
 #            stylestring = stylestring.replace(self._namespace_uri, newnamespace)
 #            stylestring = stylestring.replace(self._namespace_local + ":", newlocalns + ":")
 #            stylestring = stylestring.replace("xmlns:" + self._namespace_local, "xmlns:" + newlocalns)
-#            print "Namespace Changed:"
-#            print stylestring
 #            stylestring = stylestring.replace(self.__class__.__name__ + '-', newnamedtemplates)
-#            print "Named Templates Updated:"
-#            print stylestring
 #            self._namespace_uri = newnamespace
 #            self._namespace_local = newlocalns
 #            pass
 #
-#        print "Adding Style"
 #        self._web_support.style.AddStyle(self._namespace_uri, stylestring)
 #
 #        pass
+
+### FOR DEBUGGING PURPOSES ###
+    def loadStyleFunction(self):
+        """ Look In Standard Places For the Appropriate Static Stylesheet """
+
+        # Get Variables Containing Search Locations Ready
+        print "In loadStyleFunction"
+        print "Path = " + self._fullpath
+        print "Plugin = " + self.__class__.__name__
+        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) + \
+            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
+        defaultpath = os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
+        print "Custom Search Path = " + custompath
+        print "Default Search Path = " + defaultpath
+
+        # Look for Custom Stylesheets in a .databrowse folder relative to the current path
+        filename = custompath if os.path.exists(custompath) else None
+        print "Looking For Custom File === Filename is now " + repr(filename)
+
+        # If we find one, see if its overriding the standard stylesheet and set a flag to remind us later
+        override = False
+        if filename is not None:
+            override = True if (os.path.exists(defaultpath) or hasattr(self, '_style_' + self._style_mode)) else False
+            pass
+        print "Checking for Default Stylesheets === Override is now " + repr(override)
+
+        # Let's first check if we have already loaded the standard stylesheets
+        if filename is None:
+            print "Filename is still empty so let's see if we have loaded the default already"
+            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override is not True:
+                print "We have loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                return
+            else:
+                # If not, let's look for normal stylesheets
+                print "Not loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                filename = defaultpath if os.path.exists(defaultpath) else None
+                pass
+
+        # Let's check for a stylesheet in the current file
+        if filename is None:
+            print "Filename is still none = looking for variable"
+            if hasattr(self, '_style_' + self._style_mode):
+                stylestring = getattr(self, '_style_' + self._style_mode)
+                pass
+            else:
+                # Unable to Find Stylesheet Anywhere - Return Error
+                print "Unable to find stylesheet"
+                raise self.RendererException("Unable To Locate Stylesheet")
+        else:
+            # Lets load up whatever stylesheet we found
+            f = open(filename, 'r')
+            stylestring = f.read()
+            f.close()
+            pass
+
+        print "Stylesheet Loaded Successfully:"
+        print stylestring
+
+        # If we set the flag earlier, we need to change the namespace
+        if override is True:
+            print "Override is True = Lets Modify Our Stylesheet"
+            randomid = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
+            print "Random ID is " + randomid
+            newnamespace = self._namespace_uri + randomid
+            newlocalns = self._namespace_local + randomid
+            print "New namespace is " + newnamespace
+            newnamedtemplates = self.__class__.__name__ + '-' + randomid + '-'
+            print "Named templates are now prefixed " + newnamedtemplates
+            stylestring = stylestring.replace(self._namespace_uri, newnamespace)
+            stylestring = stylestring.replace(self._namespace_local + ":", newlocalns + ":")
+            stylestring = stylestring.replace("xmlns:" + self._namespace_local, "xmlns:" + newlocalns)
+            print "Namespace Changed:"
+            print stylestring
+            stylestring = stylestring.replace(self.__class__.__name__ + '-', newnamedtemplates)
+            print "Named Templates Updated:"
+            print stylestring
+            self._namespace_uri = newnamespace
+            self._namespace_local = newlocalns
+            pass
+
+        print "Adding Style"
+        self._web_support.style.AddStyle(self._namespace_uri, stylestring)
+
+        pass

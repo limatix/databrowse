@@ -60,6 +60,8 @@ class dbr_wsgi_monthly_rpt(renderer_class):
             output = module.application(environcopy, self.dummy_start_response)
             os.chdir(savedCWD)
             output = output.replace(' xmlns="http://www.w3.org/1999/xhtml"', "")
+            del module
+            del environcopy
             return etree.XML(output)
         elif self._content_mode is "raw":
             savedCWD = os.getcwd()
@@ -73,6 +75,8 @@ class dbr_wsgi_monthly_rpt(renderer_class):
             output = module.application(environcopy, self._web_support.req.start_response)
             os.chdir(savedCWD)
             self._web_support.req.output_done = True
+            del module
+            del environcopy
             return output
         else:
             raise self.RendererException("Invalid Content Mode")

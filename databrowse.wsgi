@@ -77,101 +77,104 @@ def application(environ, start_response):
 
     try:
         # Add paths and import support modules
-        sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
-        sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
-        import web_support as web_support_module
+        if os.path.dirname(environ['SCRIPT_FILENAME']) not in sys.path:
+            sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
+        if os.path.dirname(environ['SCRIPT_FILENAME'] + '/support/') not in sys.path:
+            sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
+        import web_support as db_web_support_module
 
         # Set up web_support class with environment information
-        web_support = web_support_module.web_support(environ, start_response)
+        db_web_support = db_web_support_module.web_support(environ, start_response)
 
         # Determine Requested File/Folder Absolute Path and Path Relative to Dataroot
-        if "path" not in web_support.req.form:
-            fullpath = web_support.dataroot
+        if "path" not in db_web_support.req.form:
+            fullpath = db_web_support.dataroot
             relpath = '/'
             pass
         else:
-            fullpath = os.path.abspath(web_support.dataroot + '/' + web_support.req.form["path"].value)
-            if not fullpath.startswith(web_support.dataroot):
-                return web_support.req.return_error(403)
+            fullpath = os.path.abspath(db_web_support.dataroot + '/' + db_web_support.req.form["path"].value)
+            if not fullpath.startswith(db_web_support.dataroot):
+                return db_web_support.req.return_error(403)
             if os.path.exists(fullpath):
-                if fullpath == web_support.dataroot:
+                if fullpath == db_web_support.dataroot:
                     relpath = '/'
                     pass
                 else:
-                    relpath = fullpath.replace(web_support.dataroot, '')
+                    relpath = fullpath.replace(db_web_support.dataroot, '')
                     pass
                 pass
             else:
-                return web_support.req.return_error(404)
+                return db_web_support.req.return_error(404)
             pass
 
         # Determine handler for requested path
         import handler_support as handler_support_module
-        handler_support = handler_support_module.handler_support(web_support.handlerpath, web_support.icondbpath, web_support.hiddenfiledbpath)
+        handler_support = handler_support_module.handler_support(db_web_support.handlerpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath)
         handler = handler_support.GetHandler(fullpath)
 
         # Get A Handle to The Rendering Plugin
-        sys.path.append(web_support.rendererpath)
+        if db_web_support.rendererpath not in sys.path:
+            sys.path.append(db_web_support.rendererpath)
         exec "import %s as %s_module" % (handler, handler)
-        exec "renderer = %s_module.%s(relpath, fullpath, web_support, handler_support, caller='databrowse'%s%s%s)" % (handler, handler,\
-                    ', content_mode="' + web_support.req.form["content_mode"].value + '"' if "content_mode" in web_support.req.form else '',\
-                    ', style_mode="' + web_support.req.form['style_mode'].value + '"' if "style_mode" in web_support.req.form else '',\
-                    ', recursion_depth=' + web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in web_support.req.form else '')
+        exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller='databrowse'%s%s%s)" % (handler, handler,\
+                    ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
+                    ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
+                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
 
         if not renderer.isRaw():
             # If we are only requesting content or style, output them
-            if "contentonly" in web_support.req.form:
+            if "contentonly" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                web_support.req.response_headers['Content-Type'] = 'text/xml'
-                web_support.req.output = etree.tostring(xml, pretty_print=True)
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.output = etree.tostring(xml, pretty_print=True)
                 #raise Exception("Testing in ?contentonly")
-                return [web_support.req.return_page()]
-            elif "styleonly" in web_support.req.form:
-                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
-                web_support.req.response_headers['Content-Type'] = 'text/xml'
-                web_support.req.output = style
+                return [db_web_support.req.return_page()]
+            elif "styleonly" in db_web_support.req.form:
+                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.output = style
                 #raise Exception("Testing in ?contentonly")
-                return [web_support.req.return_page()]
+                return [db_web_support.req.return_page()]
             else:
                 pass
 
             # If we want styling to be done by the browser or we don't want page styling
             parser = etree.XMLParser()
             parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
-            if "nopagestyle" in web_support.req.form:
+            if "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
-                web_support.req.output = etree.tostring(content, pretty_print=True)
-                return [web_support.req.return_page()]
-            elif "localpagestyle" in web_support.req.form:
+                db_web_support.req.output = etree.tostring(content, pretty_print=True)
+                return [db_web_support.req.return_page()]
+            elif "localpagestyle" in db_web_support.req.form:
                 xmlcontent = renderer.getContent()
-                xmlcontent.append(web_support.menu.GetMenu())
+                xmlcontent.append(db_web_support.menu.GetMenu())
                 xml = etree.ElementTree(xmlcontent)
-                style = localwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
+                style = localwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
-                web_support.req.output = etree.tostring(content, pretty_print=True)
-                web_support.req.response_headers['Content-Type'] = 'text/xml'
-                return [web_support.req.return_page()]
-            elif "ajax" in web_support.req.form:
+                db_web_support.req.output = etree.tostring(content, pretty_print=True)
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                return [db_web_support.req.return_page()]
+            elif "ajax" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = ajaxwrapper % (renderer.getContentMode(), web_support.style.GetStyle())
+                style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
-                web_support.req.output = str(content)
-                web_support.req.response_headers['Content-Type'] = 'text/html'
-                return [web_support.req.return_page()]
+                db_web_support.req.output = str(content)
+                db_web_support.req.response_headers['Content-Type'] = 'text/html'
+                return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (web_support.resurl, renderer.getContentMode(), web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
-                contentroot.append(web_support.menu.GetMenu())
-                f = file(os.path.join(web_support.webdir, "resources/ag_web.xml"))
+                contentroot.append(db_web_support.menu.GetMenu())
+                f = file(os.path.join(db_web_support.webdir, "resources/ag_web.xml"))
                 template = etree.parse(f)
                 f.close()
-                web_support.req.output = str(content.xslt(template))
+                db_web_support.req.output = str(content.xslt(template))
                 #raise Exception("Testing")
-                return [web_support.req.return_page()]
+                return [db_web_support.req.return_page()]
         else:
             # We're outputting raw content, so pass it off to the plugin to do its thing
             return renderer.getContent()
@@ -252,3 +255,7 @@ def application(environ, start_response):
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
         pass
+    finally:
+        del db_web_support
+        del handler_support
+        del renderer

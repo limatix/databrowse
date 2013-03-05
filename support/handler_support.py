@@ -38,7 +38,8 @@ class handler_support:
         # Parse Handlers
         handlerlist = os.listdir(handlerpath)
         handlerlist.sort()
-        sys.path.append(handlerpath)
+        if handlerpath not in sys.path:
+            sys.path.append(handlerpath)
         for filename in handlerlist:
             if filename.endswith(".py"):
                 modulename = filename[:-3]
