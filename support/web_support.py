@@ -76,6 +76,9 @@ class wsgi_req:
             self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
             self.environ['wsgi.input'] = self.form
             pass
+        else:
+            self.form = fs
+            pass
 
         self.status = '200 OK'
         self.response_headers = {}
