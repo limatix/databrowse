@@ -38,32 +38,6 @@ class wsgi_req:
     response_headers = None     # Dictionary of response headers
     output_done = None          # Flag: Have we generated output yet or not?
 
-#    def is_post_request(self):
-#        if self.environ['REQUEST_METHOD'].upper() != 'POST':
-#            return False
-#        content_type = self.environ.get('CONTENT_TYPE', 'application/x-www-form-urlencoded')
-#        return (content_type.startswith('application/x-www-form-urlencoded') or content_type.startswith('multipart/form-data'))
-#
-#    def get_post_form(self):
-#        assert self.is_post_request(self.environ)
-#        input = self.environ['wsgi.input']
-#        post_form = self.environ.get('wsgi.post_form')
-#        if (post_form is not None and post_form[0] is input):
-#            return post_form[2]
-#        # This must be done to avoid a bug in cgi.FieldStorage
-#        self.environ.setdefault('QUERY_STRING', '')
-#        fs = cgi.FieldStorage(fp=input, environ=self.environ, keep_blank_values=1)
-#        new_input = self.InputProcessed('')
-#        post_form = (new_input, input, fs)
-#        self.environ['wsgi.post_form'] = post_form
-#        self.environ['wsgi.input'] = new_input
-#        return fs
-#
-#    class InputProcessed(object):
-#        def read(self, *args):
-#            raise EOFError('The wsgi.input stream has already been consumed')
-#        readline = readlines = __iter__ = read
-
     def __init__(self, environ, start_response):
         """ Load Values from Request """
         self.environ = environ
@@ -140,6 +114,9 @@ class style_support:
     class StyleException(Exception):
         pass
 
+    def __init__(self):
+        self._style_dict = {}
+
     def AddStyle(self, namespace, content):
         if (namespace) in self._style_dict:
             # Check to ensure new value is the same as the current value, otherwise throw error
@@ -173,14 +150,14 @@ class menu_support:
     _menu = {}
     test = '''\
 <?xml version="1.0" encoding="UTF-8"?>
-<navbar>
-    <navelem><a extcvt="true">Display Style</a>
-        <navdir alwaysopen="true">
-            <navelem><a extcvt="true" href="?style_mode=list">List</a></navelem>
-            <navelem><a extcvt="true" href="?style_mode=table">Table</a></navelem>
-        </navdir>
-    </navelem>
-</navbar>
+<db:navbar xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <db:navelem><a>Display Style</a>
+        <db:navdir alwaysopen="true">
+            <db:navelem><a extcvt="true" href="?style_mode=list">List</a></db:navelem>
+            <db:navelem><a extcvt="true" href="?style_mode=table">Table</a></db:navelem>
+        </db:navdir>
+    </db:navelem>
+</db:navbar>
 '''
 
     class MenuException(Exception):

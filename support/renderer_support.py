@@ -171,7 +171,7 @@ class renderer_class(object):
 
     def loadStyle(self):
         """ Safe Function Wrapper To Prevent Errors When Stylesheet Doesn't Exist """
-        print "loadStyle being called"
+        #print "loadStyle being called"
         try:
             #print "About to call loadStyleFunction"
             self.loadStyleFunction()

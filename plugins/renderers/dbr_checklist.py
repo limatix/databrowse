@@ -39,10 +39,16 @@ class dbr_checklist(renderer_class):
             xmlroot = etree.Element('{%s}checklist' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "full":
+            etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
             f = open(self._fullpath, 'r')
-            xmltree = etree.parse(f)
+            xml = etree.parse(f)
             f.close()
-            return xmltree.getroot()
+            g = open('/usr/local/QAutils/checklist/chx2html.xsl', 'r')
+            xsltransform = etree.parse(g)
+            g.close()
+            transformedxml = xml.xslt(xsltransform)
+            xmloutput = etree.XML(str(transformedxml))
+            return xmloutput
         else:
             raise self.RendererException("Invalid Content Mode")
 

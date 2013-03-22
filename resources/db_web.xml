@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+	<xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+	
+	<!-- Title Variable - Obtains Title for Page from one of several sources -->
+	<xsl:variable name="title">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:pagetitle">
+				<xsl:value-of select="html:html/html:body/@db:pagetitle"/>
+			</xsl:when>
+			<xsl:when test="html:html/html:head/html:title">
+				<xsl:value-of select="html:html/html:head/html:title"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="html:html/html:body/html:h1"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Resdir Variable - Full URL to Resource Directory -->
+	<xsl:variable name="resdir">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:resdir"><xsl:value-of select="html:html/html:body/@db:resdir"/>/</xsl:when>
+			<xsl:otherwise>https://localhost/dbres/</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Begin Page Templates -->
+	<xsl:template match="/">
+		<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+				<title><xsl:if test="not($title='')"><xsl:value-of select="$title"/> - </xsl:if><xsl:value-of select="document('db_style.xml')/db:dbstyle/db:titlesuffix"/></title>
+				<link rel="shortcut icon" type="image/x-icon">
+					<xsl:attribute name="href"><xsl:value-of select="$resdir"/>favicon.ico</xsl:attribute>
+				</link>
+				<xsl:element name="link">
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
+				  	<xsl:attribute name="media">all</xsl:attribute>
+				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+			    </xsl:element>
+				<xsl:element name="link">
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.1</xsl:attribute>
+				  	<xsl:attribute name="media">all</xsl:attribute>
+				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+			    </xsl:element>
+			    <!--[if lt IE 9]>
+					<style>
+						ul.left > li, ul.right > li{
+							*display: inline;
+						}
+						#ribbon form > input[type="submit"]{
+							*vertical-align: baseline;
+						}
+					</style>
+				<![endif]--> 
+				<xsl:apply-templates select="html:html/html:head/*" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:meta" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:link" mode="head"/>				
+				<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:inlinestyle" mode="head"/>
+				<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:inlinescript" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:style" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:script" mode="head"/>
+			</head>
+			<body>
+				<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
+				<div class="hwrapper" id="header">
+					<div id="top-strip">
+						<div class="grids-24">
+							<div class="grid-8">
+						  		<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarleft/*"/>
+							</div>
+							<div class="grid-16">
+						  		<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarright/*"/>
+							</div>
+						</div>
+					</div>
+					<div id="ribbon">
+						<div class="grids-24">
+							<div class="grid-16">
+								<h1 class="nameplate">
+									<a accesskey="1" href="http://www.iastate.edu/">
+										<xsl:element name="img">
+							    			<xsl:attribute name="alt">Iowa State University</xsl:attribute>
+							    			<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
+							  			</xsl:element>
+									</a>
+								</h1>
+							</div>
+							<div class="grid-8">
+								<form action="http://google.iastate.edu/search" method="GET">
+									<input name="output" type="hidden" value="xml_no_dtd"/>
+									<input name="client" type="hidden" value="default_frontend"/>
+									<input name="sitesearch" type="hidden" value=""/>
+									<input name="proxystylesheet" type="hidden" value="default_frontend"/>
+									<input accesskey="s" name="q" placeholder="Search" tabindex="1" type="text"/>
+									<input name="btnG" title="Search" type="submit" value=""/>
+								</form>
+							</div>
+						</div>
+						<div class="grids-24">
+							<div class="grid-12">
+								<h2 class="site-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></h2>
+							</div>
+							<div class="grid-12">
+						
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="container">
+					<div class="grids-24">
+						<div class="grid-5 sidebar" id="left-sidebar">
+							<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbar" mode="vert"/>
+							<xsl:apply-templates select="html:html/db:navbar" mode="vert"/>
+ 							<ul class="navigation footer">
+ 								<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbarfoot/*" mode="html"/>
+							</ul>
+						</div>
+						<div class="grid-19" id="content">
+							<div class="header gutter">
+								<xsl:apply-templates mode="html"/>
+							</div>
+						</div>
+						<div class="clear"></div>
+					</div>
+				</div>
+				<div class="fwrapper grids-24">
+					<div class="grids-24" id="footer">
+						<div class="grid-3 first">
+							<a class="nameplate" href="/">
+						  		<xsl:element name="img">
+						    		<xsl:attribute name="alt">Iowa State University</xsl:attribute>
+						    		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
+						  		</xsl:element>
+							</a>
+						</div>
+						<div class="grid-21 last">
+					        <xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:footer/*"/>
+						</div>
+					</div>
+				</div>
+			</body>
+		</html>
+	</xsl:template>
+
+	<!-- BEGIN NAVIGATION BAR -->
+
+	<!-- Catch all to Apply Nav Bar Templates -->
+	<xsl:template match="db:navbar" mode="vert">
+		<ul class="navigation">
+			<xsl:apply-templates mode="vert"/>
+		</ul>
+	</xsl:template>
+
+	<!-- Root Level Navelem Tag -->
+	<xsl:template match="db:navelem" mode="vert">
+		<xsl:element name="li">
+			<xsl:choose>
+				<xsl:when test="@selected='true'"> 
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="db:navdir/@alwaysopen='true'">
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
+			<xsl:apply-templates mode="subtree"/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Navdir Tag -->
+	<xsl:template match="db:navdir" mode="subtree">
+		<ul class="vertbarsubtree">
+			<xsl:apply-templates mode="subtree"/>
+		</ul>
+	</xsl:template>
+
+	<!-- Navelem in a Navdir -->
+	<xsl:template match="db:navelem" mode="subtree">
+		<xsl:element name="li">
+			<xsl:choose>
+				<xsl:when test="@selected='true'"> 
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="db:navdir/@alwaysopen='true'">
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
+			<xsl:apply-templates mode="subtree"/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Apply Class to Anchors -->
+	<xsl:template match="html:a" mode="subtree">
+		<xsl:element name="{name()}">
+			<xsl:attribute name="class">navbaranchor</xsl:attribute>
+			<xsl:for-each select="@*">
+				<xsl:attribute name="{name()}"><xsl:value-of select="."/></xsl:attribute>
+			</xsl:for-each>
+			<xsl:value-of select="."/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Filter out Navbar -->
+	<xsl:template match="db:navbar" mode="html">
+	</xsl:template>
+
+	<!-- END NAVIGATION BAR -->
+
+
+	<!-- Apply Templates to Body -->
+	<xsl:template match="html:html" mode="html" priority="1">
+		<xsl:apply-templates mode="html"/>
+	</xsl:template>
+	<xsl:template match="html:head" priority="1" mode="html">
+	</xsl:template>
+	<xsl:template match="html:body" priority="1" mode="html">
+		<xsl:apply-templates mode="html"/>
+	</xsl:template>
+
+	<!-- Copy Meta Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:meta">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Link Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:link">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Script Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:script">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Style Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:style">
+		<!-- keep contents -->
+		<xsl:element name="{name()}">
+			<xsl:for-each select="@*">
+    			<xsl:attribute name="{name()}">
+    				<xsl:value-of select="."/>
+    			</xsl:attribute>
+			</xsl:for-each>
+			<xsl:apply-templates select="node()" mode="head"/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- replacement for the broken &nbsp; -->
+	<xsl:template match="nbsp" mode="html">
+		<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+	</xsl:template>
+
+	<!-- replacement for the broken &emsp; -->
+	<xsl:template match="emsp" mode="html">
+		<!-- IE6 doesn't support &emsp; ... use this <span> as an alternative -->
+		<!-- <xsl:text disable-output-escaping="yes">&amp;emsp;</xsl:text> -->
+		<span style="margin-left: 1em"> </span>
+	</xsl:template>
+
+	<!-- filter out META elements -->
+	<xsl:template match="html:meta" mode="html">
+	</xsl:template>
+
+	<!-- filter out LINK elements -->
+	<xsl:template match="html:link" mode="html">
+	</xsl:template>
+
+	<!-- filter out STYLE elements -->
+	<xsl:template match="html:style" mode="html">
+	</xsl:template>
+
+	<!-- filter out SCRIPT elements -->
+	<xsl:template match="html:script" mode="html">
+	</xsl:template>
+
+	<!-- filter out TITLE elements -->
+	<xsl:template match="html:title" mode="html">
+	</xsl:template>
+
+	<!-- fallthrough for unadjusted elements -->
+	<xsl:template match="@*|*|text()|processing-instruction()|comment()" priority="0" mode="html"><xsl:copy><xsl:apply-templates select="@*|*|text()|processing-instruction()|comment()" mode="html"/></xsl:copy></xsl:template>
+
+</xsl:stylesheet>

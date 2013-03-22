@@ -27,33 +27,41 @@ import cgitb
 cgitb.enable()
 
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
-    <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+    <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
-        <body resdir="%s">
-            <xsl:apply-templates mode="%s"/>
-        </body>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+            <body db:resdir="%s">
+                <xsl:apply-templates mode="%s"/>
+            </body>
+        </html>
     </xsl:template>
     %s
 </xsl:stylesheet>'''
 
 localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
-    <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+    <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
-        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/ag_web.xml"</xsl:processing-instruction>
-        <body resdir="%s">
-            <xsl:apply-templates mode="%s"/>
-        </body>
+    <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+            <body db:resdir="%s">
+                <xsl:apply-templates mode="%s"/>
+            </body>
+        </html>
     </xsl:template>
     %s
 </xsl:stylesheet>'''
 
 ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
-    <xsl:output method="html"/>
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
+    <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
-        <xsl:apply-templates mode="%s"/>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+            <body>
+                <xsl:apply-templates mode="%s"/>
+            </body>
+        </html>
     </xsl:template>
     %s
 </xsl:stylesheet>'''
@@ -93,10 +101,9 @@ def application(environ, start_response):
             pass
         else:
             fullpath = os.path.abspath(db_web_support.dataroot + '/' + db_web_support.req.form["path"].value)
-            print fullpath
             if not fullpath.startswith(db_web_support.dataroot):
                 return db_web_support.req.return_error(403)
-            if os.path.exists(fullpath):
+            if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:
                     relpath = '/'
                     pass
@@ -104,6 +111,8 @@ def application(environ, start_response):
                     relpath = fullpath.replace(db_web_support.dataroot, '')
                     pass
                 pass
+            elif not os.access(fullpath, os.R_OK):
+                return db_web_support.req.return_error(401)
             else:
                 return db_web_support.req.return_error(404)
             pass
@@ -122,12 +131,15 @@ def application(environ, start_response):
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
                     ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
 
+        # Register Primary Namespace
+        etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
+
         if not renderer.isRaw():
             # If we are only requesting content or style, output them
             if "contentonly" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-                db_web_support.req.output = etree.tostring(xml, pretty_print=True)
+                db_web_support.req.output = etree.tostring(xml)
                 #raise Exception("Testing in ?contentonly")
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
@@ -146,7 +158,8 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
-                db_web_support.req.output = etree.tostring(content, pretty_print=True)
+                db_web_support.req.output = etree.tostring(content)
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xmlcontent = renderer.getContent()
@@ -154,7 +167,7 @@ def application(environ, start_response):
                 xml = etree.ElementTree(xmlcontent)
                 style = localwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
-                db_web_support.req.output = etree.tostring(content, pretty_print=True)
+                db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 return [db_web_support.req.return_page()]
             elif "ajax" in db_web_support.req.form:
@@ -162,7 +175,7 @@ def application(environ, start_response):
                 style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = str(content)
-                db_web_support.req.response_headers['Content-Type'] = 'text/html'
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
@@ -170,10 +183,11 @@ def application(environ, start_response):
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 contentroot.append(db_web_support.menu.GetMenu())
-                f = file(os.path.join(db_web_support.webdir, "resources/ag_web.xml"))
+                f = file(os.path.join(db_web_support.webdir, "resources/db_web.xml"))
                 template = etree.parse(f)
                 f.close()
                 db_web_support.req.output = str(content.xslt(template))
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 #raise Exception("Testing")
                 return [db_web_support.req.return_page()]
         else:
@@ -184,7 +198,8 @@ def application(environ, start_response):
         # Something has gone terribly wrong, let's display some useful information to the user
         # Error Page Template
         errormessage = '''\
-<?xml-stylesheet type="text/xsl" href="/dbres/ag_web.xml"?>
+<?xml-stylesheet type="text/xsl" href="/dbres/db_web.xml"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml">
 <body>
     <h1>500 Internal Server Error</h1>
     <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
@@ -203,7 +218,8 @@ def application(environ, start_response):
         <strong>Dir()</strong>                                                          <br/>
         <pre style="overflow:auto">%s</pre>
     </p>
-</body>'''
+</body>
+</html>'''
 
         # Import Modules Needed For All Of This - No need to import these things otherwise
         import traceback
@@ -213,7 +229,13 @@ def application(environ, start_response):
         from time import gmtime, strftime
 
         # Get Our Own FieldStorage Object
-        form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
+        fs = environ['wsgi.input'] if isinstance(environ['wsgi.input'], cgi.FieldStorage) else None
+        if fs is None:
+            form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
+            pass
+        else:
+            form = fs
+            pass
 
         # Return Proper Error so AJAX Works
         if "ajax" in form:
@@ -256,9 +278,3 @@ def application(environ, start_response):
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
         pass
-    finally:
-        del db_web_support.style
-        del db_web_support.req
-        del db_web_support
-        del handler_support
-        del renderer

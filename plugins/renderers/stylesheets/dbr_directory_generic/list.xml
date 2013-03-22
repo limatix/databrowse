@@ -16,11 +16,8 @@
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="dbr_directory_generic-directorytree">
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
-        <script>
-            <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/jquery-1.9.1.min.js</xsl:attribute>
-        </script>
-        <script type="text/javascript">
-                $(document).ready(function() {
+        <script type="text/javascript" DEFER="true">
+                <![CDATA[
                     $.ImgToggle = function(img, resurl) {
                         if(img.attr("src") == resurl + "/icons/folder-open.png") {
                             img.attr("src", resurl + "/icons/folder.png");
@@ -39,19 +36,18 @@
                         else {
                             $.ajax({
                                 url: requrl,
+                                dataType: "xml",
                                 beforeSend: function ( xhr ) {
-                                    xhr.overrideMimeType("text/plain; charset=x-user-defined");
                                     img.attr("src", resurl + "/icons/loading.gif");
                                 }
                             }).done(function ( data ) {
-                                obj = $('&lt;html /&gt;').html(data);
-                                text = $('ul.rootdir',obj).html();
+                                text = $(data).find('ul.rootdir')
                                 id.html(text);
                                 img.attr("src", resurl + "/icons/folder-open.png");
                             });
                         }
                     };
-                }); 
+                ]]> 
         </script>
         <style>
                 ul.tree, ul.tree ul {
