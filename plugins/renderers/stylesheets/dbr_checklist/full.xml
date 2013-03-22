@@ -3,13 +3,15 @@
     <xsl:apply-templates select="html:head" mode="full"/>
     <script type="text/javascript" DEFER='true'>
         <![CDATA[
+
             // Error Saving Callback Function
             function saveErrorCallback (jqXHR, textStatus, errorThrown) {
                 alert("Failure: " + errorThrown)
             }
 
             function saveSuccessCallback (data, textStatus, jqXHR) {
-                alert("Success: " + data)
+                saved=true;
+                set_savecolor_and_allchecked_attribute();
             }
             
             savexml = function() {
@@ -19,22 +21,23 @@
                 processor.importStylesheet(filternums_xsl_parsed);
                 //filteredchecklistxml=processor.transformToFragment(checklistxml,document);
                 var filteredchecklistxml=processor.transformToDocument(checklistxml);
+                var filenameinput=document.getElementById("filenameinput");
 
                 // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', (new XMLSerializer).serializeToString(filteredchecklistxml));
+                saveform.append('filename', filenameinput.value);
                 $.ajax({
                     async: 'false',
                     cache: 'false',
-                    contentType: 'text/xml',
-                    data: filteredchecklistxml,
-                    datatype: 'xml',
+                    contentType: false,
+                    data: saveform,
                     error: saveErrorCallback,
                     processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
-                    url: 'https://thermal.cnde.iastate.edu/bugtest.wsgi'
+                    type: 'POST'
                     });
-
-                }
+            }
 
         ]]>
     </script>

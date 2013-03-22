@@ -278,3 +278,32 @@ def application(environ, start_response):
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
         pass
+
+
+class Debugger:
+    """ Code Used To Enable PDB in Single Instance Apache Mode """
+
+    def __init__(self, object):
+        self.__object = object
+
+    def __call__(self, *args, **kwargs):
+        import pdb
+        import sys
+        debugger = pdb.Pdb()
+        debugger.use_rawinput = 0
+        debugger.reset()
+        sys.settrace(debugger.trace_dispatch)
+
+        try:
+            return self.__object(*args, **kwargs)
+        finally:
+            debugger.quitting = 1
+            sys.settrace(None)
+        pass
+    pass
+
+# Uncomment this line to enable PDB
+# Apache must be ran in single instance mode using the following commands:
+#   sudo /etc/init.d/httpd stop
+#   httpd -X
+#application = Debugger(application)
