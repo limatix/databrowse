@@ -6,10 +6,11 @@
 
             // Error Saving Callback Function
             function saveErrorCallback (jqXHR, textStatus, errorThrown) {
-                alert("Failure: " + errorThrown)
+                alert("FAILURE: " + errorThrown)
             }
 
             function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data)
                 saved=true;
                 set_savecolor_and_allchecked_attribute();
             }
@@ -22,20 +23,34 @@
                 //filteredchecklistxml=processor.transformToFragment(checklistxml,document);
                 var filteredchecklistxml=processor.transformToDocument(checklistxml);
                 var filenameinput=document.getElementById("filenameinput");
+                var destnameinput=document.getElementsByName("dest")[0];
+
+                // Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax";
+                }
 
                 // New Saving Components //////////////////////////////////
                 saveform = new FormData();
                 saveform.append('file', (new XMLSerializer).serializeToString(filteredchecklistxml));
                 saveform.append('filename', filenameinput.value);
+                saveform.append('destination', destnameinput.value);
                 $.ajax({
                     async: 'false',
                     cache: 'false',
                     contentType: false,
                     data: saveform,
+                    dataType: "text",
                     error: saveErrorCallback,
                     processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST'
+                    type: 'POST',
+                    url: ajaxurl
                     });
             }
 

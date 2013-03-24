@@ -140,13 +140,11 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = etree.tostring(xml)
-                #raise Exception("Testing in ?contentonly")
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = style
-                #raise Exception("Testing in ?contentonly")
                 return [db_web_support.req.return_page()]
             else:
                 pass
@@ -154,7 +152,9 @@ def application(environ, start_response):
             # If we want styling to be done by the browser or we don't want page styling
             parser = etree.XMLParser()
             parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
-            if "nopagestyle" in db_web_support.req.form:
+            if "ajax" in db_web_support.req.form:
+                return renderer.getContent()
+            elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
@@ -170,20 +170,14 @@ def application(environ, start_response):
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 return [db_web_support.req.return_page()]
-            elif "ajax" in db_web_support.req.form:
-                xml = etree.ElementTree(renderer.getContent())
-                style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style, parser))
-                db_web_support.req.output = str(content)
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-                return [db_web_support.req.return_page()]
+
             else:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 contentroot.append(db_web_support.menu.GetMenu())
-                f = file(os.path.join(db_web_support.webdir, "resources/db_web.xml"))
+                f = open(os.path.join(db_web_support.webdir, "resources/db_web.xml"))
                 template = etree.parse(f)
                 f.close()
                 db_web_support.req.output = str(content.xslt(template))

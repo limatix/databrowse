@@ -64,7 +64,7 @@ class dbr_directory_generic(renderer_class):
         else:
             #ajax url and what not
             xmlroot.set("ajax", "True")
-            xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, ajax=True, content_mode=self._content_mode, style_mode=self._style_mode))
+            xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
             pass
         self._xml = xmlroot
         pass
