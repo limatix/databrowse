@@ -159,7 +159,7 @@ def application(environ, start_response):
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xmlcontent = renderer.getContent()
@@ -168,7 +168,7 @@ def application(environ, start_response):
                 style = localwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
 
             else:
@@ -181,7 +181,7 @@ def application(environ, start_response):
                 template = etree.parse(f)
                 f.close()
                 db_web_support.req.output = str(content.xslt(template))
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 #raise Exception("Testing")
                 return [db_web_support.req.return_page()]
         else:
