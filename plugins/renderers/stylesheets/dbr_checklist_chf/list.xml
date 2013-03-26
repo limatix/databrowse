@@ -1,0 +1,6 @@
+<xsl:template xmlns:chf="http://thermal.cnde.iastate.edu/databrowse/checklist_chf" match="chf:checklist" mode="detailed">
+</xsl:template>
+<xsl:template xmlns:chf="http://thermal.cnde.iastate.edu/databrowse/checklist_chf" match="chf:checklist" mode="summary">
+</xsl:template>
+<xsl:template xmlns:chf="http://thermal.cnde.iastate.edu/databrowse/checklist_chf" match="chf:checklist" mode="title">
+</xsl:template>

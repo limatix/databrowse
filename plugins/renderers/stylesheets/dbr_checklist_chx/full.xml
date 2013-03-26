@@ -4,15 +4,26 @@
     <script type="text/javascript" DEFER='true'>
         <![CDATA[
 
+            window.onbeforeunload = function () {
+                return 'You are about to leave a page that may have unsaved data.';
+            }
+
             // Error Saving Callback Function
             function saveErrorCallback (jqXHR, textStatus, errorThrown) {
-                alert("FAILURE: " + errorThrown)
+                alert("Error Saving File: " + errorThrown)
             }
 
             function saveSuccessCallback (data, textStatus, jqXHR) {
-                alert(data)
-                saved=true;
-                set_savecolor_and_allchecked_attribute();
+                alert(data);
+                if(data=="File Saved Successfully")
+                {
+                    saved=true;
+                    set_savecolor_and_allchecked_attribute();
+                    var filenameinput=document.getElementById("filenameinput");
+                    var destnameinput=document.getElementsByName("dest")[0];
+                    window.onbeforeunload = null
+                    window.location.href = "/databrowse/" + destnameinput.value + "/" + filenameinput.value;
+                }
             }
             
             savexml = function() {

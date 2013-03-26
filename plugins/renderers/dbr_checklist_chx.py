@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_checklist.py - Generic Checklist Files """
+""" plugins/renderers/dbr_checklist_chx.py - Generic Checklist Files """
 
 import os
 import os.path
@@ -24,7 +24,7 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_checklist(renderer_class):
+class dbr_checklist_chx(renderer_class):
     """ Generic Checklist Files """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/checklist"
@@ -45,14 +45,14 @@ class dbr_checklist(renderer_class):
                     raise self.RendererException("Attempt to Save File Outside of Dataroot")
                 # Let's check on the directory and make sure its writable and it exists
                 if not os.access(fullpath, os.W_OK) and os.path.exists(fullpath):
-                    self._web_support.req.output = "FAILURE:  Save Directory Not Writable"
+                    self._web_support.req.output = "Error Saving File:  Save Directory Not Writable"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
                 elif not os.path.exists(fullpath):
                     try:
                         os.makedirs(fullpath)
                     except:
-                        self._web_support.req.output = "FAILURE:  Unable to Create Directory " + fullpath
+                        self._web_support.req.output = "Error Saving File:  Unable to Create Directory " + fullpath
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
                     pass
@@ -70,12 +70,12 @@ class dbr_checklist(renderer_class):
                     f = open(fullfilename, "w")
                     f.write(filestring)
                     f.close
-                    self._web_support.req.output = "SUCCESS"
+                    self._web_support.req.output = "File Saved Successfully"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
                 pass
             else:
-                self._web_support.req.output = "FAILURE: Incomplete Request"
+                self._web_support.req.output = "Error Saving File: Incomplete Request"
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
         elif self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
