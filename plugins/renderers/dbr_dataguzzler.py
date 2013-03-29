@@ -20,7 +20,6 @@
 
 import os
 import os.path
-import time
 from stat import *
 from lxml import etree
 from renderer_support import renderer_class
@@ -28,14 +27,11 @@ import magic
 import dg_file as dgf
 import struct
 
-
-
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
-dgf_nestedchunks=set([ "DATAGUZZ","GUZZNWFM","GUZZWFMD","METADATA","METDATUM","SNAPSHOT","SNAPSHTS","VIBRDATA","VIBFCETS","VIBFACET"]);
-dgf_stringchunks=set([ "WAVENAME", "METDNAME", "METDSTRV" ]);
-dgf_int64chunks=set([ "METDINTV", "WFMDIMNS"]);
-dgf_float64chunks=set([ "METDDBLV" ]);
-
+dgf_nestedchunks = set(["DATAGUZZ", "GUZZNWFM", "GUZZWFMD", "METADATA", "METDATUM", "SNAPSHOT", "SNAPSHTS", "VIBRDATA", "VIBFCETS", "VIBFACET"])
+dgf_stringchunks = set(["WAVENAME", "METDNAME", "METDSTRV"])
+dgf_int64chunks = set(["METDINTV", "WFMDIMNS"])
+dgf_float64chunks = set(["METDDBLV"])
 
 
 class dbr_dataguzzler(renderer_class):
@@ -47,72 +43,70 @@ class dbr_dataguzzler(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 2
 
-    def dumpxmlchunk(self,dgfh,nestdepth=-1):
-        ellist=[]
+    def dumpxmlchunk(self, dgfh, nestdepth=-1):
+        ellist = []
 
-        Chunk=dgf.nextchunk(dgfh);
-        while (Chunk) :
-            
-            newel=etree.Element("{%s}%s" % (self._namespace_uri,Chunk.Name));
-            
-            if (Chunk.Name in dgf_nestedchunks) :
+        Chunk = dgf.nextchunk(dgfh)
+        while Chunk:
+            newel = etree.Element("{%s}%s" % (self._namespace_uri, Chunk.Name))
+            if (Chunk.Name in dgf_nestedchunks):
                 if nestdepth > 0:
-                    nestedchunks=self.dumpxmlchunk(dgfh,nestdepth-1);
+                    nestedchunks = self.dumpxmlchunk(dgfh, nestdepth-1)
                     for nestedchunk in nestedchunks:
-                        newel.append(nestedchunk)                
+                        newel.append(nestedchunk)
+                        pass
+                    pass
+                else:
+                    nestedchunks = self.dumpxmlchunk(dgfh, -1)
+                    for nestedchunk in nestedchunks:
+                        newel.append(nestedchunk)
                         pass
                     pass
                 pass
-            elif (Chunk.Name in dgf_stringchunks) :
-                newel.text=dgf.readdata(dgfh,Chunk.ChunkLen);
+            elif Chunk.Name in dgf_stringchunks:
+                newel.text = dgf.readdata(dgfh, Chunk.ChunkLen)
                 pass
-            elif (Chunk.Name in dgf_int64chunks) :
-                textdata=""
-                for cnt in range(Chunk.ChunkLen/8) :
-                    textdata+="%d\n" % (struct.unpack("@Q",dgf.readdata(dgfh,8)));
+            elif Chunk.Name in dgf_int64chunks:
+                textdata = ""
+                for cnt in range(Chunk.ChunkLen/8):
+                    textdata += "%d\n" % (struct.unpack("@Q", dgf.readdata(dgfh, 8)))
                     pass
-                newel.text=textdata
+                newel.text = textdata
                 pass
-            elif (Chunk.Name in dgf_float64chunks) :
-                textdata=""
-                for cnt in range(Chunk.ChunkLen/8) :
-                    textdata+="%.10g\n" % (struct.unpack("@d",dgf.readdata(dgfh,8)));
+            elif Chunk.Name in dgf_float64chunks:
+                textdata = ""
+                for cnt in range(Chunk.ChunkLen/8):
+                    textdata += "%.10g\n" % (struct.unpack("@d", dgf.readdata(dgfh, 8)))
                     pass
-                newel.text=textdata
+                newel.text = textdata
                 pass
-            else :
-                newel.text=" %d bytes\n" % (Chunk.ChunkLen);
+            else:
+                newel.text = " %d bytes\n" % (Chunk.ChunkLen)
                 pass
-            dgf.chunkdone(dgfh,None);
-            
-            Chunk=dgf.nextchunk(dgfh);
-
+            dgf.chunkdone(dgfh, None)
+            Chunk = dgf.nextchunk(dgfh)
             ellist.append(newel)
-            
             pass
         return ellist
 
-
     def getContent(self):
-        if self._content_mode=="title":
+        if self._content_mode is "title":
             return None  # just use filename
-        elif self._content_mode == "detailed" or self._content_mode=="summary":
-            
-            nestdepth=-1
-            if self._content_mode=="summary":
-                nestdepth=3
+        elif self._content_mode is "detailed" or self._content_mode is "summary":
+            nestdepth = -1
+            if self._content_mode is "summary":
+                nestdepth = 3
                 pass
 
-            dgfh=dgf.open(self._fullpath);
-            if (dgfh) :
-                
-                xmlchunk=self.dumpxmlchunk(dgfh,nestdepth=nestdepth);
-                dgf.close(dgfh);
+            dgfh = dgf.open(self._fullpath)
+            if dgfh:
+                xmlchunk = self.dumpxmlchunk(dgfh, nestdepth=nestdepth)
+                dgf.close(dgfh)
                 pass
-            assert(len(xmlchunk)==1)
-            
+            assert(len(xmlchunk) == 1)
+
             return xmlchunk[0]
-        
+
         elif self._content_mode == "raw":
             size = os.path.getsize(self._fullpath)
             magicstore = magic.open(magic.MAGIC_NONE)
