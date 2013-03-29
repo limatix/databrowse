@@ -21,7 +21,7 @@
 
 def dbh_directory(path, contenttype, extension):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
-    if contenttype == "inode/directory" or contenttype == "directory":
+    if contenttype == "inode/directory" or contenttype == "directory" or contenttype == "setgid directory":
         return "dbr_directory_generic"
     else:
         return False

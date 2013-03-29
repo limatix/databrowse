@@ -75,7 +75,7 @@ class handler_support:
         """ Return the handler given a full path """
         magicstore = magic.open(magic.MAGIC_NONE)
         magicstore.load()
-        contenttype = magicstore.file(fullpath)
+        contenttype = magicstore.file(os.path.realpath(fullpath))   # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
         handler = []
         for function in self._handlers:
