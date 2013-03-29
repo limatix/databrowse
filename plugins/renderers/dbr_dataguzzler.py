@@ -47,7 +47,7 @@ class dbr_dataguzzler(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 2
 
-    def dumpxmlchunk(self,dgfh):
+    def dumpxmlchunk(self,dgfh,nestdepth=-1):
         ellist=[]
 
         Chunk=dgf.nextchunk(dgfh);
@@ -56,9 +56,11 @@ class dbr_dataguzzler(renderer_class):
             newel=etree.Element("{%s}%s" % (self._namespace_uri,Chunk.Name));
             
             if (Chunk.Name in dgf_nestedchunks) :
-                nestedchunks=self.dumpxmlchunk(dgfh);
-                for nestedchunk in nestedchunks:
-                    newel.append(nestedchunk)                
+                if nestdepth > 0:
+                    nestedchunks=self.dumpxmlchunk(dgfh,nestdepth-1);
+                    for nestedchunk in nestedchunks:
+                        newel.append(nestedchunk)                
+                        pass
                     pass
                 pass
             elif (Chunk.Name in dgf_stringchunks) :
@@ -92,11 +94,19 @@ class dbr_dataguzzler(renderer_class):
 
 
     def getContent(self):
-        if self._content_mode == "detailed" or self._content_mode=="summary" or self._content_mode=="title":
+        if self._content_mode=="title":
+            return None  # just use filename
+        elif self._content_mode == "detailed" or self._content_mode=="summary":
             
+            nestdepth=-1
+            if self._content_mode=="summary":
+                nestdepth=3
+                pass
+
             dgfh=dgf.open(self._fullpath);
             if (dgfh) :
-                xmlchunk=self.dumpxmlchunk(dgfh);
+                
+                xmlchunk=self.dumpxmlchunk(dgfh,nestdepth=nestdepth);
                 dgf.close(dgfh);
                 pass
             assert(len(xmlchunk)==1)
