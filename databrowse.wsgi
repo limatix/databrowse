@@ -120,13 +120,20 @@ def application(environ, start_response):
         # Determine handler for requested path
         import handler_support as handler_support_module
         handler_support = handler_support_module.handler_support(db_web_support.handlerpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath)
-        handler = handler_support.GetHandler(fullpath)
+        handlers = handler_support.GetHandler(fullpath)
+        handler = handlers[-1]
+
+        # Let's see if we want to override the default handler
+        if "handler" in db_web_support.req.form:
+            handler = db_web_support.req.form['handler'].value
+            pass
 
         # Get A Handle to The Rendering Plugin
         if db_web_support.rendererpath not in sys.path:
             sys.path.append(db_web_support.rendererpath)
+        caller = "databrowse"
         exec "import %s as %s_module" % (handler, handler)
-        exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller='databrowse'%s%s%s)" % (handler, handler,\
+        exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
                     ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
@@ -163,6 +170,7 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xmlcontent = renderer.getContent()
+                renderer.loadMenu()
                 xmlcontent.append(db_web_support.menu.GetMenu())
                 xml = etree.ElementTree(xmlcontent)
                 style = localwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
@@ -170,12 +178,12 @@ def application(environ, start_response):
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
-
             else:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
+                renderer.loadMenu()
                 contentroot.append(db_web_support.menu.GetMenu())
                 f = open(os.path.join(db_web_support.webdir, "resources/db_web.xml"))
                 template = etree.parse(f)

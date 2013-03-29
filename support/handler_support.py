@@ -34,7 +34,8 @@ class handler_support:
 
     def __init__(self, handlerpath, icondbpath, hiddenfiledbpath):
         """ Load up all of the handler plugins and icon database """
-
+        # Reset Handler List
+        self._handlers = []
         # Parse Handlers
         handlerlist = os.listdir(handlerpath)
         handlerlist.sort()
@@ -76,10 +77,11 @@ class handler_support:
         magicstore.load()
         contenttype = magicstore.file(fullpath)
         extension = os.path.splitext(fullpath)[1][1:]
-        handler = False
+        handler = []
         for function in self._handlers:
             temp = function(fullpath, contenttype, extension)
-            handler = temp if temp else handler
+            if temp:
+                handler.append(temp)
             pass
         return handler
 
@@ -89,10 +91,11 @@ class handler_support:
         magicstore.load()
         contenttype = magicstore.file(fullpath)
         extension = os.path.splitext(fullpath)[1][1:]
-        handler = False
+        handler = []
         for function in self._handlers:
             temp = function(fullpath, contenttype, extension)
-            handler = temp if temp else handler
+            if temp:
+                handler.append(temp)
             pass
         try:
             iconname = self._icondb.get("Content-Type", contenttype)

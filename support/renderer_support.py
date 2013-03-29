@@ -34,6 +34,7 @@ class renderer_class(object):
     _web_support = None
     _handler_support = None
     _caller = None
+    _handlers = None
     _content_mode = None
     _style_mode = None
     _dynamic_style = None
@@ -45,7 +46,7 @@ class renderer_class(object):
     class RendererException(Exception):
         pass
 
-    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode=None, style_mode=None, recursion_depth=None):
+    def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=None, style_mode=None, recursion_depth=None):
         """ Default Initialization Function """
 
         # Set all of our argument variables
@@ -56,6 +57,7 @@ class renderer_class(object):
         self._web_support = web_support
         self._handler_support = handler_support
         self._caller = caller
+        self._handlers = handlers
         if content_mode is None:
             self._content_mode = self._default_content_mode
             pass
@@ -167,6 +169,25 @@ class renderer_class(object):
         exec "returnlist.sort(%s%s)" % ("reverse=True" if order is "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
         return returnlist
 
+        pass
+
+    def loadMenu(self):
+        """ Load Menu Items for all current handlers """
+        for handler in reversed(self._handlers):
+            dirlist = [os.path.splitext(item)[0] for item in os.listdir(os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + handler + '/')) if item.lower().endswith(".xml")]
+            newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
+            navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+            title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
+            title.text = handler[4:].title().replace("_", " ")
+            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
+            for item in dirlist:
+                link = self.getURL(self._relpath, handler=handler, style_mode=item)
+                itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
+                menuitem.text = item.title().replace("_", " ")
+                pass
+            self._web_support.menu.AddMenu(newmenu)
+            pass
         pass
 
     def loadStyle(self):

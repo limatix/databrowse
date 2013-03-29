@@ -147,24 +147,35 @@ class style_support:
 class menu_support:
     """ Class containing support functionality for xslt stylesheet compliation """
 
-    _menu = {}
+    _menu = []
     test = '''\
 <?xml version="1.0" encoding="UTF-8"?>
-<db:navbar xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-    <db:navelem><a>Display Style</a>
-        <db:navdir alwaysopen="true">
-            <db:navelem><a extcvt="true" href="?style_mode=list">List</a></db:navelem>
-            <db:navelem><a extcvt="true" href="?style_mode=table">Table</a></db:navelem>
-        </db:navdir>
-    </db:navelem>
-</db:navbar>
+<navbar>
+    <navelem><a extcvt="true">Display Style</a>
+        <navdir alwaysopen="true">
+            <navelem><a extcvt="true" href="?style_mode=list">List</a></navelem>
+            <navelem><a extcvt="true" href="?style_mode=table">Table</a></navelem>
+        </navdir>
+    </navelem>
+</navbar>
 '''
 
     class MenuException(Exception):
         pass
 
+    def __init__(self):
+        self._menu = []
+
+    def AddMenu(self, xml):
+        self._menu.append(xml)
+
     def GetMenu(self):
-        menu = etree.XML(self.test)
+        menu = self._menu[0]
+        if len(self._menu) > 1:
+            for item in self._menu[1:]:
+                menu.append(item)
+                pass
+            pass
         return menu
 
     pass

@@ -34,9 +34,9 @@ class dbr_directory_generic(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 2
 
-    def __init__(self, relpath, fullpath, web_support, handler_support, caller, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
+    def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
         """ Load all of the values provided by initialization """
-        super(dbr_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, content_mode, style_mode)
+        super(dbr_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
             xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
@@ -49,13 +49,15 @@ class dbr_directory_generic(renderer_class):
             xmlroot.set("ajaxreq", "True")
             pass
         if recursion_depth is not 0:
+            caller = 'dbr_directory_generic'
             dirlist = self.getDirectoryList(self._fullpath)
             for item in dirlist:
                 itemrelpath = os.path.join(self._relpath, item)
                 itemfullpath = os.path.join(self._fullpath, item)
-                (handler, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
+                (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
+                handler = handlers[-1]
                 exec "import %s as %s_module" % (handler, handler)
-                exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller='dbr_directory_generic', content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
                 xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath), icon=icon)
                 xmlchild.append(content)
