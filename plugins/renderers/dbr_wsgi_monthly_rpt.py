@@ -59,7 +59,6 @@ class dbr_wsgi_monthly_rpt(renderer_class):
             environcopy['SCRIPT_FILENAME'] = self._fullpath
             output = module.application(environcopy, self.dummy_start_response)
             os.chdir(savedCWD)
-            output = output.replace(' xmlns="http://www.w3.org/1999/xhtml"', "")
             del module
             del environcopy
             return etree.XML(output)
