@@ -114,10 +114,10 @@ def application(environ, start_response):
                     relpath = fullpath.replace(db_web_support.dataroot, '')
                     pass
                 pass
-            elif not os.access(fullpath, os.R_OK):
-                return db_web_support.req.return_error(401)
-            else:
+            elif not os.path.exists(fullpath):
                 return db_web_support.req.return_error(404)
+            else:
+                return db_web_support.req.return_error(401)
             pass
 
         # Determine handler for requested path
