@@ -228,8 +228,8 @@ def application(environ, start_response):
         # Error Page Template
         errormessage = '''\
 <?xml-stylesheet type="text/xsl" href="/dbres/db_web.xml"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml">
-<body>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+<body db:resdir="/dbres/">
     <h1>500 Internal Server Error</h1>
     <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
     <p>
