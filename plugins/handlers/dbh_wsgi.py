@@ -21,7 +21,7 @@
 
 def dbh_wsgi(path, contenttype, extension):
     """ Generic WSGI Handler - Returns wsgi_generic for all wsgi files """
-    if extension == "wsgi":
+    if extension.lower() == "wsgi":
         return "dbr_wsgi_generic"
     else:
         return False

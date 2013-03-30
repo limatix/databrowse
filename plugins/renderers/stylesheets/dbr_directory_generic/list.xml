@@ -132,7 +132,7 @@
                     </img>
                 </span>
                 <span class="basename">
-                    <xsl:value-of select="@path"/>&#160;
+                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap"><xsl:value-of select="@path"/></span>&#160;
                     <a>
                         <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
                         <img alt="Up" title="Go Up One Directory Level">

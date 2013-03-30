@@ -1,0 +1,77 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="image:image" mode="detailed">
+    <div class="grid-row">
+	    <div class="grid g-1-1">
+	    	<div style="width:300px; padding-right:5px; float:left">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+					<img style="border:1px solid #900;" title="Click to View Image Full Size">
+		    			<xsl:attribute name="src"><xsl:value-of select="@src"/></xsl:attribute>
+					</img>
+				</a>
+	    	</div>
+		    <div>
+		    	<table class="cream" style="table-layout:fixed; width:419px">
+		    		<thead>
+		        		<tr class="dark-title">
+		        			<th style="width:8px">
+		        				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/image-x-generic.png</xsl:attribute></img>
+		        			</th>
+		        			<th colspan="2" style="word-wrap: break-word">
+		        				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+		        				<a>
+		        					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+		        					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+		        				</a>
+		        			</th></tr>
+		        	</thead>
+		        	<tbody>
+			        	<tr><td style="width:10px"></td><td style="width:100px">Size: </td><td><xsl:value-of select="size"/></td></tr>
+		        		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+		        		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+		        		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+		        	</tbody>
+		    	</table>
+		    </div>
+		</div>
+	</div>
+    <div class="grid-row">
+    	<div class="grid g-1-1">
+    		<xsl:apply-templates select="ricohtags" mode="tags"/>
+    		<xsl:apply-templates select="exiftags" mode="tags"/>
+    	</div>
+    </div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="image:image" mode="summary">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="image:image" mode="title">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="exiftags" mode="tags">
+	<xsl:if test="tag">
+		<h3>EXIF Data</h3>
+		<table class="cream full-width">
+			<thead>
+				<tr class="dark-title"><th>Tag Name</th><th>Data</th></tr>
+			</thead>
+			<tbody>
+				<xsl:for-each select="tag">
+					<tr><td><xsl:value-of select="@name"/></td><td><xsl:value-of select="."/></td></tr>
+				</xsl:for-each>
+			</tbody>
+		</table>
+	</xsl:if>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="ricohtags" mode="tags">
+	<xsl:if test="tag">
+		<h3>Barcode Data</h3>
+		<table class="cream full-width">
+			<thead>
+				<tr class="dark-title"><th>#</th><th>Data</th></tr>
+			</thead>
+			<tbody>
+				<xsl:for-each select="tag">
+					<tr><td><xsl:value-of select="@name"/></td><td><xsl:value-of select="."/></td></tr>
+				</xsl:for-each>
+			</tbody>
+		</table>
+	</xsl:if>
+</xsl:template>

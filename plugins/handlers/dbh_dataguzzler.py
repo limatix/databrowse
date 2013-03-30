@@ -21,7 +21,7 @@
 
 def dbh_dataguzzler(path, contenttype, extension):
     """ Generic Dataguzzler Handler - Returns dbr_dataguzzler for all dataguzzler files """
-    if extension == "dgs" or extension=="dgz" or extension=="dga" or extension=="dgd":
+    if extension.lower() == "dgs" or extension.lower() == "dgz" or extension.lower() == "dga" or extension.lower() == "dgd":
         return "dbr_dataguzzler"
     else:
         return False

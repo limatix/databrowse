@@ -21,7 +21,7 @@
 
 def dbh_checklist_chf(path, contenttype, extension):
     """ Generic Checklist Handler - Returns checlist for Checklist Files """
-    if extension == "chf":
+    if extension.lower() == "chf":
         return "dbr_checklist_chf"
     else:
         return False

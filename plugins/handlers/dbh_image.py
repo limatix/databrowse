@@ -16,12 +16,12 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/dbh_html.py - Generic Web Page Handler """
+""" plugins/handlers/dbh_image.py - Generic Image Handler """
 
 
-def dbh_html(path, contenttype, extension):
-    """ Generic Web Page Handler - Returns html_generic for Web Pages """
-    if extension.lower() == "html" or extension.lower() == "htm":
-        return "dbr_html_generic"
+def dbh_image(path, contenttype, extension):
+    """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
+    if extension.lower() in ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff"]:
+        return "dbr_image_generic"
     else:
         return False
