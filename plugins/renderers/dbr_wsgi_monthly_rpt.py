@@ -29,8 +29,8 @@ from renderer_support import renderer_class
 class dbr_wsgi_monthly_rpt(renderer_class):
     """ Default Renderer for WSGI Scripts - Simply Passes Everything Off To The Script """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/monthlyrpt"
-    _namespace_local = "monthlyrpt"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/monthrpt"
+    _namespace_local = "monthrpt"
     _default_content_mode = "full"
     _default_style_mode = "full"
     _default_recursion_depth = 2
@@ -46,7 +46,7 @@ class dbr_wsgi_monthly_rpt(renderer_class):
     def getContent(self):
         if self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{%s}monthlyrpt' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
+            xmlroot = etree.Element('{%s}monthrpt' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "full":
             savedCWD = os.getcwd()
@@ -57,6 +57,7 @@ class dbr_wsgi_monthly_rpt(renderer_class):
             environcopy = copy.copy(self._web_support.req.environ)
             environcopy['DATABROWSE_FILENAME'] = environcopy['SCRIPT_FILENAME']
             environcopy['SCRIPT_FILENAME'] = self._fullpath
+            etree.register_namespace("monthlyrpt", "http://thermal.cnde.iastate.edu/monthly_rpt")
             output = module.application(environcopy, self.dummy_start_response)
             os.chdir(savedCWD)
             del module
@@ -71,6 +72,7 @@ class dbr_wsgi_monthly_rpt(renderer_class):
             environcopy = copy.copy(self._web_support.req.environ)
             environcopy['DATABROWSE_FILENAME'] = environcopy['SCRIPT_FILENAME']
             environcopy['SCRIPT_FILENAME'] = self._fullpath
+            etree.register_namespace("monthlyrpt", "http://thermal.cnde.iastate.edu/monthly_rpt")
             output = module.application(environcopy, self._web_support.req.start_response)
             os.chdir(savedCWD)
             self._web_support.req.output_done = True

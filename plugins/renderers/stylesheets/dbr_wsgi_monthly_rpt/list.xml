@@ -1,6 +1,6 @@
-<xsl:template xmlns:monthlyrpt="http://thermal.cnde.iastate.edu/databrowse/monthlyrpt" match="monthlyrpt:monthlyrpt" mode="detailed">
+<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="detailed">
 </xsl:template>
-<xsl:template xmlns:monthlyrpt="http://thermal.cnde.iastate.edu/databrowse/monthlyrpt" match="monthlyrpt:monthlyrpt" mode="summary">
+<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="summary">
 </xsl:template>
-<xsl:template xmlns:monthlyrpt="http://thermal.cnde.iastate.edu/databrowse/monthlyrpt" match="monthlyrpt:monthlyrpt" mode="title">
+<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="title">
 </xsl:template>
