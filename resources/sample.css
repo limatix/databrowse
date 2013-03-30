@@ -53,3 +53,45 @@ p.note{
 .toc a{
 	color: #756d45;
 }
+
+
+/*-- Path Bar --*/
+
+.pathbar{
+	background-color: #ccc;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAbCAYAAAC9WOV0AAAAHklEQVQY02NhAAIWGMEIIpjgXCZcEoyoSnBKEG0oACP0AIWLLZ8oAAAAAElFTkSuQmCC");
+	background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+	background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+	background-position: bottom;
+	background-repeat: repeat-x;
+	position: relative;	
+	left: -20px;
+	top: -12px;
+	width: 772px;
+
+	overflow: hidden;
+}
+
+.pathbar .button{
+	color: #444;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-decoration: none;
+}
+
+.pathbar .button:hover{
+	background-color: #b8b8b8;
+	border-radius:3px;
+}
+
+.pathbar .button.active{
+	background-color: #777;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAQCAYAAADXnxW3AAAAHElEQVQY02NhYGCoZAESP1CJ71jEcEqAxX6CCQA5vw9BVGDSpgAAAABJRU5ErkJggg==");
+	background-image: -moz-linear-gradient(rgba(0, 0, 0, 0.5), transparent);
+	background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.5), transparent);
+	background-position: bottom;
+	background-repeat: repeat-y;
+	border-radius:3px;
+	color: #fff;
+	text-decoration: none;
+}

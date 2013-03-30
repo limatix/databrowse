@@ -27,33 +27,24 @@
 
 	<!-- Begin Page Templates -->
 	<xsl:template match="/">
-		<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+		<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us">
 			<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
+				<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
 				<title><xsl:if test="not($title='')"><xsl:value-of select="$title"/> - </xsl:if><xsl:value-of select="document('db_style.xml')/db:dbstyle/db:titlesuffix"/></title>
 				<link rel="shortcut icon" type="image/x-icon">
 					<xsl:attribute name="href"><xsl:value-of select="$resdir"/>favicon.ico</xsl:attribute>
 				</link>
 				<xsl:element name="link">
-			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.1</xsl:attribute>
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css?1.0</xsl:attribute>
 				  	<xsl:attribute name="media">all</xsl:attribute>
 				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
 			    </xsl:element>
 				<xsl:element name="link">
-			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.1</xsl:attribute>
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css?1.0</xsl:attribute>
 				  	<xsl:attribute name="media">all</xsl:attribute>
 				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
 			    </xsl:element>
-			    <!--[if lt IE 9]>
-					<style>
-						ul.left > li, ul.right > li{
-							*display: inline;
-						}
-						#ribbon form > input[type="submit"]{
-							*vertical-align: baseline;
-						}
-					</style>
-				<![endif]--> 
 				<xsl:apply-templates select="html:html/html:head/*" mode="head"/>
 				<xsl:apply-templates select="html:html/html:body/html:meta" mode="head"/>
 				<xsl:apply-templates select="html:html/html:body/html:link" mode="head"/>				
@@ -65,30 +56,28 @@
 			<body>
 				<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
 				<div class="hwrapper" id="header">
-					<div id="top-strip">
-						<div class="grids-24">
-							<div class="grid-8">
-						  		<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarleft/*"/>
+					<div class="isu-dark-ribbon" id="top-strip">
+						<div class="grid-fluid clearfix">
+							<div class="grid-left">
+							  	<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarleft/*"/>
 							</div>
-							<div class="grid-16">
-						  		<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarright/*"/>
+							<div class="grid-right">
+							  	<xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:topbarright/*"/>
 							</div>
 						</div>
 					</div>
-					<div id="ribbon">
-						<div class="grids-24">
-							<div class="grid-16">
-								<h1 class="nameplate">
-									<a accesskey="1" href="http://www.iastate.edu/">
-										<xsl:element name="img">
-							    			<xsl:attribute name="alt">Iowa State University</xsl:attribute>
-							    			<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
-							  			</xsl:element>
-									</a>
-								</h1>
+					<div class="isu-red-ribbon" id="ribbon">
+						<div class="grid-fluid clearfix">
+							<div class="grid-left">
+								<a accesskey="1" class="nameplate" href="http://www.iastate.edu/">
+									<xsl:element name="img">
+										<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
+							    		<xsl:attribute name="alt">Iowa State University</xsl:attribute>
+							  		</xsl:element>
+								</a>
 							</div>
-							<div class="grid-8">
-								<form action="http://google.iastate.edu/search" method="GET">
+							<div class="grid-right">
+								<form action="http://google.iastate.edu/search" class="isu-search-form" method="GET">
 									<input name="output" type="hidden" value="xml_no_dtd"/>
 									<input name="client" type="hidden" value="default_frontend"/>
 									<input name="sitesearch" type="hidden" value=""/>
@@ -98,36 +87,33 @@
 								</form>
 							</div>
 						</div>
-						<div class="grids-24">
-							<div class="grid-12">
-								<h2 class="site-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></h2>
+						<div class="grid-fluid clearfix">
+							<div class="grid-left">
+								<div class="site-title sub-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
 							</div>
 							<div class="grid-12">
-						
+								<div class="site-title sub-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div id="container">
-					<div class="grids-24">
-						<div class="grid-5 sidebar" id="left-sidebar">
+					<div class="grids clearfix">
+						<div class="grid-4 sidebar" id="left-sidebar">
 							<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbar" mode="vert"/>
 							<xsl:apply-templates select="html:html/db:navbar" mode="vert"/>
  							<ul class="navigation footer">
  								<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbarfoot/*" mode="html"/>
 							</ul>
 						</div>
-						<div class="grid-19" id="content">
-							<div class="header gutter">
-								<xsl:apply-templates mode="html"/>
-							</div>
+						<div class="grid-16" id="content">
+							<xsl:apply-templates mode="html"/>
 						</div>
-						<div class="clear"></div>
 					</div>
 				</div>
-				<div class="fwrapper grids-24">
-					<div class="grids-24" id="footer">
-						<div class="grid-3 first">
+				<div class="fwrapper">
+					<div class="grid-fluid clearfix" id="footer">
+						<div class="grid-left first">
 							<a class="nameplate" href="/">
 						  		<xsl:element name="img">
 						    		<xsl:attribute name="alt">Iowa State University</xsl:attribute>
@@ -135,11 +121,12 @@
 						  		</xsl:element>
 							</a>
 						</div>
-						<div class="grid-21 last">
+						<div class="grid-left last">
 					        <xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:footer/*"/>
 						</div>
 					</div>
 				</div>
+				<div id="loading" style="display:none">Loading...</div>
 			</body>
 		</html>
 	</xsl:template>

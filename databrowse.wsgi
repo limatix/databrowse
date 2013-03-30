@@ -20,6 +20,7 @@
 
 import sys
 import os
+import string
 from lxml import etree
 
 # Enable cgitb to provide better error message output
@@ -32,6 +33,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     <xsl:template match="/">
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
             <body db:resdir="%s">
+                %s
                 <xsl:apply-templates mode="%s"/>
             </body>
         </html>
@@ -46,6 +48,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
             <body db:resdir="%s">
+                %s
                 <xsl:apply-templates mode="%s"/>
             </body>
         </html>
@@ -156,6 +159,30 @@ def application(environ, start_response):
             else:
                 pass
 
+            # Prepare Top Menu String
+            topbarstring = '<div class="pathbar">'
+            linkstring = db_web_support.siteurl
+            itemslist = string.split(relpath, "/")[1:]
+            count = 1
+            if itemslist[0] is not "":
+                topbarstring += '<a class="button" href="%s">/</a>&gt;' % linkstring
+                pass
+            for item in itemslist:
+                if item is not "" and count is not len(itemslist):
+                    linkstring += "/" + item
+                    topbarstring += '<a class="button" href="%s">%s</a>&gt;' % (linkstring, item)
+                    pass
+                elif item is not "" and count is len(itemslist):
+                    linkstring += "/" + item
+                    topbarstring += '<a class="button active" href="%s">%s</a>' % (linkstring, item)
+                    pass
+                else:
+                    topbarstring += '<a class="button active" href="%s">/</a>' % linkstring
+                    pass
+                count += 1
+                pass
+            topbarstring += "</div>"
+
             # If we want styling to be done by the browser or we don't want page styling
             parser = etree.XMLParser()
             parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
@@ -163,7 +190,7 @@ def application(environ, start_response):
                 return renderer.getContent()
             elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
@@ -173,14 +200,14 @@ def application(environ, start_response):
                 renderer.loadMenu()
                 xmlcontent.append(db_web_support.menu.GetMenu())
                 xml = etree.ElementTree(xmlcontent)
-                style = localwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = localwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 renderer.loadMenu()
