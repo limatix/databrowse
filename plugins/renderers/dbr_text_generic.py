@@ -49,7 +49,7 @@ class dbr_text_generic(renderer_class):
                 file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
                 file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                 file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-                magicstore = magic.open(magic.MAGIC_MIME_TYPE)
+                magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
                 extension = os.path.splitext(self._fullpath)[1][1:]

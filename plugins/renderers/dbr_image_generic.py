@@ -88,7 +88,7 @@ class dbr_image_generic(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "owner")
                 xmlchild.text = "%s:%s" % (username, groupname)
 
-                magicstore = magic.open(magic.MAGIC_MIME_TYPE)
+                magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
                 xmlchild = etree.SubElement(xmlroot, "contenttype")
