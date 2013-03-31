@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 ## Databrowse:  An Extensible Data Management Platform                       ##
-## Copyright (C) 2012 Iowa State University                                  ##
+## Copyright (C) 2012-2013 Iowa State University                             ##
 ##                                                                           ##
 ## This program is free software: you can redistribute it and/or modify      ##
 ## it under the terms of the GNU General Public License as published by      ##
@@ -16,9 +16,16 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
+## Portions of this software are adapted from hurry.filesize-0.9:            ##
+## Copyright (C) 2009 Martijn Faassen, Startifact                            ##
+## CHANGE LOG:                                                               ##
+##     2013-03-30 - filesize.py condensed and adapted for use in the         ##
+##                  ConvertUserFriendlySize function                         ##
+###############################################################################
 """ support/renderer_support.py - Encapsulation Class for Renderer Plugins """
 
 from lxml import etree
+from stat import *
 import os.path
 import string
 import random
@@ -99,6 +106,118 @@ class renderer_class(object):
             pass
 
         pass
+
+    def getSize(self, fullpath=None):
+        """ Get Size of A File - Returns size of current file if none specified """
+
+        if fullpath is None:
+            fullpath = self._fullpath
+            pass
+
+        st = os.stat(fullpath)
+        return st[ST_SIZE]
+
+    def getUserFriendlySize(self, fullpath=None, mode="alternative", custom=None):
+        return self.ConvertUserFriendlySize(self.getSize(fullpath), mode, custom)
+
+    def ConvertUserFriendlySize(self, bytes, mode="alternative", custom=None):
+        """Human-readable file size. """
+
+        if custom is not None:
+            formatstrings = custom
+            pass
+        elif mode is "traditional":
+            formatstrings = [
+                (1024 ** 5, 'P'),
+                (1024 ** 4, 'T'),
+                (1024 ** 3, 'G'),
+                (1024 ** 2, 'M'),
+                (1024 ** 1, 'K'),
+                (1024 ** 0, 'B'),
+            ]
+        elif mode is "alternative":
+            formatstrings = [
+                (1024 ** 5, ' PB'),
+                (1024 ** 4, ' TB'),
+                (1024 ** 3, ' GB'),
+                (1024 ** 2, ' MB'),
+                (1024 ** 1, ' KB'),
+                (1024 ** 0, (' byte', ' bytes')),
+            ]
+        elif mode is "verbose":
+            formatstrings = [
+                (1024 ** 5, (' petabyte', ' petabytes')),
+                (1024 ** 4, (' terabyte', ' terabytes')),
+                (1024 ** 3, (' gigabyte', ' gigabytes')),
+                (1024 ** 2, (' megabyte', ' megabytes')),
+                (1024 ** 1, (' kilobyte', ' kilobytes')),
+                (1024 ** 0, (' byte', ' bytes')),
+            ]
+        elif mode is "iec":
+            formatstrings = [
+                (1024 ** 5, 'Pi'),
+                (1024 ** 4, 'Ti'),
+                (1024 ** 3, 'Gi'),
+                (1024 ** 2, 'Mi'),
+                (1024 ** 1, 'Ki'),
+                (1024 ** 0, ''),
+            ]
+        elif mode is "si":
+            formatstrings = [
+                (1000 ** 5, 'P'),
+                (1000 ** 4, 'T'),
+                (1000 ** 3, 'G'),
+                (1000 ** 2, 'M'),
+                (1000 ** 1, 'K'),
+                (1000 ** 0, 'B'),
+            ]
+        else:
+            formatstrings = [
+                (1024 ** 5, ' PB'),
+                (1024 ** 4, ' TB'),
+                (1024 ** 3, ' GB'),
+                (1024 ** 2, ' MB'),
+                (1024 ** 1, ' KB'),
+                (1024 ** 0, (' byte', ' bytes')),
+            ]
+
+        for factor, suffix in formatstrings:
+            if bytes >= factor:
+                break
+        amount = float(bytes/factor)
+        if isinstance(suffix, tuple):
+            singular, multiple = suffix
+            if amount == 1:
+                suffix = singular
+            else:
+                suffix = multiple
+        return str(amount) + suffix
+
+    def ConvertUserFriendlyPermissions(self, p):
+        ts = {
+            0140000: 'ssocket',
+            0120000: 'llink',
+            0100000: '-file',
+            0060000: 'bblock',
+            0040000: 'ddir',
+            0020000: 'cchar',
+            0010000: 'pfifo'
+        }
+
+        t = p & 0170000
+
+        permstr = ts[t][0] if t in ts else 'u'
+        permstr += 'r' if p & 0x0100 else '-'
+        permstr += 'w' if p & 0x0080 else '-'
+        permstr += 's' if p & 0x0800 else 'x' if p & 0x0040 else 'S' if p & 0x0800 else '-'
+        permstr += 'r' if p & 0x0020 else '-'
+        permstr += 'w' if p & 0x0010 else '-'
+        permstr += 's' if p & 0x0400 else 'x' if p & 0x0008 else 'S' if p & 0x0400 else '-'
+        permstr += 'r' if p & 0x0004 else '-'
+        permstr += 'w' if p & 0x0002 else '-'
+        permstr += 's' if p & 0x0200 else 'x' if p & 0x0001 else 'S' if p & 0x0200 else '-'
+
+        return permstr
 
     def isRaw(self):
         #print "isRaw being called"

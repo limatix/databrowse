@@ -39,11 +39,13 @@
                                 dataType: "xml",
                                 beforeSend: function ( xhr ) {
                                     img.attr("src", resurl + "/icons/loading.gif");
+                                    $("#loading").fadeIn(100);
                                 }
                             }).done(function ( data ) {
                                 text = $(data).find('ul.rootdir')
                                 id.html(text);
                                 img.attr("src", resurl + "/icons/folder-open.png");
+                                $("#loading").fadeOut();
                             });
                         }
                     };

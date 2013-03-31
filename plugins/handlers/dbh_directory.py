@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 ## Databrowse:  An Extensible Data Management Platform                       ##
-## Copyright (C) 2012 Iowa State University                                  ##
+## Copyright (C) 2012-2013 Iowa State University                             ##
 ##                                                                           ##
 ## This program is free software: you can redistribute it and/or modify      ##
 ## it under the terms of the GNU General Public License as published by      ##
@@ -21,7 +21,7 @@
 
 def dbh_directory(path, contenttype, extension):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
-    if contenttype == "inode/directory" or contenttype == "directory" or contenttype == "setgid directory":
+    if contenttype.startswith("inode/directory") or contenttype.startswith("directory") or contenttype.startswith("setgid directory"):
         return "dbr_directory_generic"
     else:
         return False

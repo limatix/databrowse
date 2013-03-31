@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 ## Databrowse:  An Extensible Data Management Platform                       ##
-## Copyright (C) 2012 Iowa State University                                  ##
+## Copyright (C) 2012-2013 Iowa State University                             ##
 ##                                                                           ##
 ## This program is free software: you can redistribute it and/or modify      ##
 ## it under the terms of the GNU General Public License as published by      ##
@@ -21,6 +21,8 @@
 import os
 import os.path
 import time
+import pwd
+import grp
 from stat import *
 from lxml import etree
 from renderer_support import renderer_class
@@ -39,30 +41,6 @@ class dbr_image_generic(renderer_class):
     _default_content_mode = "detailed"
     _default_style_mode = "list"
     _default_recursion_depth = 2
-
-    def getsize(self, bytes):
-        """Human-readable file size. """
-
-        alternative = [
-            (1024 ** 5, ' PB'),
-            (1024 ** 4, ' TB'),
-            (1024 ** 3, ' GB'),
-            (1024 ** 2, ' MB'),
-            (1024 ** 1, ' KB'),
-            (1024 ** 0, (' byte', ' bytes')),
-        ]
-
-        for factor, suffix in alternative:
-            if bytes >= factor:
-                break
-        amount = float(bytes/factor)
-        if isinstance(suffix, tuple):
-            singular, multiple = suffix
-            if amount == 1:
-                suffix = singular
-            else:
-                suffix = multiple
-        return str(amount) + suffix
 
     def getContent(self):
         if self._content_mode == "detailed":
@@ -88,8 +66,8 @@ class dbr_image_generic(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "path")
                 xmlchild.text = os.path.dirname(self._fullpath)
 
-                xmlchild = etree.SubElement(xmlroot, "size")
-                xmlchild.text = self.getsize(file_size)
+                xmlchild = etree.SubElement(xmlroot, "filesize")
+                xmlchild.text = self.ConvertUserFriendlySize(file_size)
 
                 xmlchild = etree.SubElement(xmlroot, "mtime")
                 xmlchild.text = file_mtime
@@ -99,6 +77,28 @@ class dbr_image_generic(renderer_class):
 
                 xmlchild = etree.SubElement(xmlroot, "atime")
                 xmlchild.text = file_atime
+
+                # File Permissions
+                xmlchild = etree.SubElement(xmlroot, "permissions")
+                xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
+
+                # User and Group
+                username = pwd.getpwuid(st[ST_UID])[0]
+                groupname = grp.getgrgid(st[ST_GID])[0]
+                xmlchild = etree.SubElement(xmlroot, "owner")
+                xmlchild.text = "%s:%s" % (username, groupname)
+
+                magicstore = magic.open(magic.MAGIC_MIME_TYPE)
+                magicstore.load()
+                contenttype = magicstore.file(self._fullpath)
+                xmlchild = etree.SubElement(xmlroot, "contenttype")
+                xmlchild.text = contenttype
+
+                img = Image.open(self._fullpath)
+                xmlchild = etree.SubElement(xmlroot, "imgsize")
+                xmlchild.text = "%s x %s pixels" % img.size
+                xmlchild = etree.SubElement(xmlroot, "imgmode")
+                xmlchild.text = img.mode
 
                 f = open(self._fullpath, 'rb')
                 exiftags = EXIF.process_file(f)
@@ -128,12 +128,9 @@ class dbr_image_generic(renderer_class):
             xmlroot = etree.Element('{%s}image' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode == "raw":
-            magicstore = magic.open(magic.MAGIC_NONE)
+            magicstore = magic.open(magic.MAGIC_MIME)
             magicstore.load()
             contenttype = magicstore.file(self._fullpath)
-            # Work-around for PNG mime type issues
-            if contenttype.startswith('PNG'):
-                contenttype = "image/png"
             if "thumbnail" in self._web_support.req.form:
                 img = Image.open(self._fullpath)
                 format = img.format

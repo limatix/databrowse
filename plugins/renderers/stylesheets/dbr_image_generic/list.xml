@@ -22,13 +22,19 @@
 		        					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
 		        					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
 		        				</a>
-		        			</th></tr>
+		        			</th>
+		        		</tr>
 		        	</thead>
 		        	<tbody>
-			        	<tr><td style="width:10px"></td><td style="width:100px">Size: </td><td><xsl:value-of select="size"/></td></tr>
+			        	<tr><td style="width:10px"></td><td style="width:100px">Content Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+			        	<tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+			        	<tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+		        		<tr><td></td><td>File Size: </td><td><xsl:value-of select="filesize"/></td></tr>
 		        		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
 		        		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
 		        		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+		        		<tr><td></td><td>Size: </td><td><xsl:value-of select="imgsize"/></td></tr>
+		        		<tr><td></td><td>Color Mode: </td><td><xsl:value-of select="imgmode"/></td></tr>
 		        	</tbody>
 		    	</table>
 		    </div>
@@ -62,7 +68,7 @@
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="ricohtags" mode="tags">
 	<xsl:if test="tag">
-		<h3>Barcode Data</h3>
+		<h3>RICOH Memo Fields</h3>
 		<table class="cream full-width">
 			<thead>
 				<tr class="dark-title"><th>#</th><th>Data</th></tr>

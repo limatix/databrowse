@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 ## Databrowse:  An Extensible Data Management Platform                       ##
-## Copyright (C) 2012 Iowa State University                                  ##
+## Copyright (C) 2012-2013 Iowa State University                             ##
 ##                                                                           ##
 ## This program is free software: you can redistribute it and/or modify      ##
 ## it under the terms of the GNU General Public License as published by      ##
@@ -73,7 +73,7 @@ class handler_support:
 
     def GetHandler(self, fullpath):
         """ Return the handler given a full path """
-        magicstore = magic.open(magic.MAGIC_NONE)
+        magicstore = magic.open(magic.MAGIC_MIME)
         magicstore.load()
         contenttype = magicstore.file(os.path.realpath(fullpath))   # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
@@ -110,6 +110,22 @@ class handler_support:
             pass
         #print "Returning Handler Name:  %s" % handler
         return (handler, iconname)
+
+    def GetIcon(self, contenttype, extension):
+        """ Return the icon for a contenttype or extension """
+        try:
+            iconname = self._icondb.get("Content-Type", contenttype)
+            pass
+        except ConfigParser.NoOptionError:
+            try:
+                iconname = self._icondb.get("Extension", extension)
+                pass
+            except:
+                iconname = "unknown.png"
+                pass
+            pass
+
+        return iconname
 
     def GetHiddenFileList(self):
         """ Return the list of files marked to be hidden """
