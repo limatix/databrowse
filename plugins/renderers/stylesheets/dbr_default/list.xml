@@ -6,10 +6,12 @@
 			</th>
 			<th colspan="2" style="word-wrap: break-word">
 				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
-				<a>
-					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
-					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
-				</a>
+				<xsl:if test="@downlink">
+					<a>
+						<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+						<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+					</a>
+				</xsl:if>
 			</th>
     	</thead>
     	<tbody>

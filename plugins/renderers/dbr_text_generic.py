@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_default.py - Default Renderer - Basic Output for Any File """
+""" plugins/renderers/dbr_text_generic.py - Default Text Renderer """
 
 import os
 import os.path
@@ -29,11 +29,11 @@ from renderer_support import renderer_class
 import magic
 
 
-class dbr_default(renderer_class):
+class dbr_text_generic(renderer_class):
     """ Default Renderer - Basic Output for Any File """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"
-    _namespace_local = "default"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/text"
+    _namespace_local = "text"
     _default_content_mode = "detailed"
     _default_style_mode = "list"
     _default_recursion_depth = 2
@@ -55,11 +55,9 @@ class dbr_default(renderer_class):
                 extension = os.path.splitext(self._fullpath)[1][1:]
                 icon = self._handler_support.GetIcon(contenttype, extension)
 
-                src = self.getURL(self._relpath, content_mode="raw", thumbnail="medium")
-                href = self.getURL(self._relpath, content_mode="raw")
                 downlink = self.getURL(self._relpath, content_mode="raw", download="true")
 
-                xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=os.path.basename(self._relpath), src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+                xmlroot = etree.Element('{%s}text' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
 
                 xmlchild = etree.SubElement(xmlroot, "filename")
                 xmlchild.text = os.path.basename(self._fullpath)
@@ -92,6 +90,12 @@ class dbr_default(renderer_class):
                 groupname = grp.getgrgid(st[ST_GID])[0]
                 xmlchild = etree.SubElement(xmlroot, "owner")
                 xmlchild.text = "%s:%s" % (username, groupname)
+
+                # Contents of File
+                f = open(self._fullpath)
+                xmlchild = etree.SubElement(xmlroot, "contents")
+                xmlchild.text = f.read()
+                f.close()
 
                 return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":

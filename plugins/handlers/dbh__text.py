@@ -16,12 +16,12 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/dbh_directory.py - Generic Directory Handler """
+""" plugins/handlers/dbh_text.py - Generic Text Handler """
 
 
-def dbh_directory(path, contenttype, extension):
-    """ Generic Directory Handler - Returns directory_generic for all inode/directory """
-    if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
-        return "dbr_directory_generic"
+def dbh_text(path, contenttype, extension):
+    """ Generic Text Handler - Returns text_generic for all text files """
+    if contenttype.startswith('text'):
+        return "dbr_text_generic"
     else:
         return False

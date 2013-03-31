@@ -1,4 +1,4 @@
-<xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="detailed">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="detailed">
     <table class="cream">
     	<thead>
         	<th style="width:8px">
@@ -22,8 +22,27 @@
 	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
 	    </tbody>
     </table>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+    	<![CDATA[
+    		$(document).ready(function() {
+  				prettyPrint();
+			});    		
+    	]]>
+    </script>
+    <xsl:element name="link">
+    	<xsl:attribute name="type">text/css</xsl:attribute>
+    	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <pre class="prettyprint">
+    	<xsl:value-of select="contents"/>
+    </pre>
 </xsl:template>
-<xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="summary">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="summary">
 </xsl:template>
-<xsl:template xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" match="default:default" mode="title">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="title">
 </xsl:template>

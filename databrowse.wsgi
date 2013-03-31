@@ -145,20 +145,6 @@ def application(environ, start_response):
         etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
         if not renderer.isRaw():
-            # If we are only requesting content or style, output them
-            if "contentonly" in db_web_support.req.form:
-                xml = etree.ElementTree(renderer.getContent())
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-                db_web_support.req.output = etree.tostring(xml)
-                return [db_web_support.req.return_page()]
-            elif "styleonly" in db_web_support.req.form:
-                style = serverwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
-                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-                db_web_support.req.output = style
-                return [db_web_support.req.return_page()]
-            else:
-                pass
-
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar">'
             linkstring = db_web_support.siteurl
@@ -182,6 +168,20 @@ def application(environ, start_response):
                 count += 1
                 pass
             topbarstring += "</div>"
+
+            # If we are only requesting content or style, output them
+            if "contentonly" in db_web_support.req.form:
+                xml = etree.ElementTree(renderer.getContent())
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.output = etree.tostring(xml)
+                return [db_web_support.req.return_page()]
+            elif "styleonly" in db_web_support.req.form:
+                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                db_web_support.req.response_headers['Content-Type'] = 'text/xml'
+                db_web_support.req.output = style
+                return [db_web_support.req.return_page()]
+            else:
+                pass
 
             # If we want styling to be done by the browser or we don't want page styling
             parser = etree.XMLParser()

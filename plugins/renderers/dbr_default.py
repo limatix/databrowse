@@ -57,9 +57,12 @@ class dbr_default(renderer_class):
 
                 src = self.getURL(self._relpath, content_mode="raw", thumbnail="medium")
                 href = self.getURL(self._relpath, content_mode="raw")
-                downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-
-                xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=os.path.basename(self._relpath), src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+                name = os.path.basename(self._relpath) if self._relpath is not '/' else os.path.basename(self._fullpath)
+                if not os.path.isdir(self._fullpath):
+                    downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+                    xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+                else:
+                    xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, icon=icon)
 
                 xmlchild = etree.SubElement(xmlroot, "filename")
                 xmlchild.text = os.path.basename(self._fullpath)

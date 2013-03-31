@@ -235,7 +235,13 @@ class renderer_class(object):
         return self._content_mode
 
     def getURL(self, relpath, **kwargs):
+        """ Return Full URL to a Relative Path """
         #print "getURL being called"
+        # We need to tack in handler if handler is overridden
+        if self._handlers[-1] is not self.__class__.__name__ and "handler" not in kwargs:
+            kwargs["handler"] = self.__class__.__name__
+            pass
+        # Build the URL
         if self._web_support.seo_urls is True:
             url = self._web_support.siteurl + relpath
             if len(kwargs) > 0:
