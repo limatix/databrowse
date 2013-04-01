@@ -32,7 +32,7 @@ class dbr_directory_generic(renderer_class):
     _namespace_local = "dir"
     _default_content_mode = "title"
     _default_style_mode = "list"
-    _default_recursion_depth = 2
+    _default_recursion_depth = 1
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
         """ Load all of the values provided by initialization """
