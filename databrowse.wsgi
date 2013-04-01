@@ -60,11 +60,7 @@ ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
-        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-            <body>
-                <xsl:apply-templates mode="%s"/>
-            </body>
-        </html>
+        <xsl:apply-templates mode="%s"/>
     </xsl:template>
     %s
 </xsl:stylesheet>'''
@@ -188,6 +184,13 @@ def application(environ, start_response):
             parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
             if "ajax" in db_web_support.req.form:
                 return renderer.getContent()
+            elif renderer.getContentMode() is "ajax":
+                xml = etree.ElementTree(renderer.getContent())
+                style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
+                content = xml.xslt(etree.XML(style, parser))
+                db_web_support.req.output = etree.tostring(content)
+                db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
+                return [db_web_support.req.return_page()]
             elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
                 style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())

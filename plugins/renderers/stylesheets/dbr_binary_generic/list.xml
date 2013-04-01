@@ -1,0 +1,279 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:binary="http://thermal.cnde.iastate.edu/databrowse/binary" match="binary:binary" mode="detailed">
+    <table class="cream">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+				</a>
+			</th>
+    	</thead>
+    	<tbody>
+	        <tr><td></td><td>Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+	        <tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+	        <tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+	        <tr><td></td><td>Size: </td><td><xsl:value-of select="size"/></td></tr>
+	        <tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+	        <tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+	    </tbody>
+    </table>
+    <script type="text/javascript">
+        var requrl = "<xsl:value-of select="contentinfo/@ajaxlink"/>";
+        var offset = <xsl:value-of select="contentinfo/@offset"/>;
+        var numofoffsets = <xsl:value-of select="contentinfo/@numofoffsets"/>;
+        var filesize = <xsl:value-of select="contentinfo/@size"/>;
+    </script>
+    <script type="text/javascript" defer="true">
+    	<![CDATA[
+    		function MI(element)
+            {
+                SelectOffset(element.id.substring(1));
+            }
+            function MO(element)
+            {
+                UnselectOffset(element.id.substring(1));
+            }
+            function SelectOffset(value)
+            {
+                hexElement = document.getElementById('h' + value);
+                charElement = document.getElementById('s' + value);
+
+                hexElement.className = 'hexhovered';
+                charElement.className = 'hexhovered';
+            }
+            function UnselectOffset(value)
+            {
+                hexElement = document.getElementById('h' + value);
+                charElement = document.getElementById('s' + value);
+
+                hexElement.className = '';
+                charElement.className = '';
+            }
+            function hexnext()
+            {
+                var nextoffset = offset + (numofoffsets * 16);
+                if(nextoffset < filesize)
+                {
+                    $.AjaxRequest(nextoffset, numofoffsets);
+                    offset = nextoffset;
+                    nextoffset = offset + (numofoffsets * 16);
+                    if(nextoffset > filesize)
+                    {
+                        $('#nextlink').html("Next Offsets");
+                    }
+                    if(offset > 0)
+                    {
+                        $('#previouslink').html('<a onclick="hexprev()" style="cursor: pointer;">Previous Offsets</a>');
+                    }
+                }
+                else
+                {
+                    if(nextoffset > filesize)
+                    {
+                        $('#nextlink').html("Next Offsets");
+                    }
+                }                
+            }
+            function hexprev()
+            {
+                var nextoffset = offset - (numofoffsets * 16);
+                if(nextoffset < 0)
+                {
+                    nextoffset = 0;
+                }
+                if(offset != 0)
+                {
+                    $.AjaxRequest(nextoffset, numofoffsets);
+                    offset = nextoffset;
+                    if(offset < 1)
+                    {
+                        $('#previouslink').html("Previous Offsets");
+                    }
+                    nextoffset = offset + (numofoffsets * 16);
+                    if(nextoffset < filesize)
+                    {
+                        $('#nextlink').html('<a onclick="hexnext()" style="cursor: pointer;">Next Offsets</a>');
+                    }
+                }
+                else
+                {
+                    $('#previouslink').html("Previous Offsets");
+                }    
+            }
+            $.AjaxRequest = function(offset, lines) {
+                var ajaxurl = requrl + '&offset=' + String(offset) + '&lines=' + String(lines);
+                $.ajax({
+                    url: ajaxurl,
+                    dataType: "xml",
+                    beforeSend: function ( xhr ) {
+                        $("#loading").fadeIn(100);
+                    }
+                }).done(function ( data ) {
+                    text = $(data).find('table');
+                    $('#hexpre').html(text);
+                    $("#loading").fadeOut();
+                });
+            };
+    	]]>
+    </script>
+    <style>
+            .hexheader {
+                color: #900;
+                font-weight: bold;
+            }
+            .hexbin {
+                color: #900;
+                font-weight: bold;
+                padding-right: 10px;
+            }
+            .hexstr {
+                padding: 0px;
+                padding-left: 10px;
+                margin: 0px;
+            }
+            .hexhex {
+                width: 25px;
+                text-align: center;
+            }
+            .hextable {
+                border-collapse: collapse;
+                text-align: center;
+            }
+            .hexfirst {
+                padding-left: 10px;
+            }
+            .hexhovered {
+                outline: 1px dashed #900;
+            }
+
+    </style>
+    <span id="previouslink">Previous Offsets</span> | <span id="nextlink"><a onclick="hexnext()" style="cursor: pointer;">Next Offsets</a></span>
+    <pre id="hexpre">
+        <table class="hextable">
+            <thead>
+                <tr class="hexheader">
+                    <th class="hexbin"></th>
+                    <th class="hexhex">00</th>
+                    <th class="hexhex">01</th>
+                    <th class="hexhex">02</th>
+                    <th class="hexhex">03</th>
+                    <th class="hexhex">04</th>
+                    <th class="hexhex">05</th>
+                    <th class="hexhex">06</th>
+                    <th class="hexhex">07</th>
+                    <th class="hexhex">08</th>
+                    <th class="hexhex">09</th>
+                    <th class="hexhex">0A</th>
+                    <th class="hexhex">0B</th>
+                    <th class="hexhex">0C</th>
+                    <th class="hexhex">0D</th>
+                    <th class="hexhex">0E</th>
+                    <th class="hexhex">0F</th>
+                    <th class="hexstr">
+                        <span>0</span>
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                        <span>6</span>
+                        <span>7</span>
+                        <span>8</span>
+                        <span>8</span>
+                        <span>9</span>
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
+                        <span>D</span>
+                        <span>E</span>
+                        <span>F</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            	<xsl:for-each select="contents/bin">
+                    <tr>
+                        <td class="hexbin hexlast"><xsl:value-of select="offset/."/></td>
+                        <xsl:for-each select="*/hexelem">
+                            <td onmouseover="MI(this)" onmouseout="MO(this)"><xsl:attribute name="id">h<xsl:number count="bin"/>-<xsl:number count="hexelem"/></xsl:attribute><xsl:value-of select="."/></td>
+                        </xsl:for-each>
+                        <td class="hexstr">
+                            <xsl:for-each select="*/strelem">
+                                    <span onmouseover="MI(this)" onmouseout="MO(this)"><xsl:attribute name="id">s<xsl:number count="bin"/>-<xsl:number count="strelem"/></xsl:attribute><xsl:value-of select="."/></span>                 
+                            </xsl:for-each>
+                        </td>                        
+                    </tr>
+                </xsl:for-each>
+            </tbody>
+        </table>
+    </pre>
+
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:binary="http://thermal.cnde.iastate.edu/databrowse/binary" match="binary:binary" mode="ajax">
+        <table class="hextable">
+            <thead>
+                <tr class="hexheader">
+                    <th class="hexbin"></th>
+                    <th class="hexhex">00</th>
+                    <th class="hexhex">01</th>
+                    <th class="hexhex">02</th>
+                    <th class="hexhex">03</th>
+                    <th class="hexhex">04</th>
+                    <th class="hexhex">05</th>
+                    <th class="hexhex">06</th>
+                    <th class="hexhex">07</th>
+                    <th class="hexhex">08</th>
+                    <th class="hexhex">09</th>
+                    <th class="hexhex">0A</th>
+                    <th class="hexhex">0B</th>
+                    <th class="hexhex">0C</th>
+                    <th class="hexhex">0D</th>
+                    <th class="hexhex">0E</th>
+                    <th class="hexhex">0F</th>
+                    <th class="hexstr">
+                        <span>0</span>
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                        <span>6</span>
+                        <span>7</span>
+                        <span>8</span>
+                        <span>8</span>
+                        <span>9</span>
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
+                        <span>D</span>
+                        <span>E</span>
+                        <span>F</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <xsl:for-each select="contents/bin">
+                    <tr>
+                        <td class="hexbin hexlast"><xsl:value-of select="offset/."/></td>
+                        <xsl:for-each select="*/hexelem">
+                            <td onmouseover="MI(this)" onmouseout="MO(this)"><xsl:attribute name="id">h<xsl:number count="bin"/>-<xsl:number count="hexelem"/></xsl:attribute><xsl:value-of select="."/></td>
+                        </xsl:for-each>
+                        <td class="hexstr">
+                            <xsl:for-each select="*/strelem">
+                                    <span onmouseover="MI(this)" onmouseout="MO(this)"><xsl:attribute name="id">s<xsl:number count="bin"/>-<xsl:number count="strelem"/></xsl:attribute><xsl:value-of select="."/></span>                                            
+                            </xsl:for-each>
+                        </td>                        
+                    </tr>
+                </xsl:for-each>
+            </tbody>
+        </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="summary">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="title">
+</xsl:template>
