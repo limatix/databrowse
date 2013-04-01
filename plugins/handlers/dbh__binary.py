@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__octet.py - Generic Binary Handler """
 
 
-def dbh_octet(path, contenttype, extension):
+def dbh_binary(path, contenttype, extension):
     """ Generic Binary Handler - Returns binary_generic for all text files """
     if not (contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory")) and len(contenttype) > 14 and contenttype[-14:] == 'charset=binary':
         return "dbr_binary_generic"
