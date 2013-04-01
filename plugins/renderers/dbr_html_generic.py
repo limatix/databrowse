@@ -27,7 +27,7 @@ from renderer_support import renderer_class
 class dbr_html_generic(renderer_class):
     """ Generic HTML Files """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/html"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dbhtml"
     _namespace_local = "dbhtml"
     _default_content_mode = "full"
     _default_style_mode = "full"
@@ -39,11 +39,17 @@ class dbr_html_generic(renderer_class):
             xmlroot = etree.Element('{%s}dbhtml' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "full":
-            f = open(self._fullpath, 'r')
-            content = f.read()
-            f.close()
-            content = content.replace(' xmlns="http://www.w3.org/1999/xhtml"', "")
-            return etree.XML(content)
+            xmlroot = etree.Element('{%s}dbhtml' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
+            if self.getSize() > 0:
+                f = open(self._fullpath, 'r')
+                parser = etree.HTMLParser()
+                htmltree = etree.parse(f, parser)
+                f.close()
+                htmlroot = htmltree.getroot()
+                xmlchild = etree.SubElement(xmlroot, "contents")
+                xmlchild.append(htmlroot)
+                pass
+            return xmlroot
         else:
             raise self.RendererException("Invalid Content Mode")
 

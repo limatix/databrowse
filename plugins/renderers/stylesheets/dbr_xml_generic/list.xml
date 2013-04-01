@@ -46,7 +46,7 @@
         <xsl:attribute name="href"><xsl:value-of select="@resurl"/>/prettify/prettify.css</xsl:attribute>
     </xsl:element>
     <pre id="prettyprint" class="prettyprint">
-        <xsl:apply-templates select="contents" mode="escape"/>
+        <xsl:apply-templates select="contents/*" mode="escape"/>
     </pre>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" match="dbxml:dbxml" mode="summary">
