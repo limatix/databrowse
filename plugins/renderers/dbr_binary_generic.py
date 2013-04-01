@@ -63,7 +63,7 @@ class dbr_binary_generic(renderer_class):
             pass
         for line in range(offset, os.path.getsize(self._fullpath), 16)[:lines]:
             data = f.read(16)
-            yield '{:08x} | {:47} | {}\n'.format(line, myhex(data), mystr(data))
+            yield '{0:08x} | {1:47} | {2}\n'.format(line, myhex(data), mystr(data))
         f.close()
 
     def getContent(self):
@@ -169,7 +169,7 @@ class dbr_binary_generic(renderer_class):
                 data = f.read(16)
                 newtr = etree.SubElement(xmlchild, "bin")
                 newtd = etree.SubElement(newtr, "offset")
-                newtd.text = '{:08x}'.format(line)
+                newtd.text = "%08x" % line
                 newtd = etree.SubElement(newtr, "hex")
                 for x in data:
                     hexelem = etree.SubElement(newtd, "hexelem")
