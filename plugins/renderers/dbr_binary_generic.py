@@ -130,7 +130,7 @@ class dbr_binary_generic(renderer_class):
                     data = f.read(16)
                     newtr = etree.SubElement(xmlchild, "bin")
                     newtd = etree.SubElement(newtr, "offset")
-                    newtd.text = '{:08x}'.format(line)
+                    newtd.text = "%08x" % line
                     newtd = etree.SubElement(newtr, "hex")
                     for x in data:
                         hexelem = etree.SubElement(newtd, "hexelem")
