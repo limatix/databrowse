@@ -105,7 +105,17 @@ class dbr_dataguzzler(renderer_class):
                 pass
             assert(len(xmlchunk) == 1)
 
-            return xmlchunk[0]
+            extension = os.path.splitext(self._fullpath)[1][1:]
+            icon = self._handler_support.GetIcon('application/octet-stream', extension)
+
+            downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+
+            etree.register_namespace("dbdg", "http://thermal.cnde.iastate.edu/databrowse/dataguzzler")
+
+            xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+            xmlroot.append(xmlchunk[0])
+
+            return xmlroot
 
         elif self._content_mode == "raw":
             size = os.path.getsize(self._fullpath)

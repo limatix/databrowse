@@ -98,7 +98,7 @@ class handler_support:
                 handler.append(temp)
             pass
         try:
-            iconname = self._icondb.get("Content-Type", contenttype)
+            iconname = self._icondb.get("Content-Type", contenttype.split(';')[0])
             pass
         except ConfigParser.NoOptionError:
             try:
@@ -114,7 +114,7 @@ class handler_support:
     def GetIcon(self, contenttype, extension):
         """ Return the icon for a contenttype or extension """
         try:
-            iconname = self._icondb.get("Content-Type", contenttype)
+            iconname = self._icondb.get("Content-Type", contenttype.split(';')[0])
             pass
         except ConfigParser.NoOptionError:
             try:
