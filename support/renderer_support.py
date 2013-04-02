@@ -307,7 +307,10 @@ class renderer_class(object):
             navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
             for item in dirlist:
                 link = self.getURL(self._relpath, handler=handler, style_mode=item)
-                itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                if self._style_mode == item and self.__class__.__name__ == handler:
+                    itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                else:
+                    itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
                 menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
                 menuitem.text = item.title().replace("_", " ")
                 pass

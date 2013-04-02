@@ -1,0 +1,109 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" match="dc:experiment" mode="detailed">
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h3>Experiment Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th>Item</th><th>Details</th></tr>
+        </thead>
+    	<tbody>
+	        <tr><td>Specimen: </td><td><xsl:value-of select="dc:summary/dc:specimen"/></td></tr>
+            <tr><td>Performed By: </td><td><xsl:value-of select="dc:summary/dc:perfby"/></td></tr>
+            <tr><td>Date: </td><td><xsl:value-of select="dc:summary/dc:date"/></td></tr>
+            <tr>
+                <td>Experiment Notes: </td>
+                <td>
+                    <xsl:call-template name="dc-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:summary/dc:expnotes"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+            <tr>
+                <td>Goal: </td>
+                <td>
+                    <xsl:call-template name="dc-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:summary/dc:goal"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+	    </tbody>
+    </table>
+    <h3>Measurement Log</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr>
+                <th>#</th><th>Specimen</th><th>Date</th><th>By</th><th>Notes</th><th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <xsl:for-each select="dc:measurement">
+                <tr>
+                    <td><xsl:value-of select="dc:measnum"/></td>
+                    <td><xsl:value-of select="dc:specimen"/></td>
+                    <td><xsl:value-of select="dc:date"/></td>
+                    <td><xsl:value-of select="dc:perfby"/></td>
+                    <td>
+                        <xsl:call-template name="dc-lf2p">
+                            <xsl:with-param name="instr">
+                                <xsl:value-of select="dc:notes"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </td>
+                    <td></td>
+                </tr>
+            </xsl:for-each>
+        </tbody>
+    </table>
+    <h3>Configuration</h3>
+        <xsl:element name="script">
+            <xsl:attribute name="type">text/javascript</xsl:attribute>
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/prettify/prettify.js</xsl:attribute>
+        </xsl:element>
+        <script type="text/javascript" defer="true">
+            <![CDATA[
+                $(document).ready(function() {
+                    prettyPrint();
+                });         
+            ]]>
+        </script>
+        <xsl:element name="link">
+            <xsl:attribute name="type">text/css</xsl:attribute>
+            <xsl:attribute name="rel">stylesheet</xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+        </xsl:element>
+        <pre class="prettyprint">
+            <xsl:value-of select="dc:configstr"/>
+        </pre>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" match="dc:experiment" mode="summary">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" match="dc:experiment" mode="title">
+</xsl:template>
+<xsl:template name="dc-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="dc-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 

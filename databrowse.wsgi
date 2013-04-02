@@ -30,9 +30,11 @@ cgitb.enable()
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+    <xsl:variable name="resdir">%s</xsl:variable>
     <xsl:template match="/">
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-            <body db:resdir="%s">
+            <body>
+                <xsl:attribute name="db:resdir"><xsl:value-of select="$resdir"/></xsl:attribute>
                 %s
                 <xsl:apply-templates mode="%s"/>
             </body>
@@ -44,10 +46,12 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+    <xsl:variable name="resdir">%s</xsl:variable>
     <xsl:template match="/">
-    <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
+        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-            <body db:resdir="%s">
+            <body>
+                <xsl:attribute name="db:resdir"><xsl:value-of select="$resdir"/></xsl:attribute>
                 %s
                 <xsl:apply-templates mode="%s"/>
             </body>
@@ -199,12 +203,12 @@ def application(environ, start_response):
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
-                xmlcontent = renderer.getContent()
-                renderer.loadMenu()
-                xmlcontent.append(db_web_support.menu.GetMenu())
-                xml = etree.ElementTree(xmlcontent)
+                xml = etree.ElementTree(renderer.getContent())
                 style = localwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
+                contentroot = content.getroot()
+                renderer.loadMenu()
+                contentroot.append(db_web_support.menu.GetMenu())
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]

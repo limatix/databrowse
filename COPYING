@@ -10,6 +10,10 @@ Portions of this software are adapted from jQuery-1.9.1:
 Copyright (C) 2013 jQuery Foundation and other contributors
 License: MIT
 
+Portions of this software are adapted from DataTables-1.9.4:
+Copyright (C) 2008-2010 Allan Jardine
+License: GPL v2 or BSD-3
+
 Portions of this software are adapted from hurry.filesize-0.9:
 Copyright (C) 2009 Martijn Faassen, Startifact
 License: ZPL v2.1

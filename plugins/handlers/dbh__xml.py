@@ -21,7 +21,7 @@
 
 def dbh_text(path, contenttype, extension):
     """ Generic XML Handler - Returns xml_generic for all XML files """
-    if contenttype.startswith('application/xml') or extension == "xlg":
+    if contenttype.startswith('application/xml') or extension == "xlg" or extension == "xml":
         return "dbr_xml_generic"
     else:
         return False
