@@ -39,16 +39,15 @@ class dbr_xml_monthly_rpt(renderer_class):
             xmlroot = etree.Element('{%s}monthlyrptxml' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode is "full":
-            class FileResolver(etree.Resolver):
-                def resolve(self, url, pubid, context):
-                    return self.resolve_filename(url, context)
-
-            parser = etree.XMLParser()
-            parser.resolvers.add(FileResolver())
             f = open(self._fullpath, 'r')
-            xmltree = etree.parse(f, parser)
+            xmltree = etree.parse(f)
             f.close()
-            return xmltree.getroot()
+            g = open(os.path.dirname(self._fullpath) + '/view_monthly_reports.xml', 'r')
+            xsltransform = etree.parse(g)
+            g.close()
+            transformedxml = xmltree.xslt(xsltransform)
+            xmloutput = etree.XML(str(transformedxml))
+            return xmloutput
         else:
             raise self.RendererException("Invalid Content Mode")
 
