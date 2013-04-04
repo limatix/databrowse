@@ -24,6 +24,8 @@ from lxml import etree
 from renderer_support import renderer_class
 import subprocess
 import shutil
+import sys
+import imp
 
 
 class dbr_checklist_chx(renderer_class):
@@ -105,26 +107,14 @@ class dbr_checklist_chx(renderer_class):
                     shutil.copy(imagepath, tempsavedir)
                 f = open(fullfilename, "w")
                 f.write(filestring)
-                f.close
+                f.close()
                 try:
-                    print "Current Working Directory: " + os.getcwd()
-                    print "Calling chx2pdf with: " + repr(['chx2pdf',
-                                                          fullfilename,
-                                                          self._web_support.req.form["specimen"].value,
-                                                          self._web_support.req.form["perfby"].value,
-                                                          self._web_support.req.form["date"].value,
-                                                          self._web_support.req.form["dest"].value])
-                    subprocess.check_call(['chx2pdf',
-                                           fullfilename,
-                                           self._web_support.req.form["specimen"].value,
-                                           self._web_support.req.form["perfby"].value,
-                                           self._web_support.req.form["date"].value,
-                                           self._web_support.req.form["dest"].value])
+                    chx2pdf = imp.load_source("chx2pdf", "/usr/local/QAutils/bin/chx2pdf")
+                    chx2pdf.chx2pdf(fullfilename)
                 except Exception as err:
                     self._web_support.req.output = "Error Generating PDF:  " + str(err)
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
-
                 try:
                     f = open(os.path.join(tempsavedir, filename + ".pdf"), 'rb')
                     self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
