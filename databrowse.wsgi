@@ -273,6 +273,15 @@ def application(environ, start_response):
             form = fs
             pass
 
+        # Get a Trace and Also Output a Copy of the Trace to the Server Log
+        trace = StringIO.StringIO()
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=trace)
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
+        tracestring = trace.getvalue()
+        trace.close()
+        tracestring = tracestring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
+
         # Return Proper Error so AJAX Works
         if "ajax" in form:
             start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'})
@@ -283,16 +292,7 @@ def application(environ, start_response):
             for key in form.keys():
                 inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
                 pass
-            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
-
-            # Get a Trace and Also Output a Copy of the Trace to the Server Log
-            trace = StringIO.StringIO()
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=trace)
-            traceback.print_exception(exc_type, exc_value, exc_traceback)
-            tracestring = trace.getvalue()
-            trace.close()
-            tracestring = tracestring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
+            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")           
 
             # Get A List of Everything in Environ
             keystring = ""

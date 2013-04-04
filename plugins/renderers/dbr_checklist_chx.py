@@ -22,6 +22,8 @@ import os
 import os.path
 from lxml import etree
 from renderer_support import renderer_class
+import subprocess
+import shutil
 
 
 class dbr_checklist_chx(renderer_class):
@@ -34,18 +36,21 @@ class dbr_checklist_chx(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if "ajax" in self._web_support.req.form:
+        if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
             if "filename" in self._web_support.req.form and "destination" in self._web_support.req.form and "file" in self._web_support.req.form:
                 filename = self._web_support.req.form["filename"].value
                 destination = self._web_support.req.form["destination"].value
                 filestring = self._web_support.req.form["file"].value
-                fullpath = os.path.abspath(self._web_support.dataroot + "/" + destination)
+                if destination.startswith('/'):
+                    fullpath = os.path.abspath(destination)
+                else:
+                    fullpath = os.path.abspath(self._web_support.dataroot + "/" + destination)
                 fullfilename = os.path.abspath(fullpath + "/" + filename)
                 if not fullpath.startswith(self._web_support.dataroot):
                     raise self.RendererException("Attempt to Save File Outside of Dataroot")
                 # Let's check on the directory and make sure its writable and it exists
                 if not os.access(fullpath, os.W_OK) and os.path.exists(fullpath):
-                    self._web_support.req.output = "Error Saving File:  Save Directory Not Writable"
+                    self._web_support.req.output = "Error Saving File:  Save Directory Not Writable " + fullpath
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
                 elif not os.path.exists(fullpath):
@@ -76,6 +81,67 @@ class dbr_checklist_chx(renderer_class):
                 pass
             else:
                 self._web_support.req.output = "Error Saving File: Incomplete Request"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
+        elif "ajax" in self._web_support.req.form and "pdf" in self._web_support.req.form:
+            if all(k in self._web_support.req.form for k in ("file", "specimen", "perfby", "date", "dest")):
+                filestring = self._web_support.req.form["file"].value
+                if 'filename' in self._web_support.req.form:
+                    upfilename = self._web_support.req.form["filename"].value
+                else:
+                    upfilename = "chxfromweb.chx"
+                filename = os.path.splitext(upfilename)[0]
+                tempsavedir = os.tempnam(None, "dbchx")
+                fullfilename = os.path.join(tempsavedir, filename + ".chx")
+                os.mkdir(tempsavedir)
+                os.chdir(tempsavedir)
+                chxparsed = etree.XML(filestring)
+                imagelist = chxparsed.xpath("//chx:checklist/chx:checkitem/chx:parameter[@name='image']", namespaces={"chx": "http://thermal.cnde.iastate.edu/checklist"})
+                for image in imagelist:
+                    image = image.text
+                    image = image.translate(None, "\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f")
+                    image = image.strip()
+                    imagepath = os.path.abspath(os.path.dirname(self._fullpath) + '/' + image)
+                    shutil.copy(imagepath, tempsavedir)
+                f = open(fullfilename, "w")
+                f.write(filestring)
+                f.close
+                try:
+                    print "Current Working Directory: " + os.getcwd()
+                    print "Calling chx2pdf with: " + repr(['chx2pdf',
+                                                          fullfilename,
+                                                          self._web_support.req.form["specimen"].value,
+                                                          self._web_support.req.form["perfby"].value,
+                                                          self._web_support.req.form["date"].value,
+                                                          self._web_support.req.form["dest"].value])
+                    subprocess.check_call(['chx2pdf',
+                                           fullfilename,
+                                           self._web_support.req.form["specimen"].value,
+                                           self._web_support.req.form["perfby"].value,
+                                           self._web_support.req.form["date"].value,
+                                           self._web_support.req.form["dest"].value])
+                except Exception as err:
+                    self._web_support.req.output = "Error Generating PDF:  " + str(err)
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+
+                try:
+                    f = open(os.path.join(tempsavedir, filename + ".pdf"), 'rb')
+                    self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
+                    self._web_support.req.response_headers['Content-Length'] = str(self.getSize(os.path.join(tempsavedir, filename + ".pdf")))
+                    self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + filename + ".pdf"
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
+                except Exception as err:
+                    self._web_support.req.output = "Error Generating PDF:  " + err
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+            else:
+                self._web_support.req.output = "Error Generating PDF: Incomplete Request"
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
         elif self._content_mode is "summary" or self._content_mode is "detailed" or self._content_mode is "title":

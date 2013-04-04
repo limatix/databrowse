@@ -39,11 +39,11 @@
                 // Get URL
                 if (window.location.search != '')
                 {
-                    ajaxurl = window.location.href + "&ajax";
+                    ajaxurl = window.location.href + "&ajax&save";
                 }
                 else
                 {
-                    ajaxurl = window.location.href + "?ajax";
+                    ajaxurl = window.location.href + "?ajax&save";
                 }
 
                 // New Saving Components //////////////////////////////////
@@ -62,6 +62,40 @@
                     success: saveSuccessCallback,
                     type: 'POST',
                     url: ajaxurl
+                    });
+            }
+
+            openpdf = function() {
+                // Everything Here is the Same as in chx2html.xsl /////////
+                /* first filter checkitemnum attributes from <checkitem> tags */
+                var processor=new XSLTProcessor();
+                processor.importStylesheet(filternums_xsl_parsed);
+                //filteredchecklistxml=processor.transformToFragment(checklistxml,document);
+                var filteredchecklistxml=processor.transformToDocument(checklistxml);
+                var filenameinput=document.getElementById("filenameinput");
+                var destnameinput=document.getElementsByName("dest")[0];
+                var specimeninput=document.getElementsByName("specimen")[0];
+                var perfbyinput=document.getElementsByName("perfby")[0];
+                var dateinput=document.getElementsByName("date")[0];
+
+                // Get URL
+                if (window.location.search != '')
+                {
+                    posturl = window.location.href + "&ajax&pdf";
+                }
+                else
+                {
+                    posturl = window.location.href + "?ajax&pdf";
+                }
+
+                // New Saving Components //////////////////////////////////
+                $.post(posturl, {
+                    file: (new XMLSerializer).serializeToString(filteredchecklistxml),
+                    filename: filenameinput.value,
+                    dest: destnameinput.value,
+                    specimen: specimeninput.value,
+                    perfby: perfbyinput.value,
+                    date: dateinput.value
                     });
             }
 
