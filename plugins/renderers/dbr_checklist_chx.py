@@ -109,6 +109,7 @@ class dbr_checklist_chx(renderer_class):
                 f.write(filestring)
                 f.close()
                 try:
+                    os.environ["HOME"] = "/var/www/.home"
                     chx2pdf = imp.load_source("chx2pdf", "/usr/local/QAutils/bin/chx2pdf")
                     chx2pdf.chx2pdf(fullfilename)
                 except Exception as err:
