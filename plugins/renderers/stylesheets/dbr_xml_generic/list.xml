@@ -35,9 +35,11 @@
             $(document).ready(function() {
                 var htmlstring = $('#prettyprint').html();
                 var prettystring = vkbeautify.xml(htmlstring, 3);
-                $('#prettyprint').text(prettystring).html();
-                prettyPrint();
-            });         
+                $('#prettyprint').text(htmlstring).html();
+                if($('#prettyprint').text().length < 100000) {
+                    prettyPrint();
+                }
+            });
         ]]>
     </script>
     <xsl:element name="link">
