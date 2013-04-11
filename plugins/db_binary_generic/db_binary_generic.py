@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_binary_generic.py - Default Binary Renderer """
+""" plugins/renderers/db_binary_generic.py - Default Binary Renderer """
 
 import os
 import os.path
@@ -29,7 +29,7 @@ from renderer_support import renderer_class
 import magic
 
 
-class dbr_binary_generic(renderer_class):
+class db_binary_generic(renderer_class):
     """ Default Renderer - Basic Output for Any Binary File """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/binary"

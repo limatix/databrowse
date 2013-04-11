@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_default.py - Default Renderer - Basic Output for Any File """
+""" plugins/renderers/db_default.py - Default Renderer - Basic Output for Any File """
 
 import os
 import os.path
@@ -29,7 +29,7 @@ from renderer_support import renderer_class
 import magic
 
 
-class dbr_default(renderer_class):
+class db_default(renderer_class):
     """ Default Renderer - Basic Output for Any File """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"

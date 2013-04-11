@@ -22,6 +22,6 @@
 def dbh_directory(path, contenttype, extension):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
-        return "dbr_directory_generic"
+        return "db_directory_generic"
     else:
         return False

@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_xml_monthly_rpt.py - Monthly Report XML Files """
+""" plugins/renderers/db_xml_monthly_rpt.py - Monthly Report XML Files """
 
 import os
 import os.path
@@ -24,7 +24,7 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_xml_monthly_rpt(renderer_class):
+class db_xml_monthly_rpt(renderer_class):
     """ Monthly Report XML Files """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/monthlyrptxml"

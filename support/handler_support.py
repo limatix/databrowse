@@ -28,31 +28,29 @@ import ConfigParser
 class handler_support:
     """ Class to encapsulate handler plugin management """
 
-    _handlers = []
+    _handlers = {}
     _icondb = None
     _hiddenfiledb = None
 
-    def __init__(self, handlerpath, icondbpath, hiddenfiledbpath):
+    def __init__(self, pluginpath, icondbpath, hiddenfiledbpath):
         """ Load up all of the handler plugins and icon database """
         # Reset Handler List
-        self._handlers = []
+        self._handlers = {}
         # Parse Handlers
-        handlerlist = os.listdir(handlerpath)
-        handlerlist.sort()
-        if handlerpath not in sys.path:
-            sys.path.append(handlerpath)
-        for filename in handlerlist:
-            if filename.endswith(".py"):
-                modulename = filename[:-3]
+        pluginlist = os.listdir(pluginpath)
+        pluginlist.sort()
+        for filename in pluginlist:
+            if filename.startswith("db_"):
+                modulename = filename
                 functions = None
                 try:
-                    exec "import %s" % modulename
-                    exec "functions = dir(%s)" % modulename
+                    exec "import %s.handlers" % modulename
+                    exec "functions = dir(%s.handlers)" % modulename
                     for function in functions:
-                        if not function.startswith("dbh_"):                                 # Ignore all functions not starting with dbh_
+                        if not function.startswith("dbh_"):    # Ignore all functions not starting with dbh_
                             pass
                         else:
-                            exec "self._handlers.append(%s.%s)" % (modulename, function)
+                            exec "self._handlers['%s']=(%s.handlers.%s)" % (function, modulename, function)
                             pass
                         pass
                     pass
@@ -78,8 +76,8 @@ class handler_support:
         contenttype = magicstore.file(os.path.realpath(fullpath))   # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
         handler = []
-        for function in self._handlers:
-            temp = function(fullpath, contenttype, extension)
+        for function in sorted(self._handlers):
+            temp = self._handlers[function](fullpath, contenttype, extension)
             if temp:
                 handler.append(temp)
             pass
@@ -92,8 +90,8 @@ class handler_support:
         contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
         handler = []
-        for function in self._handlers:
-            temp = function(fullpath, contenttype, extension)
+        for function in sorted(self._handlers):
+            temp = self._handlers[function](fullpath, contenttype, extension)
             if temp:
                 handler.append(temp)
             pass

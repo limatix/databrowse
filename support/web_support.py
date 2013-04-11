@@ -198,8 +198,7 @@ class web_support:
     siteurl = None              # URL to site root directory
     resurl = None               # URL to resources directory
     dataroot = None             # Path to root of data directory
-    handlerpath = None          # Path to root of handler plugin directory (default plugins/handlers)
-    rendererpath = None         # Path to root of renderer plugin directory (default plugins/renderers)
+    pluginpath = None           # Path to root of plugin directory (default plugins)
     icondbpath = None           # Path to icon db (default support/iconmap.conf)
     hiddenfiledbpath = None     # Path to hidden file list (default support/hiddenfiles.conf)
     stderr = None               # filehandle to server error log
@@ -233,12 +232,8 @@ class web_support:
             self.resurl = "http://localhost/dbres"
             pass
 
-        if self.handlerpath is None:
-            self.handlerpath = os.path.join(self.webdir, "plugins/handlers")
-            pass
-
-        if self.rendererpath is None:
-            self.rendererpath = os.path.join(self.webdir, "plugins/renderers")
+        if self.pluginpath is None:
+            self.pluginpath = os.path.join(self.webdir, "plugins")
             pass
 
         if self.icondbpath is None:

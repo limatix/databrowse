@@ -22,6 +22,6 @@
 def dbh__text(path, contenttype, extension):
     """ Generic Text Handler - Returns text_generic for all text files """
     if contenttype.startswith('text'):
-        return "dbr_text_generic"
+        return "db_text_generic"
     else:
         return False

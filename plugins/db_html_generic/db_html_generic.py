@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_html_generic.py - Generic HTML Files """
+""" plugins/renderers/db_html_generic.py - Generic HTML Files """
 
 import os
 import os.path
@@ -24,7 +24,7 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_html_generic(renderer_class):
+class db_html_generic(renderer_class):
     """ Generic HTML Files """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dbhtml"

@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_checklist_chf.py - Generic Checklist Files """
+""" plugins/renderers/db_checklist_chf.py - Generic Checklist Files """
 
 import os
 import os.path
@@ -24,7 +24,7 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_checklist_chf(renderer_class):
+class db_checklist_chf(renderer_class):
     """ Generic Checklist Files """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/checklist_chf"

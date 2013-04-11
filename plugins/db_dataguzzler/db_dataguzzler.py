@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_dataguzzler.py - Default Renderer - Basic Output for Any Dataguzzler File """
+""" plugins/renderers/db_dataguzzler.py - Default Renderer - Basic Output for Any Dataguzzler File """
 
 import os
 import os.path
@@ -34,7 +34,7 @@ dgf_int64chunks = set(["METDINTV", "WFMDIMNS"])
 dgf_float64chunks = set(["METDDBLV"])
 
 
-class dbr_dataguzzler(renderer_class):
+class db_dataguzzler(renderer_class):
     """ Default Renderer - Basic Output for Any Dataguzzler File """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/dataguzzler"

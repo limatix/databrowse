@@ -120,9 +120,13 @@ def application(environ, start_response):
                 return db_web_support.req.return_error(401)
             pass
 
+        # Import Plugin Directory
+        if db_web_support.pluginpath not in sys.path:
+            sys.path.append(db_web_support.pluginpath)
+
         # Determine handler for requested path
         import handler_support as handler_support_module
-        handler_support = handler_support_module.handler_support(db_web_support.handlerpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath)
+        handler_support = handler_support_module.handler_support(db_web_support.pluginpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath)
         handlers = handler_support.GetHandler(fullpath)
         handler = handlers[-1]
 
@@ -132,10 +136,8 @@ def application(environ, start_response):
             pass
 
         # Get A Handle to The Rendering Plugin
-        if db_web_support.rendererpath not in sys.path:
-            sys.path.append(db_web_support.rendererpath)
         caller = "databrowse"
-        exec "import %s as %s_module" % (handler, handler)
+        exec "import %s.%s as %s_module" % (handler, handler, handler)
         exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\

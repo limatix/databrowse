@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_wsgi_generic.py - Default Handler for WSGI Scripts """
+""" plugins/renderers/db_wsgi_generic.py - Default Handler for WSGI Scripts """
 
 import imp
 import os
@@ -26,7 +26,7 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class dbr_wsgi_generic(renderer_class):
+class db_wsgi_generic(renderer_class):
     """ Default Renderer for WSGI Scripts - Simply Passes Everything Off To The Script """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/wsgigeneric"

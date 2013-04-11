@@ -20,7 +20,7 @@
 
 
 def dbh_dataguzzler(path, contenttype, extension):
-    """ Generic Dataguzzler Handler - Returns dbr_dataguzzler for all dataguzzler files """
+    """ Generic Dataguzzler Handler - Returns db_dataguzzler for all dataguzzler files """
     if extension.lower() == "dgs" or extension.lower() == "dgz" or extension.lower() == "dga" or extension.lower() == "dgd":
         return "db_dataguzzler"
     else:

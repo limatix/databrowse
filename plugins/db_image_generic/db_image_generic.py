@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_image_generic.py - Default Image Renderer """
+""" plugins/renderers/db_image_generic.py - Default Image Renderer """
 
 import os
 import os.path
@@ -33,7 +33,7 @@ import EXIF
 import RMETA
 
 
-class dbr_image_generic(renderer_class):
+class db_image_generic(renderer_class):
     """ Default Renderer - Basic Output for Any File """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/image"

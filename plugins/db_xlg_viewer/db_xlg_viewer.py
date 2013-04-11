@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/dbr_xlg_viewer.py - Experiment Log Viewer """
+""" plugins/renderers/db_xlg_viewer.py - Experiment Log Viewer """
 
 import os
 import os.path
@@ -29,7 +29,7 @@ from renderer_support import renderer_class
 import magic
 
 
-class dbr_xlg_viewer(renderer_class):
+class db_xlg_viewer(renderer_class):
     """ Experiment Log Viewer """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/datacollect"
