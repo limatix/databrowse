@@ -125,7 +125,10 @@ class db_image_generic(renderer_class):
                 return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{%s}image' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
+            src = self.getURL(self._relpath, content_mode="raw", thumbnail="gallery")
+            href = self.getURL(self._relpath, content_mode="raw")
+            downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+            xmlroot = etree.Element('{%s}image' % self._namespace_uri, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
             magicstore = magic.open(magic.MAGIC_MIME)
@@ -140,6 +143,8 @@ class db_image_generic(renderer_class):
                     newsize = (300, 300)
                 elif self._web_support.req.form['thumbnail'].value == "large":
                     newsize = (500, 500)
+                elif self._web_support.req.form['thumbnail'].value == "gallery":
+                    newsize = (201, 201)
                 else:
                     newsize = (150, 150)
                 img.thumbnail(newsize, Image.ANTIALIAS)

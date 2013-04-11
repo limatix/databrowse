@@ -1,19 +1,19 @@
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="detailed">
-    <xsl:call-template name="db_directory_generic-directorytree">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="detailed">
+    <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">detailed</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="summary">
-    <xsl:call-template name="db_directory_generic-directorytree">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="summary">
+    <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">summary</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:dir" mode="title">
-    <xsl:call-template name="db_directory_generic-directorytree">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="title">
+    <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">title</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="db_directory_generic-directorytree">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" name="db_directory_image-directorytree">
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
         <script type="text/javascript" DEFER="true">
@@ -56,17 +56,17 @@
                     list-style-type: none;
                     margin: 0px;
                     padding: 0 0px;
-                    background: url('<xsl:value-of select="/dir:dir/@resurl"/>/vline.png') repeat-y;
+                    background: url('<xsl:value-of select="$resdir"/>/vline.png') repeat-y;
                 }
                 .item {
                     margin: 0px;
                     padding: 0 18px;
                     line-height:20px;
-                    background: url('<xsl:value-of select="/dir:dir/@resurl"/>/node.png'), url('<xsl:value-of select="/dir:dir/@resurl"/>/vline.png');
+                    background: url('<xsl:value-of select="$resdir"/>/node.png'), url('<xsl:value-of select="$resdir"/>/vline.png');
                     background-repeat: no-repeat, repeat-y;
                 }
                 ul.tree li:last-child{
-                    background: #fff url('<xsl:value-of select="/dir:dir/@resurl"/>/lastnode.png') no-repeat;
+                    background: #fff url('<xsl:value-of select="$resdir"/>/lastnode.png') no-repeat;
                 }
                 ul.root {
                     margin: 0px;
@@ -102,25 +102,24 @@
                 }
         </style>
     </xsl:if>
-
     <xsl:choose>
          <xsl:when test="@root='True'">
             <ul class="tree root" id="tree">
-                <xsl:call-template name="db_directory_generic-treestructure">
+                <xsl:call-template name="db_directory_image-treestructure">
                     <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
                 </xsl:call-template>
             </ul>
          </xsl:when>
          <xsl:otherwise>
             <ul class="tree root">
-                <xsl:call-template name="db_directory_generic-treestructure">
+                <xsl:call-template name="db_directory_image-treestructure">
                     <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
                 </xsl:call-template>
             </ul>
          </xsl:otherwise>
     </xsl:choose>
 </xsl:template>
-<xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" name="db_directory_generic-treestructure">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" name="db_directory_image-treestructure">
     <xsl:param name="mode"/>
     <li>
         <xsl:choose>
@@ -130,7 +129,7 @@
                     <img>
                         <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-visiting.png</xsl:attribute>
                     </img>
                 </span>
                 <span class="basename">
@@ -138,7 +137,7 @@
                     <a>
                         <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
                         <img alt="Up" title="Go Up One Directory Level">
-                            <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/up.png</xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/up.png</xsl:attribute>
                         </img>
                     </a>
                 </span>
@@ -146,10 +145,10 @@
             <xsl:when test="@ajax='True'">
                 <xsl:attribute name="class">subdir</xsl:attribute>
                 <span class="icon">
-                    <img onclick="$(this).parent().next().next().toggle();$.AjaxRequest($(this).parent().next().next(),$(this),&apos;{@ajaxurl}&apos;,&apos;{/dir:dir/@resurl}&apos;);">
+                    <img onclick="$(this).parent().next().next().toggle();$.AjaxRequest($(this).parent().next().next(),$(this),&apos;{@ajaxurl}&apos;,&apos;{$resdir}&apos;);">
                         <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/folder.png</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-pictures.png</xsl:attribute>
                     </img>
                 </span>
                 <span class="basename">
@@ -162,10 +161,10 @@
             <xsl:otherwise>
                 <xsl:attribute name="class">subdir</xsl:attribute>
                 <span class="icon">
-                    <img onclick="$(this).parent().next().next().toggle();$.ImgToggle($(this),&apos;{/dir:dir/@resurl}&apos;);">
+                    <img onclick="$(this).parent().next().next().toggle();$.ImgToggle($(this),&apos;{$resdir}&apos;);">
                         <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
-                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/folder.png</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-pictures.png</xsl:attribute>
                     </img>
                 </span>
                 <span class="basename">
@@ -186,13 +185,13 @@
                     <xsl:attribute name="style">display:none</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:for-each select="dir:file">
+            <xsl:for-each select="imgdir:file">
                 <li class="item">
-                    <xsl:if test="not(child::dir:dir) and not(child::imgdir:imgdir)">
+                    <xsl:if test="not(child::imgdir:imgdir)">
                         <span class="icon">
                             <img>
                                 <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
-                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
                             </img>
                         </span>
                         <span class="basename">

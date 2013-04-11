@@ -1,0 +1,73 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:imgdir" mode="title">
+    <style>
+        #imglist {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        #imglist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            width:50%;
+            padding: 0px;
+            float: left;
+        }
+        #imglist li div {
+            float: left;
+            padding-right: 5px;
+        }
+        .nobreak {
+
+        }
+    </style>
+    <ul id="imglist">
+        <xsl:for-each select="imgdir:file">
+            <xsl:if test="child::*[1][self::image:image]">
+                <li>
+                    <table class="cream" style="table-layout:fixed;margin-bottom:0px">
+                        <thead>
+                            <tr class="dark-title">
+                                <th colspan="3" style="word-wrap: break-word">
+                                    <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
+                                    <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="4">
+                                    <a>
+                                        <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
+                                        <img style="border:1px solid #900;" title="Click to View Image Full Size">
+                                            <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
+                                        </img>
+                                    </a>
+                                </td>
+                                <td width="10px"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute></img></a></td>
+                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>View Details</a></td>
+                            </tr>
+                            <tr>
+                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></a></td>
+                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>View Full Size</a></td>
+                            </tr>
+                            <tr>
+                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img></a></td>
+                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>Download Image</a></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+            </xsl:if>
+        </xsl:for-each>
+    </ul>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:imgdir" mode="summary">
+    <xsl:apply-templates select="imgdir:imgdir" mode="title"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:imgdir" mode="detailed">
+    <xsl:apply-templates select="imgdir:imgdir" mode="title"/>
+</xsl:template>

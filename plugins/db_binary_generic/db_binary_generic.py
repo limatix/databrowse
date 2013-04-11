@@ -185,7 +185,7 @@ class db_binary_generic(renderer_class):
             return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{http://thermal.cnde.iastate.edu/databrowse/default}default', xmlns="http://thermal.cnde.iastate.edu/databrowse/default", name=os.path.basename(self._relpath), href=link)
+            xmlroot = etree.Element('{%s}binary' % self._namespace_uri, name=os.path.basename(self._relpath), href=link)
             return xmlroot
         elif self._content_mode == "raw":
             if "stream" in self._web_support.req.form:
