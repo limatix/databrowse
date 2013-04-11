@@ -56,8 +56,11 @@ class db_directory_generic(renderer_class):
                 itemfullpath = os.path.join(self._fullpath, item)
                 (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
                 handler = handlers[-1]
-                exec "import %s.%s as %s_module" % (handler, handler, handler)
-                exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                if handler == "db_directory_generic":
+                    renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
+                else:
+                    exec "import %s.%s as %s_module" % (handler, handler, handler)
+                    exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
                 xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath), icon=icon)
                 if content is not None:

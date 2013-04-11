@@ -299,11 +299,11 @@ class renderer_class(object):
     def loadMenu(self):
         """ Load Menu Items for all current handlers """
         for handler in reversed(self._handlers):
-            dirlist = [os.path.splitext(item)[0] for item in os.listdir(os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + handler + '/')) if item.lower().endswith(".xml")]
+            dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(self._web_support.pluginpath + '/' + handler + '/')) if item.lower().startswith("dbs_")]
             newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
-            title.text = handler[4:].title().replace("_", " ")
+            title.text = handler[3:].title().replace("_", " ")
             navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
             for item in dirlist:
                 link = self.getURL(self._relpath, handler=handler, style_mode=item)
@@ -343,8 +343,8 @@ class renderer_class(object):
         #print "Path = " + self._fullpath
         #print "Plugin = " + self.__class__.__name__
         custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) + \
-            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
-        defaultpath = os.path.abspath(self._web_support.rendererpath + '/stylesheets/' + self.__class__.__name__ + '/' + self._style_mode + '.xml')
+            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
+        defaultpath = os.path.abspath(self._web_support.pluginpath + '/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
         #print "Custom Search Path = " + custompath
         #print "Default Search Path = " + defaultpath
 
