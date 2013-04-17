@@ -22,46 +22,62 @@
     </style>
     <ul id="imglist">
         <xsl:for-each select="imgdir:file">
-            <xsl:if test="child::*[1][self::image:image]">
-                <li>
-                    <table class="cream" style="table-layout:fixed;margin-bottom:0px">
-                        <thead>
-                            <tr class="dark-title">
-                                <th colspan="3" style="word-wrap: break-word">
-                                    <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
-                                    <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td rowspan="4">
-                                    <a>
-                                        <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
-                                        <img style="border:1px solid #900;" title="Click to View Image Full Size">
-                                            <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
-                                        </img>
-                                    </a>
-                                </td>
-                                <td width="10px"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute></img></a></td>
-                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>View Details</a></td>
-                            </tr>
-                            <tr>
-                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></a></td>
-                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>View Full Size</a></td>
-                            </tr>
-                            <tr>
-                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img></a></td>
-                                <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>Download Image</a></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </li>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="child::*[1][self::image:image]">
+                    <li>
+                        <table class="cream" style="table-layout:fixed;margin-bottom:0px">
+                            <thead>
+                                <tr class="dark-title">
+                                    <th colspan="3" style="word-wrap: break-word">
+                                        <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
+                                        <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="4">
+                                        <a>
+                                            <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
+                                            <img style="border:1px solid #900;" title="Click to View Image Full Size">
+                                                <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
+                                            </img>
+                                        </a>
+                                    </td>
+                                    <td width="10px"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute></img></a></td>
+                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>View Details</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></a></td>
+                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>View Full Size</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img></a></td>
+                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>Download Image</a></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </xsl:when>
+                <xsl:otherwise>
+                    <li>
+                        <table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
+                            <thead>
+                                <tr class="dark-title">
+                                    <th colspan="3" style="word-wrap: break-word">
+                                        <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img></span>
+                                        <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute><xsl:value-of select="@basename"/></a></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </li>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:for-each>
     </ul>
 </xsl:template>
