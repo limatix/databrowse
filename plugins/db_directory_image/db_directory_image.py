@@ -37,11 +37,11 @@ class db_directory_image(renderer_class):
         if self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
             if self._caller == "databrowse":
                 uphref = self.getURLToParent(self._relpath)
-                xmlroot = etree.Element('{%s}imgdir' % self._namespace_uri, path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
+                xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
                 pass
             else:
                 link = self.getURL(self._relpath)
-                xmlroot = etree.Element('{%s}imgdir' % self._namespace_uri, name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
+                xmlroot = etree.Element('{%s}dir' % self._namespace_uri, name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
                 pass
             if "ajax" in self._web_support.req.form:
                 xmlroot.set("ajaxreq", "True")

@@ -1,14 +1,14 @@
-<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="detailed">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:dir" mode="detailed">
     <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">detailed</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="summary">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:dir" mode="summary">
     <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">summary</xsl:with-param>
     </xsl:call-template>
 </xsl:template>
-<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:imgdir" mode="title">
+<xsl:template xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" match="imgdir:dir" mode="title">
     <xsl:call-template name="db_directory_image-directorytree">
         <xsl:with-param name="mode">title</xsl:with-param>
     </xsl:call-template>
@@ -187,7 +187,7 @@
             </xsl:choose>
             <xsl:for-each select="imgdir:file">
                 <li class="item">
-                    <xsl:if test="not(child::imgdir:imgdir)">
+                    <xsl:if test="not(child::imgdir:dir)">
                         <span class="icon">
                             <img>
                                 <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
