@@ -49,6 +49,61 @@
                             });
                         }
                     };
+                    function showContextMenu(event) {
+                         var rightclick; //will be set to true or false
+                         if (event.button) {
+                              rightclick = (event.button == 2);
+                         } else if (e.button) {
+                              rightclick = (event.which == 3);
+                         }
+                     
+                         if(rightclick) { //if the secondary mouse botton was clicked
+                              var menu = document.getElementById('contextmenu');
+                                                   
+                              if (event.button) {
+                                var x = event.clientX; //get X and Y coordinance for menu position
+                                var y = event.clientY;
+                              } else if (e.button) {
+                                var x = e.clientX; //get X and Y coordinance for menu position
+                                var y = e.clientY;
+                              }
+                     
+                              //This section is necessary if you click on the far right edge or bottom
+                              //The 200 is arbitrary, choose whatever number you want based on how large your menu is
+                              if(window.innerWidth) {
+                                   windowWidth = window.innerWidth;
+                                   windowHeight = window.innerHeight;
+                              } else if(document.documentElement.clientWidth) {
+                                   windowWidth = document.documentElement.clientWidth;
+                                   windowHeight = document.documentElement.clientHeight;
+                              } else {
+                                   windowWidth = document.getElementsByTagName('body')[0].clientWidth;
+                                   windowHeight = document.getElementsByTagName('body')[0].clientHeight;
+                              }
+                              if(windowWidth < (x + 200)) {
+                                   x = x - 200;
+                              }
+                              if(windowHeight < (y + 200)) {
+                                   y -= 200;
+                              }
+                     
+                              //position the menu
+                              menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
+                              menu.style.top = y+"px";
+                              menu.style.left= x+"px";
+
+                              $('#contextmenu').slideDown(25);
+                         }
+
+                    }
+                    function clearContextMenu() { //used to make the menu disappear
+                         //this function should be used at the beginning of any function that is called from the menu
+                         $('#contextmenu').slideUp(25);
+                    }
+                    $(document).click(function(e) {
+                        if($(e.target).is("#contextmenu")) return;
+                        clearContextMenu();
+                    });
                 ]]> 
         </script>
         <style>
@@ -86,7 +141,7 @@
                 }
                 ul.tree li.subdir {
                     background: #fff none;
-                }                
+                }    
                 ul.tree li.rootdir {
                     background: #fff none;
                 }
@@ -100,7 +155,54 @@
                 .title {
                     padding-right: 4px;
                 }
+                #contextmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    z-order: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                .contextmenuitem {
+                    background-color: #ddd;
+                    cursor: default;
+                    padding-left:5px;
+                    padding-top:5px;
+                    padding-bottom:5px;
+                }
+                .contextmenuitem img {
+                    vertical-align: middle;
+                    padding-right: 2px;
+                }
+                .contextmenuitem span {
+                    vertical-align: middle;
+                }
+                .contextmenuitem:hover {
+                    background-color: #cb182a;
+                    border-color: #200;
+                    color: #fff;
+                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAZCAYAAADwkER/AAAAIElEQVQY02NgYGBgZIIRTKgEM5yFTRZNHSMqC5ssumIAF1EAYnirD50AAAAASUVORK5CYII%3D");
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-position: bottom center;
+                    background-repeat: repeat-x;
+                }
         </style>
+        <div id="contextmenu" style="display:none" onclick="return clearContextMenu()">
+            <div class="contextmenuitem">
+                <img>
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                </img>
+                <span onclick="alert('This feature not yet implemented.')">Start Checklist Here</span>
+            </div>
+            <div class="contextmenuitem">
+                <img>
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+                </img>
+                <span onclick="alert('This feature not yet implemented.')">Upload File Here</span>
+            </div>
+        </div>
     </xsl:if>
 
     <xsl:choose>
@@ -134,7 +236,8 @@
                     </img>
                 </span>
                 <span class="basename">
-                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap"><xsl:value-of select="@path"/></span>&#160;
+                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default"><xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
+                        <xsl:attribute name="onmouseup">showContextMenu(event);</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
                     <a>
                         <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
                         <img alt="Up" title="Go Up One Directory Level">
@@ -154,6 +257,8 @@
                 </span>
                 <span class="basename">
                     <a>
+                        <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
+                        <xsl:attribute name="onmouseup">showContextMenu(event);</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>
@@ -170,6 +275,8 @@
                 </span>
                 <span class="basename">
                     <a>
+                        <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
+                        <xsl:attribute name="onmouseup">showContextMenu(event);</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>
