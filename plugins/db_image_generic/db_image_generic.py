@@ -135,25 +135,50 @@ class db_image_generic(renderer_class):
             magicstore.load()
             contenttype = magicstore.file(self._fullpath)
             if "thumbnail" in self._web_support.req.form:
-                img = Image.open(self._fullpath)
-                format = img.format
+                basename = os.path.splitext(os.path.basename(self._fullpath))
+                cachedir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/")
                 if self._web_support.req.form['thumbnail'].value == "small":
+                    cachefilename = basename[0] + "_small" + basename[1]
                     newsize = (150, 150)
                 elif self._web_support.req.form['thumbnail'].value == "medium":
+                    cachefilename = basename[0] + "_medium" + basename[1]
                     newsize = (300, 300)
                 elif self._web_support.req.form['thumbnail'].value == "large":
+                    cachefilename = basename[0] + "_large" + basename[1]
                     newsize = (500, 500)
                 elif self._web_support.req.form['thumbnail'].value == "gallery":
+                    cachefilename = basename[0] + "_gallery" + basename[1]
                     newsize = (201, 201)
                 else:
+                    cachefilename = basename[0] + "_small" + basename[1]
                     newsize = (150, 150)
-                img.thumbnail(newsize, Image.ANTIALIAS)
-                output = StringIO.StringIO()
-                img.save(output, format=format)
-                self._web_support.req.response_headers['Content-Type'] = contenttype
-                self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
-                self._web_support.req.output_done = True
-                return [output.getvalue()]
+                cachefullpath = os.path.join(cachedir, cachefilename)
+                if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
+                    size = os.path.getsize(cachefullpath)
+                    f = open(cachefullpath, "rb")
+                    self._web_support.req.response_headers['Content-Type'] = contenttype
+                    self._web_support.req.response_headers['Content-Length'] = str(size)
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
+                else:
+                    img = Image.open(self._fullpath)
+                    format = img.format
+                    img.thumbnail(newsize, Image.ANTIALIAS)
+                    output = StringIO.StringIO()
+                    img.save(output, format=format)
+                    if not os.path.exists(cachedir):
+                        os.makedirs(cachedir)
+                    f = open(cachefullpath, "wb")
+                    img.save(f, format=format)
+                    f.close()
+                    self._web_support.req.response_headers['Content-Type'] = contenttype
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    return [output.getvalue()]
             else:
                 size = os.path.getsize(self._fullpath)
                 f = open(self._fullpath, "rb")

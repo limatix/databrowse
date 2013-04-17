@@ -113,8 +113,8 @@
                 var PostForm = document.createElement("form");
                 PostForm.method = "post";
                 PostForm.action = posturl;
-                PostForm.target = "popup";
-                PostForm.onsubmit = "return window.open('','popup','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550')"
+                PostForm.target = "_blank";
+                PostForm.onsubmit = "return window.open('','_blank','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550').blur()"
                 for (var k in data) {
                     var PostInput = document.createElement("input");
                     PostInput.setAttribute("name", k);
@@ -123,6 +123,7 @@
                 }
                 document.body.appendChild(PostForm);
                 PostForm.submit();
+                window.focus();
                 document.body.removeChild(PostForm);
 
             }
