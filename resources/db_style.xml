@@ -22,9 +22,9 @@
 	<db:sitetitle></db:sitetitle>
 
 	<!-- NavBar Top -->
-	<db:navbar>
+	<!--<db:navbar>
 		<db:navelem><a href="/databrowse">Databrowse Home</a></db:navelem>
-	</db:navbar>
+	</db:navbar>-->
 
 	<!-- Quick Link Top Bar - Left Side -->
 	<db:topbarleft>

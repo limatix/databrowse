@@ -86,8 +86,8 @@
 					</div>
 					<div class="clearfix cwrapper wrapper" id="container">
 						<div class="isu-sidebar" id="sidebar">
-							<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbar" mode="vert"/>
-							<xsl:apply-templates select="html:html/db:navbar" mode="vert"/>
+							<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navigation" mode="vert"/>
+							<xsl:apply-templates select="html:html/db:navigation" mode="vert"/>
 	 						<ul class="navigation footer">
 	 							<xsl:apply-templates select="document('db_style.xml')/db:dbstyle/db:navbarfoot/*" mode="html"/>
 							</ul>
@@ -118,6 +118,11 @@
 	</xsl:template>
 
 	<!-- BEGIN NAVIGATION BAR -->
+
+	<!-- Catch Navigation Tags -->
+	<xsl:template match="db:navigation" mode="vert">
+		<xsl:apply-templates mode="vert"/>
+	</xsl:template>
 
 	<!-- Catch all to Apply Nav Bar Templates -->
 	<xsl:template match="db:navbar" mode="vert">

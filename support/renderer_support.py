@@ -298,9 +298,9 @@ class renderer_class(object):
 
     def loadMenu(self):
         """ Load Menu Items for all current handlers """
+        newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
         for handler in reversed(self._handlers):
             dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(self._web_support.pluginpath + '/' + handler + '/')) if item.lower().startswith("dbs_")]
-            newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
             title.text = handler[3:].title().replace("_", " ")
@@ -314,8 +314,8 @@ class renderer_class(object):
                 menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
                 menuitem.text = item.title().replace("_", " ")
                 pass
-            self._web_support.menu.AddMenu(newmenu)
             pass
+        self._web_support.menu.AddMenu(newmenu)
         pass
 
     def loadStyle(self):

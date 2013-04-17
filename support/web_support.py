@@ -148,34 +148,30 @@ class menu_support:
     """ Class containing support functionality for xslt stylesheet compliation """
 
     _menu = []
-    test = '''\
-<?xml version="1.0" encoding="UTF-8"?>
-<navbar>
-    <navelem><a extcvt="true">Display Style</a>
-        <navdir alwaysopen="true">
-            <navelem><a extcvt="true" href="?style_mode=list">List</a></navelem>
-            <navelem><a extcvt="true" href="?style_mode=table">Table</a></navelem>
-        </navdir>
-    </navelem>
-</navbar>
-'''
 
     class MenuException(Exception):
         pass
 
-    def __init__(self):
+    def __init__(self, siteurl, logouturl, username):
         self._menu = []
+        topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', xmlns="http://www.w3.org/1999/xhtml")
+        menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
+        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=siteurl)
+        menulink.text = "Databrowse Home"
+        menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
+        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=logouturl)
+        menulink.text = "Logout " + username
+        self.AddMenu(topmenu)
 
     def AddMenu(self, xml):
         self._menu.append(xml)
 
     def GetMenu(self):
-        menu = self._menu[0]
-        if len(self._menu) > 1:
-            for item in self._menu[1:]:
-                menu.append(item)
-                pass
+        menu = etree.XML('<db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse"/>')
+        for item in self._menu:
+            menu.append(item)
             pass
+        pass
         return menu
 
     pass
@@ -195,8 +191,10 @@ class web_support:
     administrators = None       # dictionary containing administrator list
     sitetitle = None            # site title
     shorttitle = None           # abbreviated site title
+    remoteuser = None           # Username
     siteurl = None              # URL to site root directory
     resurl = None               # URL to resources directory
+    logouturl = None            # URL to logout
     dataroot = None             # Path to root of data directory
     pluginpath = None           # Path to root of plugin directory (default plugins)
     icondbpath = None           # Path to icon db (default support/iconmap.conf)
@@ -211,7 +209,6 @@ class web_support:
         self.webdir = os.path.dirname(self.reqfilename)
         self.stderr = environ["wsgi.errors"]
         self.style = style_support()
-        self.menu = menu_support()
 
         # Try to Load Optional Configuration File
         try:
@@ -231,6 +228,15 @@ class web_support:
         if self.resurl is None:
             self.resurl = "http://localhost/dbres"
             pass
+
+        if self.logouturl is None:
+            self.logouturl = "http://localhost/logout"
+            pass
+
+        if not environ["REMOTE_USER"]:
+            raise Exception("User Not Logged In")
+        else:
+            self.remoteuser = environ["REMOTE_USER"]
 
         if self.pluginpath is None:
             self.pluginpath = os.path.join(self.webdir, "plugins")
@@ -275,6 +281,8 @@ class web_support:
         if self.debugging is None:
             self.debugging = False
             pass
+
+        self.menu = menu_support(self.siteurl, self.logouturl, self.remoteuser)
 
         assert(self.dataroot is not None)
 
