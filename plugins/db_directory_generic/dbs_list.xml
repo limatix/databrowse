@@ -16,6 +16,9 @@
 <xsl:template xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" name="db_directory_generic-directorytree">
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
+        <script type="text/javascript">
+            <![CDATA[var relpath = "";]]>            
+        </script>
         <script type="text/javascript" DEFER="true">
                 <![CDATA[
                     $.ImgToggle = function(img, resurl) {
@@ -150,6 +153,18 @@
                         clearContextMenu("contextmenu");
                         clearContextMenu("checklistmenu");
                     });
+                    function startchecklist(checklistname) {
+                        var PostForm = document.createElement("form");
+                        PostForm.method = "POST";
+                        PostForm.action = checklistname;
+                        var PostInput = document.createElement("input");
+                        PostInput.setAttribute("name", "dest");
+                        PostInput.setAttribute("value", relpath.slice(1));
+                        PostForm.appendChild(PostInput);
+                        document.body.appendChild(PostForm);
+                        PostForm.submit();
+                        document.body.removeChild(PostForm);
+                    }
                 ]]> 
         </script>
         <style>
@@ -206,6 +221,7 @@
                     background-color: #ddd;
                     border: 1px solid #666;
                     min-width: 200px;
+                    min-height: 31px;
                     z-order: 100;
                     box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
                 }
@@ -214,6 +230,7 @@
                     background-color: #ddd;
                     border: 1px solid #666;
                     min-width: 200px;
+                    min-height: 31px;
                     z-order: 100;
                     box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
                 }
@@ -250,35 +267,26 @@
                 </img>
                 <span class="menuitemcomponent">Start Checklist Here</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onclick="alert('This feature not yet implemented.')">
+            <div class="menuitemcomponent contextmenuitem" onmouseup="alert('This feature not yet implemented.')">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Upload File Here</span>
             </div>
         </div>
-        <div id="checklistmenu" class="menuitemcomponent" style="display:none" onclick="clearContextMenu('checklistmenu')">
-            <div class="menuitemcomponent contextmenuitem" onclick="alert('This feature not yet implemented.')">
-                <img class="menuitemcomponent">
-                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
-                </img>
-                <span class="menuitemcomponent">vibro_neworientation.chx</span>
-            </div>
-            <div class="menuitemcomponent contextmenuitem" onclick="alert('This feature not yet implemented.')">
-                <img class="menuitemcomponent">
-                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
-                </img>
-                <span class="menuitemcomponent">vibro_setup.chx</span>
-            </div>
-            <div class="menuitemcomponent contextmenuitem" onclick="alert('This feature not yet implemented.')">
-                <img class="menuitemcomponent">
-                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
-                </img>
-                <span class="menuitemcomponent">vibro_testfreq.chx</span>
-            </div>
+
+        <div id="checklistmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('checklistmenu')">
+            <xsl:for-each select="/dir:dir/dir:chxlist/dir:chxfile">
+                <div class="menuitemcomponent contextmenuitem">
+                    <xsl:attribute name="onmouseup">startchecklist('<xsl:value-of select="@url"/>')</xsl:attribute>
+                    <img class="menuitemcomponent">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                    </img>
+                    <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                </div>
+            </xsl:for-each>
         </div>
     </xsl:if>
-
     <xsl:choose>
          <xsl:when test="@root='True'">
             <ul class="tree root" id="tree">
@@ -311,7 +319,7 @@
                 </span>
                 <span class="basename">
                     <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default"><xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">showContextMenu(event, "contextmenu", 'r');</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
+                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
                     <a>
                         <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
                         <img alt="Up" title="Go Up One Directory Level">
@@ -332,7 +340,7 @@
                 <span class="basename">
                     <a>
                         <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
+                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>
@@ -350,7 +358,7 @@
                 <span class="basename">
                     <a>
                         <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
+                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>

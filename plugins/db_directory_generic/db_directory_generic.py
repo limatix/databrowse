@@ -39,11 +39,11 @@ class db_directory_generic(renderer_class):
         super(db_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, relpath=self._relpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
             pass
         else:
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, name=os.path.basename(self._relpath), path=self._fullpath, href=link, resurl=self._web_support.resurl)
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, name=os.path.basename(self._relpath), path=self._fullpath, relpath=self._relpath, href=link, resurl=self._web_support.resurl)
             pass
         if "ajax" in self._web_support.req.form:
             xmlroot.set("ajaxreq", "True")
@@ -72,6 +72,14 @@ class db_directory_generic(renderer_class):
             #ajax url and what not
             xmlroot.set("ajax", "True")
             xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
+            pass
+        if self._caller == "databrowse" and self._web_support.checklistpath is not None:
+            chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri))
+            chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
+            for item in [item for item in chxdirlist if item.endswith(".chx")]:
+                itemurl = self.getURL(os.path.join(self._web_support.checklistpath, item))
+                etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), url=itemurl, name=item)
+                pass
             pass
         self._xml = xmlroot
         pass

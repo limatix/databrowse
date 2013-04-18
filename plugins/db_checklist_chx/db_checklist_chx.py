@@ -147,7 +147,11 @@ class db_checklist_chx(renderer_class):
             g = open('/usr/local/QAutils/checklist/chx2html.xsl', 'r')
             xsltransform = etree.parse(g)
             g.close()
-            transformedxml = xml.xslt(xsltransform)
+            transform = etree.XSLT(xsltransform)
+            if "dest" in self._web_support.req.form:
+                transformedxml = transform(xml, dest=etree.XSLT.strparam(self._web_support.req.form['dest'].value))
+            else:
+                transformedxml = transform(xml)
             xmloutput = etree.XML(str(transformedxml))
             return xmloutput
         else:

@@ -199,6 +199,7 @@ class web_support:
     pluginpath = None           # Path to root of plugin directory (default plugins)
     icondbpath = None           # Path to icon db (default support/iconmap.conf)
     hiddenfiledbpath = None     # Path to hidden file list (default support/hiddenfiles.conf)
+    checklistpath = None        # Relative path to checklist directory
     stderr = None               # filehandle to server error log
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
     debugging = None            # Boolean indicating whether debugging messages should be shown
