@@ -440,11 +440,16 @@
                 }
                 #uploadframe {
                     position:relative;
-                    height: 479px;
+                    height: 459px;
                     border: 0px;
                     left: 0px;
                     top: 0px;
-                    margin: 8px;
+                    padding: 8px;
+                    overflow-y: scroll;
+                    -moz-border-bottom-left-radius: 5px;
+                    border-bottom-left-radius: 5px;
+                    -moz-border-bottom-right-radius: 5px;
+                    border-bottom-right-radius: 5px;
                 }
                 .contextmenuitem {
                     background-color: #ddd;
