@@ -17,7 +17,8 @@
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
         <script type="text/javascript">
-            <![CDATA[var relpath = "";]]>            
+            <![CDATA[var relpath = "";]]> 
+            var siteurl = "<xsl:value-of select="/dir:dir/@siteurl" />";
         </script>
         <script type="text/javascript" DEFER="true">
                 <![CDATA[
@@ -184,7 +185,7 @@
                         $('#uploadwindow').slideDown(25);
                         'use strict';
                         $('#fileupload').fileupload({
-                            url: "http://localhost/databrowse/"+relpath.slice(1)+"?handler=db_file_ops&operation=upload"
+                            url: siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=upload"
                         });
                     }
                     

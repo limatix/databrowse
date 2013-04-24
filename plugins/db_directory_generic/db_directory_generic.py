@@ -39,7 +39,7 @@ class db_directory_generic(renderer_class):
         super(db_directory_generic, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, relpath=self._relpath, uphref=uphref, resurl=self._web_support.resurl, root="True")
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, relpath=self._relpath, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
             pass
         else:
             link = self.getURL(self._relpath)
