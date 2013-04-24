@@ -1,6 +1,6 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:dir" mode="title">
     <style>
-        #imglist {
+        /*#imglist {
             padding-left: 0px;
             padding-right: 0px;
         }
@@ -18,19 +18,292 @@
         }
         .nobreak {
 
+        }*/
+        #imglist {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        #imglist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            width:50%;
+            padding: 0px;
+            float: left;
+        }
+        .listitem{
+            width: 362px;
+            table-layout: fixed;
+            padding: 0px;
+        }
+        .listitemheader{
+            width: 362px;
+            border: 1px solid #c1b78f;
+            border-width: 1px 0;
+            background-color: #f5e39a;
+            border-color: #c63600;
+            padding: 2px 0;
+            margin-bottom: 2px;
+        }
+        .listicon{
+            width: 22px;
+            text-align: center;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .listitemtitle{
+            width: 340px;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-weight: bold;
+        }
+        .listitemthumbnail{
+            float: left;
+            width: 201px;
+            min-height: 68px;
+            padding-right: 5px;
+        }
+        .listitemthumbnail img{
+            border: 1px solid #900;
+        }
+        .listitemoptions div:nth-child(even){
+            background-color: #f8f8f0;
+            border: 1px solid #c1b78f;
+            border-width: 1px 0;
+            border-color: #c1b78f;
+        }
+        .listitemoptions div:nth-child(odd){
+            background-color: #fff;
+        }
+        .listitemoptions {
+            width: 150px;
+            float: right;
+            padding-right: 5px;
+        }
+        .listitemoption {
+            
+        }
+        .listitemoptionname {
+
+        }
+        #blackout {
+            display: none;
+            width: 100%;
+            height: 100%;
+            z-order: 50;
+            background-color: rgba(0,0,0,0.5);
+            left: 0px;
+            top: 0px;
+            position: fixed;
+        }
+        #blackout:hover{
+            cursor: pointer;
+        }
+        #imageviewerheader {
+            width: 100%;
+            background-color: #ccc;
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAbCAYAAAC9WOV0AAAAHklEQVQY02NhAAIWGMEIIpjgXCZcEoyoSnBKEG0oACP0AIWLLZ8oAAAAAElFTkSuQmCC");
+            background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+            background-position: bottom;
+            background-repeat: repeat-x;
+            border-bottom: 1px solid gray;
+            position: relative; 
+            overflow: hidden;
+            vertical-align:middle;
+            -moz-border-top-left-radius: 5px;
+            border-top-left-radius: 5px;
+            -moz-border-top-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        #closeimageviewer{
+            z-order: 75;
+            margin:3px;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0);
+        }
+        #closeimageviewer:hover{
+            cursor: pointer;
+            background-color: #eb958a;
+            border: 1px solid #c96356;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+        }
+        #closeimageviewer:active{
+            cursor: pointer;
+            background-color: #e07373;
+            border: 1px solid #c55353;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+        }
+        #lightbox {
+            display: none;
+            z-order: 100;
+            box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+            background-color: #fff;
+            border: 1px solid #666;
+            left: 0px;
+            top: 0px;
+            position: fixed;
+            list-style: none;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+        #imageviewerwrapper {
+            position: relative;
+            text-align: center;
+        }
+        #lightboximg {      
+            position: relative;    
+            text-align: center;
+            max-height: 100%;
+            max-width: 100%;
+            -moz-border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            -moz-border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 5px;
         }
     </style>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                $('#blackout').mouseup(function() {
+                    $("#blackout").fadeOut(25);
+                    $('#lightbox').fadeOut(25);
+                });
+                $("#closeimageviewer").click(function() {
+                    $("#blackout").fadeOut(25);
+                    $('#lightbox').fadeOut(25);
+                });
+            });
+            function openimage(title, src) {
+                $('#loading').fadeIn(5);
+                $('#blackout').fadeIn(25);  
+                var curwidth = $('#lightbox').width("auto");
+                var curheight = $('#lightbox').height("auto");              
+                $('#lightboximg').attr("src", src).load(function() {
+                    var curwidth = $('#lightbox').width();
+                    var curheight = $('#lightbox').height();
+                    var maxwidth = document.documentElement.clientWidth - 40;
+                    var maxheight = document.documentElement.clientHeight - 40;
+                    var naturalwidth = this.naturalWidth;
+                    var naturalheight = this.naturalHeight;
+                    if (naturalwidth > maxwidth) {
+                        $('#lightbox').width(maxwidth);
+                    }                    
+                    if (naturalheight > maxheight) {
+                        $('#lightbox').height(maxheight);
+                    }                    
+                    if (this.naturalHeight < maxheight) {
+                        $('#lightbox').height(this.naturalHeight + 25);
+                    }
+                    $("#imageviewerwrapper").height($('#lightbox').height()-25);
+                    $("#lightbox").width(this.style.width);
+                    $('#lightbox').css({top:'50%',left:'50%',margin:'-'+($('#lightbox').height() / 2)+'px 0 0 -'+($('#lightbox').width() / 2)+'px'});
+                    $('#imagename').html(title + " (Scale "+  String(Math.round((($('#lightbox').height()-25)/this.naturalHeight)*100))+"%)");
+                    $('#loading').fadeOut(5);
+                    $('#lightbox').fadeIn(25);    
+                });                         
+            }
+        ]]>
+    </script>
+    <div id="blackout">
+    </div>
+    <div id="lightbox">
+        <div id="imageviewerheader">            
+            <div style="float:left; padding-left:5px; vertical-align:middle;">
+                <h3 style="margin-bottom:0px; margin-top:3px;vertical-align:middle">Large Preview of <span id="imagename"></span></h3>
+            </div>
+            <div style="float:right; vertical-align:middle;">
+                <img id="closeimageviewer" alt="X" title="Click to Close Upload Window" style="vertical-align:middle;">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/window-close.png</xsl:attribute>
+                </img>
+            </div>
+        </div>
+        <div id="imageviewerwrapper">
+            <img id="lightboximg"/>
+        </div>
+    </div>
     <ul id="imglist">
         <xsl:for-each select="imgdir:file">
             <xsl:choose>
                 <xsl:when test="child::*[1][self::image:image]">
                     <li>
-                        <table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
+                        <div class="listitem">
+                            <div class="listitemheader">
+                                    <span class="listicon">
+                                        <img>
+                                            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute>
+                                        </img>
+                                    </span>
+                                    <span class="listitemtitle">
+                                        <a>
+                                            <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
+                                            <xsl:value-of select="image:image/@name"/>
+                                        </a>
+                                    </span>
+                            </div>
+                            <div class="listitemcontents">
+                                <div class="listitemthumbnail">
+                                    <a>
+                                        <xsl:attribute name="onclick">openimage('<xsl:value-of select="image:image/@name"/>','<xsl:value-of select="image:image/@href"/>')</xsl:attribute>
+                                        <img title="Click to View Image Full Size">
+                                                <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
+                                        </img>
+                                    </a>
+                                </div>
+                                <div class="listitemoptions">
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>View Details</a>
+                                        </span>
+                                    </div>
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>View Full Size</a>
+                                        </span>
+                                    </div>
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>Download Image</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
                             <thead>
                                 <tr class="dark-title">
                                     <th colspan="3" style="word-wrap: break-word">
-                                        <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
-                                        <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
+                                        <span style="width:20px;display:inline-block"><img style="max-width:201px;"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
+                                        <span style="width:90%;display:inline-block;overflow:hidden;white-space:nowrap;"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
                                     </th>
                                 </tr>
                             </thead>
@@ -60,12 +333,35 @@
                                     <td></td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table>-->
                     </li>
                 </xsl:when>
                 <xsl:otherwise>
                     <li>
-                        <table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
+                        <div class="listitem">
+                            <div class="listitemheader">
+                                    <span class="listicon">
+                                        <img>
+                                            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                                        </img>
+                                    </span>
+                                    <span class="listitemtitle">
+                                        <a>
+                                            <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
+                                            <xsl:value-of select="@basename"/>
+                                        </a>
+                                    </span>
+                            </div>
+                            <div class="listitemcontents">
+                                <div class="listitemthumbnail">
+                            
+                                </div>
+                                <div class="listitemoptions">
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <!--<table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
                             <thead>
                                 <tr class="dark-title">
                                     <th colspan="3" style="word-wrap: break-word">
@@ -74,7 +370,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                        </table>
+                        </table>-->
                     </li>
                 </xsl:otherwise>
             </xsl:choose>

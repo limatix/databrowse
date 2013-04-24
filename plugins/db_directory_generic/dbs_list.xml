@@ -17,7 +17,10 @@
     <xsl:param name="mode"/>
     <xsl:if test="@root='True' and not(@ajaxreq='True')">
         <script type="text/javascript">
-            <![CDATA[var relpath = "";]]> 
+            <![CDATA[
+                var relpath = "";
+                var fileuploaded = false;
+            ]]> 
             var siteurl = "<xsl:value-of select="/dir:dir/@siteurl" />";
         </script>
         <script type="text/javascript" DEFER="true">
@@ -153,11 +156,17 @@
                     $(document).ready(function() {
                         $('#blackout').mouseup(function() {
                             $("#blackout").fadeOut(25);
-                            $('#uploadwindow').slideUp(25);   
+                            $('#uploadwindow').slideUp(25);
+                            if(fileuploaded) {
+                                window.location.href = siteurl + "/" + relpath.slice(1);
+                            }
                         });
                         $("#closeuploadwindow").click(function() {
                             $("#blackout").fadeOut(25);
                             $('#uploadwindow').slideUp(25);
+                            if(fileuploaded) {
+                                window.location.href = siteurl + "/" + relpath.slice(1);
+                            }
                         });
                         $('html').click(function(e) {
                             if($(e.target).is(".menuitemcomponent")) return;
@@ -186,6 +195,9 @@
                         'use strict';
                         $('#fileupload').fileupload({
                             url: siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=upload"
+                        });
+                        $("#fileupload").bind("fileuploaddone", function(e, data) {
+                            fileuploaded = true;
                         });
                     }
                     
