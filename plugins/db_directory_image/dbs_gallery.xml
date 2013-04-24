@@ -1,24 +1,5 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:dir" mode="title">
     <style>
-        /*#imglist {
-            padding-left: 0px;
-            padding-right: 0px;
-        }
-        #imglist li {
-            overflow:auto;
-            display:inline-block; 
-            list-style-type:none; 
-            width:50%;
-            padding: 0px;
-            float: left;
-        }
-        #imglist li div {
-            float: left;
-            padding-right: 5px;
-        }
-        .nobreak {
-
-        }*/
         #imglist {
             padding-left: 0px;
             padding-right: 0px;
@@ -29,7 +10,6 @@
             list-style-type:none; 
             width:50%;
             padding: 0px;
-            float: left;
         }
         .listitem{
             width: 362px;
