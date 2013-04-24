@@ -107,6 +107,10 @@ class renderer_class(object):
 
         pass
 
+    def getContent(self):
+        ''' Default getContent '''
+        return None
+
     def getSize(self, fullpath=None):
         """ Get Size of A File - Returns size of current file if none specified """
 
@@ -240,6 +244,9 @@ class renderer_class(object):
         # We need to tack in handler if handler is overridden
         if self._handlers[-1] is not self.__class__.__name__ and "handler" not in kwargs:
             kwargs["handler"] = self.__class__.__name__
+            pass
+        elif "handler" in kwargs and kwargs["handler"] is None:
+            del kwargs["handler"]
             pass
         # Build the URL
         if self._web_support.seo_urls is True:

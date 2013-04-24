@@ -148,11 +148,23 @@
                          //this function should be used at the beginning of any function that is called from the menu
                          $('#'+menuname).slideUp(25);
                     }
-                    $('html').click(function(e) {
-                        if($(e.target).is(".menuitemcomponent")) return;
-                        clearContextMenu("contextmenu");
-                        clearContextMenu("checklistmenu");
+                    
+                    $(document).ready(function() {
+                        $('#blackout').mouseup(function() {
+                            $("#blackout").fadeOut(25);
+                            $('#uploadwindow').slideUp(25);   
+                        });
+                        $("#closeuploadwindow").click(function() {
+                            $("#blackout").fadeOut(25);
+                            $('#uploadwindow').slideUp(25);
+                        });
+                        $('html').click(function(e) {
+                            if($(e.target).is(".menuitemcomponent")) return;
+                            clearContextMenu("contextmenu");
+                            clearContextMenu("checklistmenu");
+                        });
                     });
+
                     function startchecklist(checklistname) {
                         var PostForm = document.createElement("form");
                         PostForm.method = "POST";
@@ -165,7 +177,118 @@
                         PostForm.submit();
                         document.body.removeChild(PostForm);
                     }
+                    function openuploadwindow() {
+                        //var w = window.open('http://localhost/dbres/FileUpload/index.html');
+                        $('#uploaddir').html(relpath.slice(1));
+                        $('#blackout').fadeIn(25);
+                        $('#uploadwindow').slideDown(25);
+                        'use strict';
+                        $('#fileupload').fileupload({
+                            url: "http://localhost/databrowse/"+relpath.slice(1)+"?handler=db_file_ops&operation=upload"
+                        });
+                    }
+                    
                 ]]> 
+        </script>
+        <link rel="stylesheet">
+            <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/FileUpload/css/jquery-ui.css</xsl:attribute>
+        </link>
+        <link rel="stylesheet">
+            <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/FileUpload/css/jquery.fileupload-ui.css</xsl:attribute>
+        </link>
+        <!-- The template to display files available for upload -->
+        <script id="template-upload" type="text/x-tmpl">
+            //<xsl:value-of select="'&lt;'" disable-output-escaping="yes"/>![CDATA[
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-upload fade">
+                    <td class="preview"><span class="fade"></span></td>
+                    <td class="name"><span>{%=file.name%}</span></td>
+                    <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                    {% if (file.error) { %}
+                        <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                    {% } else if (o.files.valid <xsl:value-of select="'&amp;'" disable-output-escaping="yes"/><xsl:value-of select="'&amp;'" disable-output-escaping="yes"/> !i) { %}
+                        <td>
+                            <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar" style="width:0%;"></div></div>
+                        </td>
+                        <td>{% if (!o.options.autoUpload) { %}
+                            <button class="btn success btn-primary start">
+                                <i class="icon-upload icon-white"></i>
+                                <span>Start</span>
+                            </button>
+                        {% } %}</td>
+                    {% } else { %}
+                        <td colspan="2"></td>
+                    {% } %}
+                    <td>{% if (!i) { %}
+                        <button class="btn error btn-warning cancel">
+                            <i class="icon-ban-circle icon-white"></i>
+                            <span>Cancel</span>
+                        </button>
+                    {% } %}</td>
+                </tr>
+            {% } %}
+            //]]<xsl:value-of select="'&gt;'" disable-output-escaping="yes"/>
+        </script>
+        <!-- The template to display files available for download -->
+        <script id="template-download" type="text/x-tmpl">
+            //<xsl:value-of select="'&lt;'" disable-output-escaping="yes"/>![CDATA[
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-download fade">
+                    {% if (file.error) { %}
+                        <td></td>
+                        <td class="name"><span>{%=file.name%}</span></td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                        <td>
+                        &lt;button class="btn error btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}&gt;
+                            <i class="icon-trash icon-white"></i>
+                            <span>Delete</span>
+                        &lt;/button&gt;
+                    </td>
+                    {% } else { %}
+                        <td class="preview">{% if (file.thumbnail_url) { %}
+                            &lt;a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}"&gt;&lt;img src="{%=file.thumbnail_url%}" /&gt;&lt;/a&gt;
+                        {% } %}</td>
+                        <td class="name">
+                            &lt;a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url<xsl:value-of select="'&amp;'" disable-output-escaping="yes"/><xsl:value-of select="'&amp;'" disable-output-escaping="yes"/>'gallery'%}" download="{%=file.name%}"&gt;{%=file.name%}&lt;/a&gt;
+                        </td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td colspan="3"></td>
+                    {% } %}
+                    
+                </tr>
+            {% } %}
+            //]]<xsl:value-of select="'&gt;'" disable-output-escaping="yes"/>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery-ui.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/tmpl.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/load-image.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/canvas-to-blob.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.iframe-transport.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-fp.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-ui.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-jui.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/main.js</xsl:attribute>
         </script>
         <style>
                 ul.tree, ul.tree ul {
@@ -234,6 +357,82 @@
                     z-order: 100;
                     box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
                 }
+                #uploadwindow {
+                    display: none;
+                    width: 962px;
+                    height: 500px;
+                    z-order: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                    background-color: #fff;
+                    border: 1px solid #666;
+                    left: 50%;
+                    top: 50%;
+                    margin-left: -481px;
+                    margin-top: -250px;
+                    position: fixed;
+                    list-style: none;
+                    -moz-border-radius: 5px;
+                    border-radius: 5px;
+                }
+                #blackout {
+                    display: none;
+                    width: 100%;
+                    height: 100%;
+                    z-order: 50;
+                    background-color: rgba(0,0,0,0.5);
+                    left: 0px;
+                    top: 0px;
+                    position: fixed;
+                }
+                #blackout:hover{
+                    cursor: pointer;
+                }
+                #uploadheader {
+                    width: 100%;
+                    background-color: #ccc;
+                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAbCAYAAAC9WOV0AAAAHklEQVQY02NhAAIWGMEIIpjgXCZcEoyoSnBKEG0oACP0AIWLLZ8oAAAAAElFTkSuQmCC");
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-position: bottom;
+                    background-repeat: repeat-x;
+                    border-bottom: 1px solid gray;
+                    position: relative; 
+                    overflow: hidden;
+                    vertical-align:middle;
+                    -moz-border-top-left-radius: 5px;
+                    border-top-left-radius: 5px;
+                    -moz-border-top-right-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+                #closeuploadwindow{
+                    z-order: 75;
+                    margin:3px;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                    border: 1px solid rgba(0,0,0,0);
+                }
+                #closeuploadwindow:hover{
+                    cursor: pointer;
+                    background-color: #eb958a;
+                    border: 1px solid #c96356;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                }
+                #closeuploadwindow:active{
+                    cursor: pointer;
+                    background-color: #e07373;
+                    border: 1px solid #c55353;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                }
+                #uploadframe {
+                    position:relative;
+                    height: 479px;
+                    border: 0px;
+                    left: 0px;
+                    top: 0px;
+                    margin: 8px;
+                }
                 .contextmenuitem {
                     background-color: #ddd;
                     cursor: default;
@@ -259,6 +458,82 @@
                     background-position: bottom center;
                     background-repeat: repeat-x;
                 }
+                .btn{
+                    background-color: #ededed;
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    border: 1px solid #aaa;
+                    border-radius: 2px;
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+                    color: #444;
+                    float: left;
+                    font-size: 13px;
+                    line-height: 1.5;
+                    margin-left: 3px;
+                    padding: 0 10px;
+                    text-decoration: none;
+                    text-shadow: 0 1px 0 #f0f0f0;
+                }
+
+                .btn:hover{
+                    background-color: #f2f2f2;
+                    color: #222;
+                }
+
+                .btn:active{
+                    background-color: #ddd;
+                    border-color: #888;
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+                    color: #222;
+                }
+
+                .btn.disabled{
+                    background-color: #f2f2f2;
+                    border-color: #ccc;
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+                    color: #aaa;
+                }
+
+                .btn.success,
+                .btn.info,
+                .btn.error{
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+                    color: #fff;
+                    text-shadow: none;
+                }
+
+                .btn.success{
+                    background-color: #91a691;
+                    border-color: #4f6f4f;
+                }
+
+                .btn.info{
+                    background-color: #6e9bb3;
+                    border-color: #36627a;
+                }
+
+                .btn.error{
+                    background-color: #bc7979;
+                    border-color: #7b3131;
+                }
+
+                .btn.success:hover,
+                .btn.info:hover,
+                .btn.error:hover{
+                    background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                    background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                }
+
+                .btn.success:active,
+                .btn.info:active,
+                .btn.error:active{
+                    background-image: -moz-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4) inset;
+                }
         </style>
         <div id="contextmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('contextmenu')">
             <div class="menuitemcomponent contextmenuitem" onmouseup="showSubMenu(event, 'checklistmenu', 'contextmenu', 'l')">
@@ -267,14 +542,13 @@
                 </img>
                 <span class="menuitemcomponent">Start Checklist Here</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="alert('This feature not yet implemented.')">
+            <div class="menuitemcomponent contextmenuitem" onmouseup="openuploadwindow()">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Upload File Here</span>
             </div>
         </div>
-
         <div id="checklistmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('checklistmenu')">
             <xsl:for-each select="/dir:dir/dir:chxlist/dir:chxfile">
                 <div class="menuitemcomponent contextmenuitem">
@@ -285,6 +559,63 @@
                     <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
                 </div>
             </xsl:for-each>
+        </div>
+        <div id="blackout">
+        </div>
+        <div id="uploadwindow">
+            <div id="uploadheader">            
+                <div style="float:left; padding-left:5px; vertical-align:middle;">
+                    <h3 style="margin-bottom:0px; margin-top:3px;vertical-align:middle">Upload Files to <span id="uploaddir"></span></h3>
+                </div>
+                <div style="float:right; vertical-align:middle;">
+                    <img id="closeuploadwindow" alt="X" title="Click to Close Upload Window" style="vertical-align:middle;">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/window-close.png</xsl:attribute>
+                    </img>
+                </div>
+            </div>
+            <div id="uploadframe">
+                <p>
+                    Use the buttons below to browse for and upload files.  
+                    Otherwise, drag and drop files from your desktop into this window to upload.
+                </p>
+                <!-- The file upload form used as target for the file upload widget -->
+                <form id="fileupload" method="POST" enctype="multipart/form-data">
+                    <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+                    <div class="row fileupload-buttonbar">
+                        <div class="span7">
+                            <!-- The fileinput-button span is used to style the file input field as button -->
+                            <span class="btn info btn-success fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Add files...</span>
+                                <input type="file" name="files[]" multiple="multiple" />
+                            </span>
+                            <button type="submit" class="btn success btn-primary start">
+                                <i class="icon-upload icon-white"></i>
+                                <span>Start upload</span>
+                            </button>
+                            <button type="reset" class="btn error btn-warning cancel">
+                                <i class="icon-ban-circle icon-white"></i>
+                                <span>Cancel upload</span>
+                            </button>
+                        </div>
+                        <!-- The global progress information -->
+                        <div class="span5 fileupload-progress fade">
+                            <!-- The global progress bar -->
+                            <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                                <div class="bar" style="width:0%;"></div>
+                            </div>
+                            <!-- The extended global progress information -->
+                            <div class="progress-extended">&#160;</div>
+                        </div>
+                    </div>
+                    <!-- The loading indicator is shown during file processing -->
+                    <div class="fileupload-loading"></div>
+                    <br />
+                    <!-- The table listing the files available for upload/download -->
+                    <table role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>
+                </form>
+            </div>
+            <!--<iframe name="uploadframe" id="uploadframe" src="http://localhost/dbres/FileUpload/index.html?uploadurl=http://localhost/databrowse/?handler=db_file_ops"/>-->
         </div>
     </xsl:if>
     <xsl:choose>

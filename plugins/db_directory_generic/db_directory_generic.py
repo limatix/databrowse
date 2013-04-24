@@ -62,7 +62,7 @@ class db_directory_generic(renderer_class):
                     exec "import %s.%s as %s_module" % (handler, handler, handler)
                     exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
-                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath), icon=icon)
+                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon)
                 if content is not None:
                     xmlchild.append(content)
                     pass
@@ -77,7 +77,7 @@ class db_directory_generic(renderer_class):
             chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri))
             chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
             for item in [item for item in chxdirlist if item.endswith(".chx")]:
-                itemurl = self.getURL(os.path.join(self._web_support.checklistpath, item))
+                itemurl = self.getURL(os.path.join(self._web_support.checklistpath, item), handler=None)
                 etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), url=itemurl, name=item)
                 pass
             pass
