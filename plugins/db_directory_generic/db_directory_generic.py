@@ -57,6 +57,10 @@ class db_directory_generic(renderer_class):
                 (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
                 handler = handlers[-1]
                 if handler == "db_directory_generic":
+                    icon = "folder.png"
+                elif handler == "db_directory_image":
+                    icon = "folder-pictures.png"
+                if handler == "db_directory_generic":
                     renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
                 else:
                     exec "import %s.%s as %s_module" % (handler, handler, handler)
