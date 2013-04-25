@@ -97,7 +97,7 @@ class db_plain_text_file(renderer_class):
                     # Contents of File
                     f = open(self._fullpath)
                     xmlchild = etree.SubElement(xmlroot, "contents")
-                    xmlchild.text = f.read()
+                    xmlchild.text = unicode(f.read(), errors="replace")
                     f.close()
 
                     return xmlroot

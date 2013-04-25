@@ -257,6 +257,11 @@ def application(environ, start_response):
         <pre style="overflow:auto">%s</pre>
     </p>
 </body>
+<db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <db:navbar>
+        <db:navelem><a href="javascript:window.history.back()">Go Back</a></db:navelem>
+    </db:navbar>
+</db:navigation>
 </html>'''
 
         # Import Modules Needed For All Of This - No need to import these things otherwise
