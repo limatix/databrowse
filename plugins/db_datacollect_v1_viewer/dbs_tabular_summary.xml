@@ -1,0 +1,181 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" match="run" mode="full">
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h3>Run Summary</h3>
+    <table class="cream full-width">
+        <tbody>
+	        <tr><th width="20%">Run Index: </th><td width="30%"><xsl:value-of select="@runindex"/></td><th width="20%">Variable: </th><td width="30%"><xsl:value-of select="@variable"/></td></tr>
+            <tr><th>Date: </th><td><xsl:value-of select="@date"/></td><th>Label: </th><td><xsl:value-of select="@label"/></td></tr>
+            <tr><th>Basename: </th><td><xsl:value-of select="run_basename"/></td><td colspan="2"></td></tr>
+            <tr><th colspan="1">Description: </th>
+                <td colspan="3">
+                    <xsl:call-template name="olddc-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="descr"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <style>
+        #triggertable {
+            white-space: nowrap;
+        }
+        #fieldlist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            width:170px;
+            float: left;
+        }
+    </style>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            function fnShowHide( iCol )
+            {
+                /* Get the DataTables object again - this is not a recreation, just a get of the object */
+                var oTable = $('#triggertable').dataTable();
+                 
+                var bVis = oTable.fnSettings().aoColumns[iCol].bVisible;
+                oTable.fnSetColumnVis( iCol, bVis ? false : true );
+            }
+            $(document).ready(function() {
+                $('#triggertable').dataTable({
+                    "sScrollX": "764px",
+                    "bScrollCollapse": true,
+                    "sPaginationType": "full_numbers",
+                    "bStateSave": true
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <h3>Trigger Data</h3>
+    <table class="cream full-width" id="triggertable">
+        <thead>
+            <tr>
+                <xsl:for-each select="trigger[1]/*">
+                    <xsl:sort data-type="text" select="local-name()"/>
+                    <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+                    <th>
+                        <xsl:choose>
+                            <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$localname"/>                                    
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </th>
+                </xsl:for-each>
+            </tr>
+        </thead>
+        <tbody>
+            <xsl:for-each select="trigger[1]/*">
+                <xsl:sort data-type="text" select="local-name()"/>
+                <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+                <th>
+                    <xsl:value-of select="@units"/>
+                </th>
+            </xsl:for-each>
+            <xsl:for-each select="trigger">
+                <xsl:sort data-type="text" select="triggercount"/>
+                <tr>
+                    <xsl:for-each select="*">
+                        <xsl:sort data-type="text" select="local-name()"/>
+                        <td><xsl:value-of select="."/></td>
+                    </xsl:for-each>
+                </tr>
+            </xsl:for-each>
+        </tbody>
+    </table>
+    <br/>
+    <h4>Show/Hide Fields</h4>
+    <ul id="fieldlist">
+        <xsl:for-each select="trigger[1]/*">
+            <xsl:sort data-type="text" select="local-name()"/>
+            <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+            <li>
+                <xsl:choose>
+                    <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                        <a href="javascript:void(0);">
+                            <xsl:attribute name="onclick">fnShowHide(<xsl:value-of select="position()-1"/>)</xsl:attribute>
+                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <a href="javascript:void(0);">
+                            <xsl:attribute name="onclick">fnShowHide(<xsl:value-of select="position()-1"/>)</xsl:attribute>
+                            <xsl:value-of select="$localname"/>
+                        </a>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </li>
+        </xsl:for-each>
+    </ul>
+</xsl:template>
+<xsl:template name="olddc-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="olddc-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<db:fieldmap xmlns="http://thermal.cnde.iastate.edu/databrowse" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <entry key="aircylinder">Air Cylinder</entry>
+    <entry key="amplitude">Amplitude</entry>
+    <entry key="clampoffset">Clamp Offset</entry>
+    <entry key="clamptorque">Clamp Torque</entry>
+    <entry key="coating">Coating</entry>
+    <entry key="couplant">Couplant</entry>
+    <entry key="crackheat">Crack Heating</entry>
+    <entry key="dgsfile">DGS File</entry>
+    <entry key="dynstress">Dynamic Stress</entry>
+    <entry key="elecenergy">Electrical Energy</entry>
+    <entry key="excitation">Excitation</entry>
+    <entry key="hae">HAE</entry>
+    <entry key="hit">Hit</entry>
+    <entry key="meastype">Measurement Type</entry>
+    <entry key="notes">Notes</entry>
+    <entry key="pixelsperinch">Pixels/Inch</entry>
+    <entry key="resonantfrequency">Resonant Frequency</entry>
+    <entry key="run_basename">Run Basename</entry>
+    <entry key="setfile">Set File</entry>
+    <entry key="specimen">Specimen</entry>
+    <entry key="takenby">Taken By</entry>
+    <entry key="timestamp">Timestamp</entry>
+    <entry key="transducerforce">Transducer Force</entry>
+    <entry key="transduceroffset">Transducer Offset</entry>
+    <entry key="transducerpressure">Transducer Pressure</entry>
+    <entry key="transducerserial">Transducer Serial</entry>
+    <entry key="transducertemp">Transducer Temperature</entry>
+    <entry key="triggercount">Trigger Count</entry>
+    <entry key="triggerindex">Trigger Index</entry>
+    <entry key="view">View</entry>
+</db:fieldmap>

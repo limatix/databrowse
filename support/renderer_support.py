@@ -306,21 +306,32 @@ class renderer_class(object):
     def loadMenu(self):
         """ Load Menu Items for all current handlers """
         newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
+        isDirectory = os.path.isdir(self._fullpath)
         for handler in reversed(self._handlers):
             dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(self._web_support.pluginpath + '/' + handler + '/')) if item.lower().startswith("dbs_")]
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
-            title.text = handler[3:].title().replace("_", " ")
+            title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
             navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
             for item in dirlist:
-                link = self.getURL(self._relpath, handler=handler, style_mode=item)
-                if self._style_mode == item and self.__class__.__name__ == handler:
-                    itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
-                else:
-                    itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
-                menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
-                menuitem.text = item.title().replace("_", " ")
-                pass
+                if not isDirectory and item not in self._handler_support.directorystylesheets:
+                    link = self.getURL(self._relpath, handler=handler, style_mode=item)
+                    if self._style_mode == item and self.__class__.__name__ == handler:
+                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                    else:
+                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                    menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
+                    menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
+                    pass
+                elif isDirectory:
+                    link = self.getURL(self._relpath, handler=handler, style_mode=item)
+                    if self._style_mode == item and self.__class__.__name__ == handler:
+                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                    else:
+                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                    menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
+                    menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
+                    pass
             pass
         self._web_support.menu.AddMenu(newmenu)
         pass
@@ -334,7 +345,9 @@ class renderer_class(object):
             pass
         except self.RendererException:
             #print "loadStyleFunction failed with error"
-            if self._style_mode == self._default_style_mode:
+            if self._caller in self._handler_support.directoryplugins:
+                pass
+            elif self._style_mode == self._default_style_mode:
                 raise
             else:
                 self._style_mode = self._default_style_mode
@@ -349,8 +362,8 @@ class renderer_class(object):
         #print "In loadStyleFunction"
         #print "Path = " + self._fullpath
         #print "Plugin = " + self.__class__.__name__
-        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) + \
-            '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
+        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) +
+                                     '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
         defaultpath = os.path.abspath(self._web_support.pluginpath + '/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
         #print "Custom Search Path = " + custompath
         #print "Default Search Path = " + defaultpath

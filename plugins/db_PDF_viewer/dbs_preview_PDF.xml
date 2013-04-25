@@ -1,0 +1,29 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pdf="http://thermal.cnde.iastate.edu/databrowse/pdf" match="pdf:pdf" mode="full">
+    <object width="100%" height="700px" type="application/pdf">
+        <xsl:attribute name="data"><xsl:value-of select="@viewlink"/></xsl:attribute>
+        If the PDF does not load, click <a><xsl:attribute name="href" target="_blank"><xsl:value-of select="@downlink"/></xsl:attribute>here</a> to open the file.
+    </object>
+    <table class="cream">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+				</a>
+			</th>
+    	</thead>
+    	<tbody>
+	        <tr><td></td><td>Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+	        <tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+	        <tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+	        <tr><td></td><td>Size: </td><td><xsl:value-of select="size"/></td></tr>
+	        <tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+	        <tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+	    </tbody>
+    </table>    
+</xsl:template>

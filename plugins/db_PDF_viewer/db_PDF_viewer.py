@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/db_default.py - Default Renderer - Basic Output for Any File """
+""" plugins/renderers/db_pdf_viewer.py - Default PDF Renderer """
 
 import os
 import os.path
@@ -29,13 +29,13 @@ from renderer_support import renderer_class
 import magic
 
 
-class db_default(renderer_class):
-    """ Default Renderer - Basic Output for Any File """
+class db_PDF_viewer(renderer_class):
+    """ PDF Renderer - Basic Output for PDF Files """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"
-    _namespace_local = "default"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/pdf"
+    _namespace_local = "pdf"
     _default_content_mode = "full"
-    _default_style_mode = "file_information"
+    _default_style_mode = "preview_PDF"
     _default_recursion_depth = 2
 
     def getContent(self):
@@ -58,14 +58,10 @@ class db_default(renderer_class):
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
 
-                    src = self.getURL(self._relpath, content_mode="raw", thumbnail="medium")
-                    href = self.getURL(self._relpath, content_mode="raw")
-                    name = os.path.basename(self._relpath) if self._relpath is not '/' else os.path.basename(self._fullpath)
-                    if not os.path.isdir(self._fullpath):
-                        downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
-                    else:
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, icon=icon)
+                    downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+                    viewlink = self.getURL(self._relpath, content_mode="raw")
+
+                    xmlroot = etree.Element('{%s}pdf' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, viewlink=viewlink, downlink=downlink, icon=icon)
 
                     xmlchild = etree.SubElement(xmlroot, "filename")
                     xmlchild.text = os.path.basename(self._fullpath)
@@ -108,7 +104,8 @@ class db_default(renderer_class):
                 f = open(self._fullpath, "rb")
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)
-                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
+                if "download" in self._web_support.req.form:
+                    self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
                 self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                 self._web_support.req.output_done = True
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:
@@ -117,6 +114,6 @@ class db_default(renderer_class):
                     return iter(lambda: f.read(1024))
             else:
                 raise self.RendererException("Invalid Content Mode")
-        pass
+            pass
 
     pass

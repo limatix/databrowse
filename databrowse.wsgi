@@ -126,7 +126,7 @@ def application(environ, start_response):
 
         # Determine handler for requested path
         import handler_support as handler_support_module
-        handler_support = handler_support_module.handler_support(db_web_support.pluginpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath)
+        handler_support = handler_support_module.handler_support(db_web_support.pluginpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
         handler = handlers[-1]
 

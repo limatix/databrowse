@@ -1,0 +1,32 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="dbhtml:dbhtml" mode="full">
+  <xsl:apply-templates select="contents" mode="full"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="contents" mode="full">
+  <xsl:apply-templates select="html" mode="full"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="html" mode="full">
+    <xsl:apply-templates select="head" mode="full"/>
+    <style>
+      img {
+        max-width:724px;
+      }
+    </style>
+    <xsl:apply-templates select="body" mode="full"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="*" mode="copy">
+  <xsl:element name="{local-name()}" namespace="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml">
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates mode="copy"/>
+  </xsl:element>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="img" mode="copy">
+    <img>
+        <xsl:attribute name="src"><xsl:value-of select="@src"/>?content_mode=raw</xsl:attribute>
+    </img>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="head" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:dbhtml="http://thermal.cnde.iastate.edu/databrowse/dbhtml" match="body" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>

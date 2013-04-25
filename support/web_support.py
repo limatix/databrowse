@@ -199,6 +199,7 @@ class web_support:
     pluginpath = None           # Path to root of plugin directory (default plugins)
     icondbpath = None           # Path to icon db (default support/iconmap.conf)
     hiddenfiledbpath = None     # Path to hidden file list (default support/hiddenfiles.conf)
+    directorypluginpath = None  # Path to the directory plugin list (default support/directoryplugins.conf)
     checklistpath = None        # Relative path to checklist directory
     stderr = None               # filehandle to server error log
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
@@ -249,6 +250,10 @@ class web_support:
 
         if self.hiddenfiledbpath is None:
             self.hiddenfiledbpath = os.path.join(self.webdir, "support/hiddenfiles.conf")
+            pass
+
+        if self.directorypluginpath is None:
+            self.directorypluginpath = os.path.join(self.webdir, "support/directoryplugins.conf")
             pass
 
         if self.email_sendmail is None:

@@ -20,7 +20,6 @@
 
 import os
 import os.path
-import sys
 import magic
 import ConfigParser
 
@@ -31,8 +30,10 @@ class handler_support:
     _handlers = {}
     _icondb = None
     _hiddenfiledb = None
+    directoryplugins = {}
+    directorystylesheets = []
 
-    def __init__(self, pluginpath, icondbpath, hiddenfiledbpath):
+    def __init__(self, pluginpath, icondbpath, hiddenfiledbpath, directorypluginpath):
         """ Load up all of the handler plugins and icon database """
         # Reset Handler List
         self._handlers = {}
@@ -60,12 +61,24 @@ class handler_support:
             pass
 
         # Load Icon Database
+        self._icondb = None
         self._icondb = ConfigParser.ConfigParser()
         self._icondb.read(icondbpath)
 
         # Load Hidden File Database
+        self._hiddenfiledb = None
         self._hiddenfiledb = ConfigParser.ConfigParser()
         self._hiddenfiledb.read(hiddenfiledbpath)
+
+        # Get Directory Plugin list
+        self.directoryplugins = {}
+        self.directorystylesheets = []
+        directorypluginconfig = ConfigParser.ConfigParser()
+        directorypluginconfig.read(directorypluginpath)
+        for item in directorypluginconfig.items("directory_plugins"):
+            self.directoryplugins[item[0]] = item[1]
+        for item in directorypluginconfig.items("directory_plugin_stylesheets"):
+            self.directorystylesheets.append(item[0])
 
         pass
 

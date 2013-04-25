@@ -1,0 +1,83 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbdg="http://thermal.cnde.iastate.edu/databrowse/dataguzzler" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dbdg:dbdg" mode="full">
+	<xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/vkbeautify.0.99.00.beta.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+    	<![CDATA[
+    		$(document).ready(function() {
+                var htmlstring = $('#prettyprint').html();
+                var prettystring = vkbeautify.xml(htmlstring, 3);
+                $('#prettyprint').text(prettystring).html();
+  				prettyPrint();
+			});    		
+    	]]>
+    </script>
+    <xsl:element name="link">
+    	<xsl:attribute name="type">text/css</xsl:attribute>
+    	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <pre id="prettyprint" class="prettyprint">
+    	<xsl:apply-templates mode="escape"/>
+    </pre>
+</xsl:template>
+<xsl:template xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*" mode="escape">
+    <xsl:copy-of select="."/>
+</xsl:template>
+
+<!--
+<xsl:param name="indent-increment" select="'   '"/>
+<xsl:template name="newline">
+    <xsl:text disable-output-escaping="yes">
+</xsl:text>
+</xsl:template>
+<xsl:template xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*" mode="escape">
+        <xsl:param name="indent" select="''"/>
+    	<xsl:call-template name="newline"/>
+    	<xsl:value-of select="$indent"/>
+
+        <xsl:text>&lt;</xsl:text>
+        <xsl:value-of select="name()"/>
+
+
+        <xsl:for-each select="@*">
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="name()"/>
+            <xsl:text>='</xsl:text>
+            <xsl:call-template name="escape-xml">
+                <xsl:with-param name="text" select="."/>
+            </xsl:call-template>
+            <xsl:text>'</xsl:text>
+        </xsl:for-each>
+
+
+        <xsl:text>&gt;</xsl:text>
+
+
+        <xsl:choose>
+        	<xsl:when test="count(child::*) > 0">
+        		<xsl:apply-templates select="node()" mode="escape">
+        			<xsl:with-param name="indent" select="concat ($indent, $indent-increment)"/>
+        		</xsl:apply-templates>
+
+        		<xsl:call-template name="newline"/>
+    			<xsl:value-of select="$indent"/>
+        		<xsl:text>&lt;/</xsl:text>
+        		<xsl:value-of select="name()"/>
+        		<xsl:text>&gt;</xsl:text>
+        	</xsl:when>
+        	<xsl:otherwise>
+        		<xsl:apply-templates select="node()" mode="escape" />
+
+        		<xsl:text>&lt;/</xsl:text>
+        		<xsl:value-of select="name()"/>
+        		<xsl:text>&gt;</xsl:text>
+        	</xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+-->

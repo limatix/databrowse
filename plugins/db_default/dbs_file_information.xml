@@ -1,0 +1,27 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:default="http://thermal.cnde.iastate.edu/databrowse/default" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" match="default:default" mode="full">
+    <table class="cream">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<xsl:if test="@downlink">
+					<a>
+						<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+						<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+					</a>
+				</xsl:if>
+			</th>
+    	</thead>
+    	<tbody>
+	        <tr><td></td><td>Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+	        <tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+	        <tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+	        <tr><td></td><td>Size: </td><td><xsl:value-of select="size"/></td></tr>
+	        <tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+	        <tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+	    </tbody>
+    </table>
+</xsl:template>

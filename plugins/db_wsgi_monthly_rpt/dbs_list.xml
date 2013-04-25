@@ -1,6 +1,0 @@
-<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="detailed">
-</xsl:template>
-<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="summary">
-</xsl:template>
-<xsl:template xmlns:monthrpt="http://thermal.cnde.iastate.edu/databrowse/monthrpt" match="monthrpt:monthrpt" mode="title">
-</xsl:template>

@@ -1,0 +1,112 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" match="run" mode="full">
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h3>Run Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th>Item</th><th>Details</th></tr>
+        </thead>
+    	<tbody>
+	        <tr><td>Variable: </td><td><xsl:value-of select="@variable"/></td></tr>
+            <tr><td>Run Index: </td><td><xsl:value-of select="@runindex"/></td></tr>
+            <tr><td>Date: </td><td><xsl:value-of select="@date"/></td></tr>
+            <tr><td>Label: </td><td><xsl:value-of select="@label"/></td></tr>
+            <tr><td>Basename: </td><td><xsl:value-of select="run_basename"/></td></tr>
+            <tr>
+                <td>Description: </td>
+                <td>
+                    <xsl:call-template name="olddc-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="descr"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+	    </tbody>
+    </table>
+
+    <h3>Trigger Data</h3>
+    <xsl:for-each select="trigger">
+        <table class="cream full-width">
+            <thead>
+                <tr><th>Item</th><th>Details</th><th>Units</th></tr>
+            </thead>
+            <tbody>
+                <xsl:for-each select="*">
+                    <xsl:sort data-type="text" select="local-name()"/>
+                    <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+                    <tr>
+                        <td>
+                            <xsl:choose>
+                                <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                    <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$localname"/>                                    
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </td>
+                        <td><xsl:value-of select="."/></td>
+                        <td><xsl:value-of select="@units"/></td>
+                    </tr>
+                </xsl:for-each>
+            </tbody>
+        </table>
+    </xsl:for-each>
+</xsl:template>
+<xsl:template name="olddc-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="olddc-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<db:fieldmap xmlns="http://thermal.cnde.iastate.edu/databrowse" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <entry key="aircylinder">Air Cylinder</entry>
+    <entry key="amplitude">Amplitude</entry>
+    <entry key="clampoffset">Clamp Offset</entry>
+    <entry key="clamptorque">Clamp Torque</entry>
+    <entry key="coating">Coating</entry>
+    <entry key="couplant">Couplant</entry>
+    <entry key="crackheat">Crack Heating</entry>
+    <entry key="dgsfile">DGS File</entry>
+    <entry key="dynstress">Dynamic Stress</entry>
+    <entry key="elecenergy">Electrical Energy</entry>
+    <entry key="excitation">Excitation</entry>
+    <entry key="hae">HAE</entry>
+    <entry key="hit">Hit</entry>
+    <entry key="meastype">Measurement Type</entry>
+    <entry key="notes">Notes</entry>
+    <entry key="pixelsperinch">Pixels/Inch</entry>
+    <entry key="resonantfrequency">Resonant Frequency</entry>
+    <entry key="run_basename">Run Basename</entry>
+    <entry key="setfile">Set File</entry>
+    <entry key="specimen">Specimen</entry>
+    <entry key="takenby">Taken By</entry>
+    <entry key="timestamp">Timestamp</entry>
+    <entry key="transducerforce">Transducer Force</entry>
+    <entry key="transduceroffset">Transducer Offset</entry>
+    <entry key="transducerpressure">Transducer Pressure</entry>
+    <entry key="transducerserial">Transducer Serial</entry>
+    <entry key="transducertemp">Transducer Temperature</entry>
+    <entry key="triggercount">Trigger Count</entry>
+    <entry key="triggerindex">Trigger Index</entry>
+    <entry key="view">View</entry>
+</db:fieldmap>

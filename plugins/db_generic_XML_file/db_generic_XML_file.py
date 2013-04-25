@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/db_default.py - Default Renderer - Basic Output for Any File """
+""" plugins/renderers/db_xml_generic.py - Default Text Renderer """
 
 import os
 import os.path
@@ -29,13 +29,13 @@ from renderer_support import renderer_class
 import magic
 
 
-class db_default(renderer_class):
-    """ Default Renderer - Basic Output for Any File """
+class db_generic_XML_file(renderer_class):
+    """ Default Renderer - Basic Output for Any XML File """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/default"
-    _namespace_local = "default"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dbxml"
+    _namespace_local = "dbxml"
     _default_content_mode = "full"
-    _default_style_mode = "file_information"
+    _default_style_mode = "XML_preview"
     _default_recursion_depth = 2
 
     def getContent(self):
@@ -58,14 +58,9 @@ class db_default(renderer_class):
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
 
-                    src = self.getURL(self._relpath, content_mode="raw", thumbnail="medium")
-                    href = self.getURL(self._relpath, content_mode="raw")
-                    name = os.path.basename(self._relpath) if self._relpath is not '/' else os.path.basename(self._fullpath)
-                    if not os.path.isdir(self._fullpath):
-                        downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
-                    else:
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, icon=icon)
+                    downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+
+                    xmlroot = etree.Element('{%s}dbxml' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
 
                     xmlchild = etree.SubElement(xmlroot, "filename")
                     xmlchild.text = os.path.basename(self._fullpath)
@@ -99,6 +94,13 @@ class db_default(renderer_class):
                     xmlchild = etree.SubElement(xmlroot, "owner")
                     xmlchild.text = "%s:%s" % (username, groupname)
 
+                    # Contents of File
+                    f = open(self._fullpath)
+                    xmlchild = etree.SubElement(xmlroot, "contents")
+                    xmlchild.append(etree.XML(f.read()))
+                    #xmlchild.text = f.read()
+                    f.close()
+
                     return xmlroot
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
@@ -117,6 +119,6 @@ class db_default(renderer_class):
                     return iter(lambda: f.read(1024))
             else:
                 raise self.RendererException("Invalid Content Mode")
-        pass
+            pass
 
     pass

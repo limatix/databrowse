@@ -1,6 +1,0 @@
-<xsl:template xmlns:wsgigeneric="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric" match="wsgigeneric:wsgigeneric" mode="detailed">
-</xsl:template>
-<xsl:template xmlns:wsgigeneric="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric" match="wsgigeneric:wsgigeneric" mode="summary">
-</xsl:template>
-<xsl:template xmlns:wsgigeneric="http://thermal.cnde.iastate.edu/databrowse/wsgigeneric" match="wsgigeneric:wsgigeneric" mode="title">
-</xsl:template>
