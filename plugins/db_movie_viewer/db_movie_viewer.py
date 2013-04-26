@@ -29,7 +29,7 @@ from renderer_support import renderer_class
 import magic
 import Image
 import StringIO
-from subprocess import Popen, PIPE
+import subprocess
 import re
 
 
@@ -103,8 +103,7 @@ class db_movie_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "contenttype")
                 xmlchild.text = contenttype
 
-                os.environ["HOME"] = "/var/www/.home"
-                probe = Popen(("/usr/local/bin/mplayer", "-identify", "-frames", "0", "-ao", "null", self._fullpath), stdout=PIPE, stderr=PIPE).communicate()[0]
+                probe = subprocess.Popen(("/usr/local/bin/mplayer", "-identify", "-frames", "0", "-ao", "null", self._fullpath), stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
                 video_codec = re.search('ID_VIDEO_CODEC=(.+?)\n', probe)
                 video_bitrate = re.search('ID_VIDEO_BITRATE=(.+?)\n', probe)
                 video_width = re.search('ID_VIDEO_WIDTH=(.+?)\n', probe)
@@ -167,32 +166,30 @@ class db_movie_viewer(renderer_class):
             xmlroot = etree.Element('{%s}movie' % self._namespace_uri, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
-            magicstore = magic.open(magic.MAGIC_MIME)
-            magicstore.load()
-            contenttype = magicstore.file(self._fullpath)
             if "thumbnail" in self._web_support.req.form:
                 basename = os.path.splitext(os.path.basename(self._fullpath))
                 cachedir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/")
                 if self._web_support.req.form['thumbnail'].value == "small":
-                    cachefilename = basename[0] + "_small" + basename[1]
+                    cachefilename = basename[0] + "_small.jpg"
                     newsize = (150, 150)
                 elif self._web_support.req.form['thumbnail'].value == "medium":
-                    cachefilename = basename[0] + "_medium" + basename[1]
+                    cachefilename = basename[0] + "_medium.jpg"
                     newsize = (300, 300)
                 elif self._web_support.req.form['thumbnail'].value == "large":
-                    cachefilename = basename[0] + "_large" + basename[1]
+                    cachefilename = basename[0] + "_large.jpg"
                     newsize = (500, 500)
                 elif self._web_support.req.form['thumbnail'].value == "gallery":
-                    cachefilename = basename[0] + "_gallery" + basename[1]
+                    cachefilename = basename[0] + "_gallery.jpg"
                     newsize = (201, 201)
                 else:
-                    cachefilename = basename[0] + "_small" + basename[1]
+                    cachefilename = basename[0] + "_small.jpg"
                     newsize = (150, 150)
                 cachefullpath = os.path.join(cachedir, cachefilename)
+                cachedframe = os.path.join(cachedir, basename[0] + "_full.jpg")
                 if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
                     size = os.path.getsize(cachefullpath)
                     f = open(cachefullpath, "rb")
-                    self._web_support.req.response_headers['Content-Type'] = contenttype
+                    self._web_support.req.response_headers['Content-Type'] = 'image/jpeg'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                     self._web_support.req.output_done = True
@@ -201,7 +198,11 @@ class db_movie_viewer(renderer_class):
                     else:
                         return iter(lambda: f.read(1024))
                 else:
-                    img = Image.open(self._fullpath)
+                    if os.access(cachedframe, os.R_OK) and os.path.exists(cachedframe):
+                        img = Image.open(cachedframe)
+                    else:
+                        subprocess.call(["/usr/local/bin/ffmpeg", "-y", "-i", self._fullpath, "-f", "mjpeg", "-vframes", "1", cachedframe])
+                        img = Image.open(cachedframe)
                     format = img.format
                     img.thumbnail(newsize, Image.ANTIALIAS)
                     output = StringIO.StringIO()
@@ -211,11 +212,14 @@ class db_movie_viewer(renderer_class):
                     f = open(cachefullpath, "wb")
                     img.save(f, format=format)
                     f.close()
-                    self._web_support.req.response_headers['Content-Type'] = contenttype
+                    self._web_support.req.response_headers['Content-Type'] = 'image/jpeg'
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                     self._web_support.req.output_done = True
                     return [output.getvalue()]
             else:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(self._fullpath)
                 size = os.path.getsize(self._fullpath)
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

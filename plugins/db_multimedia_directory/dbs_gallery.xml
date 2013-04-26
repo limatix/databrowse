@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="imgdir:dir" mode="title">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" xmlns:movie="http://thermal.cnde.iastate.edu/databrowse/movie" match="imgdir:dir" mode="title">
     <style>
         #imglist {
             padding-left: 0px;
@@ -278,42 +278,76 @@
                                 </div>
                             </div>
                         </div>
-                        <!--<table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
-                            <thead>
-                                <tr class="dark-title">
-                                    <th colspan="3" style="word-wrap: break-word">
-                                        <span style="width:20px;display:inline-block"><img style="max-width:201px;"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></span>
-                                        <span style="width:90%;display:inline-block;overflow:hidden;white-space:nowrap;"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><xsl:value-of select="image:image/@name"/></a></span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td rowspan="4">
+                    </li>
+                </xsl:when>
+                <xsl:when test="child::*[1][self::movie:movie]">
+                    <li>
+                        <div class="listitem">
+                            <div class="listitemheader">
+                                    <span class="listicon">
+                                        <img>
+                                            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/video-x-generic.png</xsl:attribute>
+                                        </img>
+                                    </span>
+                                    <span class="listitemtitle">
                                         <a>
-                                            <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
-                                            <img style="border:1px solid #900;" title="Click to View Image Full Size">
-                                                <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
-                                            </img>
+                                            <xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>
+                                            <xsl:value-of select="movie:movie/@name"/>
                                         </a>
-                                    </td>
-                                    <td width="10px"><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute></img></a></td>
-                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>View Details</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute></img></a></td>
-                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>View Full Size</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img></a></td>
-                                    <td><a><xsl:attribute name="href"><xsl:value-of select="image:image/@downlink"/></xsl:attribute>Download Image</a></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>-->
+                                    </span>
+                            </div>
+                            <div class="listitemcontents">
+                                <div class="listitemthumbnail">
+                                    <a>
+                                        <xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>
+                                        <img>
+                                                <xsl:attribute name="src"><xsl:value-of select="movie:movie/@src"/></xsl:attribute>
+                                        </img>
+                                    </a>
+                                </div>
+                                <div class="listitemoptions">
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>View Details</a>
+                                        </span>
+                                    </div>
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="movie:movie/@href"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="movie:movie/@href"/></xsl:attribute>View Full Size</a>
+                                        </span>
+                                    </div>
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="movie:movie/@downlink"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="movie:movie/@downlink"/></xsl:attribute>Download Video</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </li>
                 </xsl:when>
                 <xsl:otherwise>
@@ -341,16 +375,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--<table class="cream" style="table-layout:fixed;margin-bottom:0px;width:362px">
-                            <thead>
-                                <tr class="dark-title">
-                                    <th colspan="3" style="word-wrap: break-word">
-                                        <span style="width:20px;display:inline-block"><img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img></span>
-                                        <span style="width:90%;display:inline-block"><a><xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute><xsl:value-of select="@basename"/></a></span>
-                                    </th>
-                                </tr>
-                            </thead>
-                        </table>-->
                     </li>
                 </xsl:otherwise>
             </xsl:choose>
