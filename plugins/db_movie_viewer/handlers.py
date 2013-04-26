@@ -21,7 +21,7 @@
 
 def dbh__movie(path, contenttype, extension):
     """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
-    if extension.lower() in ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff"]:
-        return False
+    if extension.lower() in ["avi", "mpg"]:
+        return 'db_movie_viewer'
     else:
         return False
