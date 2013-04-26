@@ -327,7 +327,7 @@
                                     </span>
                                     <span class="listitemtitle">
                                         <a>
-                                            <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
+                                            <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
                                             <xsl:value-of select="@basename"/>
                                         </a>
                                     </span>

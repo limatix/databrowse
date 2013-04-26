@@ -124,7 +124,7 @@ class renderer_class(object):
     def getUserFriendlySize(self, fullpath=None, mode="alternative", custom=None):
         return self.ConvertUserFriendlySize(self.getSize(fullpath), mode, custom)
 
-    def ConvertUserFriendlySize(self, bytes, mode="alternative", custom=None):
+    def ConvertUserFriendlySize(self, bytes, mode="alternative", custom=None, rounding=None):
         """Human-readable file size. """
 
         if custom is not None:
@@ -147,6 +147,32 @@ class renderer_class(object):
                 (1024 ** 2, ' MB'),
                 (1024 ** 1, ' KB'),
                 (1024 ** 0, (' byte', ' bytes')),
+            ]
+        elif mode is "bitrate":
+            formatstrings = [
+                (1024 ** 5, ' Pbps'),
+                (1024 ** 4, ' Tbps'),
+                (1024 ** 3, ' Gbps'),
+                (1024 ** 2, ' Mbps'),
+                (1024 ** 1, ' Kbps'),
+                (1024 ** 0, ' bps'),
+            ]
+        elif mode is "frequency":
+            formatstrings = [
+                (1000 ** 5, ' PHz'),
+                (1000 ** 4, ' THz'),
+                (1000 ** 3, ' GHz'),
+                (1000 ** 2, ' MHz'),
+                (1000 ** 1, ' KHz'),
+                (1000 ** 0, ' Hz'),
+            ]
+        elif mode is "time":
+            formatstrings = [
+                (4 ** 4, (' week', ' weeks')),
+                (7 ** 3, (' day', ' days')),
+                (24 ** 2, (' hr', ' hrs')),
+                (60 ** 1, ' min'),
+                (60 ** 0, ' sec'),
             ]
         elif mode is "verbose":
             formatstrings = [
@@ -195,6 +221,8 @@ class renderer_class(object):
                 suffix = singular
             else:
                 suffix = multiple
+        if rounding is not None:
+            amount = round(amount, rounding)
         return str(amount) + suffix
 
     def ConvertUserFriendlyPermissions(self, p):

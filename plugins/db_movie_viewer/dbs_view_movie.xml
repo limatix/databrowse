@@ -1,0 +1,59 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:movie="http://thermal.cnde.iastate.edu/databrowse/movie" match="movie:movie" mode="full">
+    <div class="grid-row">
+	    <div class="grid g-1-1">
+	    	<div style="width:300px; padding-right:5px; float:left">
+				<object height="300" width="300"><xsl:attribute name="data"><xsl:value-of select="@href"/></xsl:attribute></object>
+	    	</div>
+		    <div>
+		    	<table class="cream" style="table-layout:fixed; width:419px">
+		    		<thead>
+		        		<tr class="dark-title">
+		        			<th style="width:8px">
+		        				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/image-x-generic.png</xsl:attribute></img>
+		        			</th>
+		        			<th colspan="2" style="word-wrap: break-word">
+		        				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+		        				<a>
+		        					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+		        					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+		        				</a>
+		        			</th>
+		        		</tr>
+		        	</thead>
+		        	<tbody>
+			        	<tr><td style="width:10px"></td><td style="width:100px">Content Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+			        	<tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+			        	<tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+		        		<tr><td></td><td>File Size: </td><td><xsl:value-of select="filesize"/></td></tr>
+		        		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+		        		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+		        		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+		        		<tr><td></td><td>Length: </td><td><xsl:value-of select="length"/></td></tr>
+		        		<tr><th></th><th colspan="2">Video</th></tr>
+		        		<xsl:choose>
+		        			<xsl:when test="video/@video='True'">
+		        				<xsl:for-each select="video/attr">
+		        					<tr><td></td><td><xsl:value-of select="@name"/>: </td><td><xsl:value-of select="."/></td></tr>
+		        				</xsl:for-each>
+		        			</xsl:when>
+		        			<xsl:otherwise>
+		        				<tr><td></td><td colspan="2">No Video</td></tr>
+		        			</xsl:otherwise>
+		        		</xsl:choose>
+		        	   	<tr><th></th><th colspan="2">Audio</th></tr>
+		        		<xsl:choose>
+		        			<xsl:when test="audio/@audio='True'">
+		        				<xsl:for-each select="audio/attr">
+		        					<tr><td></td><td><xsl:value-of select="@name"/>: </td><td><xsl:value-of select="."/></td></tr>
+		        				</xsl:for-each>
+		        			</xsl:when>
+		        			<xsl:otherwise>
+		        				<tr><td></td><td colspan="2">No Audio</td></tr>
+		        			</xsl:otherwise>
+		        		</xsl:choose>
+		        	</tbody>
+		    	</table>
+		    </div>
+		</div>
+	</div>
+</xsl:template>
