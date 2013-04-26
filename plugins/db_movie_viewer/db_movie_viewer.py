@@ -103,6 +103,7 @@ class db_movie_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "contenttype")
                 xmlchild.text = contenttype
 
+                os.environ["HOME"] = "/var/www/.home"
                 probe = Popen(("mplayer", "-identify", "-frames", "0", "-ao", "null", self._fullpath), stdout=PIPE, stderr=PIPE).communicate()[0]
                 video_codec = re.search('ID_VIDEO_CODEC=(.+?)\n', probe)
                 video_bitrate = re.search('ID_VIDEO_BITRATE=(.+?)\n', probe)
