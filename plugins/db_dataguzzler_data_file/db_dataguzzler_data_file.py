@@ -40,7 +40,7 @@ class db_dataguzzler_data_file(renderer_class):
     _namespace_uri = "http://thermal.cnde.iastate.edu/dataguzzler"
     _namespace_local = "dg"
     _default_content_mode = "full"
-    _default_style_mode = "file_preview"
+    _default_style_mode = "examine_file_contents"
     _default_recursion_depth = 2
 
     def dumpxmlchunk(self, dgfh, nestdepth=-1):
@@ -81,7 +81,7 @@ class db_dataguzzler_data_file(renderer_class):
                 newel.text = textdata
                 pass
             else:
-                newel.text = " %d bytes\n" % (Chunk.ChunkLen)
+                newel.text = "%s\n" % (self.ConvertUserFriendlySize(Chunk.ChunkLen))
                 pass
             dgf.chunkdone(dgfh, None)
             Chunk = dgf.nextchunk(dgfh)

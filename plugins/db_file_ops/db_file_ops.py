@@ -91,6 +91,65 @@ class db_file_ops(renderer_class):
             self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
             self._web_support.req.output_done = True
             return [s]
+        elif operation == "newdir":
+            outputmsg = ""
+            if not os.path.isdir(self._fullpath):
+                outputmsg = "ERROR:  Directories Must Be Created Inside Directories"
+            elif not "dirname" in self._web_support.req.form or self._web_support.req.form["dirname"].value == "":
+                outputmsg = "ERROR:  No Directory Name Supplied"
+            elif not os.access(self._fullpath, os.W_OK) and not os.path.exists(self._fullpath):
+                outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
+            else:
+                newdirpath = os.path.abspath(os.path.join(self._fullpath, self._web_support.req.form["dirname"].value))
+                if not newdirpath.startswith(self._web_support.dataroot):
+                    outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
+                elif os.path.exists(newdirpath):
+                    outputmsg = "ERROR: Directory Already Exists"
+                else:
+                    try:
+                        os.makedirs(newdirpath)
+                        pass
+                    except Exception as err:
+                        outputmsg = "ERROR: " + repr(err)
+                        pass
+                    else:
+                        outputmsg = "Directory Created Successfully"
+                        pass
+                    pass
+                pass
+            self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+            self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+            self._web_support.req.output_done = True
+            return [outputmsg]
+        elif operation == "rename":
+            outputmsg = ""
+            if not "newname" in self._web_support.req.form or self._web_support.req.form["newname"].value == "":
+                outputmsg = "ERROR:  Name Must Be Specified"
+            elif not os.access(self._fullpath, os.W_OK) and not os.path.exists(self._fullpath):
+                outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
+            else:
+                newpath = os.path.abspath(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form["newname"].value))
+                if not newpath.startswith(self._web_support.dataroot):
+                    outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
+                elif os.path.exists(newpath):
+                    outputmsg = "ERROR: File or Directory Already Exists"
+                else:
+                    try:
+                        os.renames(self._fullpath, newpath)
+                        pass
+                    except Exception as err:
+                        outputmsg = "ERROR: " + repr(err)
+                        pass
+                    else:
+                        outputmsg = "Item Renamed Successfully"
+                        pass
+                    pass
+                pass
+            pass
+            self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+            self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+            self._web_support.req.output_done = True
+            return [outputmsg]
         else:
             raise self.RendererException("Invalid Operation Specificed")
 
