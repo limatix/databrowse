@@ -137,6 +137,8 @@ class db_SolidWorks_viewer(renderer_class):
                     if os.access(cachedframe, os.R_OK) and os.path.exists(cachedframe):
                         img = Image.open(cachedframe)
                     else:
+                        if not os.path.exists(cachedir):
+                            os.makedirs(cachedir)
                         with open(cachedframe, 'wb') as output_f:
                             p = subprocess.call(["/usr/bin/gsf", "cat", self._fullpath, "PreviewPNG"], stdout=output_f)
                         img = Image.open(cachedframe)
@@ -144,8 +146,6 @@ class db_SolidWorks_viewer(renderer_class):
                     img.thumbnail(newsize, Image.ANTIALIAS)
                     output = StringIO.StringIO()
                     img.save(output, format=format)
-                    if not os.path.exists(cachedir):
-                        os.makedirs(cachedir)
                     f = open(cachefullpath, "wb")
                     img.save(f, format=format)
                     f.close()
