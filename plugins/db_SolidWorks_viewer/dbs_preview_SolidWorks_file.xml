@@ -1,0 +1,38 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sdw="http://thermal.cnde.iastate.edu/databrowse/solidworks" match="sdw:sdw" mode="full">
+    <div class="grid-row">
+	    <div class="grid g-1-1">
+	    	<div style="width:300px; padding-right:5px; float:left">
+				<img style="border:1px solid #900;">
+	    			<xsl:attribute name="src"><xsl:value-of select="@src"/></xsl:attribute>
+				</img>
+	    	</div>
+		    <div>
+		    	<table class="cream" style="table-layout:fixed; width:419px">
+		    		<thead>
+		        		<tr class="dark-title">
+		        			<th style="width:8px">
+		        				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/image-x-generic.png</xsl:attribute></img>
+		        			</th>
+		        			<th colspan="2" style="word-wrap: break-word">
+		        				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+		        				<a>
+		        					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+		        					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+		        				</a>
+		        			</th>
+		        		</tr>
+		        	</thead>
+		        	<tbody>
+			        	<tr><td style="width:10px"></td><td style="width:100px">Content Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+			        	<tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+			        	<tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+		        		<tr><td></td><td>File Size: </td><td><xsl:value-of select="filesize"/></td></tr>
+		        		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+		        		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+		        		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+		        	</tbody>
+		    	</table>
+		    </div>
+		</div>
+	</div>
+</xsl:template>

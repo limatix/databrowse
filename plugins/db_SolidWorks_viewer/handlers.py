@@ -16,22 +16,12 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/dbh_multimedia_directory.py - Image Directory Handler """
-
-import os
+""" plugins/handlers/dbh__image.py - Generic Image Handler """
 
 
-def dbh_directory_image(path, contenttype, extension):
-    """ Generic Image Directory Handler - Returns directory_image for all directories with more than 50 percent images """
-    if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
-        dirlist = os.listdir(path)
-        count = 0
-        for item in dirlist:
-            if (os.path.splitext(item)[1].lower() in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".avi", ".mpg", ".mpeg", ".mpe", ".mpeg-1", ".mpeg-2", ".m1s", ".mpa", ".mp2", ".m2a", ".mp2v", ".m2v", ".m2s", ".mov", ".qt", ".asf", ".asx", ".wmv", ".wma", ".wmx", ".rm", ".ra", ".ram", ".rmvb", ".mp4", ".3gp", ".ogm", ".mkv", ".sldprt", ".sldasm", ".slddrw"]):
-                count = count + 1
-        if count > (len(dirlist) * 0.5):
-            return "db_multimedia_directory"
-        else:
-            return False
+def dbh_solidworks(path, contenttype, extension):
+    """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
+    if extension.lower() in ["sldprt", "slddrw", "sldasm"]:
+        return 'db_SolidWorks_viewer'
     else:
         return False
