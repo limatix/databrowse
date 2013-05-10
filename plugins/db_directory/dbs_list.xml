@@ -621,7 +621,7 @@
                 <span class="menuitemcomponent">Upload File Here</span>
             </div>
             <div class="menuitemcomponent contextmenuseparator">
-                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px"/>
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
             <div class="menuitemcomponent contextmenuitem" onmouseup="newdirectory()">
                 <img class="menuitemcomponent">
