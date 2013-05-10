@@ -64,7 +64,15 @@ class db_directory(renderer_class):
                     exec "import %s.%s as %s_module" % (handler, handler, handler)
                     exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
-                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon)
+                if os.path.islink(itemfullpath):
+                    overlay = "link"
+                elif not os.access(itemfullpath, os.W_OK):
+                    overlay = "readonly"
+                elif not os.access(itemfullpath, os.R_OK):
+                    overlay = "unreadable"
+                else:
+                    overlay = "none"
+                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
                 if content is not None:
                     xmlchild.append(content)
                     pass

@@ -386,6 +386,7 @@
                 }
                 .icon {
                     padding-right: 4px;
+                    position: relative;
                 }
                 .basename {
                     font-weight: bold;
@@ -734,6 +735,26 @@
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/folder-visiting.png</xsl:attribute>
                     </img>
+                    <xsl:choose>
+                        <xsl:when test="@overlay='link'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='readonly'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='unreadable'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
                 </span>
                 <span class="basename">
                     <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default"><xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
@@ -754,6 +775,26 @@
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="../@icon"/></xsl:attribute>
                     </img>
+                    <xsl:choose>
+                        <xsl:when test="../@overlay='link'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="../@overlay='readonly'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="../@overlay='unreadable'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
                 </span>
                 <span class="basename">
                     <a>
@@ -772,6 +813,26 @@
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="../@icon"/></xsl:attribute>
                     </img>
+                    <xsl:choose>
+                        <xsl:when test="../@overlay='link'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="../@overlay='readonly'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="../@overlay='unreadable'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
                 </span>
                 <span class="basename">
                     <a>
@@ -801,6 +862,26 @@
                                 <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
                                 <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
                             </img>
+                            <xsl:choose>
+                                <xsl:when test="@overlay='link'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                                <xsl:when test="@overlay='readonly'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                                <xsl:when test="@overlay='unreadable'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                            </xsl:choose>
                         </span>
                         <span class="basename">
                             <a>
