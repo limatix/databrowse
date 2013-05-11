@@ -115,21 +115,27 @@ class db_office_viewer(renderer_class):
                         return iter(lambda: f.read(1024))
                 else:
                     if not os.path.exists(cachedir):
-                        os.makedirs(cachedir)
+                        try:
+                            os.makedirs(cachedir)
+                        except Exception as err:
+                            raise self.RendererException("Unable to Create Cache Directory - Check File Permissions")
                     os.environ["HOME"] = "/var/www/.home"
                     subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", cachedir, self._fullpath])
-                    size = os.path.getsize(cachefullpath)
-                    f = open(cachefullpath, "rb")
-                    if "download" in self._web_support.req.form:
-                        self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
-                    self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
-                    self._web_support.req.response_headers['Content-Length'] = str(size)
-                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
-                    self._web_support.req.output_done = True
-                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
-                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
-                    else:
-                        return iter(lambda: f.read(1024))
+                    try:
+                        size = os.path.getsize(cachefullpath)
+                        f = open(cachefullpath, "rb")
+                        if "download" in self._web_support.req.form:
+                            self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
+                        self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
+                        self._web_support.req.response_headers['Content-Length'] = str(size)
+                        self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                        self._web_support.req.output_done = True
+                        if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                            return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                        else:
+                            return iter(lambda: f.read(1024))
+                    except Exception as err:
+                        raise self.RendererException("Unable to Generate PDF File - Check File Permissions")
             else:
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
