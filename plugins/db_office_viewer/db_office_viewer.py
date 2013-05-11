@@ -52,9 +52,10 @@ class db_office_viewer(renderer_class):
                 file_atime = time.asctime(time.localtime(st[ST_ATIME]))
 
                 viewlink = self.getURL(self._relpath, content_mode="raw", pdf="pdf")
+                pdflink = self.getURL(self._relpath, content_mode="raw", pdf="pdf", download="download")
                 downlink = self.getURL(self._relpath, content_mode="raw")
 
-                xmlroot = etree.Element('{%s}office' % self._namespace_uri, name=os.path.basename(self._relpath), viewlink=viewlink, resurl=self._web_support.resurl, downlink=downlink)
+                xmlroot = etree.Element('{%s}office' % self._namespace_uri, name=os.path.basename(self._relpath), viewlink=viewlink, pdflink=pdflink, resurl=self._web_support.resurl, downlink=downlink)
 
                 xmlchild = etree.SubElement(xmlroot, "filename")
                 xmlchild.text = os.path.basename(self._fullpath)
@@ -102,6 +103,8 @@ class db_office_viewer(renderer_class):
                 if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
                     size = os.path.getsize(cachefullpath)
                     f = open(cachefullpath, "rb")
+                    if "download" in self._web_support.req.form:
+                        self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
                     self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
@@ -117,6 +120,8 @@ class db_office_viewer(renderer_class):
                     subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", cachedir, self._fullpath])
                     size = os.path.getsize(cachefullpath)
                     f = open(cachefullpath, "rb")
+                    if "download" in self._web_support.req.form:
+                        self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
                     self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())

@@ -22,6 +22,24 @@
     		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
     		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
     		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+    		<tr><td></td><td>Download: </td>
+    			<td><a>
+    					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+    					<img style="vertical-align:text-bottom"><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+    				</a>
+    				<a>
+    					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>As Original Document
+    				</a>
+    				<br/>
+    				<a>
+    					<xsl:attribute name="href"><xsl:value-of select="@pdflink"/></xsl:attribute>
+    					<img style="vertical-align:text-bottom"><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+    				</a>
+    				<a>
+    					<xsl:attribute name="href"><xsl:value-of select="@pdflink"/></xsl:attribute>As PDF File
+    				</a>
+    			</td>
+    		</tr>
     	</tbody>
 	</table>
 	<object width="100%" height="700px" type="application/pdf">
