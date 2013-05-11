@@ -116,7 +116,6 @@ class db_office_viewer(renderer_class):
                 else:
                     if not os.path.exists(cachedir):
                         os.makedirs(cachedir)
-                    os.environ["HOME"] = "/var/www/.home"
                     subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", cachedir, self._fullpath])
                     size = os.path.getsize(cachefullpath)
                     f = open(cachefullpath, "rb")
