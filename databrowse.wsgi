@@ -153,7 +153,7 @@ def application(environ, start_response):
             itemslist = string.split(relpath, "/")[1:]
             count = 1
             if itemslist[0] is not "":
-                topbarstring += '<a class="button" href="%s">/</a>&gt;' % linkstring
+                topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (linkstring, db_web_support.resurl, linkstring)
                 pass
             for item in itemslist:
                 if item is not "" and count is not len(itemslist):
@@ -165,7 +165,7 @@ def application(environ, start_response):
                     topbarstring += '<a class="button active" href="%s">%s</a>' % (linkstring, item)
                     pass
                 else:
-                    topbarstring += '<a class="button active" href="%s">/</a>' % linkstring
+                    topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button active" href="%s">/</a>' % (linkstring, db_web_support.resurl, linkstring)
                     pass
                 count += 1
                 pass

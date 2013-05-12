@@ -23,6 +23,7 @@ import os.path
 from renderer_support import renderer_class
 import re
 import json
+import shutil
 
 
 class db_file_ops(renderer_class):
@@ -142,6 +143,36 @@ class db_file_ops(renderer_class):
                         pass
                     else:
                         outputmsg = "Item Renamed Successfully"
+                        pass
+                    pass
+                pass
+            pass
+            self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+            self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+            self._web_support.req.output_done = True
+            return [outputmsg]
+        elif operation == "delete":
+            outputmsg = ""
+            if not os.access(self._fullpath, os.W_OK) and not os.path.exists(self._fullpath):
+                outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
+            elif self._fullpath == self._web_support.dataroot:
+                outputmsg = "ERROR: Databrowse Data Root Directory '" + self._fullpath + "' Cannot Be Deleted"
+            else:
+                trashdir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/trash/")
+                if not os.path.exists(trashdir):
+                    try:
+                        os.makedirs(trashdir)
+                    except Exception as err:
+                        outputmsg = "ERROR:  Unable to Create Trash Directory - Check File Permissions"
+                if outputmsg == "":
+                    try:
+                        shutil.move(self._fullpath, trashdir)
+                        pass
+                    except Exception as err:
+                        outputmsg = "ERROR: " + repr(err)
+                        pass
+                    else:
+                        outputmsg = "Item Moved To Trash Successfully"
                         pass
                     pass
                 pass

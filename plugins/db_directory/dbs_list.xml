@@ -244,11 +244,34 @@
                             });
                         }
                     }
+                    function deletefile() {
+                        var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=delete";
+                        var relpathlist = relpath.slice(1).split("/");
+                        if(confirm('Are you sure you want to delete "'+relpath+'"?')) {
+                            $.ajax({
+                                type: "POST",
+                                url: ajaxurl,
+                            }).done(function(msg) {
+                                if(msg=="Item Moved To Trash Successfully") {
+                                    window.location.href = siteurl+"/"+relpathlist.slice(0,-1).join("/");
+                                }
+                                else {
+                                    alert(msg);
+                                }
+                            });
+                        }
+                    }
                     function openiteminnewtab() {
                         window.open(siteurl+"/"+relpath.slice(1));
                     }
                     function openiteminsftpclient() {
-                        window.open("sftp://"+location.hostname+dataroot+"/"+relpath.slice(1))
+                        window.open("sftp://"+location.hostname+dataroot+"/"+relpath.slice(1));
+                    }
+                    function displaylink() {
+                        window.prompt("Press Ctrl + C to Copy Link", siteurl+"/"+relpath.slice(1));
+                    }
+                    function displayproperties() {
+                        window.location.href = siteurl+"/"+relpath.slice(1)+"?handler=db_default"
                     }
                 ]]> 
         </script>
@@ -628,6 +651,12 @@
                 </img>
                 <span class="menuitemcomponent">Open Folder in SFTP Client</span>
             </div>
+            <div class="menuitemcomponent contextmenuitem" onmouseup="displaylink()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Get Link to this Folder</span>
+            </div>
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
@@ -650,13 +679,28 @@
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-new.png</xsl:attribute>
                 </img>
-                <span class="menuitemcomponent">New Directory Here</span>
+                <span class="menuitemcomponent">New Folder Here</span>
             </div>
             <div class="menuitemcomponent contextmenuitem" onmouseup="renamefile()">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-open.png</xsl:attribute>
                 </img>
-                <span class="menuitemcomponent">Rename Directory</span>
+                <span class="menuitemcomponent">Rename Folder</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onmouseup="deletefile()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Move Folder to Trash</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onmouseup="displayproperties()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Folder Properties</span>
             </div>
         </div>
         <div id="checklistmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('checklistmenu')">

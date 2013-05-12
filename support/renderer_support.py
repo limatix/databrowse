@@ -317,15 +317,18 @@ class renderer_class(object):
         #print "getDirectoryList being called"
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
         reallist = os.listdir(fullpath)
-        removelist = copy.copy(reallist)
-        for item in hiddenlist:
-            removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
-            pass
-        addlist = []
-        for item in shownlist:
-            addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
-            pass
-        returnlist = list(set(removelist + addlist))
+        if "showhiddenfiles" in self._web_support.req.form:
+            returnlist = reallist
+        else:
+            removelist = copy.copy(reallist)
+            for item in hiddenlist:
+                removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
+                pass
+            addlist = []
+            for item in shownlist:
+                addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
+                pass
+            returnlist = list(set(removelist + addlist))
         exec "returnlist.sort(%s%s)" % ("reverse=True" if order is "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
         return returnlist
 
