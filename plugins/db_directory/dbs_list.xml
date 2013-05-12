@@ -22,6 +22,7 @@
                 var fileuploaded = false;
             ]]> 
             var siteurl = "<xsl:value-of select="/dir:dir/@siteurl" />";
+            var dataroot = "<xsl:value-of select="/dir:dir/@dataroot" />";
         </script>
         <script type="text/javascript" DEFER="true">
                 <![CDATA[
@@ -242,6 +243,12 @@
                                 }
                             });
                         }
+                    }
+                    function openiteminnewtab() {
+                        window.open(siteurl+"/"+relpath.slice(1));
+                    }
+                    function openiteminsftpclient() {
+                        window.open("sftp://"+location.hostname+dataroot+"/"+relpath.slice(1))
                     }
                 ]]> 
         </script>
@@ -504,8 +511,8 @@
                     line-height:10px;
                 }
                 .contextmenuitem img {
-                    vertical-align: middle;
-                    padding-right: 2px;
+                    vertical-align: text-bottom;
+                    padding-right: 5px;
                 }
                 .contextmenuitem span {
                     vertical-align: middle;
@@ -609,6 +616,21 @@
                 }
         </style>
         <div id="contextmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('contextmenu')">
+            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminnewtab()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/tab-new.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in New Tab</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsftpclient()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-remote.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in SFTP Client</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
             <div class="menuitemcomponent contextmenuitem" onmouseup="showSubMenu(event, 'checklistmenu', 'contextmenu', 'l')">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>

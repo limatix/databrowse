@@ -241,7 +241,7 @@
                                             <a>
                                                 <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
                                                 <img>
-                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
                                                 </img>
                                             </a>
                                         </span>
@@ -311,7 +311,7 @@
                                             <a>
                                                 <xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>
                                                 <img>
-                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
                                                 </img>
                                             </a>
                                         </span>
@@ -381,7 +381,7 @@
                                             <a>
                                                 <xsl:attribute name="href"><xsl:value-of select="sdw:sdw/@link"/></xsl:attribute>
                                                 <img>
-                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/system-file-manager.png</xsl:attribute>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
                                                 </img>
                                             </a>
                                         </span>
