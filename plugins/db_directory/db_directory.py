@@ -40,6 +40,20 @@ class db_directory(renderer_class):
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
             xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
+            topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', xmlns="http://www.w3.org/1999/xhtml")
+            navelem = etree.SubElement(topmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+            title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
+            title.text = "View Options"
+            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
+            if not "showhiddenfiles" in self._web_support.req.form:
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=""))
+                menulink.text = "Show Hidden Files"
+            else:
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=None))
+                menulink.text = "Hide Hidden Files"
+            self._web_support.menu.AddMenu(topmenu)
             pass
         else:
             link = self.getURL(self._relpath)

@@ -33,6 +33,7 @@ import os
 import copy
 import fnmatch
 
+
 class renderer_class(object):
     """ Renderer Plugin Support - Encapsulation Class for Renderer Plugins """
 
@@ -276,6 +277,11 @@ class renderer_class(object):
         elif "handler" in kwargs and kwargs["handler"] is None:
             del kwargs["handler"]
             pass
+        # Add flag for hidden files if needed
+        if "showhiddenfiles" in self._web_support.req.form and "showhiddenfiles" not in kwargs:
+            kwargs["showhiddenfiles"] = ""
+        elif "showhiddenfiles" in kwargs and kwargs["showhiddenfiles"] is None:
+            del kwargs["showhiddenfiles"]
         # Build the URL
         if self._web_support.seo_urls is True:
             url = self._web_support.siteurl + relpath
