@@ -32,6 +32,7 @@ class handler_support:
     _hiddenfiledb = None
     directoryplugins = {}
     directorystylesheets = []
+    hiddenstylesheets = []
 
     def __init__(self, pluginpath, icondbpath, hiddenfiledbpath, directorypluginpath):
         """ Load up all of the handler plugins and icon database """
@@ -79,6 +80,8 @@ class handler_support:
             self.directoryplugins[item[0]] = item[1]
         for item in directorypluginconfig.items("directory_plugin_stylesheets"):
             self.directorystylesheets.append(item[0])
+        for item in directorypluginconfig.items("hidden_plugin_stylesheets"):
+            self.hiddenstylesheets.append(item[0])
 
         pass
 

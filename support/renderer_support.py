@@ -351,24 +351,27 @@ class renderer_class(object):
             title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
             navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
             for item in dirlist:
-                if not isDirectory and item not in self._handler_support.directorystylesheets:
-                    link = self.getURL(self._relpath, handler=handler, style_mode=item)
-                    if self._style_mode == item and self.__class__.__name__ == handler:
-                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                if item not in self._handler_support.hiddenstylesheets:
+                    if not isDirectory and item not in self._handler_support.directorystylesheets:
+                        link = self.getURL(self._relpath, handler=handler, style_mode=item)
+                        if self._style_mode == item and self.__class__.__name__ == handler:
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                        else:
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                        menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
+                        menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
+                        pass
+                    elif isDirectory:
+                        link = self.getURL(self._relpath, handler=handler, style_mode=item)
+                        if self._style_mode == item and self.__class__.__name__ == handler:
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
+                        else:
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
+                        menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
+                        menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
+                        pass
                     else:
-                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
-                    menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
-                    menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
-                    pass
-                elif isDirectory:
-                    link = self.getURL(self._relpath, handler=handler, style_mode=item)
-                    if self._style_mode == item and self.__class__.__name__ == handler:
-                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
-                    else:
-                        itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
-                    menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
-                    menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
-                    pass
+                        pass
             pass
         self._web_support.menu.AddMenu(newmenu)
         pass
