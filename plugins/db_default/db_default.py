@@ -106,9 +106,13 @@ class db_default(renderer_class):
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
                 f = open(self._fullpath, "rb")
-                self._web_support.req.response_headers['Content-Type'] = contenttype
+                if "Content-Type" in self._web_support.req.form:
+                    self._web_support.req.response_headers['Content-Type'] = self._web_support.req.form["Content-Type"].value
+                else:
+                    self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)
-                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
+                if "download" in self._web_support.req.form:
+                    self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
                 self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                 self._web_support.req.output_done = True
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:

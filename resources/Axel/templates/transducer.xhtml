@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:xt="http://ns.inria.org/xtiger" xml:lang="en">
+<head>                  
+  <!-- Use UTF-8 and avoid the xml protocol declaration at the top for Internet Explorer -->
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=8;" />   
+  <meta name="description" content="XTiger XML document template" />
+  <meta name="keywords" content="template, XTiger" />
+
+  <title>transducer</title>
+
+  <xt:head version="1.1" templateVersion="1.0" label="transducer">
+		<xt:component name="outline">
+			<p class="outline">Transducer ID: <xt:use types="text" label="id">AA9999</xt:use></p> 
+		</xt:component>
+
+		<xt:component name="modification">
+			<p class="indentation"> connector added: <xt:use types="text" label="date" >AA9999</xt:use></p> 
+			<xt:repeat minOccurs="0" maxOccurs="1">
+				<p class="indentation"><xt:menu-marker/>notes:<xt:use types="text" label="notes" >ISU connector Added</xt:use></p> 
+			</xt:repeat>
+		</xt:component>
+
+		<xt:component name="stackgeometry">
+			<p class="indentation"> Diameter: <xt:use types="text" label="diameter">16</xt:use> <xt:attribute types="string" name="units" default="mm"/>  Length: <xt:use types="text" label="length">20</xt:use><xt:attribute types="string" name="units" default="mm"/></p> 
+		</xt:component>
+
+		<xt:component name="spectrumfile">
+			<p><xt:use types="text"> AA9999spectrum.dgs</xt:use> the file was created  on <xt:attribute types="string" name="date" default="2013-02-25"/></p> 
+		</xt:component>
+
+		<xt:component name="logfile">
+			<p class="indentation"> filename: <xt:use types="text" label="logfile"  >AA999.log</xt:use> </p>
+		</xt:component>
+
+  </xt:head>                         
+
+  <link rel="stylesheet" type="text/css" href="Preview.css" />
+
+  <style type="text/css">
+    body {
+          counter-reset: req;     
+      margin: 20px 10px;
+      padding: 0;     
+			font-family: Helvetica
+    }   
+		body > span {
+			color: brown;
+		}
+		p > span {
+			color: green;
+			font-style:italic;
+		}
+  </style>
+  
+  <!-- Place here optional AXEL code for making the template auto-editable -->
+
+</head>
+<body>
+		<h2> <span style="color: blue; font-family: Times"> Enter the transducer information. Edit the fields highlighted in <span style="color:green;font-style:italic"> green </span> to change the values. After making changes, click the <span style="font-style:italic"> Dump</span> button to view the data in xml format</span>  </h2>
+		<h3><xt:use types="outline"/> </h3>
+		<h2> <span style="color: brown; font-family: Times">Modifications to transducer:</span> </h2>
+		<h3><xt:use types="modification" label="connectoradded"/> </h3>
+		<h2> <span style="color: brown; font-family: Times">Stack Geometry:</span> </h2>
+		<h3><xt:use types="stackgeometry" label="stackgeometry"/> </h3>
+		<h2> <span style="color: brown; font-family: Times">Spectrum file:</span> </h2>
+		<h3><xt:use types="spectrumfile" label="spectrumfile"/></h3>
+
+		
+
+		<h2> <span style="color: brown; font-family: Times">Log file:</span> </h2>
+		<h3><xt:use types="logfile"/> </h3>
+</body> 
+</html>
