@@ -106,8 +106,8 @@ class db_default(renderer_class):
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
                 f = open(self._fullpath, "rb")
-                if "Content-Type" in self._web_support.req.form:
-                    self._web_support.req.response_headers['Content-Type'] = self._web_support.req.form["Content-Type"].value
+                if "ContentType" in self._web_support.req.form:
+                    self._web_support.req.response_headers['Content-Type'] = self._web_support.req.form["ContentType"].value
                 else:
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

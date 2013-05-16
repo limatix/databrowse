@@ -43,33 +43,113 @@
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/services/date.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/util/ioutils.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/util/debug.js</xsl:attribute></script>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/axel/axel.css</xsl:attribute></link>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/axel/bundles/photo/photo.css</xsl:attribute></link>
 	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/editor/extras/editor.css</xsl:attribute></link>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/editor/extras/editor.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/config/templates.js</xsl:attribute></script>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/templates/Preview.css</xsl:attribute></link>
+  <!-- Place here optional AXEL code for making the template auto-editable -->
+		
 	<script type="text/javascript">
 		var resdir = "<xsl:value-of select="$resdir"/>";
-
+		var templateurl = "<xsl:value-of select="@templatefile"/>";
 		<![CDATA[
-			var appController;    
+			var appController;
 		
-			function initApp () {                       
-			  var defaultTemplates = (typeof(getDefaultTemplates) != typeof(undefined))  ? getDefaultTemplates() : [];
+			function initApp () {
+				var defaultTemplates = (typeof(getDefaultTemplates) != typeof(undefined))  ? getDefaultTemplates() : [];
 				// Application controller
 				appController = new viewerApp(resdir+"/Axel/templates/", defaultTemplates);
 				appController.setBase(resdir+'/Axel/axel/bundles')
 				appController.setXTigerStylesheet(resdir+'/Axel/axel/axel.css'); 
-				appController.frameLoaded();
+
+				var result = new xtiger.util.Logger();
+				var xtDoc = xtiger.debug.loadDocument(templateurl, result);
+				if (xtDoc) {
+					appController.curForm = new xtiger.util.Form (xttMakeLocalURLFor(appController.baseUrl));
+					appController.curForm.setTemplateSource (xtDoc); 
+					appController.curForm.setTargetDocument (document, 'iframe', true)
+					appController.curForm.enableTabGroupNavigation (); 
+					appController.curForm.transform (result);
+				}
+				if (result.inError()) {	appController.log(result.printErrors(), 1); }
+				//appController.frameLoaded();
 				string = $('#string').html();
 				appController.handleInstanceData(string);
 			}
-			xtdom.addEventListener(window, 'load', initApp, false);
+
+			$(function () {
+				initApp();
+			});
+
+			window.onbeforeunload = function () {
+                return 'You are about to leave a page that may have unsaved data.';
+            }
+
+            // Error Saving Callback Function
+            function saveErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Saving File: " + errorThrown)
+            }
+
+            function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data);
+                if(data=="File Saved Successfully")
+                {
+                    window.onbeforeunload = null;
+                    window.location.href = window.location.href.replace(window.location.search, "");
+                }
+            }
+
+            function cancel() {
+            	window.onbeforeunload = null;
+                window.location.href = window.location.href.replace(window.location.search, "");
+            }			
+
+			function save () {
+				algo = appController.getPreferredAlgo("save");
+				appController.curForm.setSerializer(appController.serializers[algo]);
+				var g = new xtiger.util.DOMLogger();
+				var f = appController.curForm.serializeData(g);
+				results = g.dump("*");
+				results = results.replace("<specimen>", '<specimen xmlns="http://thermal.cnde.iastate.edu/specimen">');
+				// Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax&save";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax&save";
+                }
+
+                // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', results);
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
+                    dataType: "text",
+                    error: saveErrorCallback,
+                    processData: false,
+                    success: saveSuccessCallback,
+                    type: 'POST',
+                    url: ajaxurl
+                    });
+
+			}
 
 
 		]]>
 	</script>
+
+	<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
+	<h1>Edit Specimen</h1>
 	
-	<div id="frameContainer" style="height:100%">
-		<iframe id="iframe" src="src/specimen.xhtml?handler=db_default&amp;content_mode=raw&amp;Content-Type=application/xml+xhtml"></iframe>
+	<div id="iframe">
+		
 	</div>
 	<div id="string" style="display:none">
 		<specimen:specimen>
@@ -147,13 +227,14 @@
 				</div>
 			</form>
 		</div>
+		<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
 </xsl:template>
 <xsl:template >
 	
 	<xsl:copy-of select="."/>
 </xsl:template>
 
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="*" mode="copy">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:*" mode="copy">
     <xsl:element name="{local-name()}" namespace="http://thermal.cnde.iastate.edu/specimen">
         <xsl:apply-templates select="@*|node()" mode="copy"/>
     </xsl:element>
