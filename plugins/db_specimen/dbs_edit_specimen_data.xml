@@ -67,12 +67,14 @@
 
 		]]>
 	</script>
-	<p id="titleUrl" class="single-line" style="display:none">...</p>
+	
 	<div id="frameContainer" style="height:100%">
 		<iframe id="iframe" src="src/specimen.xhtml?handler=db_default&amp;content_mode=raw&amp;Content-Type=application/xml+xhtml"></iframe>
 	</div>
 	<div id="string" style="display:none">
-		<xsl:apply-templates mode="copy"/>
+		<specimen:specimen>
+			<xsl:apply-templates mode="copy"/>
+		</specimen:specimen>
 	</div>
 	<div id="formular" style="display:none">
 			<form id="formUrl" action="javascript:alert('Oops, something went wrong !')"
@@ -152,7 +154,7 @@
 </xsl:template>
 
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="*" mode="copy">
-    <xsl:element name="{local-name()}">
+    <xsl:element name="{local-name()}" namespace="http://thermal.cnde.iastate.edu/specimen">
         <xsl:apply-templates select="@*|node()" mode="copy"/>
     </xsl:element>
 </xsl:template>
