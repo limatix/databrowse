@@ -63,7 +63,7 @@ class db_directory(renderer_class):
             xmlroot.set("ajaxreq", "True")
             pass
         if recursion_depth is not 0:
-            caller = 'db_directory'
+            caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
             for item in dirlist:
                 itemrelpath = os.path.join(self._relpath, item)

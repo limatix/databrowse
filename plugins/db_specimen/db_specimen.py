@@ -50,6 +50,11 @@ class db_specimen(renderer_class):
                 templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
                 xmlroot.set("templatefile", templatefile)
             return xmlroot
+        elif self._caller == "db_specimen_database":
+            f = open(self._fullpath, 'r')
+            xml = etree.parse(f)
+            f.close()
+            return xml.getroot()
         elif "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
             if "file" in self._web_support.req.form:
                 filestring = self._web_support.req.form["file"].value
