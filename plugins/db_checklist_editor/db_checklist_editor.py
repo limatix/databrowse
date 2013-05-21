@@ -67,24 +67,22 @@ class db_checklist_editor(renderer_class):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         pass
-                    else:
-                        #Let's check on the file and make sure its writable and doesn't exist
-                        if os.path.exists(fullfilename):
-                            # rename old version into .1 .2. .3 etc.
-                            filenum = 1
-                            while os.path.exists("%s.%.2d" % (fullfilename, filenum)):
-                                filenum += 1
-                                pass
-                            os.rename(fullfilename, "%s.%.2d" % (fullfilename, filenum))
+                    #Let's check on the file and make sure its writable and doesn't exist
+                    if os.path.exists(fullfilename):
+                        # rename old version into .1 .2. .3 etc.
+                        filenum = 1
+                        while os.path.exists("%s.%.2d" % (fullfilename, filenum)):
+                            filenum += 1
                             pass
+                        os.rename(fullfilename, "%s.%.2d" % (fullfilename, filenum))
+                        pass
 
-                        f = open(fullfilename, "w")
-                        f.write(filestring)
-                        f.close
-                        self._web_support.req.output = "File Saved Successfully"
-                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
-                        return [self._web_support.req.return_page()]
-                    pass
+                    f = open(fullfilename, "w")
+                    f.write(filestring)
+                    f.close
+                    self._web_support.req.output = "File Saved Successfully"
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
                 else:
                     self._web_support.req.output = "Error Saving File: Incomplete Request"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
