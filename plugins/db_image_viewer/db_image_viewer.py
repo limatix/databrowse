@@ -135,27 +135,24 @@ class db_image_viewer(renderer_class):
             magicstore.load()
             contenttype = magicstore.file(self._fullpath)
             if "thumbnail" in self._web_support.req.form:
-                basename = os.path.splitext(os.path.basename(self._fullpath))
-                cachedir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/")
                 if self._web_support.req.form['thumbnail'].value == "small":
-                    cachefilename = basename[0] + "_small" + basename[1]
+                    tagname = "small"
                     newsize = (150, 150)
                 elif self._web_support.req.form['thumbnail'].value == "medium":
-                    cachefilename = basename[0] + "_medium" + basename[1]
+                    tagname = "medium"
                     newsize = (300, 300)
                 elif self._web_support.req.form['thumbnail'].value == "large":
-                    cachefilename = basename[0] + "_large" + basename[1]
+                    tagname = "large"
                     newsize = (500, 500)
                 elif self._web_support.req.form['thumbnail'].value == "gallery":
-                    cachefilename = basename[0] + "_gallery" + basename[1]
+                    tagname = "gallery"
                     newsize = (201, 201)
                 else:
-                    cachefilename = basename[0] + "_small" + basename[1]
+                    tagname = "small"
                     newsize = (150, 150)
-                cachefullpath = os.path.join(cachedir, cachefilename)
-                if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
-                    size = os.path.getsize(cachefullpath)
-                    f = open(cachefullpath, "rb")
+                if self.CacheFileExists(tagname):
+                    size = os.path.getsize(self.getCacheFileName(tagname))
+                    f = self.getCacheFileHandler('rb', tagname)
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
@@ -170,9 +167,7 @@ class db_image_viewer(renderer_class):
                     img.thumbnail(newsize, Image.ANTIALIAS)
                     output = StringIO.StringIO()
                     img.save(output, format=format)
-                    if not os.path.exists(cachedir):
-                        os.makedirs(cachedir)
-                    f = open(cachefullpath, "wb")
+                    f = self.getCacheFileHandler('wb', tagname)
                     img.save(f, format=format)
                     f.close()
                     self._web_support.req.response_headers['Content-Type'] = contenttype

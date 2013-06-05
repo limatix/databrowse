@@ -96,15 +96,11 @@ class db_office_viewer(renderer_class):
             return None
         elif self._content_mode == "raw":
             if "pdf" in self._web_support.req.form:
-                basename = os.path.splitext(os.path.basename(self._fullpath))
-                cachedir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/")
-                cachefilename = basename[0] + ".pdf"
-                cachefullpath = os.path.join(cachedir, cachefilename)
-                if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
-                    size = os.path.getsize(cachefullpath)
-                    f = open(cachefullpath, "rb")
+                if self.CacheFileExists(None, 'pdf'):
+                    size = os.path.getsize(self.getCacheFileName(None, 'pdf'))
+                    f = self.getCacheFileHandler('rb', None, 'pdf')
                     if "download" in self._web_support.req.form:
-                        self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
+                        self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self.getCacheFileName(None, 'pdf'))
                     self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
@@ -114,18 +110,14 @@ class db_office_viewer(renderer_class):
                     else:
                         return iter(lambda: f.read(1024))
                 else:
-                    if not os.path.exists(cachedir):
-                        try:
-                            os.makedirs(cachedir)
-                        except Exception as err:
-                            raise self.RendererException("Unable to Create Cache Directory - Check File Permissions")
+                    self.PrepareCacheDir()
                     os.environ["HOME"] = "/var/www/.home"
-                    subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", cachedir, self._fullpath])
+                    subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
                     try:
-                        size = os.path.getsize(cachefullpath)
-                        f = open(cachefullpath, "rb")
+                        size = os.path.getsize(self.getCacheFileName(None, 'pdf'))
+                        f = self.getCacheFileHandler('rb', None, 'pdf')
                         if "download" in self._web_support.req.form:
-                            self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(cachefilename)
+                            self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self.getCacheFileName(None, 'pdf'))
                         self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
                         self._web_support.req.response_headers['Content-Length'] = str(size)
                         self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())

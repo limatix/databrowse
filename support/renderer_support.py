@@ -340,6 +340,75 @@ class renderer_class(object):
 
         pass
 
+    class CacheFileHandler(file):
+        """ Overrride File Close Class to Reassign Timestamp """
+
+        timestamp = None
+
+        def __init__(self, filename, mode='r', timestamp=None):
+            self.timestamp = timestamp
+            super(renderer_class.CacheFileHandler, self).__init__(filename, mode)
+
+        def close(self):
+            super(renderer_class.CacheFileHandler, self).close()
+            if self.mode not in ['r', 'rb'] and self.timestamp is not None:
+                st = os.stat(self.name)
+                atime = st[ST_ATIME]
+                os.utime(self.name, (atime, self.timestamp))
+            else:
+                pass
+
+        pass
+
+    def getCacheFileHandler(self, mode='r', tag=None, extension=None):
+        """ Return File Handler For Cache File """
+        filename = self.getCacheFileName(tag, extension)
+        st = os.stat(self._fullpath)
+        timestamp = st[ST_MTIME]
+        if mode not in ['r', 'rb']:
+            self.PrepareCacheDir()
+            if not os.access(filename, os.W_OK) and os.path.exists(filename):
+                raise self.RendererException("Unable to Open Cache File for Writing: " + filename)
+        else:
+            if not os.access(filename, os.R_OK):
+                raise self.RendererException("Unable to Open Cache File for Reading: " + filename)
+        return self.CacheFileHandler(filename, mode, timestamp)
+
+    def PrepareCacheDir(self):
+        cachedirname = self.getCacheDirName()
+        if not os.path.exists(os.path.dirname(cachedirname)):
+            os.makedirs(cachedirname)
+        pass
+
+    def CacheFileExists(self, tag=None, extension=None):
+        """ Return Boolean after Verifying the Existance of a Cache File """
+        filename = self.getCacheFileName(tag, extension)
+        if os.access(filename, os.R_OK) and os.path.exists(filename):
+            basestat = os.stat(self._fullpath)
+            cachestat = os.stat(filename)
+            if basestat[ST_MTIME] != cachestat[ST_MTIME]:
+                return False
+            else:
+                return True
+        else:
+            return False
+
+    def getCacheDirName(self):
+        return os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/" + self.__class__.__name__ + "/")
+
+    def getCacheFileName(self, tag=None, extension=None):
+        """ Get the Name of a Cache File Given a Tag and Extension """
+        basefilename = os.path.splitext(os.path.basename(self._fullpath))
+        basedirname = self.getCacheDirName()
+        filename = basefilename[0]
+        if tag is not None:
+            filename = filename + "_" + tag
+        if extension is not None:
+            filename = filename + "." + extension
+        else:
+            filename = filename + basefilename[1]
+        return os.path.join(basedirname, filename)
+
     def loadMenu(self):
         """ Load Menu Items for all current handlers """
         newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')

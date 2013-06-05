@@ -30,7 +30,6 @@ import magic
 import Image
 import StringIO
 import subprocess
-import re
 
 
 class db_SolidWorks_viewer(renderer_class):
@@ -103,28 +102,24 @@ class db_SolidWorks_viewer(renderer_class):
             return xmlroot
         elif self._content_mode == "raw":
             if "thumbnail" in self._web_support.req.form:
-                basename = os.path.splitext(os.path.basename(self._fullpath))
-                cachedir = os.path.abspath(os.path.dirname(self._fullpath) + "/.databrowse/cache/")
                 if self._web_support.req.form['thumbnail'].value == "small":
-                    cachefilename = basename[0] + "_small.png"
+                    tagname = "small"
                     newsize = (150, 150)
                 elif self._web_support.req.form['thumbnail'].value == "medium":
-                    cachefilename = basename[0] + "_medium.png"
+                    tagname = "medium"
                     newsize = (300, 300)
                 elif self._web_support.req.form['thumbnail'].value == "large":
-                    cachefilename = basename[0] + "_large.png"
+                    tagname = "large"
                     newsize = (500, 500)
                 elif self._web_support.req.form['thumbnail'].value == "gallery":
-                    cachefilename = basename[0] + "_gallery.png"
+                    tagname = "gallery"
                     newsize = (201, 201)
                 else:
-                    cachefilename = basename[0] + "_small.png"
+                    tagname = "small"
                     newsize = (150, 150)
-                cachefullpath = os.path.join(cachedir, cachefilename)
-                cachedframe = os.path.join(cachedir, basename[0] + "_full.png")
-                if os.access(cachefullpath, os.R_OK) and os.path.exists(cachefullpath):
-                    size = os.path.getsize(cachefullpath)
-                    f = open(cachefullpath, "rb")
+                if self.CacheFileExists(tagname, 'png'):
+                    size = os.path.getsize(self.getCacheFileName(tagname, 'png'))
+                    f = self.getCacheFileHandler('rb', tagname, 'png')
                     self._web_support.req.response_headers['Content-Type'] = 'image/png'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
@@ -134,19 +129,17 @@ class db_SolidWorks_viewer(renderer_class):
                     else:
                         return iter(lambda: f.read(1024))
                 else:
-                    if os.access(cachedframe, os.R_OK) and os.path.exists(cachedframe):
-                        img = Image.open(cachedframe)
+                    if self.CacheFileExists('full', 'png'):
+                        img = Image.open(self.getCacheFileHandler('rb', 'full', 'png'))
                     else:
-                        if not os.path.exists(cachedir):
-                            os.makedirs(cachedir)
-                        with open(cachedframe, 'wb') as output_f:
+                        with self.getCacheFileHandler('wb', 'full', 'png') as output_f:
                             p = subprocess.call(["/usr/bin/gsf", "cat", self._fullpath, "PreviewPNG"], stdout=output_f)
-                        img = Image.open(cachedframe)
+                        img = Image.open(self.getCacheFileHandler('rb', 'full', 'png'))
                     format = img.format
                     img.thumbnail(newsize, Image.ANTIALIAS)
                     output = StringIO.StringIO()
                     img.save(output, format=format)
-                    f = open(cachefullpath, "wb")
+                    f = self.getCacheFileHandler('wb', tagname, 'png')
                     img.save(f, format=format)
                     f.close()
                     self._web_support.req.response_headers['Content-Type'] = 'image/png'
