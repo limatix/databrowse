@@ -376,7 +376,7 @@ class renderer_class(object):
 
     def PrepareCacheDir(self):
         cachedirname = self.getCacheDirName()
-        if not os.path.exists(os.path.dirname(cachedirname)):
+        if not os.path.exists(cachedirname):
             os.makedirs(cachedirname)
         pass
 
