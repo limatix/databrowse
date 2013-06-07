@@ -1,0 +1,64 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:text="http://thermal.cnde.iastate.edu/databrowse/text" match="text:text" mode="full">
+    <script type="text/javascript">
+        <![CDATA[
+            window.onbeforeunload = function () {
+                    return 'You are about to leave a page that may have unsaved data.';
+                }
+
+            // Error Saving Callback Function
+            function saveErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Saving File: " + errorThrown)
+            }
+
+            function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data);
+                if(data=="File Saved Successfully")
+                {
+                    window.onbeforeunload = null
+                    window.location.href = window.location.href.replace(window.location.search, "");
+                }
+            }
+
+            function save () {
+                // Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax&save";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax&save";
+                }
+
+                // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', $('#contents').val());
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
+                    dataType: "text",
+                    error: saveErrorCallback,
+                    processData: false,
+                    success: saveSuccessCallback,
+                    type: 'POST',
+                    url: ajaxurl
+                    });
+            }
+
+        ]]>
+    </script>
+    <h1>Editing <xsl:value-of select="@name"/></h1>
+    <div class="btn-group clearfix" style="padding-bottom:5px;">
+        <a class="btn success" onclick="save()" style="cursor:pointer">Save</a>
+        <a class="btn error" onclick="window.history.back()" style="cursor:pointer">Cancel</a>
+    </div>
+    <form>
+        <textarea id="contents" rows="30" cols="80"><xsl:value-of select="contents"/></textarea>
+    </form>
+    <div class="btn-group clearfix" style="padding-bottom:5px;">
+        <a class="btn success" onclick="save()" style="cursor:pointer">Save</a>
+        <a class="btn error" onclick="window.history.back()" style="cursor:pointer">Cancel</a>
+    </div>
+</xsl:template>

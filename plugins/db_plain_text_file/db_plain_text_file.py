@@ -42,7 +42,34 @@ class db_plain_text_file(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode == "full":
+            if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
+                if "file" in self._web_support.req.form:
+                    filestring = self._web_support.req.form["file"].value
+                    # Let's check on the file and make sure its writable and it exists
+                    if not os.access(self._fullpath, os.W_OK) and os.path.exists(self._fullpath):
+                        self._web_support.req.output = "Error Saving File:  File Not Writable " + fullpath
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
+                    #Let's check on the file and make sure its writable and doesn't exist
+                    if os.path.exists(self._fullpath):
+                        # rename old version into .1 .2. .3 etc.
+                        filenum = 1
+                        while os.path.exists("%s.bak.%.2d" % (self._fullpath, filenum)):
+                            filenum += 1
+                            pass
+                        os.rename(self._fullpath, "%s.bak.%.2d" % (self._fullpath, filenum))
+                        pass
+                    f = open(self._fullpath, "w")
+                    f.write(filestring)
+                    f.close
+                    self._web_support.req.output = "File Saved Successfully"
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+                else:
+                    self._web_support.req.output = "Error Saving File: Incomplete Request"
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+            elif self._content_mode == "full":
                 try:
                     st = os.stat(self._fullpath)
                 except IOError:
