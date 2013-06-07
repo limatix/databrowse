@@ -26,6 +26,7 @@
 
 from lxml import etree
 from stat import *
+from errno import EEXIST
 import os.path
 import string
 import random
@@ -377,7 +378,13 @@ class renderer_class(object):
     def PrepareCacheDir(self):
         cachedirname = self.getCacheDirName()
         if not os.path.exists(cachedirname):
-            os.makedirs(cachedirname)
+            try:
+                os.makedirs(cachedirname)
+            except OSError as err:
+                if err.errno == EEXIST:  # Handle the Race Condition
+                    pass
+                else:
+                    raise
         pass
 
     def CacheFileExists(self, tag=None, extension=None):
