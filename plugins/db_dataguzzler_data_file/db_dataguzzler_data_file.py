@@ -104,7 +104,18 @@ class db_dataguzzler_data_file(renderer_class):
                     xmlchunk = self.dumpxmlchunk(dgfh, nestdepth=nestdepth)
                     dgf.close(dgfh)
                     pass
-                assert(len(xmlchunk) == 1)
+                if len(xmlchunk) > 1:
+                    xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ')
+                    for x in xmlchunk:
+                        xmlcontent.append(x)
+                elif len(xmlchunk) == 1:
+                    if xmlchunk[0].xpath("local-name()") == "GUZZWFMD":
+                        xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ')
+                        xmlcontent.append(xmlchunk[0])
+                    else:
+                        xmlcontent = xmlchunk[0]
+                else:
+                    raise self.RendererException("Empty Dataguzzler File")
 
                 extension = os.path.splitext(self._fullpath)[1][1:]
                 icon = self._handler_support.GetIcon('application/octet-stream', extension)
@@ -114,7 +125,7 @@ class db_dataguzzler_data_file(renderer_class):
                 etree.register_namespace("dbdg", "http://thermal.cnde.iastate.edu/databrowse/dataguzzler")
 
                 xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
-                xmlroot.append(xmlchunk[0])
+                xmlroot.append(xmlcontent)
 
                 return xmlroot
 

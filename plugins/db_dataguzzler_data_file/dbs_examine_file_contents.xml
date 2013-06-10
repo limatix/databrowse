@@ -173,6 +173,98 @@
         </tbody>
     </table>
 </xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:DATAGUZZ">
+    <xsl:choose>
+        <xsl:when test="count(dg:GUZZWFMD)>1">
+            <xsl:element name="script">
+                <xsl:attribute name="type">text/javascript</xsl:attribute>
+                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+            </xsl:element>
+            <script type="text/javascript" defer="true">
+                <![CDATA[
+                    $(document).ready(function() {
+                        $('#waveformlist').dataTable({
+                            "sScrollX": "764px",
+                            "bScrollCollapse": true,
+                            "sPaginationType": "full_numbers",
+                            "bStateSave": true
+                        });
+                    });         
+                ]]>
+            </script>
+            <xsl:element name="link">
+                <xsl:attribute name="type">text/css</xsl:attribute>
+                <xsl:attribute name="rel">stylesheet</xsl:attribute>
+                <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+            </xsl:element>
+            <style>
+                #waveformlist {
+                    white-space: nowrap;
+                }
+            </style>
+            <h2>Dataguzzler Unnamed Waveform Array Summary</h2>
+            <table class="cream" id="waveformlist">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Waveform Size</th>
+                        <th>Dimensions</th>
+                        <xsl:for-each select="dg:GUZZWFMD[1]/dg:METADATA/dg:METDATUM">
+                            <th><xsl:value-of select="dg:METDNAME"/></th>
+                        </xsl:for-each>
+                    </tr>
+                </thead>
+                <tbody>
+                    <xsl:for-each select="dg:GUZZWFMD">
+                        <tr>
+                            <td><xsl:number/></td>
+                            <td><xsl:value-of select="dg:DATARRYF"/></td>
+                            <td><xsl:value-of select="dg:WFMDIMNS"/></td>
+                            <xsl:for-each select="dg:METADATA/dg:METDATUM">
+                                <td><xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/></td>
+                            </xsl:for-each>
+                        </tr>
+                    </xsl:for-each>
+                </tbody>
+            </table>
+        </xsl:when>
+        <xsl:otherwise>
+            <h2>Dataguzzler Unnamed Waveform Summary</h2>
+            <xsl:for-each select="dg:GUZZWFMD">
+                <table class="cream full-width">
+                    <tbody>
+                        <tr>
+                            <th>Waveform Size:</th>
+                            <td><xsl:value-of select="dg:DATARRYF"/></td>
+                        </tr>
+                        <tr>
+                            <th>Dimensions:</th>
+                            <td><xsl:value-of select="dg:WFMDIMNS"/></td>
+                        </tr>
+                        <xsl:for-each select="dg:METADATA/dg:METDATUM">
+                            <xsl:sort select="dg:METDNAME"/>
+                            <tr>
+                                <th><xsl:value-of select="dg:METDNAME"/>:</th>
+                                <td>
+                                    <xsl:choose>
+                                        <xsl:when test="dg:METDNAME/. = 'ProcExpr' or dg:METDNAME/. = 'ProcRGBA' or dg:METDNAME/. = 'ProcMD'">
+                                            <pre class="prettyprint dgcode">
+                                                <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
+                                            </pre>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </td>
+                            </tr>
+                        </xsl:for-each>
+                    </tbody>
+                </table>
+            </xsl:for-each>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:METADATA">
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:*">
