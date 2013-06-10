@@ -26,6 +26,9 @@
         </script>
         <script type="text/javascript" DEFER="true">
                 <![CDATA[
+
+                    
+
                     $.ImgToggle = function(img, resurl, origimg) {
                         if(img.attr("src") == resurl + "/icons/folder-open.png") {
                             img.attr("src", resurl + "/icons/" + origimg);
@@ -69,9 +72,9 @@
                             }                              
                          } else if ("button" in e) {
                             if (click == "l"){
-                                clicktriggered = (event.button == 1);
+                                clicktriggered = (e.button == 1);
                             } else if (click == "r") {
-                                clicktriggered = (event.button == 3);
+                                clicktriggered = (e.button == 3);
                             } else if (click == "a") {
                                 clicktriggered = True;
                             }
@@ -128,14 +131,14 @@
                             }                              
                          } else if ("button" in e) {
                             if (click == "l"){
-                                clicktriggered = (event.button == 1);
+                                clicktriggered = (e.button == 1);
                             } else if (click == "r") {
-                                clicktriggered = (event.button == 3);
+                                clicktriggered = (e.button == 3);
                             } else if (click == "a") {
                                 clicktriggered = True;
                             }
                          }
-                     
+
                          if(clicktriggered) { //if the secondary mouse botton was clicked
                               var menu = document.getElementById(menuname);
                               var parentmenu = document.getElementById(parentname);
@@ -641,14 +644,14 @@
                     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4) inset;
                 }
         </style>
-        <div id="contextmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('contextmenu')">
-            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminnewtab()">
+        <div id="contextmenu" class="menuitemcomponent" style="display:none">
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminnewtab(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/tab-new.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Open Folder in New Tab</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsftpclient()">
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminsftpclient(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-remote.png</xsl:attribute>
                 </img>
@@ -660,7 +663,7 @@
                 </img>
                 <span class="menuitemcomponent">Open Folder in SSH Client</span>
             </div>-->
-            <div class="menuitemcomponent contextmenuitem" onmouseup="displaylink()">
+            <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
                 </img>
@@ -669,13 +672,13 @@
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="showSubMenu(event, 'checklistmenu', 'contextmenu', 'l')">
+            <div class="menuitemcomponent contextmenuitem" onclick="showSubMenu(event, 'checklistmenu', 'contextmenu', 'l'); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Start Checklist Here</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="openuploadwindow()">
+            <div class="menuitemcomponent contextmenuitem" onclick="openuploadwindow(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
                 </img>
@@ -684,19 +687,19 @@
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="newdirectory()">
+            <div class="menuitemcomponent contextmenuitem" onclick="newdirectory(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-new.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">New Folder Here</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="renamefile()">
+            <div class="menuitemcomponent contextmenuitem" onclick="renamefile(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-open.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Rename Folder</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="deletefile()">
+            <div class="menuitemcomponent contextmenuitem" onclick="deletefile(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
                 </img>
@@ -705,17 +708,17 @@
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="displayproperties()">
+            <div class="menuitemcomponent contextmenuitem" onclick="displayproperties(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Folder Properties</span>
             </div>
         </div>
-        <div id="checklistmenu" class="menuitemcomponent" style="display:none" onmouseup="clearContextMenu('checklistmenu')">
+        <div id="checklistmenu" class="menuitemcomponent" style="display:none">
             <xsl:for-each select="/dir:dir/dir:chxlist/dir:chxfile">
                 <div class="menuitemcomponent contextmenuitem">
-                    <xsl:attribute name="onmouseup">startchecklist('<xsl:value-of select="@url"/>')</xsl:attribute>
+                    <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('contextmenu');</xsl:attribute>
                     <img class="menuitemcomponent">
                         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
                     </img>
@@ -832,8 +835,8 @@
                     </xsl:choose>
                 </span>
                 <span class="basename">
-                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default"><xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
+                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default">
+                        <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
                     <a>
                         <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
                         <img alt="Up" title="Go Up One Directory Level">
@@ -872,9 +875,8 @@
                     </xsl:choose>
                 </span>
                 <span class="basename">
+                    <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute>
                     <a>
-                        <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>
@@ -910,9 +912,8 @@
                     </xsl:choose>
                 </span>
                 <span class="basename">
+                    <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute>
                     <a>
-                        <xsl:attribute name="oncontextmenu">return false;</xsl:attribute>
-                        <xsl:attribute name="onmouseup">relpath="<xsl:value-of select="@relpath"/>";showContextMenu(event, "contextmenu", 'r');</xsl:attribute>
                         <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
                         <xsl:value-of select="@name"/>
                     </a>
