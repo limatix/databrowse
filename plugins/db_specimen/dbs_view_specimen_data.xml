@@ -1,6 +1,28 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="specimen:specimen" mode="full">
-    <xsl:if test="count(dir:dir/*)">
-        <div style="float:right; width:300px;">
+    <script type="text/javascript">
+        var printurl = "<xsl:value-of select="@printbarcode"/>";
+        <![CDATA[
+            function printbarcode() {
+                $.ajax({
+                    type: "POST",
+                    url: printurl
+                }).done(function(msg) { 
+                    alert(msg); 
+                }); 
+            }
+        ]]>
+    </script>
+    <div style="float:right; width:300px; margin-left: 15px;">
+        <table class="cream" style="width:278px;">
+            <thead>
+                <tr><th>Specimen Barcode</th></tr>
+            </thead>
+            <tbody>
+                <tr><td style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="@barcode"/></xsl:attribute></img><br/>
+                <a onclick="printbarcode()" style="cursor:pointer">Print Barcode on Label Printer</a></td></tr>
+            </tbody>
+        </table>
+        <xsl:if test="count(dir:dir/*)">
             <table class="cream">
                 <thead>
                     <tr><th colspan="2">Supporting Files</th></tr>
@@ -9,8 +31,8 @@
                     <xsl:apply-templates select="dir:dir/*" mode="directory"/>
                 </tbody>
             </table>
-        </div>
-    </xsl:if>
+        </xsl:if>
+    </div>
     <h1>Specimen Details</h1>
     <table class="cream">
         <tbody>
