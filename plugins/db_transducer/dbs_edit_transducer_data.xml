@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:specimen" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" match="transducer:transducer" mode="full">
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/loader.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/dom.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/parser.js</xsl:attribute></script>
@@ -112,7 +112,7 @@
 				var g = new xtiger.util.DOMLogger();
 				var f = appController.curForm.serializeData(g);
 				results = g.dump("*");
-				results = results.replace("<specimen>", '<specimen xmlns="http://thermal.cnde.iastate.edu/specimen">');
+				results = results.replace("<transducer>", '<transducer xmlns="http://thermal.cnde.iastate.edu/transducer">');
 				// Get URL
                 if (window.location.search != '')
                 {
@@ -146,15 +146,15 @@
 	</script>
 
 	<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
-	<h1>Edit Specimen</h1>
+	<h1>Edit Transducer</h1>
 	
 	<div id="iframe">
 		
 	</div>
 	<div id="string" style="display:none">
-		<specimen:specimen>
+		<transducer:transducer>
 			<xsl:apply-templates mode="copy"/>
-		</specimen:specimen>
+		</transducer:transducer>
 	</div>
 	<div id="formular" style="display:none">
 			<form id="formUrl" action="javascript:alert('Oops, something went wrong !')"
@@ -229,12 +229,12 @@
 		</div>
 		<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:*" mode="copy">
-    <xsl:element name="{local-name()}" namespace="http://thermal.cnde.iastate.edu/specimen">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" match="transducer:*" mode="copy">
+    <xsl:element name="{local-name()}" namespace="http://thermal.cnde.iastate.edu/transducer">
         <xsl:apply-templates select="@*|node()" mode="copy"/>
     </xsl:element>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="@*|text()|comment()|processing-instruction()" mode="copy">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" match="@*|text()|comment()|processing-instruction()" mode="copy">
     <xsl:copy>
         <xsl:apply-templates select="@*|node()" mode="copy"/>
     </xsl:copy>

@@ -23,13 +23,13 @@ from lxml import etree
 from renderer_support import renderer_class
 
 
-class db_specimen(renderer_class):
+class db_transducer(renderer_class):
     """ Default Renderer - Basic Output for Any XML File """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/specimen"
-    _namespace_local = "specimen"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/transducer"
+    _namespace_local = "transducer"
     _default_content_mode = "full"
-    _default_style_mode = "view_specimen_data"
+    _default_style_mode = "view_transducer_data"
     _default_recursion_depth = 2
 
     def getContent(self):
@@ -39,18 +39,18 @@ class db_specimen(renderer_class):
             f.close()
             filerelpath = os.path.join(os.path.dirname(self._relpath), os.path.splitext(os.path.basename(self._relpath))[0] + "_files")
             filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
-            if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
+            if os.path.exists(filefullpath) and self._style_mode == "view_transducer_data":
                 import db_directory.db_directory as db_directory_module
-                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
+                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_transducer", "db_directory", style_mode="empty")
                 content = renderer.getContent()
                 xmlroot = xml.getroot()
                 xmlroot.append(content)
             else:
                 xmlroot = xml.getroot()
-                templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
+                templatefile = self.getURL("/transducers/src/transducer.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
                 xmlroot.set("templatefile", templatefile)
             return xmlroot
-        elif self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
+        elif self._caller == "db_transducer_database" and self._style_mode == 'transducer_list':
             f = open(self._fullpath, 'r')
             xml = etree.parse(f)
             f.close()

@@ -144,7 +144,7 @@
             <p>
                 <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
             </p>
-            <xsl:call-template name="olddc-lf2p">
+            <xsl:call-template name="specimen-lf2p">
                 <xsl:with-param name="instr">
                     <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
                 </xsl:with-param>
