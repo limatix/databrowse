@@ -10,6 +10,7 @@
             list-style-type:none; 
             width:50%;
             padding: 0px;
+            vertical-align: top;
         }
         .listitem{
             width: 362px;
