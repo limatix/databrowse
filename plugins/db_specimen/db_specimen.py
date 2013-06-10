@@ -50,9 +50,7 @@ class db_specimen(renderer_class):
                 templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
                 xmlroot.set("templatefile", templatefile)
             return xmlroot
-        elif self._style_mode != "full":
-            return None
-        elif self._caller == "db_specimen_database":
+        elif self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
             f = open(self._fullpath, 'r')
             xml = etree.parse(f)
             f.close()
