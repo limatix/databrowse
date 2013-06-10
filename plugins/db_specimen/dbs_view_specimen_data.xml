@@ -3,11 +3,14 @@
         var printurl = "<xsl:value-of select="@printbarcode"/>";
         <![CDATA[
             function printbarcode() {
+                $("#loading").text("Printing...");
+                $("#loading").fadeIn(500);
                 $.ajax({
                     type: "POST",
                     url: printurl
                 }).done(function(msg) { 
                     alert(msg); 
+                    $("#loading").fadeOut(500);
                 }); 
             }
         ]]>
