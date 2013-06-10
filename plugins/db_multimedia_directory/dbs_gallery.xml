@@ -221,6 +221,7 @@
                                     </span>
                                     <span class="listitemtitle">
                                         <a>
+                                            <xsl:attribute name="title"><xsl:value-of select="image:image/@name"/></xsl:attribute>
                                             <xsl:attribute name="href"><xsl:value-of select="image:image/@link"/></xsl:attribute>
                                             <xsl:value-of select="image:image/@name"/>
                                         </a>
@@ -291,6 +292,7 @@
                                     </span>
                                     <span class="listitemtitle">
                                         <a>
+                                            <xsl:attribute name="title"><xsl:value-of select="movie:movie/@name"/></xsl:attribute>
                                             <xsl:attribute name="href"><xsl:value-of select="movie:movie/@link"/></xsl:attribute>
                                             <xsl:value-of select="movie:movie/@name"/>
                                         </a>
@@ -361,6 +363,7 @@
                                     </span>
                                     <span class="listitemtitle">
                                         <a>
+                                            <xsl:attribute name="title"><xsl:value-of select="sdw:sdw/@name"/></xsl:attribute>
                                             <xsl:attribute name="href"><xsl:value-of select="sdw:sdw/@link"/></xsl:attribute>
                                             <xsl:value-of select="sdw:sdw/@name"/>
                                         </a>
@@ -418,6 +421,7 @@
                                     </span>
                                     <span class="listitemtitle">
                                         <a>
+                                            <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
                                             <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
                                             <xsl:value-of select="@basename"/>
                                         </a>
