@@ -100,6 +100,15 @@ class db_image_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "imgmode")
                 xmlchild.text = img.mode
 
+                pmdfile = os.path.splitext(self._fullpath)[0]+'.pmd'
+                if os.access(pmdfile, os.R_OK) and os.path.exists(pmdfile):
+                    f = open(pmdfile, 'r')
+                    pmddoc = etree.parse(f)
+                    f.close()
+                    pmdroot = pmddoc.getroot()
+                    xmlroot.append(pmdroot)
+                    pass
+
                 f = open(self._fullpath, 'rb')
                 exiftags = EXIF.process_file(f)
                 f.seek(0)
