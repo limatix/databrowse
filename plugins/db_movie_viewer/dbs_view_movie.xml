@@ -5,7 +5,7 @@
 				<object height="300" width="300"><xsl:attribute name="data"><xsl:value-of select="@href"/></xsl:attribute></object>
 	    	</div>
 		    <div>
-		    	<table class="cream" style="table-layout:fixed; width:419px">
+		    	<table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
 		    		<thead>
 		        		<tr class="dark-title">
 		        			<th style="width:8px">

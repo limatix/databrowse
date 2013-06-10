@@ -10,7 +10,7 @@
 				</a>
 	    	</div>
 		    <div>
-		    	<table class="cream" style="table-layout:fixed; width:419px">
+		    	<table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
 		    		<thead>
 		        		<tr class="dark-title">
 		        			<th style="width:8px">
