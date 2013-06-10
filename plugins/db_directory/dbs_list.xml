@@ -25,9 +25,7 @@
             var dataroot = "<xsl:value-of select="/dir:dir/@dataroot" />";
         </script>
         <script type="text/javascript" DEFER="true">
-                <![CDATA[
-
-                    
+                <![CDATA[                 
 
                     $.ImgToggle = function(img, resurl, origimg) {
                         if(img.attr("src") == resurl + "/icons/folder-open.png") {
@@ -81,6 +79,14 @@
                          }
                      
                          if(clicktriggered) { //if the secondary mouse botton was clicked
+                              if (menuname == "contextmenu") {
+                                    clearContextMenu("filecontextmenu");
+                                    clearContextMenu("checklistmenu");
+                              }
+                              else if (menuname == "filecontextmenu") {
+                                    clearContextMenu("contextmenu");
+                                    clearContextMenu("checklistmenu");
+                              }
                               var menu = document.getElementById(menuname);
                                                    
                               if ("button" in event) {
@@ -140,6 +146,8 @@
                          }
 
                          if(clicktriggered) { //if the secondary mouse botton was clicked
+                              clearContextMenu("contextmenu");
+                              clearContextMenu("filecontextmenu");
                               var menu = document.getElementById(menuname);
                               var parentmenu = document.getElementById(parentname);
                      
@@ -175,6 +183,7 @@
                         $('html').click(function(e) {
                             if($(e.target).is(".menuitemcomponent")) return;
                             clearContextMenu("contextmenu");
+                            clearContextMenu("filecontextmenu");
                             clearContextMenu("checklistmenu");
                         });
                     });
@@ -432,6 +441,15 @@
                     padding-right: 4px;
                 }
                 #contextmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                #filecontextmenu {
                     display: none;
                     background-color: #ddd;
                     border: 1px solid #666;
@@ -715,10 +733,60 @@
                 <span class="menuitemcomponent">Folder Properties</span>
             </div>
         </div>
+        <div id="filecontextmenu" class="menuitemcomponent" style="display:none">
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminnewtab(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/tab-new.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open File in New Tab</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminsftpclient(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-remote.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open File in SFTP Client</span>
+            </div>
+            <!--<div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in SSH Client</span>
+            </div>-->
+            <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Get Link to this File</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="renamefile(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-open.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Rename File</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="deletefile(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Move File to Trash</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="displayproperties(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">File Properties</span>
+            </div>
+        </div>
         <div id="checklistmenu" class="menuitemcomponent" style="display:none">
             <xsl:for-each select="/dir:dir/dir:chxlist/dir:chxfile">
                 <div class="menuitemcomponent contextmenuitem">
-                    <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('contextmenu');</xsl:attribute>
+                    <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu');</xsl:attribute>
                     <img class="menuitemcomponent">
                         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
                     </img>
@@ -960,6 +1028,7 @@
                             </xsl:choose>
                         </span>
                         <span class="basename">
+                            <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "filecontextmenu", 'r');return true;</xsl:attribute>
                             <a>
                                 <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
                                 <xsl:value-of select="@basename"/>
