@@ -26,6 +26,8 @@ from renderer_support import renderer_class
 import magic
 import dg_file as dgf
 import struct
+import matplotlib as mpl
+mpl.use('Agg')
 import pylab
 
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
