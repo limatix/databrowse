@@ -131,7 +131,7 @@ class db_specimen(renderer_class):
                     sf.close()
                     sdbroot = sdbfile.getroot()
                     sdbelem = sdbroot.xpath('specimen:specimenid', namespaces={"specimen": "http://thermal.cnde.iastate.edu/specimen"})[0]
-                    os.environ["HOME"] = "/var/www/.home"
+                    os.environ["HOME"] = "/home/www"
                     subprocess.call(["/usr/local/bin/printQRcode", '<specimen/>'+sdbelem.text])
                 except Exception as err:
                     self._web_support.req.output = "Error Printing Barcode:  " + err
