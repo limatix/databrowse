@@ -389,6 +389,8 @@ class renderer_class(object):
 
     def CacheFileExists(self, tag=None, extension=None):
         """ Return Boolean after Verifying the Existance of a Cache File """
+        if "ignorecache" in self._web_support.req.form:
+            return False
         filename = self.getCacheFileName(tag, extension)
         if os.access(filename, os.R_OK) and os.path.exists(filename):
             basestat = os.stat(self._fullpath)

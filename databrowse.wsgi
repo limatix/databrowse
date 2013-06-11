@@ -299,7 +299,7 @@ def application(environ, start_response):
             for key in form.keys():
                 inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
                 pass
-            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")           
+            inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 
             # Get A List of Everything in Environ
             keystring = ""
