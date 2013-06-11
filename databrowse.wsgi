@@ -85,7 +85,7 @@ class FileResolver(etree.Resolver):
 
 def application(environ, start_response):
     """ Entry Point for WSGI Application """
-    os.environ["HOME"] = "/home/www"
+    os.environ["HOME"] = "/home/www/.home"
     try:
         # Add paths and import support modules
         if os.path.dirname(environ['SCRIPT_FILENAME']) not in sys.path:

@@ -131,7 +131,7 @@ class db_transducer(renderer_class):
                     tf.close()
                     tdbroot = tdbfile.getroot()
                     tdbelem = tdbroot.xpath('transducer:id', namespaces={"transducer": "http://thermal.cnde.iastate.edu/transducer"})[0]
-                    os.environ["HOME"] = "/home/www"
+                    os.environ["HOME"] = "/home/www/.home"
                     subprocess.call(["/usr/local/bin/printQRcode", '<xducer/>'+tdbelem.text])
                 except Exception as err:
                     self._web_support.req.output = "Error Printing Barcode:  " + err

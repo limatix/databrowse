@@ -111,7 +111,7 @@ class db_office_viewer(renderer_class):
                         return iter(lambda: f.read(1024))
                 else:
                     self.PrepareCacheDir()
-                    os.environ["HOME"] = "/home/www"
+                    os.environ["HOME"] = "/home/www/.home"
                     subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
                     try:
                         size = os.path.getsize(self.getCacheFileName(None, 'pdf'))
