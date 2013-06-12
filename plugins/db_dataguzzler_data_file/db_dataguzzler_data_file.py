@@ -25,10 +25,14 @@ from lxml import etree
 from renderer_support import renderer_class
 import magic
 import dg_file as dgf
+import dg_eval as dge
 import struct
+import numpy
+import Image
 import matplotlib as mpl
 mpl.use('Agg')
 import pylab
+import images2gif
 
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
 dgf_nestedchunks = set(["DATAGUZZ", "GUZZNWFM", "GUZZWFMD", "METADATA", "METDATUM", "SNAPSHOT", "SNAPSHTS", "VIBRDATA", "VIBFCETS", "VIBFACET"])
@@ -92,6 +96,178 @@ class db_dataguzzler_data_file(renderer_class):
             pass
         return ellist
 
+    def CreateImageFromWaveform(self, waveform, waveformname, filename, dgfh):
+        if "ProcExpr" in waveform.MetaData or "ProcRGBA" in waveform.MetaData:
+            (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+            inivalstepdimlen = []
+            for i in range(ndim):
+                inivalstepdimlen.append(inival[i])
+                inivalstepdimlen.append(step[i])
+                inivalstepdimlen.append(dimlen[i])
+            waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen)
+
+        (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+        coord = []
+        units = []
+        for i in range(ndim):
+            try:
+                coord.append(waveform.MetaData['ProcCoord' + str(i+1)].Value if ("ProcCoord" + str(i+1)) in waveform.MetaData else waveform.MetaData['Coord' + str(i+1)].Value)
+                units.append(waveform.MetaData['ProcUnits' + str(i+1)].Value if ("ProcUnits" + str(i+1)) in waveform.MetaData else waveform.MetaData['Units' + str(i+1)].Value)
+            except:
+                pass
+        coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
+        units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+
+        if all(k in waveform.MetaData for k in ("Coord1", "Coord2", "Coord3")):  # Time Dependant Images
+            if len(waveform.data.shape) == 2:
+                xmin = inival[0]
+                xmax = waveform.data.shape[0] * step[0] + inival[0]
+                ymin = inival[1]
+                ymax = waveform.data.shape[1] * step[1] + inival[1]
+                pylab.imshow(waveform.data[:, :].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                cb = pylab.colorbar()
+                cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                pylab.title(waveformname)
+                pylab.xlabel(coord[0] + " (" + units[0] + ")")
+                pylab.ylabel(coord[1] + " (" + units[1] + ")")
+                f = self.getCacheFileHandler('w', filename, 'png')
+                pylab.savefig(f)
+                f.close()
+                pylab.clf()
+                dgf.close(dgfh)
+                size = os.path.getsize(self.getCacheFileName(filename, 'png'))
+                return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+            elif len(waveform.data.shape) == 3:
+                xmin = inival[0]
+                xmax = waveform.data.shape[0] * step[0] + inival[0]
+                ymin = inival[1]
+                ymax = waveform.data.shape[1] * step[1] + inival[1]
+                t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
+                images = []
+                for i in range(0, waveform.data.shape[2] - 1):
+                    fig = pylab.figure()
+                    fig.set_facecolor((1, 1, 1, 1))
+                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                    cb = pylab.colorbar()
+                    cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                    pylab.title(waveformname + " (" + coord[2] + ": " + str(t[i]) + " " + units[2] + ")")
+                    pylab.xlabel(coord[0] + " (" + units[0] + ")")
+                    pylab.ylabel(coord[1] + " (" + units[1] + ")")
+                    fig.canvas.draw()
+                    w, h = fig.canvas.get_width_height()
+                    buf = numpy.fromstring(fig.canvas.tostring_argb(), dtype=numpy.uint8)
+                    buf.shape = (w, h, 4)
+                    buf = numpy.roll(buf, 3, axis=2)
+                    images.append(Image.fromstring("RGBA", (w, h), buf.tostring()))
+                    pylab.clf()
+                if len(images) < 20:
+                    duration = 1
+                else:
+                    duration = 0.01
+                images2gif.writeGif(self.getCacheFileHandler('w', filename, 'gif'), images, duration=duration)
+                dgf.close(dgfh)
+                size = os.path.getsize(self.getCacheFileName(filename, 'gif'))
+                return (self.getCacheFileHandler('r', filename, 'gif'), size, 'image/gif')
+                pass
+            pass
+        elif all(k in waveform.MetaData for k in ("Coord1", "Coord2")):  # Static Images
+            if len(waveform.data.shape) == 3:
+                xmin = inival[0]
+                xmax = waveform.data.shape[0] * step[0] + inival[0]
+                ymin = inival[1]
+                ymax = waveform.data.shape[1] * step[1] + inival[1]
+                images = []
+                for i in range(0, waveform.data.shape[2] - 1):
+                    fig = pylab.figure()
+                    fig.set_facecolor((1, 1, 1, 1))
+                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                    cb = pylab.colorbar()
+                    cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                    pylab.title(waveformname + " (Frame " + str(i+1) + ")")
+                    pylab.xlabel(coord[0] + " (" + units[0] + ")")
+                    pylab.ylabel(coord[1] + " (" + units[1] + ")")
+                    fig.canvas.draw()
+                    w, h = fig.canvas.get_width_height()
+                    buf = numpy.fromstring(fig.canvas.tostring_argb(), dtype=numpy.uint8)
+                    buf.shape = (w, h, 4)
+                    buf = numpy.roll(buf, 3, axis=2)
+                    images.append(Image.fromstring("RGBA", (w, h), buf.tostring()))
+                    pylab.clf()
+                if len(images) < 20:
+                    duration = 1
+                else:
+                    duration = 0.01
+                images2gif.writeGif(self.getCacheFileHandler('w', filename, 'gif'), images, duration=duration)
+                dgf.close(dgfh)
+                size = os.path.getsize(self.getCacheFileName(filename, 'gif'))
+                return (self.getCacheFileHandler('r', filename, 'gif'), size, 'image/gif')
+            elif len(waveform.data.shape) == 2:
+                xmin = inival[0]
+                xmax = waveform.data.shape[0] * step[0] + inival[0]
+                ymin = inival[1]
+                ymax = waveform.data.shape[1] * step[1] + inival[1]
+                pylab.imshow(waveform.data[:, :].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                cb = pylab.colorbar()
+                cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                pylab.title(waveformname)
+                pylab.xlabel(coord[0] + " (" + units[0] + ")")
+                pylab.ylabel(coord[1] + " (" + units[1] + ")")
+                f = self.getCacheFileHandler('w', filename, 'png')
+                pylab.savefig(f)
+                f.close()
+                pylab.clf()
+                dgf.close(dgfh)
+                size = os.path.getsize(self.getCacheFileName(filename, 'png'))
+                return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+            else:
+                pass
+        elif "Coord1" in waveform.MetaData and waveform.data.shape[0] != 1:  # Plain Waveforms
+            n = waveform.data.shape[0]
+            x = pylab.arange(0, n, dtype='d') * step[0] + inival[0]
+            y = waveform.data
+            if n > 10000:
+                chunksize = 1000
+                numchunks = y.size // chunksize
+                ychunks = y[:chunksize*numchunks].reshape((-1, chunksize))
+                xchunks = x[:chunksize*numchunks].reshape((-1, chunksize))
+                max_env = ychunks.max(axis=1)
+                min_env = ychunks.min(axis=1)
+                ycenters = ychunks.mean(axis=1)
+                xcenters = xchunks.mean(axis=1)
+                pylab.fill_between(xcenters, min_env, max_env, edgecolor='none')
+                #color='gray', edgecolor='none', alpha=0.5
+                pylab.plot(xcenters, ycenters)
+            else:
+                pylab.plot(x, y)
+            pylab.title(waveformname)
+            pylab.xlabel(coord[0] + " (" + units[0] + ")")
+            pylab.ylabel(coord[-1] + " (" + units[-1] + ")")
+            pylab.grid(True)
+            f = self.getCacheFileHandler('w', filename, 'png')
+            pylab.savefig(f)
+            f.close()
+            pylab.clf()
+            dgf.close(dgfh)
+            size = os.path.getsize(self.getCacheFileName(filename, 'png'))
+            return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+            pass
+        elif waveform.data.shape[0] == 1:
+            pylab.plot(waveform.data, marker='o', color='b')
+            pylab.title(waveformname)
+            if "Coord1" in waveform.MetaData:
+                pylab.xlabel(coord[0] + " (" + units[0] + ")")
+            pylab.ylabel(coord[-1] + " (" + units[-1] + ")")
+            pylab.grid(True)
+            f = self.getCacheFileHandler('w', filename, 'png')
+            pylab.savefig(f)
+            f.close()
+            pylab.clf()
+            dgf.close(dgfh)
+            size = os.path.getsize(self.getCacheFileName(filename, 'png'))
+            return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+        else:
+            raise self.RendererException("Unrecognized Waveform Data")
+
     def getSnapshotImage(self, snapshotnumber, waveformname):
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
@@ -117,65 +293,35 @@ class db_dataguzzler_data_file(renderer_class):
 
         mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
         waveform = wfmdict[waveformname]
-        if all(k in waveform.MetaData for k in ("Coord1", "Coord2", "Coord3")):  # Time Dependant Images
-            if len(waveform.data.shape) == 2:
-                xmin = waveform.MetaData['IniVal1'].Value
-                xmax = waveform.data.shape[0] * waveform.MetaData['Step1'].Value + waveform.MetaData['IniVal1'].Value
-                ymin = waveform.MetaData['IniVal2'].Value
-                ymax = waveform.data.shape[1] * waveform.MetaData['Step2'].Value + waveform.MetaData['IniVal2'].Value
-                pylab.imshow(waveform.data[:, :].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
-                cb = pylab.colorbar()
-                cb.set_label(waveform.MetaData['AmplCoord'].Value + " (" + waveform.MetaData['AmplUnits'].Value + ")")
-                pylab.title(waveformname)
-                pylab.xlabel(waveform.MetaData['Coord1'].Value + " (" + waveform.MetaData['Units1'].Value + ")")
-                pylab.ylabel(waveform.MetaData['Coord2'].Value + " (" + waveform.MetaData['Units2'].Value + ")")
-                f = self.getCacheFileHandler('w', "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png')
-                pylab.savefig(f)
-                f.close()
-                pylab.clf()
-                dgf.close(dgfh)
-                size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png'))
-                return (self.getCacheFileHandler('r', "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png'), size, 'image/png')
-            else:
-                pass
-            pass
-        elif "Coord1" in waveform.MetaData:  # Plain Waveforms
-            n = waveform.data.shape[0]
-            x = pylab.arange(0, n, dtype='d') * waveform.MetaData['Step1'].Value + waveform.MetaData['IniVal1'].Value
-            y = waveform.data
-            if n > 10000:
-                chunksize = 1000
-                numchunks = y.size // chunksize
-                ychunks = y[:chunksize*numchunks].reshape((-1, chunksize))
-                xchunks = x[:chunksize*numchunks].reshape((-1, chunksize))
-                max_env = ychunks.max(axis=1)
-                min_env = ychunks.min(axis=1)
-                ycenters = ychunks.mean(axis=1)
-                xcenters = xchunks.mean(axis=1)
-                pylab.fill_between(xcenters, min_env, max_env, edgecolor='none')
-                #color='gray', edgecolor='none', alpha=0.5
-                pylab.plot(xcenters, ycenters)
-            else:
-                pylab.plot(x, y)
-            pylab.title(waveformname)
-            pylab.xlabel(waveform.MetaData['Coord1'].Value + " (" + waveform.MetaData['Units1'].Value + ")")
-            pylab.ylabel(waveform.MetaData['AmplCoord'].Value + " (" + waveform.MetaData['AmplUnits'].Value + ")")
-            pylab.grid(True)
-            f = self.getCacheFileHandler('w', "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png')
-            pylab.savefig(f)
-            f.close()
-            pylab.clf()
-            dgf.close(dgfh)
-            size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png'))
-            return (self.getCacheFileHandler('r', "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname, 'png'), size, 'image/png')
-            pass
-        else:
-            pass
+        filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
 
-        pass
+        return self.CreateImageFromWaveform(waveform, waveformname, filename, dgfh)
 
     def getWaveformImage(self, waveformnumber=1):
-        pass
+        dgfh = dgf.open(self._fullpath)
+        chunk = dgf.nextchunk(dgfh)
+
+        if chunk.Name == "GUZZWFMD":
+            count = 1
+            if count != waveformnumber:
+                dgf.chunkdone(dgfh, chunk)
+            while count != waveformnumber:
+                chunk = dgf.nextchunk(dgfh)
+                if chunk.Name == "GUZZWFMD":
+                    count = count + 1
+                if count == waveformnumber:
+                    break
+                else:
+                    dgf.chunkdone(dgfh, chunk)
+                pass
+            pass
+        else:
+            raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
+
+        waveform = dgf.procGUZZWFMD(dgfh, None)
+        filename = "WAVEFORM"+str(waveformnumber)
+
+        return self.CreateImageFromWaveform(waveform, "Unnamed Waveform " + str(waveformnumber), filename, dgfh)
 
     def getContent(self):
         if self._caller != "databrowse":
@@ -240,7 +386,24 @@ class db_dataguzzler_data_file(renderer_class):
                         else:
                             return iter(lambda: f.read(1024))
                     elif "waveform" in self._web_support.req.form:
-                        pass
+                        if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'png'):
+                            size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'png'))
+                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'png')
+                            contenttype = 'image/png'
+                        elif self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'gif'):
+                            size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'gif'))
+                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'gif')
+                            contenttype = 'image/gif'
+                        else:
+                            (f, size, contenttype) = self.getWaveformImage(int(self._web_support.req.form["waveform"].value))
+                        self._web_support.req.response_headers['Content-Type'] = contenttype
+                        self._web_support.req.response_headers['Content-Length'] = str(size)
+                        self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                        self._web_support.req.output_done = True
+                        if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                            return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                        else:
+                            return iter(lambda: f.read(1024))
                     else:
                         raise self.RendererException("No Image Requested")
                 else:

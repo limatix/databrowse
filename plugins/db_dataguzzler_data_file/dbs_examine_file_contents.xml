@@ -255,6 +255,13 @@
         </thead>
         <tbody>
             <tr>
+                <th>Waveform Preview:</th>
+                <td style="text-align:center"><img width="500px">
+                        <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;waveform=<xsl:number/></xsl:attribute>
+                    </img>
+                </td>
+            </tr>
+            <tr>
                 <th>Waveform Size:</th>
                 <td><xsl:value-of select="dg:DATARRYF"/></td>
             </tr>
