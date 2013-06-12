@@ -96,7 +96,7 @@ class db_dataguzzler_data_file(renderer_class):
             pass
         return ellist
 
-    def CreateImageFromWaveform(self, waveform, waveformname, filename, dgfh):
+    def CreateImageFromWaveform(self, waveform, wfmdict, waveformname, filename, dgfh):
         if "ProcExpr" in waveform.MetaData or "ProcRGBA" in waveform.MetaData:
             (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
             inivalstepdimlen = []
@@ -295,7 +295,7 @@ class db_dataguzzler_data_file(renderer_class):
         waveform = wfmdict[waveformname]
         filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
 
-        return self.CreateImageFromWaveform(waveform, waveformname, filename, dgfh)
+        return self.CreateImageFromWaveform(waveform, wfmdict, waveformname, filename, dgfh)
 
     def getWaveformImage(self, waveformnumber=1):
         dgfh = dgf.open(self._fullpath)
@@ -321,7 +321,7 @@ class db_dataguzzler_data_file(renderer_class):
         waveform = dgf.procGUZZWFMD(dgfh, None)
         filename = "WAVEFORM"+str(waveformnumber)
 
-        return self.CreateImageFromWaveform(waveform, "Unnamed Waveform " + str(waveformnumber), filename, dgfh)
+        return self.CreateImageFromWaveform(waveform, None, "Unnamed Waveform " + str(waveformnumber), filename, dgfh)
 
     def getContent(self):
         if self._caller != "databrowse":
