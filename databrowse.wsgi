@@ -317,6 +317,7 @@ def application(environ, start_response):
             dirstring = dirstring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Output Error Message
+            err = err.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
             errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring, dirstring)
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
