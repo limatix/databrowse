@@ -28,7 +28,7 @@ import dg_file as dgf
 import dg_eval as dge
 import struct
 import numpy
-import Image
+from PIL import Image
 import matplotlib as mpl
 mpl.use('Agg')
 import pylab
