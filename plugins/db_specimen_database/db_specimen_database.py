@@ -21,6 +21,7 @@
 import db_directory.db_directory as db_directory_module
 from lxml import etree
 import os
+from errno import EEXIST
 
 
 class db_specimen_database(db_directory_module.db_directory):
@@ -67,10 +68,18 @@ class db_specimen_database(db_directory_module.db_directory):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         else:
+                            try:
+                                os.makedirs(os.path.join(self._fullpath, specimenid + "_files"))
+                            except OSError as err:
+                                if err.errno == EEXIST:  # Handle the Race Condition
+                                    pass
+                                else:
+                                    self._web_support.req.output = "Error Creating Files Directory: " + str(err)
+                                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                                    return [self._web_support.req.return_page()]
                             f = open(fullfilename, "w")
                             f.write(filestring)
                             f.close
-                            os.makedirs(os.path.join(self._fullpath, specimenid + "_files"))
                             self._web_support.req.output = "File Saved Successfully"
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
