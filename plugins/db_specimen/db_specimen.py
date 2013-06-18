@@ -49,7 +49,7 @@ class db_specimen(renderer_class):
                 renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
                 content = renderer.getContent()
                 xmlroot.append(content)
-            templatefile = self.getURL("/transducers/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
+            templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
             xmlroot.set("templatefile", templatefile)
             xmlroot.set("barcode", self.getURL(self._relpath, content_mode="raw", barcode="barcode"))
             xmlroot.set("printbarcode", self.getURL(self._relpath, content_mode="raw", printbarcode="printbarcode"))
