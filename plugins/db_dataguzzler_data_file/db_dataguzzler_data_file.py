@@ -26,6 +26,7 @@ from renderer_support import renderer_class
 import magic
 import dg_file as dgf
 import dg_eval as dge
+import dg_metadata as dgm
 import struct
 import numpy
 from PIL import Image
@@ -97,14 +98,23 @@ class db_dataguzzler_data_file(renderer_class):
         return ellist
 
     def CreateImageFromWaveform(self, waveform, wfmdict, waveformname, filename, dgfh):
-        if "ProcExpr" in waveform.MetaData or "ProcRGBA" in waveform.MetaData:
+        if "ProcExpr" in waveform.MetaData:
             (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
             inivalstepdimlen = []
             for i in range(ndim):
                 inivalstepdimlen.append(inival[i])
                 inivalstepdimlen.append(step[i])
                 inivalstepdimlen.append(dimlen[i])
-            waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen)
+            waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen, rgba=False)
+        rgbawaveform = None
+        if "ProcRGBA" in wfmdict[waveformname].MetaData:
+            (ndim, dimlen, inival, step, bases) = dge.geom(wfmdict[waveformname])
+            inivalstepdimlen = []
+            for i in range(ndim):
+                inivalstepdimlen.append(inival[i])
+                inivalstepdimlen.append(step[i])
+                inivalstepdimlen.append(dimlen[i])
+            rgbawaveform = dge.eval(wfmdict[waveformname], wfmdict, ndim, *inivalstepdimlen, rgba=True)
 
         (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
         coord = []
@@ -127,6 +137,18 @@ class db_dataguzzler_data_file(renderer_class):
                 pylab.imshow(waveform.data[:, :].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
                 cb = pylab.colorbar()
                 cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                if rgbawaveform is not None:
+                        RGBAdat = rgbawaveform.data[:, :].transpose().tostring()
+                        sz = len(RGBAdat)
+                        RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
+                        RGBAmat2 = RGBAmat.copy()
+                        RGBAmat2[:, 0] = RGBAmat[:, 3]
+                        RGBAmat2[:, 1] = RGBAmat[:, 2]
+                        RGBAmat2[:, 2] = RGBAmat[:, 1]
+                        RGBAmat2[:, 3] = RGBAmat[:, 0]
+                        #newsize = (waveform.data.shape[0], waveform.data.shape[1], 4)
+                        #img = Image.fromstring("RGBA", (DimLen[0], DimLen[1]), RGBAmat2.tostring())
+                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax])
                 pylab.title(waveformname)
                 pylab.xlabel(coord[0] + " (" + units[0] + ")")
                 pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -150,6 +172,18 @@ class db_dataguzzler_data_file(renderer_class):
                     pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
                     cb = pylab.colorbar()
                     cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                    if rgbawaveform is not None:
+                        RGBAdat = rgbawaveform.data[:, :, i].transpose().tostring()
+                        sz = len(RGBAdat)
+                        RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
+                        RGBAmat2 = RGBAmat.copy()
+                        RGBAmat2[:, 0] = RGBAmat[:, 3]
+                        RGBAmat2[:, 1] = RGBAmat[:, 2]
+                        RGBAmat2[:, 2] = RGBAmat[:, 1]
+                        RGBAmat2[:, 3] = RGBAmat[:, 0]
+                        #newsize = (waveform.data.shape[0], waveform.data.shape[1], 4)
+                        #img = Image.fromstring("RGBA", (DimLen[0], DimLen[1]), RGBAmat2.tostring())
+                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax])
                     pylab.title(waveformname + " (" + coord[2] + ": " + str(t[i]) + " " + units[2] + ")")
                     pylab.xlabel(coord[0] + " (" + units[0] + ")")
                     pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -183,6 +217,18 @@ class db_dataguzzler_data_file(renderer_class):
                     pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
                     cb = pylab.colorbar()
                     cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                    if rgbawaveform is not None:
+                        RGBAdat = rgbawaveform.data[:, :, i].transpose().tostring()
+                        sz = len(RGBAdat)
+                        RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
+                        RGBAmat2 = RGBAmat.copy()
+                        RGBAmat2[:, 0] = RGBAmat[:, 3]
+                        RGBAmat2[:, 1] = RGBAmat[:, 2]
+                        RGBAmat2[:, 2] = RGBAmat[:, 1]
+                        RGBAmat2[:, 3] = RGBAmat[:, 0]
+                        #newsize = (waveform.data.shape[0], waveform.data.shape[1], 4)
+                        #img = Image.fromstring("RGBA", (DimLen[0], DimLen[1]), RGBAmat2.tostring())
+                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax])
                     pylab.title(waveformname + " (Frame " + str(i+1) + ")")
                     pylab.xlabel(coord[0] + " (" + units[0] + ")")
                     pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -292,6 +338,28 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
 
         mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+        if waveformname == "DiffStack":
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
+        elif waveformname == "VibroFit":
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+        elif waveformname == "VibroFitImg":
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+        elif waveformname == "IRstack":
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
         waveform = wfmdict[waveformname]
         filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
 
