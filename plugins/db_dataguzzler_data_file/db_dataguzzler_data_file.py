@@ -167,12 +167,14 @@ class db_dataguzzler_data_file(renderer_class):
                 xmax = waveform.data.shape[0] * step[0] + inival[0]
                 ymin = inival[1]
                 ymax = waveform.data.shape[1] * step[1] + inival[1]
+                vmin = waveform.data.min()
+                vmax = waveform.data.max()
                 t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
                 images = []
                 for i in range(0, waveform.data.shape[2] - 1):
                     fig = pylab.figure()
                     fig.set_facecolor((1, 1, 1, 1))
-                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax], vmin=vmin, vmax=vmax)
                     cb = pylab.colorbar()
                     cb.set_label(coord[-1] + " (" + units[-1] + ")")
                     if rgbawaveform is not None:
@@ -186,7 +188,7 @@ class db_dataguzzler_data_file(renderer_class):
                         RGBAmat2[:, 3] = RGBAmat[:, 0]
                         #newsize = (waveform.data.shape[0], waveform.data.shape[1], 4)
                         #img = Image.fromstring("RGBA", (DimLen[0], DimLen[1]), RGBAmat2.tostring())
-                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax])
+                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax], vmin=vmin, vmax=vmax)
                     pylab.title(waveformname + " (" + coord[2] + ": " + str(t[i]) + " " + units[2] + ")")
                     pylab.xlabel(coord[0] + " (" + units[0] + ")")
                     pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -213,11 +215,13 @@ class db_dataguzzler_data_file(renderer_class):
                 xmax = waveform.data.shape[0] * step[0] + inival[0]
                 ymin = inival[1]
                 ymax = waveform.data.shape[1] * step[1] + inival[1]
+                vmin = waveform.data.min()
+                vmax = waveform.data.max()
                 images = []
                 for i in range(0, waveform.data.shape[2] - 1):
                     fig = pylab.figure()
                     fig.set_facecolor((1, 1, 1, 1))
-                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                    pylab.imshow(waveform.data[:, :, i].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax], vmin=vmin, vmax=vmax)
                     cb = pylab.colorbar()
                     cb.set_label(coord[-1] + " (" + units[-1] + ")")
                     if rgbawaveform is not None:
@@ -231,7 +235,7 @@ class db_dataguzzler_data_file(renderer_class):
                         RGBAmat2[:, 3] = RGBAmat[:, 0]
                         #newsize = (waveform.data.shape[0], waveform.data.shape[1], 4)
                         #img = Image.fromstring("RGBA", (DimLen[0], DimLen[1]), RGBAmat2.tostring())
-                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax])
+                        pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=[xmin, xmax, ymin, ymax], vmin=vmin, vmax=vmax)
                     pylab.title(waveformname + " (Frame " + str(i+1) + ")")
                     pylab.xlabel(coord[0] + " (" + units[0] + ")")
                     pylab.ylabel(coord[1] + " (" + units[1] + ")")
