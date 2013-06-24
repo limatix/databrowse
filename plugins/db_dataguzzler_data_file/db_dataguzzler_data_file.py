@@ -134,7 +134,11 @@ class db_dataguzzler_data_file(renderer_class):
                 xmax = waveform.data.shape[0] * step[0] + inival[0]
                 ymin = inival[1]
                 ymax = waveform.data.shape[1] * step[1] + inival[1]
-                pylab.imshow(waveform.data[:, :].T, cmap='hot', origin='lower', extent=[xmin, xmax, ymin, ymax])
+                if waveformname == "VibroFitImg":
+                    cmap = 'hsv'
+                else:
+                    cmap = 'hot'
+                pylab.imshow(waveform.data[:, :].T, cmap=cmap, origin='lower', extent=[xmin, xmax, ymin, ymax])
                 cb = pylab.colorbar()
                 cb.set_label(coord[-1] + " (" + units[-1] + ")")
                 if rgbawaveform is not None:
@@ -357,6 +361,8 @@ class db_dataguzzler_data_file(renderer_class):
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
             dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+            dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
         elif waveformname == "IRstack":
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
