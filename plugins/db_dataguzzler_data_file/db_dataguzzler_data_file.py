@@ -20,7 +20,6 @@
 
 import os
 import os.path
-from stat import *
 from lxml import etree
 from renderer_support import renderer_class
 import magic
@@ -342,12 +341,15 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
 
         mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+        waveform = wfmdict[waveformname]
         if waveformname == "DiffStack":
+            mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
         elif waveformname == "VibroFit":
+            mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
@@ -355,8 +357,9 @@ class db_dataguzzler_data_file(renderer_class):
             dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
         elif waveformname == "VibroFitImg":
+            mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
-            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
+            dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", mean))
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
             dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
@@ -364,9 +367,9 @@ class db_dataguzzler_data_file(renderer_class):
             dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
         elif waveformname == "IRstack":
+            mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
             dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(296.5)))
-        waveform = wfmdict[waveformname]
         filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
 
         return self.CreateImageFromWaveform(waveform, wfmdict, waveformname, filename, dgfh)
