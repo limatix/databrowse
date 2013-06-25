@@ -154,7 +154,7 @@
                                         <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
                                             <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
                                         </xsl:when>
-                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150'">
+                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
                                             <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
                                         </xsl:when>
                                         <xsl:otherwise>
