@@ -147,7 +147,23 @@
             <tr>
                 <th>Waveform Preview:</th>
                 <td style="text-align:center"><img width="500px">
-                        <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>
+                        
+                            <xsl:choose>
+                                <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
+                                    <xsl:choose>
+                                        <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150'">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></xsl:otherwise>
+                            </xsl:choose>                        
                     </img>
                 </td>
             </tr>
