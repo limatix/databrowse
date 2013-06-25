@@ -140,7 +140,7 @@
         <thead>
             <tr>
                 <th style="width:144px">Waveform Name:</th>
-                <td><a><xsl:attribute name="name">SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></a><strong><xsl:value-of select="dg:WAVENAME"/></strong></td>
+                <td><a><xsl:attribute name="name">SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></a><strong><xsl:value-of select="dg:WAVENAME"/></strong><div style="float:right"><img style="vertical-align:text-top"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>&#160;<a><xsl:attribute name="href"><xsl:value-of select="//@matlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>MAT</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@csvlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>CSV</a></div></td>
             </tr>
         </thead>
         <tbody>
@@ -153,10 +153,10 @@
                                     <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
                                         <xsl:choose>
                                             <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
-                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
                                             </xsl:when>
                                             <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
-                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
