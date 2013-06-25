@@ -36,7 +36,7 @@ import pylab
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
 dgf_nestedchunks = set(["DATAGUZZ", "GUZZNWFM", "GUZZWFMD", "METADATA", "METDATUM", "SNAPSHOT", "SNAPSHTS", "VIBRDATA", "VIBFCETS", "VIBFACET"])
 dgf_stringchunks = set(["WAVENAME", "METDNAME", "METDSTRV"])
-dgf_int64chunks = set(["METDINTV", "WFMDIMNS"])
+dgf_int64chunks = set(["METDINTV"])
 dgf_float64chunks = set(["METDDBLV"])
 
 
@@ -86,6 +86,29 @@ class db_dataguzzler_data_file(renderer_class):
                     pass
                 newel.text = textdata
                 pass
+            elif Chunk.Name == "WFMDIMNS":
+                length = struct.unpack("@Q", dgf.readdata(dgfh, 8))[0]
+                ndim = struct.unpack("@Q", dgf.readdata(dgfh, 8))[0]
+                dimlen = numpy.zeros((ndim), dtype='Q')
+                for dimcnt in range(ndim):
+                    dimlen[dimcnt] = struct.unpack("@Q", dgf.readdata(dgfh, 8))[0]
+                newel.text = str(length) + "\n" + str(ndim) + "\n" + "\n".join(str(dimcnt) for dimcnt in dimlen) + "\n"
+                if ndim == 1 and dimlen[0] == 1:
+                    dgf.chunkdone(dgfh, None)
+                    ellist.append(newel)
+                    Chunk = dgf.nextchunk(dgfh)
+                    if Chunk.Name in ["DATARRYF", "DATARRYD"]:
+                        newel = etree.Element("{%s}%s" % (self._namespace_uri, "DATASVAL"))
+                        if Chunk.Name == "DATARRYF":
+                            dtype = 'f'
+                            dsize = 4
+                        elif Chunk.Name == "DATARRYD":
+                            dtype = 'd'
+                            dsize = 8
+                        data = numpy.fromstring(dgf.readdata(dgfh, dsize*long(length)), dtype=dtype).reshape(dimlen, order='F')
+                        newel.text = str(data[0])
+                else:
+                    pass
             else:
                 newel.text = "%s\n" % (self.ConvertUserFriendlySize(Chunk.ChunkLen))
                 pass

@@ -144,32 +144,42 @@
             </tr>
         </thead>
         <tbody>
+            <xsl:if test="not(dg:GUZZWFMD/dg:DATASVAL)">
+                <tr>
+                    <th>Waveform Preview:</th>
+                    <td style="text-align:center"><img width="500px">
+                            
+                                <xsl:choose>
+                                    <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
+                                        <xsl:choose>
+                                            <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
+                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
+                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                    <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></xsl:otherwise>
+                                </xsl:choose>                        
+                        </img>
+                    </td>
+                </tr>
+            </xsl:if>
             <tr>
-                <th>Waveform Preview:</th>
-                <td style="text-align:center"><img width="500px">
-                        
-                            <xsl:choose>
-                                <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
-                                    <xsl:choose>
-                                        <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
-                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
-                                        </xsl:when>
-                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
-                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=119</xsl:attribute>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xsl:when>
-                                <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></xsl:otherwise>
-                            </xsl:choose>                        
-                    </img>
-                </td>
-            </tr>
-            <tr>
-                <th>Waveform Size:</th>
-                <td><xsl:value-of select="dg:GUZZWFMD/dg:DATARRYF"/></td>
+                <xsl:choose>
+                    <xsl:when test="dg:GUZZWFMD/dg:DATASVAL">
+                        <th>Scalar Value:</th>
+                        <td><xsl:value-of select="dg:GUZZWFMD/dg:DATASVAL"/>&#160;<xsl:value-of select="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='AmplUnits']/dg:METDSTRV"/></td>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <th>Waveform Size:</th>
+                        <td><xsl:value-of select="dg:GUZZWFMD/dg:DATARRYF"/></td>
+                    </xsl:otherwise>
+                </xsl:choose>
             </tr>
             <tr>
                 <th>Dimensions:</th>
@@ -270,16 +280,26 @@
             </tr>
         </thead>
         <tbody>
+            <xsl:if test="not(dg:DATASVAL)">
+                <tr>
+                    <th>Waveform Preview:</th>
+                    <td style="text-align:center"><img width="500px">
+                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;waveform=<xsl:number/></xsl:attribute>
+                        </img>
+                    </td>
+                </tr>
+            </xsl:if>
             <tr>
-                <th>Waveform Preview:</th>
-                <td style="text-align:center"><img width="500px">
-                        <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;waveform=<xsl:number/></xsl:attribute>
-                    </img>
-                </td>
-            </tr>
-            <tr>
-                <th>Waveform Size:</th>
-                <td><xsl:value-of select="dg:DATARRYF"/></td>
+                <xsl:choose>
+                    <xsl:when test="dg:DATASVAL">
+                        <th>Scalar Value:</th>
+                        <td><xsl:value-of select="dg:DATASVAL"/>&#160;<xsl:value-of select="dg:METADATA/dg:METDATUM[dg:METDNAME='AmplUnits']/dg:METDSTRV"/></td>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <th>Waveform Size:</th>
+                        <td><xsl:value-of select="dg:DATARRYF"/></td>
+                    </xsl:otherwise>
+                </xsl:choose>
             </tr>
             <tr>
                 <th>Dimensions:</th>
