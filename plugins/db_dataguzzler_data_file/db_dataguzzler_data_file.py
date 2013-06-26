@@ -605,7 +605,7 @@ class db_dataguzzler_data_file(renderer_class):
         os.waitpid(myproc.pid, 0)
         myproc = subprocess.Popen(("/usr/local/bin/ffmpeg", "-r", "%g" % fps, "-i", "%s" % os.path.join(tmpdir, filename+'.avi'), "-vcodec", "mjpeg", "-r", "%g" % fps, "-b", "%dk" % 2000, "-y", "%s" % cachefile))
         os.waitpid(myproc.pid, 0)
-        os.removedirs(tmpdir)
+        #os.removedirs(tmpdir)
         size = os.path.getsize(self.getCacheFileName(filename, 'avi'))
         return (self.getCacheFileHandler('r', filename, 'avi'), size, 'application/x-msvideo')
 
