@@ -600,9 +600,10 @@ class db_dataguzzler_data_file(renderer_class):
             fps = 1.0/float(step[2])*0.1
         else:
             fps = float(1.0)
-        myproc = subprocess.Popen("/usr/bin/mencoder -fps %g -ovc lavc -lavcopts vcodec=ljpeg mf://%s/*.png -o %s" % (fps, tmpdir, os.path.join(tmpdir, filename+'.avi')))
+        #myproc = subprocess.Popen("/usr/local/bin/mencoder -fps %g -ovc lavc -lavcopts vcodec=ljpeg mf://%s/*.png -o %s" % (fps, tmpdir, os.path.join(tmpdir, filename+'.avi')))
+        myproc = subprocess.Popen(("/usr/local/bin/mencoder", "-fps", "%g" % fps, "-ovc", "lavc", "-lavcopts", "vcodec=ljpeg", "mf://%s/*.png" % tmpdir, "-o" "%s" % os.path.join(tmpdir, filename+'.avi')))
         os.waitpid(myproc.pid, 0)
-        myproc = subprocess.Popen("/usr/bin/ffmpeg -r %g -i %s -vcodec mjpeg -r %g -b %dk -y %s" % (fps, os.path.join(tmpdir, filename+'.avi'), fps, 2000, cachefile))
+        myproc = subprocess.Popen(("/usr/local/bin/ffmpeg", "-r", "%g" % fps, "-i", "%s" % os.path.join(tmpdir, filename+'.avi'), "-vcodec", "mjpeg", "-r", "%g" % fps, "-b", "%dk" % 2000, "-y", "%s" % cachefile))
         os.waitpid(myproc.pid, 0)
         os.removedirs(tmpdir)
         size = os.path.getsize(self.getCacheFileName(filename, 'avi'))
