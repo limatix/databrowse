@@ -601,7 +601,7 @@ class db_dataguzzler_data_file(renderer_class):
         else:
             fps = float(1.0)
         #myproc = subprocess.Popen("/usr/local/bin/mencoder -fps %g -ovc lavc -lavcopts vcodec=ljpeg mf://%s/*.png -o %s" % (fps, tmpdir, os.path.join(tmpdir, filename+'.avi')))
-        myproc = subprocess.Popen(("/usr/local/bin/mencoder", "-fps", "%g" % fps, "-ovc", "lavc", "-lavcopts", "vcodec=ljpeg", "mf://%s/*.png" % tmpdir, "-o" "%s" % os.path.join(tmpdir, filename+'.avi')))
+        myproc = subprocess.Popen(("/usr/local/bin/mencoder", "-fps", "%g" % fps, "-ovc", "lavc", "-lavcopts", "vcodec=ljpeg", "mf://%s/*.png" % tmpdir, "-o", "%s" % os.path.join(tmpdir, filename+'.avi')))
         os.waitpid(myproc.pid, 0)
         myproc = subprocess.Popen(("/usr/local/bin/ffmpeg", "-r", "%g" % fps, "-i", "%s" % os.path.join(tmpdir, filename+'.avi'), "-vcodec", "mjpeg", "-r", "%g" % fps, "-b", "%dk" % 2000, "-y", "%s" % cachefile))
         os.waitpid(myproc.pid, 0)
