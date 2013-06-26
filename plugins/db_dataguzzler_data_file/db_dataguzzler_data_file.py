@@ -29,6 +29,8 @@ import dg_metadata as dgm
 import struct
 from scipy import io as sio
 import numpy
+import tempfile
+import subprocess
 from PIL import Image
 import matplotlib as mpl
 mpl.use('Agg')
@@ -118,6 +120,112 @@ class db_dataguzzler_data_file(renderer_class):
             ellist.append(newel)
             pass
         return ellist
+
+    def GetDataguzzlerWaveformDgzFile(self):
+        # Get Handle to Dataguzzler File and Open First Chunk
+        dgfh = dgf.open(self._fullpath)
+        chunk = dgf.nextchunk(dgfh)
+
+        # Next, Let's figure Out What Kind of File we Have
+        if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
+
+            # Look for Environment
+            if not "snapshot" in self._web_support.req.form:
+                snapshotnumber = 1
+            else:
+                snapshotnumber = int(self._web_support.req.form['snapshot'].value)
+            if not "waveform" in self._web_support.req.form:
+                raise self.RendererException("Waveform Name Must Be Specified")
+            else:
+                waveformname = self._web_support.req.form['waveform'].value
+
+            if chunk.Name == "SNAPSHTS":            # application/x-dataguzzler-data (dgd)
+                # Prep Loop
+                count = 0
+                # Loop till we find the Correct Snapshot Number
+                while count != snapshotnumber:
+                    chunk = dgf.nextchunk(dgfh)
+                    if chunk.Name == "SNAPSHOT":
+                        count = count + 1
+                    if count == snapshotnumber:
+                        break
+                    else:
+                        dgf.chunkdone(dgfh, chunk)
+                    pass
+                pass
+            elif chunk.Name == "SNAPSHOT":          # application/x-dataguzzler-snapshot (dgs)
+                # Make sure we weren't expecting SNAPSHTS
+                if "snapshot" in self._web_support.req.form and int(self._web_support.req.form['snapshot'].value) != 1:
+                    raise self.RendererException("Looking for SNAPSHTS but found SNAPSHOT")
+                pass
+
+            # Load Waveform
+            filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            waveform = wfmdict[waveformname]
+
+            # Add Simple Offsets
+            if "IRstack" in wfmdict:
+                mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
+                dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
+            if "DiffStack" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            if "VibroFit" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            if "VibroFitImg" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+
+            # Evaluate Processing Instructions, If Needed
+            if "ProcExpr" in waveform.MetaData:
+                (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+                inivalstepdimlen = []
+                for i in range(ndim):
+                    inivalstepdimlen.append(inival[i])
+                    inivalstepdimlen.append(step[i])
+                    inivalstepdimlen.append(dimlen[i])
+                waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen, rgba=False)
+
+        elif chunk.Name == "GUZZWFMD":          # either application/x-dataguzzler-waveform (dgz) or application/x-dataguzzler-array (dga)
+            # Look for Environment and Prep Loop
+            if not "waveform" in self._web_support.req.form:
+                waveformnumber = 1
+            else:
+                waveformnumber = int(self._web_support.req.form['waveform'].value)
+            count = 1
+            # Loop, if needed, to find correct Waveform
+            if count != waveformnumber:
+                dgf.chunkdone(dgfh, chunk)
+            while count != waveformnumber:
+                chunk = dgf.nextchunk(dgfh)
+                if chunk.Name == "GUZZWFMD":
+                    count = count + 1
+                if count == waveformnumber:
+                    break
+                else:
+                    dgf.chunkdone(dgfh, chunk)
+                pass
+
+            # Load Waveform
+            filename = "WAVEFORM"+str(waveformnumber)
+            waveform = dgf.procGUZZWFMD(dgfh, None)
+            pass
+        else:
+            raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
+
+        # Finish and Save
+        outputfile = self.getCacheFileName(filename, 'dgz')
+        outfile = dgf.creat(outputfile)
+        if (not outfile):
+            raise self.RendererException("Error: could not open \"%s\" for write" % outputfile)
+        dgf.writewfm(outfile, waveform)
+        dgf.close(outfile)
+        dgf.close(dgfh)
+        size = os.path.getsize(self.getCacheFileName(filename, 'dgz'))
+        return (self.getCacheFileHandler('r', filename, 'dgz'), size)
 
     def GetDataguzzlerWaveformCsvFile(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -324,6 +432,181 @@ class db_dataguzzler_data_file(renderer_class):
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'mat'))
         return (self.getCacheFileHandler('r', filename, 'mat'), size)
+
+    def GetDataguzzlerWaveformVideo(self):
+        # Get Handle to Dataguzzler File and Open First Chunk
+        dgfh = dgf.open(self._fullpath)
+        chunk = dgf.nextchunk(dgfh)
+
+        # Next, Let's figure Out What Kind of File we Have
+        if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
+
+            # Look for Environment
+            if not "snapshot" in self._web_support.req.form:
+                snapshotnumber = 1
+            else:
+                snapshotnumber = int(self._web_support.req.form['snapshot'].value)
+            if not "waveform" in self._web_support.req.form:
+                raise self.RendererException("Waveform Name Must Be Specified")
+            else:
+                waveformname = self._web_support.req.form['waveform'].value
+
+            if chunk.Name == "SNAPSHTS":            # application/x-dataguzzler-data (dgd)
+                # Prep Loop
+                count = 0
+                # Loop till we find the Correct Snapshot Number
+                while count != snapshotnumber:
+                    chunk = dgf.nextchunk(dgfh)
+                    if chunk.Name == "SNAPSHOT":
+                        count = count + 1
+                    if count == snapshotnumber:
+                        break
+                    else:
+                        dgf.chunkdone(dgfh, chunk)
+                    pass
+                pass
+            elif chunk.Name == "SNAPSHOT":          # application/x-dataguzzler-snapshot (dgs)
+                # Make sure we weren't expecting SNAPSHTS
+                if "snapshot" in self._web_support.req.form and int(self._web_support.req.form['snapshot'].value) != 1:
+                    raise self.RendererException("Looking for SNAPSHTS but found SNAPSHOT")
+                pass
+
+            # Load Waveform
+            filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            waveform = wfmdict[waveformname]
+
+            # Add Simple Offsets
+            if "IRstack" in wfmdict:
+                mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
+                dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
+            if "DiffStack" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            if "VibroFit" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+            if "VibroFitImg" in wfmdict:
+                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+
+            # Evaluate Processing Instructions, If Needed
+            if "ProcExpr" in waveform.MetaData:
+                (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+                inivalstepdimlen = []
+                for i in range(ndim):
+                    inivalstepdimlen.append(inival[i])
+                    inivalstepdimlen.append(step[i])
+                    inivalstepdimlen.append(dimlen[i])
+                waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen, rgba=False)
+            rgbawaveform = None
+            if "ProcRGBA" in wfmdict[waveformname].MetaData:
+                (ndim, dimlen, inival, step, bases) = dge.geom(wfmdict[waveformname])
+                inivalstepdimlen = []
+                for i in range(ndim):
+                    inivalstepdimlen.append(inival[i])
+                    inivalstepdimlen.append(step[i])
+                    inivalstepdimlen.append(dimlen[i])
+                rgbawaveform = dge.eval(wfmdict[waveformname], wfmdict, ndim, *inivalstepdimlen, rgba=True)
+
+        elif chunk.Name == "GUZZWFMD":          # either application/x-dataguzzler-waveform (dgz) or application/x-dataguzzler-array (dga)
+            # Look for Environment and Prep Loop
+            if not "waveform" in self._web_support.req.form:
+                waveformnumber = 1
+            else:
+                waveformnumber = int(self._web_support.req.form['waveform'].value)
+            count = 1
+            # Loop, if needed, to find correct Waveform
+            if count != waveformnumber:
+                dgf.chunkdone(dgfh, chunk)
+            while count != waveformnumber:
+                chunk = dgf.nextchunk(dgfh)
+                if chunk.Name == "GUZZWFMD":
+                    count = count + 1
+                if count == waveformnumber:
+                    break
+                else:
+                    dgf.chunkdone(dgfh, chunk)
+                pass
+
+            # Load Waveform
+            filename = "WAVEFORM"+str(waveformnumber)
+            waveform = dgf.procGUZZWFMD(dgfh, None)
+            pass
+        else:
+            raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
+
+        # We're Ready to Start Plotting
+
+        # Gather Dimensions
+        (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+        coord = []
+        units = []
+        for i in range(ndim):
+            try:
+                coord.append(waveform.MetaData['ProcCoord' + str(i+1)].Value if ("ProcCoord" + str(i+1)) in waveform.MetaData else waveform.MetaData['Coord' + str(i+1)].Value)
+                units.append(waveform.MetaData['ProcUnits' + str(i+1)].Value if ("ProcUnits" + str(i+1)) in waveform.MetaData else waveform.MetaData['Units' + str(i+1)].Value)
+            except:
+                pass
+        coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
+        units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+
+        # Set Colormap
+        if waveformname == "VibroFitImg":
+            cmap = 'hsv'
+        else:
+            cmap = 'hot'
+
+        # Verify Correct Number of Dimensions
+        if len(waveform.data.shape) == 3:   # 3D Waveforms
+            tmpdir = tempfile.mkdtemp("", "db_dataguzzler_video")
+            loop = range(dimlen[2])
+            extent = [inival[0], waveform.data.shape[0] * step[0] + inival[0], inival[1], waveform.data.shape[1] * step[1] + inival[1]]
+            vmin = waveform.data.min()
+            vmax = waveform.data.max()
+            for framenumber in loop:
+                imagefilename = filename + "_" + str(framenumber)
+                if "Coord3" in waveform.MetaData:
+                    t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
+                    title = waveformname + " (" + coord[2] + ": " + str(t[framenumber]) + " " + units[2] + ")"
+                else:
+                    title = waveformname + " (Frame " + str(framenumber) + ")"
+                pylab.imshow(waveform.data[:, :, framenumber].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
+                cb = pylab.colorbar()
+                cb.set_label(coord[-1] + " (" + units[-1] + ")")
+                if rgbawaveform is not None:
+                    RGBAdat = rgbawaveform.data[:, :, framenumber].transpose().tostring()
+                    sz = len(RGBAdat)
+                    RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
+                    RGBAmat2 = RGBAmat.copy()
+                    RGBAmat2[:, 0] = RGBAmat[:, 3]
+                    RGBAmat2[:, 1] = RGBAmat[:, 2]
+                    RGBAmat2[:, 2] = RGBAmat[:, 1]
+                    RGBAmat2[:, 3] = RGBAmat[:, 0]
+                    pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+                pylab.title(title)
+                pylab.xlabel(coord[0] + " (" + units[0] + ")")
+                pylab.ylabel(coord[1] + " (" + units[1] + ")")
+                pylab.savefig(os.path.join(tmpdir, imagefilename + '.png'))
+                pylab.clf()
+        else:
+            raise self.RendererException("Only Three Dimensional Waveforms May Be Converted To Video")
+
+        # Finish and Save
+        dgf.close(dgfh)
+        cachefile = self.getCacheFileName(filename, 'avi')
+        if dimlen[2] > 10:
+            fps = 1.0/float(step[2])*0.1
+        else:
+            fps = float(1.0)
+        myproc = subprocess.Popen("/usr/bin/mencoder -fps %g -ovc lavc -lavcopts vcodec=ljpeg mf://%s/*.png -o %s" % (fps, tmpdir, os.path.join(tmpdir, filename+'.avi')))
+        os.waitpid(myproc.pid, 0)
+        myproc = subprocess.Popen("/usr/bin/ffmpeg -r %g -i %s -vcodec mjpeg -r %g -b %dk -y %s" % (fps, os.path.join(tmpdir, filename+'.avi'), fps, 2000, cachefile))
+        os.waitpid(myproc.pid, 0)
+        os.removedirs(tmpdir)
+        size = os.path.getsize(self.getCacheFileName(filename, 'avi'))
+        return (self.getCacheFileHandler('r', filename, 'avi'), size, 'application/x-msvideo')
 
     def GetDataguzzlerWaveformImage(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -579,10 +862,12 @@ class db_dataguzzler_data_file(renderer_class):
                 imagelink = self.getURL(self._relpath, content_mode="raw", image="true")
                 matlink = self.getURL(self._relpath, content_mode="raw", matfile="true")
                 csvlink = self.getURL(self._relpath, content_mode="raw", csvfile="true")
+                dgzlink = self.getURL(self._relpath, content_mode="raw", dgzfile="true")
+                avilink = self.getURL(self._relpath, content_mode="raw", avifile="true")
 
                 etree.register_namespace("dbdg", "http://thermal.cnde.iastate.edu/databrowse/dataguzzler")
 
-                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink)
+                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink, dgzlink=dgzlink, avilink=avilink)
                 xmlroot.append(xmlcontent)
 
                 return xmlroot
@@ -624,12 +909,7 @@ class db_dataguzzler_data_file(renderer_class):
 
                 elif "matfile" in self._web_support.req.form:
                     f = None
-                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form and "frame" in self._web_support.req.form:
-                        if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'mat'):
-                            size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'mat'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'mat')
-                        pass
-                    elif "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
+                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat'))
                             f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat')
@@ -655,12 +935,7 @@ class db_dataguzzler_data_file(renderer_class):
 
                 elif "csvfile" in self._web_support.req.form:
                     f = None
-                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form and "frame" in self._web_support.req.form:
-                        if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'csv'):
-                            size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'csv'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'csv')
-                        pass
-                    elif "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
+                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv'))
                             f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv')
@@ -676,6 +951,58 @@ class db_dataguzzler_data_file(renderer_class):
 
                     self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(f.name)
                     self._web_support.req.response_headers['Content-Type'] = 'text/csv'
+                    self._web_support.req.response_headers['Content-Length'] = str(size)
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
+
+                elif "dgzfile" in self._web_support.req.form:
+                    f = None
+                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
+                        if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz'):
+                            size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz'))
+                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz')
+                        pass
+                    elif "waveform" in self._web_support.req.form:
+                        if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz'):
+                            size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz'))
+                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz')
+                        pass
+
+                    if f is None:
+                        (f, size) = self.GetDataguzzlerWaveformDgzFile()
+
+                    self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(f.name)
+                    self._web_support.req.response_headers['Content-Type'] = 'application/x-dataguzzler-waveform'
+                    self._web_support.req.response_headers['Content-Length'] = str(size)
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
+
+                elif "avifile" in self._web_support.req.form:
+                    f = None
+                    if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
+                        if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi'):
+                            size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi'))
+                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi')
+                        pass
+                    elif "waveform" in self._web_support.req.form:
+                        if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi'):
+                            size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi'))
+                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi')
+                        pass
+
+                    if f is None:
+                        (f, size) = self.GetDataguzzlerWaveformVideo()
+
+                    self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(f.name)
+                    self._web_support.req.response_headers['Content-Type'] = 'application/x-msvideo'
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                     self._web_support.req.output_done = True
