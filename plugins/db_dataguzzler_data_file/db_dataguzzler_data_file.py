@@ -558,6 +558,8 @@ class db_dataguzzler_data_file(renderer_class):
         else:
             cmap = 'hot'
 
+        filelist = []
+
         # Verify Correct Number of Dimensions
         if len(waveform.data.shape) == 3:   # 3D Waveforms
             tmpdir = tempfile.mkdtemp("", "db_dataguzzler_video")
@@ -566,7 +568,7 @@ class db_dataguzzler_data_file(renderer_class):
             vmin = waveform.data.min()
             vmax = waveform.data.max()
             for framenumber in loop:
-                imagefilename = filename + "_" + str(framenumber)
+                imagefilename = filename + "_%5.5d" % framenumber
                 if "Coord3" in waveform.MetaData:
                     t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
                     title = waveformname + " (" + coord[2] + ": " + str(t[framenumber]) + " " + units[2] + ")"
@@ -589,6 +591,7 @@ class db_dataguzzler_data_file(renderer_class):
                 pylab.xlabel(coord[0] + " (" + units[0] + ")")
                 pylab.ylabel(coord[1] + " (" + units[1] + ")")
                 pylab.savefig(os.path.join(tmpdir, imagefilename + '.png'))
+                filelist.append(os.path.join(tmpdir, imagefilename + '.png'))
                 pylab.clf()
         else:
             raise self.RendererException("Only Three Dimensional Waveforms May Be Converted To Video")
@@ -603,9 +606,12 @@ class db_dataguzzler_data_file(renderer_class):
         #myproc = subprocess.Popen("/usr/local/bin/mencoder -fps %g -ovc lavc -lavcopts vcodec=ljpeg mf://%s/*.png -o %s" % (fps, tmpdir, os.path.join(tmpdir, filename+'.avi')))
         myproc = subprocess.Popen(("/usr/local/bin/mencoder", "-fps", "%g" % fps, "-ovc", "lavc", "-lavcopts", "vcodec=ljpeg", "mf://%s/*.png" % tmpdir, "-o", "%s" % os.path.join(tmpdir, filename+'.avi')))
         os.waitpid(myproc.pid, 0)
+        filelist.append(os.path.join(tmpdir, filename + '.avi'))
         myproc = subprocess.Popen(("/usr/local/bin/ffmpeg", "-r", "%g" % fps, "-i", "%s" % os.path.join(tmpdir, filename+'.avi'), "-vcodec", "mjpeg", "-r", "%g" % fps, "-b", "%dk" % 2000, "-y", "%s" % cachefile))
         os.waitpid(myproc.pid, 0)
-        #os.removedirs(tmpdir)
+        for name in filelist:
+            os.remove(name)
+        os.rmdir(tmpdir)
         size = os.path.getsize(self.getCacheFileName(filename, 'avi'))
         return (self.getCacheFileHandler('r', filename, 'avi'), size)
 
