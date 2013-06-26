@@ -43,7 +43,7 @@ class db_checklist_viewer(renderer_class):
                 g = open('/usr/local/QAutils/checklist/chf2html.xsl', 'r')
                 xsltransform = etree.parse(g)
                 g.close()
-                transformedxml = xml.xslt(xsltransform)
+                transformedxml = xml.xslt(xsltransform,rawlink_postfix="'?content_mode=raw'")
                 xmloutput = etree.XML(str(transformedxml))
                 return xmloutput
             else:
