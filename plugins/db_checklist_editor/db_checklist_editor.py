@@ -95,8 +95,9 @@ class db_checklist_editor(renderer_class):
                     else:
                         upfilename = "chxfromweb.chx"
                     filename = os.path.splitext(upfilename)[0]
+                    (filedir,filename_nodir)=os.path.split(filename)
                     tempsavedir = os.tempnam(None, "dbchx")
-                    fullfilename = os.path.join(tempsavedir, filename + ".chx")
+                    fullfilename = os.path.join(tempsavedir, filename_nodir + ".chx")
                     os.mkdir(tempsavedir)
                     os.chdir(tempsavedir)
                     chxparsed = etree.XML(filestring)
@@ -119,9 +120,9 @@ class db_checklist_editor(renderer_class):
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
                     try:
-                        f = open(os.path.join(tempsavedir, filename + ".pdf"), 'rb')
+                        f = open(os.path.join(tempsavedir, filename_nodir + ".pdf"), 'rb')
                         self._web_support.req.response_headers['Content-Type'] = 'application/pdf'
-                        self._web_support.req.response_headers['Content-Length'] = str(self.getSize(os.path.join(tempsavedir, filename + ".pdf")))
+                        self._web_support.req.response_headers['Content-Length'] = str(self.getSize(os.path.join(tempsavedir, filename_nodir + ".pdf")))
                         self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + filename + ".pdf"
                         self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                         self._web_support.req.output_done = True
