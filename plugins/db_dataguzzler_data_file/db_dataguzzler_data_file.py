@@ -126,6 +126,9 @@ class db_dataguzzler_data_file(renderer_class):
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
 
+        waveformname = ""
+        rgbawaveform = None
+
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
 
@@ -212,6 +215,7 @@ class db_dataguzzler_data_file(renderer_class):
             # Load Waveform
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
+            waveformname = "Unnamed Waveform " + str(waveformnumber)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
@@ -232,6 +236,9 @@ class db_dataguzzler_data_file(renderer_class):
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
 
+        waveformname = ""
+        rgbawaveform = None
+
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
 
@@ -318,6 +325,7 @@ class db_dataguzzler_data_file(renderer_class):
             # Load Waveform
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
+            waveformname = "Unnamed Waveform " + str(waveformnumber)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
@@ -335,6 +343,9 @@ class db_dataguzzler_data_file(renderer_class):
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
 
+        waveformname = ""
+        rgbawaveform = None
+
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
 
@@ -421,6 +432,7 @@ class db_dataguzzler_data_file(renderer_class):
             # Load Waveform
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
+            waveformname = "Unnamed Waveform " + str(waveformnumber)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
@@ -437,6 +449,9 @@ class db_dataguzzler_data_file(renderer_class):
         # Get Handle to Dataguzzler File and Open First Chunk
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
+
+        waveformname = ""
+        rgbawaveform = None
 
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
@@ -533,6 +548,7 @@ class db_dataguzzler_data_file(renderer_class):
             # Load Waveform
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
+            waveformname = "Unnamed Waveform " + str(waveformnumber)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
@@ -620,6 +636,9 @@ class db_dataguzzler_data_file(renderer_class):
         dgfh = dgf.open(self._fullpath)
         chunk = dgf.nextchunk(dgfh)
 
+        waveformname = ""
+        rgbawaveform = None
+
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
 
@@ -715,6 +734,7 @@ class db_dataguzzler_data_file(renderer_class):
             # Load Waveform
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
+            waveformname = "Unnamed Waveform " + str(waveformnumber)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")

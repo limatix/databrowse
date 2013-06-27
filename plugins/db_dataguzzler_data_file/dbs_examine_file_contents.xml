@@ -276,7 +276,7 @@
         <thead>
             <tr>
                 <th>Waveform Number:</th>
-                <td><a><xsl:attribute name="name">WAVEFORM<xsl:number/></xsl:attribute></a><xsl:number/></td>
+                <td><a><xsl:attribute name="name">WAVEFORM<xsl:number/></xsl:attribute></a><xsl:number/><div style="float:right"><img style="vertical-align:text-top"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>&#160;<a><xsl:attribute name="href"><xsl:value-of select="//@matlink"/>&amp;waveform=<xsl:number/></xsl:attribute>MAT</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@csvlink"/>&amp;waveform=<xsl:number/></xsl:attribute>CSV</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@dgzlink"/>&amp;waveform=<xsl:number/></xsl:attribute>DGZ</a><xsl:if test="substring-before(substring-after(dg:WFMDIMNS/., '&#10;'), '&#10;')='3'"> | <a><xsl:attribute name="href"><xsl:value-of select="//@avilink"/>&amp;waveform=<xsl:number/></xsl:attribute>AVI</a></xsl:if></div></td>
             </tr>
         </thead>
         <tbody>
