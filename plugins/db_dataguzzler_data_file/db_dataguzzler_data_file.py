@@ -237,7 +237,6 @@ class db_dataguzzler_data_file(renderer_class):
         chunk = dgf.nextchunk(dgfh)
 
         waveformname = ""
-        rgbawaveform = None
 
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
@@ -344,7 +343,6 @@ class db_dataguzzler_data_file(renderer_class):
         chunk = dgf.nextchunk(dgfh)
 
         waveformname = ""
-        rgbawaveform = None
 
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:

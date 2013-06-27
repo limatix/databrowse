@@ -28,14 +28,153 @@
             width:120px;
             float: left;
         }
+        .scalars {
+            padding: 0px;
+            margin: 0px;
+            border: 0px;
+            width: 100%;
+
+        }
+        .scalars li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            float: left;
+            padding: 0px;
+            margin: 0px;
+            border: 0px;
+            
+        }
+        .scalars li > table {
+            margin: 0px;
+            padding: 0px;
+            border-spacing: 0px;
+            border-collapse: collapse;
+
+        }
+        #blackout {
+            display: none;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            background-color: rgba(0,0,0,0.5);
+            left: 0px;
+            top: 0px;
+            position: fixed;
+        }
+        #blackout:hover{
+            cursor: pointer;
+        }
+        #popupwindow {
+            display: none;
+            width: 962px;
+            height: 500px;
+            z-index: 100;
+            box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+            background-color: #fff;
+            border: 1px solid #666;
+            left: 50%;
+            top: 50%;
+            margin-left: -481px;
+            margin-top: -250px;
+            position: fixed;
+            list-style: none;
+            -moz-border-top-left-radius: 5px;
+            border-top-left-radius: 5px;
+            -moz-border-top-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        #popupheader {
+            width: 100%;
+            background-color: #ccc;
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAbCAYAAAC9WOV0AAAAHklEQVQY02NhAAIWGMEIIpjgXCZcEoyoSnBKEG0oACP0AIWLLZ8oAAAAAElFTkSuQmCC");
+            background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+            background-position: bottom;
+            background-repeat: repeat-x;
+            border-bottom: 1px solid gray;
+            position: relative; 
+            overflow: hidden;
+            vertical-align:middle;
+            -moz-border-top-left-radius: 5px;
+            border-top-left-radius: 5px;
+            -moz-border-top-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        #closepopupwindow{
+            z-index: 75;
+            margin:3px;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0);
+        }
+        #closepopupwindow:hover{
+            cursor: pointer;
+            background-color: #eb958a;
+            border: 1px solid #c96356;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+        }
+        #closepopupwindow:active{
+            cursor: pointer;
+            background-color: #e07373;
+            border: 1px solid #c55353;
+            -moz-border-radius: 16px;
+            border-radius: 16px;
+        }
+        #popupframe {
+            position:relative;
+            height: 459px;
+            border: 0px;
+            left: 0px;
+            top: 0px;
+            padding: 8px;
+            overflow-y: scroll;
+            -moz-border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            -moz-border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .snapshotdiv {
+            z-index: 100;
+        }
     </style>
     <script type="text/javascript" defer="true">
         <![CDATA[
             $(document).ready(function() {
                 prettyPrint();
-            });         
+                $('#blackout').mouseup(function() {
+                    $("#blackout").fadeOut(25);
+                    $('#popupwindow').slideUp(25);
+                });
+                $("#closepopupwindow").click(function() {
+                    $("#blackout").fadeOut(25);
+                    $('#popupwindow').slideUp(25);
+                });
+            });
+            function opendiv(divid, waveform){
+                $("#blackout").fadeIn(25);
+                $("#popupwindow").slideDown(25);
+                $("#popupframe").html($(divid).html());
+                $('#popuptitle').html('Viewing Waveform ' + waveform);
+                $('#popupframe img.lazy').attr('src', $('#popupframe img.lazy').attr('data-original'));
+            }
         ]]>
     </script>
+    <div id="blackout"/>
+    <div id="popupwindow">
+            <div id="popupheader">            
+                <div style="float:left; padding-left:5px; vertical-align:middle;">
+                    <h3 style="margin-bottom:0px; margin-top:3px;vertical-align:middle"><span id="popuptitle"></span></h3>
+                </div>
+                <div style="float:right; vertical-align:middle;">
+                    <img id="closepopupwindow" alt="X" title="Click to Close Window" style="vertical-align:middle;">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/window-close.png</xsl:attribute>
+                    </img>
+                </div>
+            </div>
+            <div id="popupframe"/>
+        </div>
     <table class="cream full-width">
         <thead>
             <th style="width:8px">
@@ -106,15 +245,7 @@
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:SNAPSHOT">
     <a><xsl:attribute name="name">SNAPSHOT<xsl:number/></xsl:attribute></a>
-    <h2>Dataguzzler Snapshot Summary</h2>
-    <h5>Jump To:</h5>
-    <ul id="wfmlist">
-        <xsl:for-each select="dg:GUZZNWFM">
-            <xsl:sort data-type="text" select="dg:WAVENAME"/>
-            <li><a><xsl:attribute name="href">#SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/></xsl:attribute><xsl:value-of select="dg:WAVENAME"/></a></li>
-        </xsl:for-each>
-    </ul>
-    <p>&#160;<br/></p>
+    <h2>Dataguzzler Snapshot</h2>
     <xsl:if test="count(dg:METADATA/dg:METDATUM) > 0">
        <h3>Snapshot Metadata</h3>
        <table class="cream full-width">
@@ -131,80 +262,167 @@
             </tbody>
         </table>
     </xsl:if>
-    <p><h3>Waveform List</h3></p>
-    <xsl:apply-templates/>
-    <hr/>
-</xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:GUZZNWFM">
+    <p><h3>Data Summary</h3></p>
     <table class="cream full-width">
-        <thead>
-            <tr>
-                <th style="width:144px">Waveform Name:</th>
-                <td><a><xsl:attribute name="name">SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></a><strong><xsl:value-of select="dg:WAVENAME"/></strong><div style="float:right"><img style="vertical-align:text-top"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>&#160;<a><xsl:attribute name="href"><xsl:value-of select="//@matlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>MAT</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@csvlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>CSV</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@dgzlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>DGZ</a><xsl:if test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'"> | <a><xsl:attribute name="href"><xsl:value-of select="//@avilink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>AVI</a></xsl:if></div></td>
-            </tr>
-        </thead>
         <tbody>
-            <xsl:if test="not(dg:GUZZWFMD/dg:DATASVAL)">
+            <tr><th style="white-space:nowrap">Waveform Count:</th><td><xsl:value-of select="count(dg:GUZZNWFM)"/></td></tr>
+            <tr><th>Timestamp:</th><td><xsl:value-of select="dg:GUZZNWFM/dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='TimeStamp']/dg:METDSTRV[1]"/></td></tr>
+            <xsl:if test="count(dg:GUZZNWFM/dg:GUZZWFMD/dg:DATASVAL)">
                 <tr>
-                    <th>Waveform Preview:</th>
-                    <td style="text-align:center"><img width="500px">
-                            
-                                <xsl:choose>
-                                    <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
-                                        <xsl:choose>
-                                            <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
-                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
-                                            </xsl:when>
-                                            <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
-                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:when>
-                                    <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></xsl:otherwise>
-                                </xsl:choose>                        
+                    <th>Scalar Waveforms:</th>
+                    <td style="padding:0px;">
+                        <ul class="scalars">
+                            <xsl:for-each select="dg:GUZZNWFM/dg:GUZZWFMD/dg:DATASVAL">
+                                <li>
+                                    <table>
+                                        <thead>
+                                            <tr><th><xsl:value-of select="../../dg:WAVENAME"/></th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td><xsl:value-of select="."/>&#160;<xsl:value-of select="../dg:METADATA/dg:METDATUM[dg:METDNAME='AmplUnits']/dg:METDSTRV"/></td></tr>
+                                        </tbody>
+                                    </table>
+                                </li>
+                            </xsl:for-each>
+                        </ul>
+                    </td>
+                </tr>
+            </xsl:if>
+            <xsl:if test="dg:GUZZNWFM[dg:WAVENAME='IRstack'] and dg:GUZZNWFM[dg:WAVENAME='VibroFitImg']">
+                <tr>
+                    <th style="text-align:center" colspan="2">Waveforms of Interest</th>
+                </tr>
+                <tr>
+                    <td colspan="2">                    
+                        <img width="50%">
+                            <xsl:choose>
+                                <xsl:when test="substring-before(substring-after(dg:GUZZNWFM[dg:WAVENAME='IRstack']/dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
+                                    <xsl:choose>
+                                        <xsl:when test="dg:GUZZNWFM[dg:WAVENAME='IRstack']/dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=IRstack&amp;frame=109</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZNWFM[dg:WAVENAME='IRstack']/dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=IRstack&amp;frame=109</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=IRstack&amp;frame=0</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=IRstack</xsl:attribute></xsl:otherwise>
+                            </xsl:choose>                        
+                        </img>
+                        <img width="50%">
+                            <xsl:choose>
+                                <xsl:when test="substring-before(substring-after(dg:GUZZNWFM[dg:WAVENAME='VibroFitImg']/dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
+                                    <xsl:choose>
+                                        <xsl:when test="dg:GUZZNWFM[dg:WAVENAME='VibroFitImg']/dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=VibroFitImg&amp;frame=109</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZNWFM[dg:WAVENAME='VibroFitImg']/dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=VibroFitImg&amp;frame=109</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=VibroFitImg&amp;frame=0</xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise><xsl:attribute name="src"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=VibroFitImg</xsl:attribute></xsl:otherwise>
+                            </xsl:choose>                        
                         </img>
                     </td>
                 </tr>
             </xsl:if>
             <tr>
-                <xsl:choose>
-                    <xsl:when test="dg:GUZZWFMD/dg:DATASVAL">
-                        <th>Scalar Value:</th>
-                        <td><xsl:value-of select="dg:GUZZWFMD/dg:DATASVAL"/>&#160;<xsl:value-of select="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='AmplUnits']/dg:METDSTRV"/></td>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <th>Waveform Size:</th>
-                        <td><xsl:value-of select="dg:GUZZWFMD/dg:DATARRYF"/></td>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <th>View Waveform:</th>
+                <td>
+                    <ul id="wfmlist">
+                        <xsl:for-each select="dg:GUZZNWFM">
+                            <xsl:sort data-type="text" select="dg:WAVENAME"/>
+                            <li><a style="cursor:pointer"><xsl:attribute name="onclick">opendiv('#SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/>', '<xsl:value-of select="dg:WAVENAME"/>')</xsl:attribute><xsl:value-of select="dg:WAVENAME"/></a></li>
+                        </xsl:for-each>
+                    </ul>
+                </td>
             </tr>
-            <tr>
-                <th>Dimensions:</th>
-                <td><xsl:value-of select="dg:GUZZWFMD/dg:WFMDIMNS"/></td>
-            </tr>
-            <xsl:for-each select="dg:GUZZWFMD/dg:METADATA/dg:METDATUM">
-                <xsl:sort select="dg:METDNAME"/>
-                <tr>
-                    <th><xsl:value-of select="dg:METDNAME"/>:</th>
-                    <td>
-                        <xsl:choose>
-                            <xsl:when test="dg:METDNAME/. = 'ProcExpr' or dg:METDNAME/. = 'ProcRGBA' or dg:METDNAME/. = 'ProcMD'">
-                                <pre class="prettyprint dgcode">
-                                    <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
-                                </pre>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </td>
-                </tr>
-            </xsl:for-each>
         </tbody>
     </table>
+    <xsl:apply-templates/>
+    <xsl:if test="//dg:SNAPSHTS"><hr/></xsl:if>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:GUZZNWFM">
+    <div style="display:none" class="snapshotdiv">
+        <xsl:attribute name="id">SNAPSHOT<xsl:number count="dg:SNAPSHOT"/>-<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>
+        <table class="cream full-width">
+            <thead>
+                <tr>
+                    <th style="width:144px">Waveform Name:</th>
+                    <td><strong><xsl:value-of select="dg:WAVENAME"/></strong><div style="float:right"><img style="vertical-align:text-top"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>&#160;<a><xsl:attribute name="href"><xsl:value-of select="//@matlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>MAT</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@csvlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>CSV</a> | <a><xsl:attribute name="href"><xsl:value-of select="//@dgzlink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>DGZ</a><xsl:if test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'"> | <a><xsl:attribute name="href"><xsl:value-of select="//@avilink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute>AVI</a></xsl:if></div></td>
+                </tr>
+            </thead>
+            <tbody>
+                <xsl:if test="not(dg:GUZZWFMD/dg:DATASVAL)">
+                    <tr>
+                        <th>Waveform Preview:</th>
+                        <td style="text-align:center">
+                            <img class="lazy" width="500px">
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/loading.gif</xsl:attribute>
+                                <xsl:choose>
+                                    <xsl:when test="substring-before(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;')='3'">
+                                        <xsl:choose>
+                                            <xsl:when test="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='ProcDimLen3' and dg:METDINTV='150&#10;']">
+                                                <xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:when test="substring-after(substring-after(substring-after(substring-after(dg:GUZZWFMD/dg:WFMDIMNS/., '&#10;'), '&#10;'), '&#10;'), '&#10;')='150&#10;'">
+                                                <xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=109</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/>&amp;frame=0</xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                    <xsl:otherwise><xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;snapshot=<xsl:number count="dg:SNAPSHOT"/>&amp;waveform=<xsl:value-of select="dg:WAVENAME"/></xsl:attribute></xsl:otherwise>
+                                </xsl:choose>                        
+                            </img>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <tr>
+                    <xsl:choose>
+                        <xsl:when test="dg:GUZZWFMD/dg:DATASVAL">
+                            <th>Scalar Value:</th>
+                            <td><xsl:value-of select="dg:GUZZWFMD/dg:DATASVAL"/>&#160;<xsl:value-of select="dg:GUZZWFMD/dg:METADATA/dg:METDATUM[dg:METDNAME='AmplUnits']/dg:METDSTRV"/></td>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <th>Waveform Size:</th>
+                            <td><xsl:value-of select="dg:GUZZWFMD/dg:DATARRYF"/></td>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </tr>
+                <tr>
+                    <th>Dimensions:</th>
+                    <td><xsl:value-of select="dg:GUZZWFMD/dg:WFMDIMNS"/></td>
+                </tr>
+                <xsl:for-each select="dg:GUZZWFMD/dg:METADATA/dg:METDATUM">
+                    <xsl:sort select="dg:METDNAME"/>
+                    <tr>
+                        <th><xsl:value-of select="dg:METDNAME"/>:</th>
+                        <td>
+                            <xsl:choose>
+                                <xsl:when test="dg:METDNAME/. = 'ProcExpr' or dg:METDNAME/. = 'ProcRGBA' or dg:METDNAME/. = 'ProcMD'">
+                                    <pre class="prettyprint dgcode">
+                                        <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
+                                    </pre>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="dg:METDNAME/following-sibling::dg:*"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </td>
+                    </tr>
+                </xsl:for-each>
+            </tbody>
+        </table>
+    </div>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dg="http://thermal.cnde.iastate.edu/dataguzzler" match="dg:DATAGUZZ">
     <xsl:choose>
