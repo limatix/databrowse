@@ -127,7 +127,6 @@ class db_dataguzzler_data_file(renderer_class):
         chunk = dgf.nextchunk(dgfh)
 
         waveformname = ""
-        rgbawaveform = None
 
         # Next, Let's figure Out What Kind of File we Have
         if chunk.Name in ["SNAPSHTS", "SNAPSHOT"]:
@@ -168,17 +167,17 @@ class db_dataguzzler_data_file(renderer_class):
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
-            if "IRstack" in wfmdict:
+            if "IRstack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict:
+            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict:
+            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict:
+            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -277,17 +276,17 @@ class db_dataguzzler_data_file(renderer_class):
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
-            if "IRstack" in wfmdict:
+            if "IRstack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict:
+            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict:
+            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict:
+            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -383,17 +382,17 @@ class db_dataguzzler_data_file(renderer_class):
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
-            if "IRstack" in wfmdict:
+            if "IRstack" in wfmdict and len(wfmdict["IRstack"].data) > 0:
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict:
+            if "DiffStack" in wfmdict and len(wfmdict["DiffStack"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict:
+            if "VibroFit" in wfmdict and len(wfmdict["VibroFit"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict:
+            if "VibroFitImg" in wfmdict and len(wfmdict["VibroFitImg"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -490,17 +489,17 @@ class db_dataguzzler_data_file(renderer_class):
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
-            if "IRstack" in wfmdict:
+            if "IRstack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict:
+            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict:
+            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict:
+            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -563,8 +562,11 @@ class db_dataguzzler_data_file(renderer_class):
                 units.append(waveform.MetaData['ProcUnits' + str(i+1)].Value if ("ProcUnits" + str(i+1)) in waveform.MetaData else waveform.MetaData['Units' + str(i+1)].Value)
             except:
                 pass
-        coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
-        units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+        try:
+            coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
+            units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+        except:
+            pass
 
         # Set Colormap
         if waveformname == "VibroFitImg":
@@ -676,17 +678,17 @@ class db_dataguzzler_data_file(renderer_class):
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
-            if "IRstack" in wfmdict:
+            if "IRstack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict:
+            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict:
+            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict:
+            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -749,8 +751,11 @@ class db_dataguzzler_data_file(renderer_class):
                 units.append(waveform.MetaData['ProcUnits' + str(i+1)].Value if ("ProcUnits" + str(i+1)) in waveform.MetaData else waveform.MetaData['Units' + str(i+1)].Value)
             except:
                 pass
-        coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
-        units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+        try:
+            coord.append(waveform.MetaData['ProcAmplCoord'].Value if "ProcAmplCoord" in waveform.MetaData else waveform.MetaData['AmplCoord'].Value)
+            units.append(waveform.MetaData['ProcAmplUnits'].Value if "ProcAmplUnits" in waveform.MetaData else waveform.MetaData['AmplUnits'].Value)
+        except:
+            pass
 
         # Set Colormap
         if waveformname == "VibroFitImg":
@@ -832,7 +837,7 @@ class db_dataguzzler_data_file(renderer_class):
             pylab.ylabel(coord[-1] + " (" + units[-1] + ")")
             pylab.grid(True)
             pass
-        elif waveform.data.shape[0] == 1:   # 1D 1 Point Scalar Waveform
+        elif len(waveform.data.shape) != 0 and waveform.data.shape[0] == 1:   # 1D 1 Point Scalar Waveform
             pylab.plot(waveform.data, marker='o', color='b')
             pylab.title(waveformname)
             if "Coord1" in waveform.MetaData:
