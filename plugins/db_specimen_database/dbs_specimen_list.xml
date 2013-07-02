@@ -34,7 +34,7 @@
                 <th>Material</th>
                 <th>Shape</th>
                 <th>Dimensions</th>
-                <th>Crack Length</th>
+                <th>Crack Location</th>
             </tr>
         </thead>
         <tbody>
