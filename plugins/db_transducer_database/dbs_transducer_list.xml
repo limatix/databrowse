@@ -3,10 +3,26 @@
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
     </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorder/media/js/ColReorder.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
+    </xsl:element>
+    <!--<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
+    </xsl:element>-->
     <script type="text/javascript" defer="true">
         <![CDATA[
             $(document).ready(function() {
                 $('#transducertable').dataTable({
+                    "sDom": 'RlCfrtip',
+                    "aoColumnDefs": [
+                        { "bVisible": false, "aTargets": [ 1 ] }
+                    ],
                     "sScrollX": "764px",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
@@ -19,6 +35,11 @@
         <xsl:attribute name="type">text/css</xsl:attribute>
         <xsl:attribute name="rel">stylesheet</xsl:attribute>
         <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
     </xsl:element>
     <style>
         #transducertable {

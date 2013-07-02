@@ -10,7 +10,6 @@ table.dataTable {
 
 table.dataTable thead th {
 	padding: 3px 18px 3px 10px;
-	border-bottom: 1px solid black;
 	font-weight: bold;
 	cursor: pointer;
 	*cursor: hand;
@@ -34,12 +33,12 @@ table.dataTable td.dataTables_empty {
 table.dataTable tr.odd { background-color: #E2E4FF; }
 table.dataTable tr.even { background-color: white; }
 
-table.dataTable tr.odd td.sorting_1 { background-color: #D3D6FF; }
-table.dataTable tr.odd td.sorting_2 { background-color: #DADCFF; }
-table.dataTable tr.odd td.sorting_3 { background-color: #E0E2FF; }
-table.dataTable tr.even td.sorting_1 { background-color: #EAEBFF; }
-table.dataTable tr.even td.sorting_2 { background-color: #F2F3FF; }
-table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
+table.dataTable tr.odd td.sorting_1 { background-color: #F5EDC0; }
+table.dataTable tr.odd td.sorting_2 { background-color: #FAF2C4; }
+table.dataTable tr.odd td.sorting_3 { background-color: #FFF7C8; }
+table.dataTable tr.even td.sorting_1 { background-color: #EBDDB1; }
+table.dataTable tr.even td.sorting_2 { background-color: #F5E7B9; }
+table.dataTable tr.even td.sorting_3 { background-color: #FFF0C0; }
 
 
 /*
@@ -81,12 +80,78 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 /*
  * Pagination
  */
+
+.dataTables_paginate{
+	float: right;
+	font-size: 13px;
+	line-height: 1.5;
+	margin-bottom: 10px;
+	margin-top: 2px;
+	overflow: hidden;
+}
+
+.dataTables_paginate .paginate_button, .dataTables_paginate .paginate_active{
+	border-radius: 3px;
+	float: left;
+	text-align: center;
+	text-decoration: none;
+	-moz-transition: background-color 0.2s, color 0.2s;
+	-webkit-transition: background-color 0.2s, color 0.2s;
+	transition: background-color 0.2s, color 0.2s;
+	cursor: pointer;
+	*cursor: hand;
+}
+
+.dataTables_paginate .first, .dataTables_paginate .previous, .dataTables_paginate .next, .dataTables_paginate .last{
+	background-color: #444;
+	border: 1px solid #444;
+	color: #fff;
+	font-weight: bold;
+	min-width: 10px;
+	padding: 0 4px;
+}
+
+.dataTables_paginate .first.paginate_button_disabled:hover, .dataTables_paginate .previous.paginate_button_disabled:hover,
+.dataTables_paginate .next.paginate_button_disabled:hover, .dataTables_paginate .last.paginate_button_disabled:hover{
+	background-color: #444 !important;
+	cursor: default;
+}
+
+.dataTables_paginate .first div, .dataTables_paginate .previous div, .dataTables_paginate .next div, .dataTables_paginate .last div{
+	display: block;
+	margin: -1px 0 1px;
+}
+
+.dataTables_paginate .first, .dataTables_paginate .previous{
+	margin-right: 2px;
+}
+
+.dataTables_paginate .next, .dataTables_paginate .last{
+	margin-left: 2px;
+}
+
+.dataTables_paginate .first:hover, .dataTables_paginate .previous:hover, .dataTables_paginate .next:hover, .dataTables_paginate .last:hover{
+	background-color: #777;
+}
+
+.dataTables_paginate span .paginate_button, .dataTables_paginate span .paginate_active{
+	color: #cb1a2a;
+	margin: 0 2px;
+	min-width: 12px;
+	padding: 1px 4px;
+}
+
+.dataTables_paginate span a.paginate_button:hover, .dataTables_paginate span a.paginate_active{
+	background-color: #cb1a2a;
+	color: #fff;
+}
+/*
 .dataTables_paginate {
 	float: right;
 	text-align: right;
 }
 
-/* Two button pagination - previous / next */
+/* Two button pagination - previous / next 
 .paginate_disabled_previous,
 .paginate_enabled_previous,
 .paginate_disabled_next,
@@ -132,7 +197,7 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 .paginate_enabled_next:hover { background: url('../images/forward_enabled_hover.png') no-repeat top right; }
 .paginate_disabled_next { background: url('../images/forward_disabled.png') no-repeat top right; }
 
-/* Full number pagination */
+/* Full number pagination 
 .paging_full_numbers {
 	height: 22px;
 	line-height: 22px;
@@ -169,7 +234,7 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 .paging_full_numbers a.paginate_active {
 	background-color: #99B3FF;
 }
-
+/*
 
 /*
  * Processing indicator
