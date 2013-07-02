@@ -46,11 +46,11 @@
                     <td><xsl:value-of select="specimen:physicalproperties/specimen:material/."/></td>
                     <td><xsl:value-of select="specimen:geometry/specimen:shape/."/></td>
                     <td><xsl:for-each select="specimen:geometry/specimen:dimension">
-                        <xsl:value-of select="."/> <xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
+                        <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
                     </xsl:for-each></td>
-                    <td><xsl:value-of select="specimen:flawparameters/specimen:flawsize/."/> <xsl:value-of select="specimen:flawparameters/specimen:flawsize/@units"/></td>
+                    <td><xsl:value-of select="specimen:flawparameters/specimen:flawsize/."/>&#160;<xsl:value-of select="specimen:flawparameters/specimen:flawsize/@units"/></td>
                     <td><xsl:for-each select="specimen:flawparameters/specimen:location/*">
-                        <xsl:value-of select="."/> <xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
+                        <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
                     </xsl:for-each></td>
                 </tr>
             </xsl:for-each>
