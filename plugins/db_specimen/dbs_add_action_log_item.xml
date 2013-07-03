@@ -80,7 +80,7 @@
 			<dd>
 				<div class="btn-group clearfix">
 					<a class="btn success" onclick="submitform()" style="cursor:pointer">Add</a>
-					<a class="btn error" onclick="window.history.back()" style="cursor:pointer">Cancel</a>
+					<a class="btn error" onclick="window.location.href = window.location.href.replace(window.location.search, '')" style="cursor:pointer">Cancel</a>
 				</div>
 			</dd>
 		</dl>
