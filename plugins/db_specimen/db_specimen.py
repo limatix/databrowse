@@ -94,6 +94,65 @@ class db_specimen(renderer_class):
                 self._web_support.req.output = "Error Saving File: Incomplete Request"
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
+        elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "addactionitem" in self._web_support.req.form:
+            if not "date" in self._web_support.req.form or self._web_support.req.form['date'].value == "":
+                self._web_support.req.output = "Date is a Required Field"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
+            elif not "perfby" in self._web_support.req.form or self._web_support.req.form['perfby'].value == "":
+                self._web_support.req.output = "Performed By is a Required Field"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
+            elif not "action" in self._web_support.req.form or self._web_support.req.form['action'].value == "":
+                self._web_support.req.output = "Action is a Required Field"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
+            else:
+                fullfilename = self._fullpath
+                xmltree = etree.parse(fullfilename)
+                xmlroot = xmltree.getroot()
+                actionlog = xmlroot.xpath("specimen:actionlog", namespaces={"specimen": "http://thermal.cnde.iastate.edu/specimen"})
+                if actionlog:
+                    actionlog = actionlog[0]
+                else:
+                    actionlog = etree.SubElement(xmlroot, "actionlog")
+                actionevent = etree.SubElement(actionlog, "actionevent")
+                actiondate = etree.SubElement(actionevent, "date")
+                actiondate.text = self._web_support.req.form["date"].value
+                actionperfby = etree.SubElement(actionevent, "perfby")
+                actionperfby.text = self._web_support.req.form["perfby"].value
+                actionaction = etree.SubElement(actionevent, "action")
+                actionaction.text = self._web_support.req.form["action"].value
+                actionnotes = etree.SubElement(actionevent, "notes")
+                actionnotes.text = self._web_support.req.form["notes"].value
+
+                # Let's check on the directory and make sure its writable and it exists
+                if not os.access(os.path.dirname(fullfilename), os.W_OK):
+                    self._web_support.req.output = "Save Directory Not Writable " + os.path.dirname(fullfilename)
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+                elif not os.access(fullfilename, os.W_OK):
+                    self._web_support.req.output = "File Not Writable " + fullfilename
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
+                else:
+                    #Let's check on the file and make sure its writable and doesn't exist
+                    if os.path.exists(fullfilename):
+                        # rename old version into .1 .2. .3 etc.
+                        filenum = 1
+                        while os.path.exists("%s.bak.%.2d" % (fullfilename, filenum)):
+                            filenum += 1
+                            pass
+                        os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
+                        pass
+
+                f = open(fullfilename, "w")
+                f.write(etree.tostring(xmltree))
+                f.close
+
+                self._web_support.req.output = "Action Item Added Successfully"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
         elif self._content_mode == "raw":
             if "barcode" in self._web_support.req.form:
                 if self.CacheFileExists("barcode", 'png'):

@@ -48,6 +48,7 @@
     <xsl:call-template name="specimen-references"/>
     <xsl:call-template name="specimen-directions"/>
     <xsl:call-template name="specimen-notes"/>
+    <xsl:call-template name="specimen-log"/>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:provenance" mode="full">
     <table class="cream">
@@ -151,6 +152,32 @@
             <tr><th>X</th><td><xsl:value-of select="specimen:location/specimen:xcoordinate/."/> <xsl:value-of select="specimen:location/specimen:xcoordinate/@units"/></td></tr>
             <tr><th>Y</th><td><xsl:value-of select="specimen:location/specimen:ycoordinate/."/> <xsl:value-of select="specimen:location/specimen:ycoordinate/@units"/></td></tr>
             <tr><th>Z</th><td><xsl:value-of select="specimen:location/specimen:zcoordinate/."/> <xsl:value-of select="specimen:location/specimen:zcoordinate/@units"/></td></tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen"  name="specimen-log" mode="full">
+    <h3>Action Log</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr>
+                <th>Date</th><th>Performed By</th><th>Action</th><th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <xsl:for-each select="specimen:actionlog/specimen:actionevent">
+                <tr>
+                    <td><xsl:value-of select="specimen:date"/></td>
+                    <td><xsl:value-of select="specimen:perfby"/></td>
+                    <td><xsl:value-of select="specimen:action"/></td>
+                    <td>
+                        <xsl:call-template name="specimen-lf2p">
+                            <xsl:with-param name="instr">
+                                <xsl:value-of select="specimen:notes"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </td>
+                </tr>
+            </xsl:for-each>
         </tbody>
     </table>
 </xsl:template>
