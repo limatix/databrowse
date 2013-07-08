@@ -38,6 +38,7 @@
             <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
         </a>
     </div>
+    <h1>Datacollect Experiment Log</h1>
     <xsl:apply-templates mode="full"/>
 </xsl:template>
 <xsl:template name="dc2-lf2p"> <!-- Convert linefeeds to <p> </p> -->
