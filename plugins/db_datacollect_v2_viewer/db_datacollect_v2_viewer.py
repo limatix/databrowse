@@ -20,7 +20,6 @@
 
 import os
 import os.path
-from stat import *
 from lxml import etree
 from renderer_support import renderer_class
 import magic
@@ -43,6 +42,34 @@ class db_datacollect_v2_viewer(renderer_class):
                 # Contents of File
                 f = open(self._fullpath)
                 xmlroot = etree.XML(f.read())
+                # Resolve URL to Files Directory
+                reldest = xmlroot.xpath('dc:summary/dc:reldest', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})[0].text
+                reldesturl = self.getURL(os.path.abspath(os.path.join(os.path.dirname(self._relpath), reldest)))
+                xmlroot.set('reldesturl', reldesturl)
+                # Resolve URLs for Config Files
+                configlist = xmlroot.xpath('dc:configstr', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})
+                for item in configlist:
+                    path = os.path.realpath(item.get('fname'))
+                    if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                        relpath = path.replace(self._web_support.dataroot, '')
+                        url = self.getURL(relpath)
+                        item.set('url', url)
+                # Resolve URLs for Specimen Database
+                specimenlist = xmlroot.xpath('//dc:specimen', namespaces={"dc": 'http://thermal.cnde.iastate.edu/datacollect', "dcv": 'http://thermal.cnde.iastate.edu/dcvalue'})
+                for item in specimenlist:
+                    if item.text:
+                        relpath = '/specimens/' + item.text + '.sdb'
+                        if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
+                            url = self.getURL(relpath)
+                            item.set('url', url)
+                # Resolve URLs for Transducer Database
+                transducerlist = xmlroot.xpath('//dc:xducer', namespaces={"dc": 'http://thermal.cnde.iastate.edu/datacollect', "dcv": 'http://thermal.cnde.iastate.edu/dcvalue'})
+                for item in transducerlist:
+                    if item.text:
+                        relpath = '/transducers/' + item.text + '.tdb'
+                        if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
+                            url = self.getURL(relpath)
+                            item.set('url', url)
                 f.close()
                 return xmlroot
             elif self._content_mode == "raw":
