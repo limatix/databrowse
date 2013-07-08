@@ -114,15 +114,54 @@
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:configstr" mode="full">
     <h3>Configuration</h3>
-        <xsl:choose>
-            <xsl:when test="@url">
-                <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
-                <tt><xsl:value-of select="@fname"/></tt></a>
-            </xsl:when>
-            <xsl:otherwise>
-                <tt><xsl:value-of select="@fname"/></tt>
-            </xsl:otherwise>
-        </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@fname and @url">
+                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                    <tt><xsl:value-of select="@fname"/></tt></a>
+                </xsl:when>
+                <xsl:when test="@fnames and @urls">
+                    <script type="text/javascript" defer="True">
+                            fnamelist<xsl:number/> = eval("<xsl:value-of select="@fnames" />");
+                            urllist<xsl:number/> = eval("<xsl:value-of select="@urls" />");
+                            string<xsl:number/> = "";
+                            if (fnamelist<xsl:number/>.length == urllist<xsl:number/>.length) {
+                                 for (i = 0; i&lt;fnamelist<xsl:number/>.length; i++) {
+                                    if (urllist<xsl:number/>[i] != '') {
+                                        if (string<xsl:number/> != ''){ 
+                                            string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                        }
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;a href="'+urllist<xsl:number/>[i]+'"&gt;' + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;&lt;/a&gt;';
+                                    }
+                                    else{
+                                        if (string<xsl:number/> != ''){ 
+                                            string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                        }
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;';
+                                    }
+                                }
+                            }
+                            else {
+                                for (i = 0; i&lt;fnamelist<xsl:number/>.length;  i++) {
+                                    if (string<xsl:number/> != ''){ 
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                    }
+                                    string<xsl:number/> = string<xsl:number/> + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;';
+                                }
+                            }
+                            $(function() {
+                                $('#configstr<xsl:number/>').html(string<xsl:number/>);
+                            });
+                    </script>
+                    <span><xsl:attribute name="id">configstr<xsl:number/></xsl:attribute>
+                    </span>
+                </xsl:when>
+                <xsl:when test="@fnames">
+                    <tt><xsl:value-of select="@fnames"/></tt>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tt><xsl:value-of select="@fname"/></tt>
+                </xsl:otherwise>
+            </xsl:choose>
         <pre class="prettyprint" style="height:300px">
             <xsl:value-of select="."/>
         </pre>
