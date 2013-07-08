@@ -21,7 +21,7 @@
 
 def dbh_checklist_1_chx(path, contenttype, extension):
     """ Generic Checklist Handler - Returns checlist for Checklist Files """
-    if extension.lower() == "chx" or extension.lower() == "chf":
+    if extension.lower() == "chx" or extension.lower() == "chf" or extension.lower() == "plx" or extension.lower() == "plf":
         return "db_checklist_editor"
     else:
         return False
