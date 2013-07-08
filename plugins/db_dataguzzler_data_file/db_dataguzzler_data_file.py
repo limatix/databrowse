@@ -594,7 +594,7 @@ class db_dataguzzler_data_file(renderer_class):
                 cb = pylab.colorbar()
                 cb.set_label(coord[-1] + " (" + units[-1] + ")")
                 if rgbawaveform is not None:
-                    RGBAdat = rgbawaveform.data[:, :, framenumber].transpose().tostring()
+                    RGBAdat = rgbawaveform.data[:, ::-1, framenumber].transpose().tostring()
                     sz = len(RGBAdat)
                     RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
                     RGBAmat2 = RGBAmat.copy()
@@ -782,7 +782,7 @@ class db_dataguzzler_data_file(renderer_class):
             cb = pylab.colorbar()
             cb.set_label(coord[-1] + " (" + units[-1] + ")")
             if rgbawaveform is not None:
-                RGBAdat = rgbawaveform.data[:, :, framenumber].transpose().tostring()
+                RGBAdat = rgbawaveform.data[:, ::-1, framenumber].transpose().tostring()
                 sz = len(RGBAdat)
                 RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
                 RGBAmat2 = RGBAmat.copy()
@@ -802,7 +802,7 @@ class db_dataguzzler_data_file(renderer_class):
             cb = pylab.colorbar()
             cb.set_label(coord[-1] + " (" + units[-1] + ")")
             if rgbawaveform is not None:
-                RGBAdat = rgbawaveform.data[:, :].transpose().tostring()
+                RGBAdat = rgbawaveform.data[:, ::-1].transpose().tostring()
                 sz = len(RGBAdat)
                 RGBAmat = numpy.fromstring(RGBAdat, 'B').reshape(sz/4, 4)
                 RGBAmat2 = RGBAmat.copy()
