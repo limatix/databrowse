@@ -37,12 +37,16 @@
         </xsl:if>
     </div>
     <h1>Specimen Details</h1>
-    <table class="cream">
+    <table class="cream" style="width:399px;">
         <tbody>
-            <tr><th>Specimen ID</th><td><xsl:value-of  select="specimen:specimenid"/></td></tr>
+            <tr><th style="width:125px;">Specimen ID</th><td><xsl:value-of  select="specimen:specimenid"/></td></tr>
             <tr><th>Specimen Group</th><td><xsl:value-of  select="specimen:groupid"/></td></tr>
         </tbody>
     </table>
+    <xsl:apply-templates select="specimen:provenance"/>
+    <xsl:apply-templates select="specimen:physicalproperties"/>
+    <xsl:apply-templates select="specimen:geometry"/>
+    <xsl:apply-templates select="specimen:flawparameters"/>
     <xsl:apply-templates mode="full"/>
     <h3>Face Reference</h3>
     <xsl:call-template name="specimen-references"/>
@@ -50,103 +54,95 @@
     <xsl:call-template name="specimen-notes"/>
     <xsl:call-template name="specimen-log"/>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:provenance" mode="full">
-    <table class="cream">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:provenance">
+    <table class="cream" style="width:399px;">
         <thead>
             <tr><th colspan="2">Provenance</th></tr>
         </thead>
         <tbody>
-            <tr><th>Manufactured By</th><td><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
-            <tr><th>Source</th><td><xsl:value-of  select="specimen:source"/></td></tr>
-            <tr><th>In Charge</th><td><xsl:value-of  select="specimen:incharge"/></td></tr>
-        </tbody>
-    </table>
-</xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:provenance" mode="full">
-    <table class="cream">
-        <thead>
-            <tr><th colspan="2">Provenance</th></tr>
-        </thead>
-        <tbody>
-            <tr><th>Manufactured By</th><td><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
+            <tr><th style="width:125px;">Manufactured By</th><td><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
             <tr><th>Source</th><td><xsl:value-of  select="specimen:source"/></td></tr>
             <tr><th>In Charge</th><td><xsl:value-of  select="specimen:incharge"/></td></tr>
         </tbody>
     </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" name="specimen-references">
-    <table class="cream">
+    <table class="cream"  style="width:399px;">
         <thead>
-            <tr><th>Face</th><th>Description</th></tr>
+            <tr><th style="width:125px;">Face</th><th>Description</th></tr>
         </thead>
         <tbody>
             <xsl:for-each select="specimen:reference">
-                <tr><td><xsl:value-of  select="@face"/></td><td><xsl:value-of select="."/></td></tr>
+                <tr><th><xsl:value-of  select="@face"/></th><td><xsl:value-of select="."/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" name="specimen-directions">
-    <table class="cream">
+    <table class="cream"  style="width:399px;">
         <thead>
-            <tr><th>Direction</th><th>Description</th></tr>
+            <tr><th  style="width:125px;">Direction</th><th>Description</th></tr>
         </thead>
         <tbody>
             <xsl:for-each select="specimen:direction">
-                <tr><td><xsl:value-of  select="@name"/></td><td><xsl:value-of select="."/></td></tr>
+                <tr><th><xsl:value-of  select="@name"/></th><td><xsl:value-of select="."/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:coordinatesystem" mode="full">
     <h3>Coordinate System</h3>
-    <table class="cream">
+    <table class="cream" style="width:399px;">
         <thead>
             <tr><th colspan="2">Axes Definition (<xsl:value-of select="name(specimen:axesdefinition/*[1])"/>)</th></tr>
         </thead>
         <tbody>
             <xsl:for-each select="specimen:axesdefinition/*[1]/*">
-                <tr><td><xsl:value-of  select="local-name()"/></td><td><xsl:value-of select="specimen:direction/@name"/></td></tr>
+                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:value-of select="specimen:direction/@name"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
-    <table class="cream">
+    <table class="cream" style="width:399px;">
         <thead>
             <tr><th colspan="2">Origin (<xsl:value-of select="name(specimen:origin/*[1])"/>)</th></tr>
         </thead>
         <tbody>
             <xsl:for-each select="specimen:origin/*[1]/*">
-                <tr><td><xsl:value-of  select="local-name()"/></td><td><xsl:value-of select="@face"/></td></tr>
+                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:value-of select="@face"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:geometry" mode="full">
-    <h3>Geometry</h3>
-    <table class="cream">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:geometry">
+    <table class="cream" style="width:399px;">
         <thead>
-            <tr><th>Shape</th><td><xsl:value-of select="specimen:shape/."/></td></tr>
+            <tr><th colspan="2">Geometry</th></tr>
         </thead>
         <tbody>
+            <tr><th style="width:125px;">Shape</th><td><xsl:value-of select="specimen:shape/."/></td></tr>
             <xsl:for-each select="specimen:dimension">
                 <tr><th><xsl:value-of  select="@direction"/></th><td><xsl:value-of select="."/> <xsl:value-of select="@units"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:physicalproperties" mode="full">
-    <h3>Physical Properties</h3>
-    <table class="cream">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:physicalproperties" >
+    <table class="cream" style="width:399px;">
+        <thead>
+            <tr><th colspan="2">Physical Properties</th></tr>
+        </thead>
         <tbody>
-            <tr><th>Material</th><td><xsl:value-of select="specimen:material/."/></td></tr>
+            <tr><th style="width:125px;">Material</th><td><xsl:value-of select="specimen:material/."/></td></tr>
         </tbody>
     </table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:flawparameters" mode="full">
-    <h3>Flaw Parameters (<xsl:value-of select="@flawtype"/>)</h3>
-    <table class="cream">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:flawparameters">
+    <table class="cream" style="width:399px;">
+        <thead>
+            <tr><th colspan="2">Flaw Parameters (<xsl:value-of select="@flawtype"/>)</th></tr>
+        </thead>
         <tbody>
-            <tr><th>Index</th><td><xsl:value-of select="specimen:index/."/></td></tr>
+            <tr><th style="width:125px;">Index</th><td><xsl:value-of select="specimen:index/."/></td></tr>
             <tr><th>Flaw Size</th><td><xsl:value-of select="specimen:flawsize/."/>&#160;<xsl:choose><xsl:when test="specimen:flawsize/@units"><xsl:value-of select="specimen:flawsize/@units" /></xsl:when><xsl:otherwise><xsl:value-of select="@units"/></xsl:otherwise></xsl:choose></td></tr>
             <tr><th colspan="2">Location</th></tr>
             <tr><th>X</th><td><xsl:value-of select="specimen:location/specimen:xcoordinate/."/>&#160;<xsl:value-of select="specimen:location/specimen:xcoordinate/@units"/></td></tr>
