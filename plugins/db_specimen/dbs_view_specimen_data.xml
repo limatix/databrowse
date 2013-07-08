@@ -147,11 +147,11 @@
     <table class="cream">
         <tbody>
             <tr><th>Index</th><td><xsl:value-of select="specimen:index/."/></td></tr>
-            <tr><th>Flaw Size</th><td><xsl:value-of select="specimen:flawsize/."/></td></tr>
+            <tr><th>Flaw Size</th><td><xsl:value-of select="specimen:flawsize/."/>&#160;<xsl:choose><xsl:when test="specimen:flawsize/@units"><xsl:value-of select="specimen:flawsize/@units" /></xsl:when><xsl:otherwise><xsl:value-of select="@units"/></xsl:otherwise></xsl:choose></td></tr>
             <tr><th colspan="2">Location</th></tr>
-            <tr><th>X</th><td><xsl:value-of select="specimen:location/specimen:xcoordinate/."/> <xsl:value-of select="specimen:location/specimen:xcoordinate/@units"/></td></tr>
-            <tr><th>Y</th><td><xsl:value-of select="specimen:location/specimen:ycoordinate/."/> <xsl:value-of select="specimen:location/specimen:ycoordinate/@units"/></td></tr>
-            <tr><th>Z</th><td><xsl:value-of select="specimen:location/specimen:zcoordinate/."/> <xsl:value-of select="specimen:location/specimen:zcoordinate/@units"/></td></tr>
+            <tr><th>X</th><td><xsl:value-of select="specimen:location/specimen:xcoordinate/."/>&#160;<xsl:value-of select="specimen:location/specimen:xcoordinate/@units"/></td></tr>
+            <tr><th>Y</th><td><xsl:value-of select="specimen:location/specimen:ycoordinate/."/>&#160;<xsl:value-of select="specimen:location/specimen:ycoordinate/@units"/></td></tr>
+            <tr><th>Z</th><td><xsl:value-of select="specimen:location/specimen:zcoordinate/."/>&#160;<xsl:value-of select="specimen:location/specimen:zcoordinate/@units"/></td></tr>
         </tbody>
     </table>
 </xsl:template>
