@@ -152,14 +152,14 @@
     </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen"  name="specimen-log" mode="full">
-    <h3>Action Log</h3>
     <table class="cream full-width">
         <thead>
+            <tr><th colspan="4">Action Log</th></tr>
+        </thead>
+        <tbody>
             <tr>
                 <th>Date</th><th>Performed By</th><th>Action</th><th>Notes</th>
             </tr>
-        </thead>
-        <tbody>
             <xsl:for-each select="specimen:actionlog/specimen:actionevent">
                 <tr>
                     <td><xsl:value-of select="specimen:date"/></td>
@@ -178,12 +178,24 @@
     </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" name="specimen-notes">
-    <h3>Notes</h3>
-    <xsl:call-template name="specimen-lf2p">
-        <xsl:with-param name="instr">
-            <xsl:value-of select="specimen:notes"/>
-        </xsl:with-param>
-    </xsl:call-template>
+    <div style="float:left; min-width: 399px; max-width:100%">
+        <table class="cream" style="width:100%">
+            <thead>
+                <tr><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <xsl:call-template name="specimen-lf2p">
+                            <xsl:with-param name="instr">
+                                <xsl:value-of select="specimen:notes"/>
+                            </xsl:with-param>
+                        </xsl:call-template>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </xsl:template>
 <xsl:template name="specimen-lf2p"> <!-- Convert linefeeds to <p> </p> -->
     <xsl:param name="instr"/>
