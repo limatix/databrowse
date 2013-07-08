@@ -49,11 +49,13 @@ class db_datacollect_v2_viewer(renderer_class):
                 # Resolve URLs for Config Files
                 configlist = xmlroot.xpath('dc:configstr', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})
                 for item in configlist:
-                    path = os.path.realpath(item.get('fname'))
-                    if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
-                        relpath = path.replace(self._web_support.dataroot, '')
-                        url = self.getURL(relpath)
-                        item.set('url', url)
+                    fname = item.get('fname')
+                    if fname:
+                        path = os.path.realpath(fname)
+                        if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                            relpath = path.replace(self._web_support.dataroot, '')
+                            url = self.getURL(relpath)
+                            item.set('url', url)
                 # Resolve URLs for Specimen Database
                 specimenlist = xmlroot.xpath('//dc:specimen', namespaces={"dc": 'http://thermal.cnde.iastate.edu/datacollect', "dcv": 'http://thermal.cnde.iastate.edu/dcvalue'})
                 for item in specimenlist:
