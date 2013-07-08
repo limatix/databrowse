@@ -171,13 +171,13 @@ class db_dataguzzler_data_file(renderer_class):
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
+            if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
+            if "VibroFit" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
+            if "VibroFitImg" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -280,13 +280,13 @@ class db_dataguzzler_data_file(renderer_class):
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
+            if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
+            if "VibroFit" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
+            if "VibroFitImg" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -386,13 +386,13 @@ class db_dataguzzler_data_file(renderer_class):
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict and len(wfmdict["DiffStack"].data) > 0:
+            if "DiffStack" in wfmdict and len(wfmdict["IRstack"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict and len(wfmdict["VibroFit"].data) > 0:
+            if "VibroFit" in wfmdict and len(wfmdict["IRstack"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict and len(wfmdict["VibroFitImg"].data) > 0:
+            if "VibroFitImg" in wfmdict and len(wfmdict["IRstack"].data) > 0:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -493,13 +493,13 @@ class db_dataguzzler_data_file(renderer_class):
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
+            if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
+            if "VibroFit" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
+            if "VibroFitImg" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
@@ -682,13 +682,13 @@ class db_dataguzzler_data_file(renderer_class):
                 mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
-            if "DiffStack" in wfmdict and wfmdict["DiffStack"].data.size > 1:
+            if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFit" in wfmdict and wfmdict["VibroFit"].data.size > 1:
+            if "VibroFit" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
-            if "VibroFitImg" in wfmdict and wfmdict["VibroFitImg"].data.size > 1:
+            if "VibroFitImg" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
 
