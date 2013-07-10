@@ -1,0 +1,288 @@
+<xsl:key name="tablekey" match="dc:experiment/dc:measurement/*" use="concat(generate-id(..), '|', local-name())" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue"/>
+<xsl:key name="varkey" match="dc:experiment/dc:measurement/*" use="local-name()" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue"/>
+<xsl:variable name="tablecolumns" select="//dc:experiment/dc:measurement/*[generate-id() = generate-id(key('varkey', normalize-space(local-name())))]" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue"/>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:experiment" mode="full">
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                prettyPrint();
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorder/media/js/ColReorder.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
+    </xsl:element>
+    <!--<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
+    </xsl:element>-->
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                $('#dc2table').dataTable({
+                    "sDom": 'RlCfrtip',
+                    "aoColumnDefs": [
+                        { "bVisible": false, "aTargets": [ 1 ] }
+                    ],
+                    "sScrollX": "764px",
+                    "bScrollCollapse": true,
+                    "sPaginationType": "full_numbers",
+                    "bStateSave": true
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        #dc2table {
+            white-space: nowrap;
+        }
+        .inlinelist {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .inlinelist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            padding: 0px;
+            margin-right: 5px;
+            vertical-align: top;
+        }
+        .inlinelist li img {
+            border: 1px solid #c00;
+        }
+    </style>
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h1>Datacollect Experiment Log</h1>
+    <xsl:apply-templates mode="pagetop"/>
+    <h3>Measurement List</h3>
+    <table class="cream full-width" id="dc2table">
+        <thead>
+            <tr>
+                <xsl:apply-templates select="$tablecolumns" mode="tableheader"/>
+            </tr>
+        </thead>
+        <tbody>
+            <xsl:apply-templates mode="tablebody"/>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:experiment/dc:measurement" mode="tablebody">
+    <tr>
+        <xsl:apply-templates mode="tablebody" select="$tablecolumns">
+            <xsl:with-param name="row" select="current()"/>
+        </xsl:apply-templates>
+    </tr>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:experiment/dc:measurement/*" mode="tablebody">
+    <xsl:param name="row"/>
+    <td>
+        <xsl:choose>
+            <xsl:when test="local-name() = 'measchecklist'">
+                <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
+            <xsl:when test="local-name() = 'dgsfile'">
+                <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
+            <xsl:when test="local-name() = 'setfile'">
+                <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
+            <xsl:when test="local-name() = 'specimen' and key('tablekey', concat(generate-id($row), '|', local-name()))/@url">
+                <a><xsl:attribute name="href"><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))/@url"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
+            <xsl:when test="local-name() = 'xducer' and key('tablekey', concat(generate-id($row), '|', local-name()))/@url">
+                <a><xsl:attribute name="href"><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))/@url"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </td>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:experiment/dc:measurement/*" mode="tableheader">
+    <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>         
+    <th><abbr><xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+        <xsl:choose>
+            <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$localname"/>                                    
+            </xsl:otherwise>
+        </xsl:choose></abbr>
+    </th>
+</xsl:template>
+<xsl:template name="dc2-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="dc2-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:summary" mode="pagetop">
+    <h3>Experiment Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th width="20%">Item</th><th>Details</th></tr>
+        </thead>
+        <tbody>
+            <xsl:if test="dc:specimen">
+                <tr><th>Specimen: </th><td><xsl:value-of select="dc:specimen"/></td></tr>
+            </xsl:if>
+            <tr><th>Performed By: </th><td><xsl:value-of select="dc:perfby"/></td></tr>
+            <tr><th>Date: </th><td><xsl:value-of select="dc:date"/></td></tr>
+            <tr><th>Data Folder: </th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/></xsl:attribute><xsl:value-of select="dc:reldest"/></a></td></tr>
+            <tr>
+                <th>Goal: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:goal"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+            <tr>
+                <th>Experiment Notes: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:expnotes"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:configstr" mode="pagetop">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dc:measurement" mode="full">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dc:measurement" mode="pagetop"/>
+<db:fieldmap xmlns="http://thermal.cnde.iastate.edu/databrowse" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <entry key="aircyl">Air Cylinder</entry>
+    <entry key="amplitude">Amplitude</entry>
+    <entry key="clampoffset">Clamp Offset</entry>
+    <entry key="clamptorque">Clamp Torque</entry>
+    <entry key="clinfo">Checklist Name</entry>
+    <entry key="cltitle">Checklist Title</entry>
+    <entry key="coating">Coating</entry>
+    <entry key="couplant">Couplant</entry>
+    <entry key="crackheat">Crack Heating</entry>
+    <entry key="date">Date</entry>
+    <entry key="dgsfile">DGS File</entry>
+    <entry key="dynstress">Dynamic Stress</entry>
+    <entry key="elecenergy">Electrical Energy</entry>
+    <entry key="excitation">Excitation</entry>
+    <entry key="hae">HAE</entry>
+    <entry key="hit">Hit</entry>
+    <entry key="leftclampoffset">Left Clamp Offset</entry>
+    <entry key="measchecklist">Checklist Link</entry>
+    <entry key="meastype">Measurement Type</entry>
+    <entry key="measnum">Measurement Number</entry>
+    <entry key="measphotos">Measurement Photos</entry>
+    <entry key="notes">Notes</entry>
+    <entry key="orientation">Orientation</entry>
+    <entry key="pixelsperinch">Pixels/Inch</entry>
+    <entry key="resonantfrequency">Resonant Frequency</entry>
+    <entry key="run_basename">Run Basename</entry>
+    <entry key="setfile">Set File</entry>
+    <entry key="specimen">Specimen</entry>
+    <entry key="perfby">Taken By</entry>
+    <entry key="pressure">Pressure</entry>
+    <entry key="rightclampoffset">Right Clamp Offset</entry>
+    <entry key="timestamp">Timestamp</entry>
+    <entry key="transducerforce">Transducer Force</entry>
+    <entry key="transduceroffset">Transducer Offset</entry>
+    <entry key="transducerpressure">Transducer Pressure</entry>
+    <entry key="transducerserial">Transducer Serial</entry>
+    <entry key="transducertemp">Transducer Temperature</entry>
+    <entry key="triggercount">Trigger Count</entry>
+    <entry key="triggerindex">Trigger Index</entry>
+    <entry key="vibsignallevel">Vibrometer Signal Level</entry>
+    <entry key="view">View</entry>
+    <entry key="xducer">Transducer</entry>
+    <entry key="xduceroffset">Transducer Offset</entry>
+    <entry key="analysisendval">Analysis End Time</entry>
+    <entry key="analysisstartval">Analysis Start Time</entry>
+    <entry key="analysisstepval">Analysis Step Length</entry>
+    <entry key="analysistype">Analysis Type</entry>
+    <entry key="couplantlength">Couplant Length</entry>
+    <entry key="couplantmaterial">Couplant Material</entry>
+    <entry key="couplantmeshsize">Couplant Mesh Size</entry>
+    <entry key="couplantmeshtype">Couplant Mesh Type</entry>
+    <entry key="couplantthickness">Couplant Thickness</entry>
+    <entry key="couplantwidth">Couplant Width</entry>
+    <entry key="crackx">Crack X</entry>
+    <entry key="cracky">Crack Y</entry>
+    <entry key="crackz">Crack Z</entry>
+    <entry key="eigsaround">Eigenvalues Near</entry>
+    <entry key="excitationamplitude">Excitation Amplitude</entry>
+    <entry key="laserx">Laser X</entry>
+    <entry key="lasery">Laser Y</entry>
+    <entry key="laserz">Laser Z</entry>
+    <entry key="lmntoffset">Left Mount Offset</entry>
+    <entry key="mounttype">Mount Type</entry>
+    <entry key="neigs">Number of Eigenvalues</entry>
+    <entry key="rmountoffset">Right Mount Offset</entry>
+    <entry key="spclength">Specimen Length</entry>
+    <entry key="spcmaterial">Specimen Material</entry>
+    <entry key="spcmeshsize">Specimen Mesh Size</entry>
+    <entry key="spcmeshtype">Specimen Mesh Type</entry>
+    <entry key="spcthickness">Specimen Thickness</entry>
+    <entry key="spcwidth">Specimen Width</entry>
+    <entry key="xducermeshsize">Transducer Mesh Size</entry>
+    <entry key="xducermeshtype">Transducer Mesh Type</entry>
+    <entry key="xducerpressure">Transducer Pressure</entry>
+    <entry key="xducertype">Transducer Type</entry>
+    <entry key="xducerxoffset">Transducer X Offset</entry>
+    <entry key="xduceryoffset">Transducer Y Offset</entry>
+    <entry key="xducerzoffset">Transducer Z Offset</entry>
+</db:fieldmap>
