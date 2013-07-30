@@ -876,8 +876,7 @@
             <xsl:when test="@root='True'">
                 <xsl:attribute name="class">rootdir</xsl:attribute>
                 <span class="icon">
-                    <img>
-                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <img width="16px" height="16px">
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/folder-visiting.png</xsl:attribute>
                     </img>
@@ -916,8 +915,7 @@
             <xsl:when test="@ajax='True'">
                 <xsl:attribute name="class">subdir</xsl:attribute>
                 <span class="icon">
-                    <img onclick="$(this).parent().next().next().toggle();$.AjaxRequest($(this).parent().next().next(),$(this),&apos;{@ajaxurl}&apos;,&apos;{/dir:dir/@resurl}&apos;,&apos;{../@icon}&apos;);">
-                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <img  width="16px" height="16px" onclick="$(this).parent().next().next().toggle();$.AjaxRequest($(this).parent().next().next(),$(this),&apos;{@ajaxurl}&apos;,&apos;{/dir:dir/@resurl}&apos;,&apos;{../@icon}&apos;);">
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="../@icon"/></xsl:attribute>
                     </img>
@@ -953,8 +951,7 @@
             <xsl:otherwise>
                 <xsl:attribute name="class">subdir</xsl:attribute>
                 <span class="icon">
-                    <img onclick="$(this).parent().next().next().toggle();$.ImgToggle($(this),&apos;{/dir:dir/@resurl}&apos;,&apos;{../@icon}&apos;);">
-                        <xsl:attribute name="alt"><xsl:value-of select="@path"/></xsl:attribute>
+                    <img  width="16px" height="16px" onclick="$(this).parent().next().next().toggle();$.ImgToggle($(this),&apos;{/dir:dir/@resurl}&apos;,&apos;{../@icon}&apos;);">
                         <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="../@icon"/></xsl:attribute>
                     </img>
@@ -1002,7 +999,7 @@
                 <li class="item">
                     <xsl:if test="not(child::node()[local-name()='dir'])">
                         <span class="icon">
-                            <img>
+                            <img width="16px" height="16px">
                                 <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
                                 <xsl:attribute name="src"><xsl:value-of select="/dir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
                             </img>
