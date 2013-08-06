@@ -25,12 +25,12 @@
 """ support/renderer_support.py - Encapsulation Class for Renderer Plugins """
 
 from lxml import etree
-from stat import *
 from errno import EEXIST
-import os.path
+from stat import *
+import sys
+import os
 import string
 import random
-import os
 import copy
 import fnmatch
 
@@ -423,7 +423,7 @@ class renderer_class(object):
         newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
         isDirectory = os.path.isdir(self._fullpath)
         for handler in reversed(self._handlers):
-            dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(self._web_support.pluginpath + '/' + handler + '/')) if item.lower().startswith("dbs_")]
+            dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(os.path.dirname(sys.modules['databrowse.plugins.' + handler].__file__) + '/')) if item.lower().startswith("dbs_")]
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
             title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
@@ -482,7 +482,7 @@ class renderer_class(object):
         #print "Plugin = " + self.__class__.__name__
         custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) +
                                      '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
-        defaultpath = os.path.abspath(self._web_support.pluginpath + '/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
+        defaultpath = os.path.abspath(os.path.dirname(sys.modules['databrowse.plugins.' + self.__class__.__name__].__file__) + '/dbs_' + self._style_mode + '.xml')
         #print "Custom Search Path = " + custompath
         #print "Default Search Path = " + defaultpath
 

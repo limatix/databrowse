@@ -19,7 +19,7 @@
 """ plugins/renderers/db_checklist_viewer.py - Generic Checklist Files """
 
 from lxml import etree
-from renderer_support import renderer_class
+from databrowse.support.renderer_support import renderer_class
 
 
 class db_checklist_viewer(renderer_class):

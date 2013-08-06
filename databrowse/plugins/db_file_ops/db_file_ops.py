@@ -20,7 +20,7 @@
 
 import os
 import os.path
-from renderer_support import renderer_class
+from databrowse.support.renderer_support import renderer_class
 import re
 import json
 import shutil

@@ -18,7 +18,7 @@
 ###############################################################################
 """ plugins/renderers/db_directory_image.py - Basic Output for Any Folder """
 
-import db_directory.db_directory as db_directory_module
+import databrowse.plugins.db_directory.db_directory as db_directory_module
 
 
 class db_multimedia_directory(db_directory_module.db_directory):

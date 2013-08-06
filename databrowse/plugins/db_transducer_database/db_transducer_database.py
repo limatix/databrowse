@@ -18,7 +18,7 @@
 ###############################################################################
 """ plugins/renderers/db_transducer_database.py - Basic Output for Any Folder """
 
-import db_directory.db_directory as db_directory_module
+import databrowse.plugins.db_directory.db_directory as db_directory_module
 from lxml import etree
 import os
 

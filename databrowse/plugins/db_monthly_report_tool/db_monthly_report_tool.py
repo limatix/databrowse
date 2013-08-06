@@ -23,7 +23,7 @@ import os
 import os.path
 import copy
 from lxml import etree
-from renderer_support import renderer_class
+from databrowse.support.renderer_support import renderer_class
 
 
 class db_monthly_report_tool(renderer_class):

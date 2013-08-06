@@ -24,7 +24,7 @@ import Image
 import StringIO
 import subprocess
 from lxml import etree
-from renderer_support import renderer_class
+from databrowse.support.renderer_support import renderer_class
 
 
 class db_specimen_group(renderer_class):

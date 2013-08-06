@@ -24,8 +24,8 @@ import Image
 import StringIO
 import subprocess
 from lxml import etree
-from renderer_support import renderer_class
-import specimen_support as ss
+from databrowse.support.renderer_support import renderer_class
+import databrowse.support.specimen_support as ss
 
 
 class db_specimen(renderer_class):
@@ -45,7 +45,7 @@ class db_specimen(renderer_class):
             filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
             xmlroot = xml.getroot()
             if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
-                import db_directory.db_directory as db_directory_module
+                import databrowse.plugins.db_directory.db_directory as db_directory_module
                 renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
                 content = renderer.getContent()
                 xmlroot.append(content)

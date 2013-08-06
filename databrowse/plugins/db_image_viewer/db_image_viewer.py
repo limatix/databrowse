@@ -25,12 +25,12 @@ import pwd
 import grp
 from stat import *
 from lxml import etree
-from renderer_support import renderer_class
+from databrowse.support.renderer_support import renderer_class
 import magic
 import Image
 import StringIO
-import EXIF
-import RMETA
+import databrowse.support.EXIF as EXIF
+import databrowse.support.RMETA as RMETA
 
 
 class db_image_viewer(renderer_class):

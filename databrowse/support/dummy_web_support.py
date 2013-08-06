@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" support/web_support.py - Classes to encapsulate Web/WSGI functionality """
+""" support/dummy_web_support.py - Classes to encapsulate Web/WSGI functionality """
 
 import os
 import os.path
@@ -39,21 +39,27 @@ class wsgi_req:
     response_headers = None     # Dictionary of response headers
     output_done = None          # Flag: Have we generated output yet or not?
 
-    def __init__(self, environ, start_response):
+    def __init__(self, filename, params):
         """ Load Values from Request """
-        self.environ = environ
-        self.start_response = start_response
-        self.filename = environ['SCRIPT_FILENAME']
-        self.dirname = os.path.dirname(self.filename)
-        self.unparse_uri = environ['REQUEST_URI']
-        fs = environ['wsgi.input'] if isinstance(environ['wsgi.input'], cgi.FieldStorage) else None
-        if fs is None:
-            self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
-            self.environ['wsgi.input'] = self.form
-            pass
-        else:
-            self.form = fs
-            pass
+        #self.environ = environ
+        #self.start_response = start_response
+        #import __main__ as main
+        #self.filename = main.__file__
+        #self.dirname = os.path.dirname(self.filename)
+        #self.unparse_uri = environ['REQUEST_URI']
+        #fs = environ['wsgi.input'] if isinstance(environ['wsgi.input'], cgi.FieldStorage) else None
+        #if fs is None:
+        #    self.form = cgi.FieldStorage(fp=environ["wsgi.input"], environ=environ, keep_blank_values=1)
+        #    self.environ['wsgi.input'] = self.form
+        #    pass
+        #else:
+        #    self.form = fs
+        #    pass
+        fs = None
+        params['path'] = filename
+        os.environ['QUERY_STRING'] = '&'.join(['%s=%s' % (key, params[key]) for key in params])
+        fs = cgi.FieldStorage(keep_blank_values=1)
+        self.form = fs
 
         self.status = '200 OK'
         self.response_headers = {}
@@ -69,9 +75,9 @@ class wsgi_req:
 
     def return_page(self):
         """ Send Webpage Output """
-        self.response_headers['Content-Length'] = str(len(self.output))
-        self.start_response(self.status, self.response_headers.items())
-        self.output_done = True
+        #self.response_headers['Content-Length'] = str(len(self.output))
+        #self.start_response(self.status, self.response_headers.items())
+        #self.output_done = True
         return self.output
 
     def return_error(self, status=500):
@@ -97,11 +103,11 @@ class wsgi_req:
         else:
             self.status = '500 Internal Server Error'
 
-        self.output_done = True
+        #self.output_done = True
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
         self.response_headers['Content-Length'] = str(len(self.status.encode('utf-8')))
-        self.start_response(self.status, self.response_headers.items())
+        #self.start_response(self.status, self.response_headers.items())
         return [self.status.encode('utf-8')]
 
     pass
@@ -206,23 +212,25 @@ class web_support:
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
     debugging = None            # Boolean indicating whether debugging messages should be shown
 
-    def __init__(self, environ, start_response):
-        self.req = wsgi_req(environ, start_response)
-        self.reqfilename = self.req.filename
-        self.webdir = os.path.dirname(self.reqfilename)
-        self.stderr = environ["wsgi.errors"]
+    def __init__(self, filename, params):
+        self.req = wsgi_req(filename, params)
+        #self.reqfilename = self.req.filename
+        #self.webdir = os.path.dirname(self.reqfilename)
+        #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
 
         # Try to Load Optional Configuration File
-        try:
-            conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
-            self.confstr = conffile.read()
-            conffile.close()
-            exec self.confstr
-        except:
-            pass
+        #try:
+            #conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
+            #self.confstr = conffile.read()
+            #conffile.close()
+            #exec self.confstr
+        #except:
+        #    pass
 
         # Set Default Configuration Options
+
+        self.dataroot = '/'
 
         if self.siteurl is None:
             self.siteurl = "http://localhost/databrowse"
@@ -236,14 +244,14 @@ class web_support:
             self.logouturl = "http://localhost/logout"
             pass
 
-        if not environ["REMOTE_USER"]:
-            raise Exception("User Not Logged In")
-        else:
-            self.remoteuser = environ["REMOTE_USER"]
+        #if not environ["REMOTE_USER"]:
+        #    raise Exception("User Not Logged In")
+        #else:
+        #    self.remoteuser = environ["REMOTE_USER"]
 
-        if self.pluginpath is None:
-            self.pluginpath = os.path.join(self.webdir, "plugins")
-            pass
+        #if self.pluginpath is None:
+        #    self.pluginpath = os.path.join(self.webdir, "plugins")
+        #    pass
 
         if self.icondbpath is None:
             self.icondbpath = os.path.join(os.path.dirname(databrowse.support.__file__), "iconmap.conf")
@@ -289,7 +297,7 @@ class web_support:
             self.debugging = False
             pass
 
-        self.menu = menu_support(self.siteurl, self.logouturl, self.remoteuser)
+        self.menu = menu_support(self.siteurl, self.logouturl, "")
 
         assert(self.dataroot is not None)
 

@@ -33,7 +33,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://thermal.cnde.iastate.edu",
-    packages=find_packages(),
+    packages=find_packages(exclude=['databrowse_wsgi']),
     license="GNU GPL v3",
     use_hg_version=True,
     setup_requires=["hgtools", "setuptools_hg"],
