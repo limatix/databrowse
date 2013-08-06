@@ -1,0 +1,89 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:specimengroup" mode="full">
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js</xsl:attribute></script>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/jquery-ui-1.10.3/themes/base/minified/jquery-ui.min.css</xsl:attribute></link>
+	<script type="text/javascript">
+		<![CDATA[
+			$(function () {
+				$( "#datepicker" ).datepicker();
+				$("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+			});
+
+			window.onbeforeunload = function () {
+                    return 'You are about to leave a page that may have unsaved data.';
+                }
+
+            // Error Saving Callback Function
+            function saveErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Adding Action Item: " + errorThrown)
+            }
+
+            function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data);
+                if(data=="Action Item Added Successfully")
+                {
+                    window.onbeforeunload = null
+                    window.location.href = window.location.href.replace(window.location.search, "");
+                }
+            }
+
+			function submitform () {
+                // Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax&addactionitem";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax&addactionitem";
+                }
+
+                // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('date', $('#datepicker').val());
+                saveform.append('perfby', $('#perfby').val());
+                saveform.append('action', $('#action').val());
+                saveform.append('notes', $('#notes').val());
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
+                    dataType: "text",
+                    error: saveErrorCallback,
+                    processData: false,
+                    success: saveSuccessCallback,
+                    type: 'POST',
+                    url: ajaxurl
+                    });
+            }
+		]]>
+	</script>
+	<h1>Adding Action Log Item to <xsl:value-of select="specimen:specimenid"/></h1>
+	<form>
+		<dl class="block-layout">
+			<dt><label class="required">Date</label></dt>
+			<dd>
+				<input type="text" id="datepicker" name="date" size="30" />
+			</dd>
+			<dt><label class="required">Performed By</label></dt>
+			<dd>
+				<input type="text" id="perfby" name="perfby" size="30" />
+			</dd>
+			<dt><label class="required">Action</label></dt>
+			<dd>
+				<input type="text" id="action" name="action" style="width:660px" />
+			</dd>
+			<dt><label>Notes</label></dt>
+			<dd>
+				<textarea name="notes" id="notes" rows="10" style="width:660px" />
+			</dd>
+			<dd>
+				<div class="btn-group clearfix">
+					<a class="btn success" onclick="submitform()" style="cursor:pointer">Add</a>
+					<a class="btn error" onclick="window.location.href = window.location.href.replace(window.location.search, '')" style="cursor:pointer">Cancel</a>
+				</div>
+			</dd>
+		</dl>
+	</form>
+</xsl:template>
+

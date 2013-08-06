@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/renderers/db_specimen.py - Default Text Renderer """
+""" plugins/renderers/db_xml_generic.py - Default Text Renderer """
 
 import os
 import qrcode
@@ -25,49 +25,40 @@ import StringIO
 import subprocess
 from lxml import etree
 from renderer_support import renderer_class
-import specimen_support as ss
 
 
-class db_specimen(renderer_class):
+class db_specimen_group(renderer_class):
     """ Default Renderer - Basic Output for Any XML File """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/specimen"
     _namespace_local = "specimen"
     _default_content_mode = "full"
-    _default_style_mode = "view_specimen_data"
+    _default_style_mode = "view_specimen_group"
     _default_recursion_depth = 2
 
     def getContent(self):
         if self._content_mode != "raw" and self._caller == "databrowse" and "ajax" not in self._web_support.req.form:
-            specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
-            xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE)
+            f = open(self._fullpath, 'r')
+            xml = etree.parse(f)
+            f.close()
             filerelpath = os.path.join(os.path.dirname(self._relpath), os.path.splitext(os.path.basename(self._relpath))[0] + "_files")
             filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
             xmlroot = xml.getroot()
             if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
                 import db_directory.db_directory as db_directory_module
-                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
+                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen_group", "db_directory", style_mode="empty")
                 content = renderer.getContent()
                 xmlroot.append(content)
-            group = xml.xpath('specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})
-            if len(group) > 0:
-                groupid = group[0].text
-                if os.access(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg'), os.R_OK) and os.path.exists(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg')):
-                    group[0].set('link', self.getURL('/specimens/' + groupid + '.sdg'))
-            templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
+            templatefile = self.getURL("/specimens/src/specimengroup.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
             xmlroot.set("templatefile", templatefile)
             xmlroot.set("barcode", self.getURL(self._relpath, content_mode="raw", barcode="barcode"))
             xmlroot.set("printbarcode", self.getURL(self._relpath, content_mode="raw", printbarcode="printbarcode"))
             return xmlroot
-        elif self._content_mode != "raw" and self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
-            specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
-            xml = ss.GetSpecimen(specimen, ss.OUTPUT_ELEMENT)
-            group = xml.xpath('specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})
-            if len(group) > 0:
-                groupid = group[0].text
-                if os.access(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg'), os.R_OK) and os.path.exists(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg')):
-                    group[0].set('link', self.getURL('/specimens/' + groupid + '.sdg'))
-            return xml
+        elif self._content_mode != "raw" and self._caller == "db_specimen_database" and self._style_mode == 'specimen_group_list':
+            f = open(self._fullpath, 'r')
+            xml = etree.parse(f)
+            f.close()
+            return xml.getroot()
         elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
             if "file" in self._web_support.req.form:
                 filestring = self._web_support.req.form["file"].value
@@ -163,54 +154,7 @@ class db_specimen(renderer_class):
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
         elif self._content_mode == "raw":
-            if "barcode" in self._web_support.req.form:
-                if self.CacheFileExists("barcode", 'png'):
-                    size = os.path.getsize(self.getCacheFileName("barcode", 'png'))
-                    f = self.getCacheFileHandler('rb', "barcode", 'png')
-                    self._web_support.req.response_headers['Content-Type'] = 'image/png'
-                    self._web_support.req.response_headers['Content-Length'] = str(size)
-                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
-                    self._web_support.req.output_done = True
-                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
-                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
-                    else:
-                        return iter(lambda: f.read(1024))
-                else:
-                    sf = open(self._fullpath, "r")
-                    sdbfile = etree.parse(sf)
-                    sf.close()
-                    sdbroot = sdbfile.getroot()
-                    sdbelem = sdbroot.xpath('specimen:specimenid', namespaces={"specimen": "http://thermal.cnde.iastate.edu/specimen"})[0]
-                    img = qrcode.make('<specimen/>'+sdbelem.text)._img
-                    img.thumbnail((201, 201), Image.ANTIALIAS)
-                    output = StringIO.StringIO()
-                    img.save(output, format="png")
-                    f = self.getCacheFileHandler('wb', "barcode", 'png')
-                    img.save(f, format="png")
-                    f.close()
-                    self._web_support.req.response_headers['Content-Type'] = 'image/png'
-                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
-                    self._web_support.req.output_done = True
-                    return [output.getvalue()]
-            if "printbarcode" in self._web_support.req.form:
-                try:
-                    sf = open(self._fullpath, "r")
-                    sdbfile = etree.parse(sf)
-                    sf.close()
-                    sdbroot = sdbfile.getroot()
-                    sdbelem = sdbroot.xpath('specimen:specimenid', namespaces={"specimen": "http://thermal.cnde.iastate.edu/specimen"})[0]
-                    os.environ["HOME"] = "/home/www/.home"
-                    subprocess.call(["/usr/local/bin/printQRcode", '<specimen/>'+sdbelem.text])
-                except Exception as err:
-                    self._web_support.req.output = "Error Printing Barcode:  " + err
-                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
-                    return [self._web_support.req.return_page()]
-                else:
-                    self._web_support.req.output = "Barcode Sent to Printer!"
-                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
-                    return [self._web_support.req.return_page()]
-            else:
-                raise self.RendererException("Raw Mode is Not Supported by this Plugin")
+            raise self.RendererException("Raw Mode is Not Supported by this Plugin")
         else:
             return None
         pass

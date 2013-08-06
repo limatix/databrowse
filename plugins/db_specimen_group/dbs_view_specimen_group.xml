@@ -1,30 +1,5 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="specimen:specimen" mode="full">
-    <script type="text/javascript">
-        var printurl = "<xsl:value-of select="@printbarcode"/>";
-        <![CDATA[
-            function printbarcode() {
-                $("#loading").text("Printing...");
-                $("#loading").fadeIn(500);
-                $.ajax({
-                    type: "POST",
-                    url: printurl
-                }).done(function(msg) { 
-                    alert(msg); 
-                    $("#loading").fadeOut(500);
-                }); 
-            }
-        ]]>
-    </script>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="specimen:specimengroup" mode="full">
     <div style="float:right; width:300px; margin-left: 15px;">
-        <table class="cream" style="width:278px;">
-            <thead>
-                <tr><th>Specimen Barcode</th></tr>
-            </thead>
-            <tbody>
-                <tr><td style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="@barcode"/></xsl:attribute></img><br/>
-                <a onclick="printbarcode()" style="cursor:pointer">Print Barcode on Label Printer</a></td></tr>
-            </tbody>
-        </table>
         <xsl:if test="count(dir:dir/*)">
             <table class="cream">
                 <thead>
@@ -36,23 +11,17 @@
             </table>
         </xsl:if>
     </div>
-    <h1>Specimen Details</h1>
+    <h1>Specimen Group Details</h1>
     <table class="cream" style="width:399px;">
         <tbody>
-            <tr><th style="width:125px;">Specimen ID</th><td><xsl:value-of  select="specimen:specimenid"/></td></tr>
-            <tr><th>Specimen Group</th>
-            <td>
-                <xsl:choose>
-                    <xsl:when test="specimen:groupid/@link">
-                        <a>
-                            <xsl:attribute name="href"><xsl:value-of select="specimen:groupid/@link"/></xsl:attribute>
-                            <xsl:value-of select="specimen:groupid/."/>
-                        </a>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="specimen:groupid/."/>
-                    </xsl:otherwise>
-                </xsl:choose>
+            <tr><th style="width:125px;">Group ID</th><td><xsl:value-of  select="specimen:groupid"/></td></tr>
+            <tr><th>Tags</th><td>
+                <xsl:for-each select="specimen:identifiertags/*">
+                    <xsl:value-of select="."/>
+                    <xsl:choose>
+                        <xsl:when test="position() != last()">, </xsl:when>
+                    </xsl:choose>
+                </xsl:for-each>
             </td></tr>
         </tbody>
     </table>
@@ -61,9 +30,9 @@
     <xsl:apply-templates select="specimen:geometry"/>
     <xsl:apply-templates select="specimen:flawparameters"/>
     <xsl:apply-templates mode="full"/>
-    <h3>Face Reference</h3>
+    <!--<h3>Face Reference</h3>
     <xsl:call-template name="specimen-references"/>
-    <xsl:call-template name="specimen-directions"/>
+    <xsl:call-template name="specimen-directions"/>-->
     <xsl:call-template name="specimen-notes"/>
     <xsl:call-template name="specimen-log"/>
 </xsl:template>

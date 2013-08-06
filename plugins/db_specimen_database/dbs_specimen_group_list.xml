@@ -18,7 +18,7 @@
     <script type="text/javascript" defer="true">
         <![CDATA[
             $(document).ready(function() {
-                $('#specimentable').dataTable({
+                $('#specimengrouptable').dataTable({
                     "sDom": 'RlCfrtip',
                     "aoColumnDefs": [
                         { "bVisible": false, "aTargets": [ 1 ] }
@@ -49,45 +49,23 @@
             text-align: center;
         }
     </style>
-    <h1>Specimen Database</h1>
-    <table class="cream full-width" id="specimentable">
+    <h1>Specimen Groups</h1>
+    <table class="cream full-width" id="specimengrouptable">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Group</th>
-                <th>Material</th>
-                <th>Shape</th>
-                <th>Dimensions</th>
-                <th>Crack Size</th>
-                <th>Crack Location</th>
+                <th>Source</th>
+                <th>In Charge</th>
+                <th>Tags</th>
             </tr>
         </thead>
         <tbody>
-            <xsl:for-each select="//specimen:specimen">
+            <xsl:for-each select="//specimen:specimengroup">
                 <tr>
-                    <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="specimen:specimenid/."/></a></td>
-                    <td>
-                        <xsl:choose>
-                            <xsl:when test="specimen:groupid/@link">
-                                <a>
-                                    <xsl:attribute name="href"><xsl:value-of select="specimen:groupid/@link"/></xsl:attribute>
-                                    <xsl:value-of select="specimen:groupid/."/>
-                                </a>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="specimen:groupid/."/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </td>
-                    <td><xsl:value-of select="specimen:physicalproperties/specimen:material/."/></td>
-                    <td><xsl:value-of select="specimen:geometry/specimen:shape/."/></td>
-                    <td><xsl:for-each select="specimen:geometry/specimen:dimension">
-                        <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
-                    </xsl:for-each></td>
-                    <td><xsl:value-of select="specimen:flawparameters/specimen:flawsize/."/>&#160;<xsl:value-of select="specimen:flawparameters/specimen:flawsize/@units"/></td>
-                    <td><xsl:for-each select="specimen:flawparameters/specimen:location/*">
-                        <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
-                    </xsl:for-each></td>
+                    <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="specimen:groupid/."/></a></td>
+                    <td><xsl:value-of select="specimen:provenance/specimen:source/."/></td>
+                    <td><xsl:value-of select="specimen:provenance/specimen:incharge/."/></td>
+                    <td><xsl:value-of select="specimen:identifiertags/."/></td>
                 </tr>
             </xsl:for-each>
         </tbody>
