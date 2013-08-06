@@ -75,7 +75,7 @@ class db_directory(renderer_class):
                 if handler == "db_directory":
                     renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
                 else:
-                    exec "import %s.%s as %s_module" % (handler, handler, handler)
+                    exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
                     exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
                 if os.path.islink(itemfullpath):

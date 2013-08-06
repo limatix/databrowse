@@ -88,11 +88,12 @@ def application(environ, start_response):
     os.environ["HOME"] = "/home/www/.home"
     try:
         # Add paths and import support modules
-        if os.path.dirname(environ['SCRIPT_FILENAME']) not in sys.path:
-            sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
-        if os.path.dirname(environ['SCRIPT_FILENAME'] + '/support/') not in sys.path:
-            sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
-        import web_support as db_web_support_module
+        #if os.path.dirname(environ['SCRIPT_FILENAME']) not in sys.path:    Removed 8/5/13 - Transition to Installed Modules
+        #    sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
+        #if os.path.dirname(environ['SCRIPT_FILENAME'] + '/support/') not in sys.path:
+        #    sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
+        #import web_support as db_web_support_module
+        import databrowse.support.web_support as db_web_support_module
 
         # Set up web_support class with environment information
         db_web_support = db_web_support_module.web_support(environ, start_response)
@@ -121,12 +122,13 @@ def application(environ, start_response):
             pass
 
         # Import Plugin Directory
-        if db_web_support.pluginpath not in sys.path:
-            sys.path.append(db_web_support.pluginpath)
+        #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
+        #    sys.path.append(db_web_support.pluginpath)
 
         # Determine handler for requested path
-        import handler_support as handler_support_module
-        handler_support = handler_support_module.handler_support(db_web_support.pluginpath, db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
+        #import handler_support as handler_support_module
+        import databrowse.support.handler_support as handler_support_module
+        handler_support = handler_support_module.handler_support(db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
         handler = handlers[-1]
 
@@ -137,7 +139,7 @@ def application(environ, start_response):
 
         # Get A Handle to The Rendering Plugin
         caller = "databrowse"
-        exec "import %s.%s as %s_module" % (handler, handler, handler)
+        exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
         exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\

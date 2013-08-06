@@ -22,6 +22,8 @@ import os
 import os.path
 import magic
 import ConfigParser
+import pkgutil
+import databrowse.plugins
 
 
 class handler_support:
@@ -34,25 +36,27 @@ class handler_support:
     directorystylesheets = []
     hiddenstylesheets = []
 
-    def __init__(self, pluginpath, icondbpath, hiddenfiledbpath, directorypluginpath):
+    def __init__(self, icondbpath, hiddenfiledbpath, directorypluginpath):
         """ Load up all of the handler plugins and icon database """
         # Reset Handler List
         self._handlers = {}
         # Parse Handlers
-        pluginlist = os.listdir(pluginpath)
+        #pluginlist = os.listdir(pluginpath)  # Removed 8/6/13 - Transition to Installed Modules
+        pkgpath = os.path.dirname(databrowse.plugins.__file__)   # Added 8/6/13 - Transition to Installed Modules
+        pluginlist = [name for _, name, _ in pkgutil.iter_modules([pkgpath])]  # Added 8/6/13 - Transition to Installed Modules
         pluginlist.sort()
         for filename in pluginlist:
             if filename.startswith("db_"):
                 modulename = filename
                 functions = None
                 try:
-                    exec "import %s.handlers" % modulename
-                    exec "functions = dir(%s.handlers)" % modulename
+                    exec "import databrowse.plugins.%s.handlers" % modulename  # Added 8/6/13 - Transition to Installed Modules
+                    exec "functions = dir(databrowse.plugins.%s.handlers)" % modulename  # Added 8/6/13 - Transition to Installed Modules
                     for function in functions:
                         if not function.startswith("dbh_"):    # Ignore all functions not starting with dbh_
                             pass
                         else:
-                            exec "self._handlers['%s']=(%s.handlers.%s)" % (function, modulename, function)
+                            exec "self._handlers['%s']=(databrowse.plugins.%s.handlers.%s)" % (function, modulename, function)  # Added 8/6/13 - Transition to Installed Modules
                             pass
                         pass
                     pass
