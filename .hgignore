@@ -5,3 +5,8 @@ syntax: glob
 *~
 *.pyc
 web.conf
+setuptools_hg-*
+hgtools-*
+build/lib.*
+*.egg-info*
+*.egg*
