@@ -83,32 +83,32 @@ class wsgi_req:
     def return_error(self, status=500):
         """ Return Error Message """
         if status == 400:
-            self.status = '400 Bad Request'
+            self.status = 'Bad Request'
         elif status == 401:
-            self.status = '401 Unauthorized'
+            self.status = 'Unauthorized'
         elif status == 403:
-            self.status = '403 Forbidden'
+            self.status = 'Forbidden'
         elif status == 404:
-            self.status = '404 Page Not Found'
+            self.status = 'Page Not Found'
         elif status == 405:
-            self.status = '405 Method Not Allowed'
+            self.status = 'Method Not Allowed'
         elif status == 406:
-            self.status = '406 Not Acceptable'
+            self.status = 'Not Acceptable'
         elif status == 500:
-            self.status = '500 Internal Server Error'
+            self.status = 'Internal Server Error'
         elif status == 501:
-            self.status = '501 Not Implemented'
+            self.status = 'Not Implemented'
         elif status == 503:
-            self.status = '503 Service Unavailable'
+            self.status = 'Service Unavailable'
         else:
-            self.status = '500 Internal Server Error'
+            self.status = 'Internal Server Error'
 
         #self.output_done = True
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
         self.response_headers['Content-Length'] = str(len(self.status.encode('utf-8')))
         #self.start_response(self.status, self.response_headers.items())
-        return [self.status.encode('utf-8')]
+        raise Exception(self.status)
 
     pass
 

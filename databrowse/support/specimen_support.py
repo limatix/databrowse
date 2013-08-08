@@ -62,7 +62,14 @@ def GetSpecimen(specimen, output=OUTPUT_STDOUT):
         # Locate the Group File
         filename = os.path.join(specimendb, groupid + '.sdg')
         if not os.path.exists(filename):
-            return specimenxml
+            if output == OUTPUT_STDOUT:
+                print etree.tostring(specimenxml, pretty_print=True)
+            elif output == OUTPUT_ELEMENT:
+                return specimenxml
+            elif output == OUTPUT_ETREE:
+                return specimenxml.getroottree()
+            else:
+                raise SpecimenException('Invalid Return Type')
         elif not os.access(filename, os.R_OK):
             raise SpecimenException('Unable to Access Specimen Database')
 
@@ -94,7 +101,7 @@ def GetSpecimen(specimen, output=OUTPUT_STDOUT):
         elif output == OUTPUT_ELEMENT:
             return specimenxml
         elif output == OUTPUT_ETREE:
-            return specimenxml.getroot()
+            return specimenxml.getroottree()
         else:
             raise SpecimenException('Invalid Return Type')
     else:
