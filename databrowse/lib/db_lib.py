@@ -18,10 +18,13 @@
 ###############################################################################
 """ databrowse.py - Library to Access Databrowse Functionality """
 
-import sys
 import os
-import string
 from lxml import etree
+
+OUTPUT_STRING = 0
+OUTPUT_ELEMENT = 1
+OUTPUT_ETREE = 2
+OUTPUT_STDOUT = 3
 
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -79,7 +82,7 @@ class FileResolver(etree.Resolver):
     pass
 
 
-def GetXML(filename, **params):
+def GetXML(filename, output=OUTPUT_ELEMENT, **params):
     """ Get XML Representation """
 
     os.environ["HOME"] = "/home/www/.home"
@@ -139,8 +142,15 @@ def GetXML(filename, **params):
     # Register Primary Namespace
     etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
-    xml = etree.ElementTree(renderer.getContent())
-    db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-    db_web_support.req.output = etree.tostring(xml)
-    return db_web_support.req.output
-    pass
+    if output == OUTPUT_ETREE:
+        return etree.ElementTree(renderer.getContent())
+    elif output == OUTPUT_STRING:
+        xmltree = etree.ElementTree(renderer.getContent())
+        return etree.tostring(xmltree)
+    elif output == OUTPUT_ELEMENT:
+        return renderer.getContent()
+    elif output == OUTPUT_STDOUT:
+        xmltree = etree.ElementTree(renderer.getContent())
+        print etree.tostring(xmltree)
+    else:
+        return etree.ElementTree(renderer.getContent())

@@ -24,7 +24,7 @@ from lxml import etree
 specimendb = '/databrowse/specimens'
 NS = {"specimen": "http://thermal.cnde.iastate.edu/specimen"}
 NSSTR = "{http://thermal.cnde.iastate.edu/specimen}"
-OUTPUT_STDOUT = 0
+OUTPUT_STRING = 0
 OUTPUT_ELEMENT = 1
 OUTPUT_ETREE = 2
 
@@ -34,7 +34,7 @@ class SpecimenException(Exception):
     pass
 
 
-def GetSpecimen(specimen, output=OUTPUT_STDOUT):
+def GetSpecimen(specimen, output=OUTPUT_STRING):
     """ Fetch the XML Representation of a Specimen with Specimen Group Data Integrated """
 
     # Locate the Speicmen File
@@ -62,7 +62,7 @@ def GetSpecimen(specimen, output=OUTPUT_STDOUT):
         # Locate the Group File
         filename = os.path.join(specimendb, groupid + '.sdg')
         if not os.path.exists(filename):
-            if output == OUTPUT_STDOUT:
+            if output == OUTPUT_STRING:
                 print etree.tostring(specimenxml, pretty_print=True)
             elif output == OUTPUT_ELEMENT:
                 return specimenxml
@@ -85,7 +85,7 @@ def GetSpecimen(specimen, output=OUTPUT_STDOUT):
         _combine_element(specimenxml, groupxml)
 
         # Output
-        if output == OUTPUT_STDOUT:
+        if output == OUTPUT_STRING:
             print etree.tostring(specimenxml, pretty_print=True)
         elif output == OUTPUT_ELEMENT:
             return specimenxml
@@ -96,7 +96,7 @@ def GetSpecimen(specimen, output=OUTPUT_STDOUT):
         pass
 
     elif len(groupidelem) == 0:
-        if output == OUTPUT_STDOUT:
+        if output == OUTPUT_STRING:
             print etree.tostring(specimenxml, pretty_print=True)
         elif output == OUTPUT_ELEMENT:
             return specimenxml
