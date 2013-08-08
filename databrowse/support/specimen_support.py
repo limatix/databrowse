@@ -112,7 +112,9 @@ def GetSpecimen(specimen, output=OUTPUT_STRING):
 
 def _combine_element(one, other):
     """ Private Function to Recursively Combine etree Elements, Preferencing the First Element """
-    mapping = {el.tag: el for el in one}
+    mapping = {}
+    for el in one:
+        mapping[el.tag] = el
     for el in [el for el in other if el.tag not in [NSSTR + 'actionlog', NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groupid']]:
         if len(el) == 0:
             # Not nested
