@@ -21,7 +21,7 @@
 
 def dbh_xlg(path, contenttype, extension):
     """ Generic XLG Handler - Returns xlg_viewer for all XLG files """
-    if extension == "xlg":
+    if extension == "xlg" or extension == "xlp":
         return "db_datacollect_v2_viewer"
     else:
         return False
