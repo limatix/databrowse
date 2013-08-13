@@ -285,4 +285,10 @@
     <entry key="xducerxoffset">Transducer X Offset</entry>
     <entry key="xduceryoffset">Transducer Y Offset</entry>
     <entry key="xducerzoffset">Transducer Z Offset</entry>
+    <entry key="processinglog">Processing Log</entry>
+    <entry key="vibropower">Vibrometer Power</entry>
+    <entry key="vibropowerplot">Vibrometer Power Plot</entry>
+    <entry key="ppstrainmean">Strain Mean</entry>
+    <entry key="ppstrainmedian">Strain Median</entry>
+    <entry key="ppstrainstd">Strain St. Dev.</entry>
 </db:fieldmap>
