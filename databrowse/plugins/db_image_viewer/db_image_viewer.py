@@ -122,13 +122,21 @@ class db_image_viewer(renderer_class):
                     if tag in ('JPEGThumbnail', 'TIFFThumbnail'):
                         continue
                     newxmltag = etree.SubElement(xmlchild, "tag", name=tag)
-                    newxmltag.text = repr(exiftags[tag].printable)
+                    tagtext = exiftags[tag].printable
+                    if not isinstance(tagtext, basestring):
+                        newxmltag.text = repr(tagtext)
+                    else:
+                        newxmltag.text = tagtext
                     pass
 
                 xmlchild = etree.SubElement(xmlroot, "ricohtags")
                 for tag in ricohtags:
                     newxmltag = etree.SubElement(xmlchild, "tag", name=str(tag))
-                    newxmltag.text = repr(ricohtags[tag])
+                    tagtext = ricohtags[tag].printable
+                    if not isinstance(tagtext, basestring):
+                        newxmltag.text = repr(tagtext)
+                    else:
+                        newxmltag.text = tagtext
                     pass
 
                 return xmlroot
