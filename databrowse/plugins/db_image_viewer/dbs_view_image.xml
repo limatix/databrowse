@@ -134,4 +134,9 @@
     <entry key="WhiteBalance">White Balance</entry>
     <entry key="ISO">ISO</entry>
     <entry key="Sharpness">Sharpness</entry>
+    <entry key="GPSLongitudeRef">Longitude Reference</entry>
+    <entry key="GPSLatitudeRef">Longitude Reference</entry>
+    <entry key="GPSLongitude">Longitude</entry>
+    <entry key="GPSLatitude">Longitude</entry>
+    <entry key="GPSAltitude">Altitude</entry>
 </db:fieldmap>
