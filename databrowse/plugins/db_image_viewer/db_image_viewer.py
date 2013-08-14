@@ -132,7 +132,7 @@ class db_image_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "ricohtags")
                 for tag in ricohtags:
                     newxmltag = etree.SubElement(xmlchild, "tag", name=str(tag))
-                    tagtext = ricohtags[tag].printable
+                    tagtext = ricohtags[tag]
                     if not isinstance(tagtext, basestring):
                         newxmltag.text = repr(tagtext)
                     else:

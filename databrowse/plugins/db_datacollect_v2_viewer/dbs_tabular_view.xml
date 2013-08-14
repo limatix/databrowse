@@ -114,6 +114,9 @@
             <xsl:when test="local-name() = 'measchecklist'">
                 <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
             </xsl:when>
+            <xsl:when test="local-name() = 'vibropowerplot'">
+                <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
+            </xsl:when>
             <xsl:when test="local-name() = 'dgsfile'">
                 <a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></xsl:attribute><xsl:value-of select="key('tablekey', concat(generate-id($row), '|', local-name()))"/></a>
             </xsl:when>
@@ -200,6 +203,8 @@
             </tr>
         </tbody>
     </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://wwww.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dcp:provenance" mode="pagetop">
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:configstr" mode="pagetop">
 </xsl:template>
