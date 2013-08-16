@@ -17,8 +17,14 @@
     </xsl:element>-->
     <script type="text/javascript" defer="true">
         <![CDATA[
+            var table;
             $(document).ready(function() {
-                $('#specimentable').dataTable({
+                $('#specimentable tr').click( function() {
+                        $(this).toggleClass('row_selected');
+                        count = $('#specimentable tr.row_selected').length;
+                        $('#printbtn').text('Print Barcodes for ' + String(count) + ' Specimens')
+                    } );
+                table = $('#specimentable').dataTable({
                     "sDom": 'RlCfrtip',
                     "aoColumnDefs": [
                         { "bVisible": false, "aTargets": [ 1 ] }
@@ -28,7 +34,20 @@
                     "sPaginationType": "full_numbers",
                     "bStateSave": true
                 });
-            });         
+            });    
+            function printlabels() {
+                    table.$('tr.row_selected').each(function(index,value) {
+                    url = value.cells[0].children[0].href + '?content_mode=raw&printbarcode=printbarcode';
+                    tag = value.cells[0].children[0].innerHTML;
+                    $.ajax({
+                        type: "POST",
+                        url: url
+                    }).done(function(msg) {
+                        $("#loading").text(tag + ": "  + msg);
+                        $("#loading").fadeIn(500).delay(500).fadeOut(500);
+                    });
+                    })
+                }     
         ]]>
     </script>
     <xsl:element name="link">
@@ -47,6 +66,13 @@
         }
         .center {
             text-align: center;
+        }
+        #specimentable tr.even.row_selected td {
+            background-color: rgb(245, 237, 192);
+        }
+
+        #specimentable tr.odd.row_selected td {
+            background-color: rgb(235, 221, 177);
         }
     </style>
     <h1>Specimen Database</h1>
@@ -92,6 +118,8 @@
             </xsl:for-each>
         </tbody>
     </table>
+    <br/>
+    <div class="btn-group clearfix"><a id='printbtn' class="btn error" onclick="printlabels()" style="cursor:pointer">Print Barcodes for Selected Specimens</a></div>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimendb="http://thermal.cnde.iastate.edu/databrowse/specimendb" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimendb:dir" mode="summary">
     <xsl:apply-templates select="specimendb:dir" mode="title"/>
