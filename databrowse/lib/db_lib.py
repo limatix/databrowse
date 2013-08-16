@@ -20,6 +20,7 @@
 
 import os
 from lxml import etree
+from databrowse.support.debug_support import Debugger
 
 OUTPUT_STRING = 0
 OUTPUT_ELEMENT = 1
@@ -154,3 +155,6 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         print etree.tostring(xmltree)
     else:
         return etree.ElementTree(renderer.getContent())
+
+
+DebugGetXML = Debugger(GetXML)

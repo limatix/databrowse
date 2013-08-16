@@ -27,6 +27,14 @@ NSSTR = "{http://thermal.cnde.iastate.edu/specimen}"
 OUTPUT_STRING = 0
 OUTPUT_ELEMENT = 1
 OUTPUT_ETREE = 2
+norecursion = []
+attributekeys = { 
+                  NSSTR + 'dimension': 'direction',
+                  NSSTR + 'direction': 'name',
+                  NSSTR + 'reference': 'face',
+                  NSSTR + 'plane': 'face'
+                }
+mergechildren = [NSSTR + 'actionlog', NSSTR + 'markings']
 
 
 class SpecimenException(Exception):
@@ -109,32 +117,57 @@ def GetSpecimen(specimen, output=OUTPUT_STRING):
 
     pass
 
+def tagname(el):
+    if el.tag in attributekeys:
+        return el.tag + el.get(attributekeys[el.tag])
+    else:
+        return el.tag
 
 def _combine_element(one, other):
     """ Private Function to Recursively Combine etree Elements, Preferencing the First Element """
     mapping = {}
     for el in one:
-        mapping[el.tag] = el
-    for el in [el for el in other if el.tag not in [NSSTR + 'actionlog', NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groupid']]:
+        mapping[tagname(el)] = el
+    for el in [el for el in other if tagname(el) not in [NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groupid']]:
         if len(el) == 0:
             # Not nested
-            if not el.tag in mapping:
+            if not tagname(el) in mapping:
                 # An element with this name is not in the mapping
-                mapping[el.tag] = el
+                mapping[tagname(el)] = el
                 # Add it
                 el.set('fromgroup', 'true')
                 one.append(el)
             else:
-                mapping[el.tag].set('override', 'true')
+                mapping[tagname(el)].set('override', 'true')
 
         else:
-            try:
-                # Recursively process the element, and update it in the same way
-                _combine_element(mapping[el.tag], el)
-            except KeyError:
-                # Not in the mapping
-                mapping[el.tag] = el
-                el.set('fromgroup', 'true')
-                # Just add it
-                one.append(el)
+            if tagname(el) in norecursion:
+                if not tagname(el) in mapping:
+                     # Not in the mapping
+                    mapping[tagname(el)] = el
+                    el.set('fromgroup', 'true')
+                    # Just add it
+                    one.append(el)
+                else:
+                    mapping[tagname(el)].set('override', 'true')
+            elif tagname(el) in mergechildren:
+                if not tagname(el) in mapping:
+                    mapping[tagname(el)] = el
+                    for child in el:
+                        el.set('fromgroup', 'true')
+                    one.append(el)
+                else:
+                    for child in el:
+                        child.set('fromgroup', 'true')
+                        mapping[tagname(el)].append(child)
+            else:   
+                try:
+                    # Recursively process the element, and update it in the same way
+                    _combine_element(mapping[tagname(el)], el)
+                except KeyError:
+                    # Not in the mapping
+                    mapping[tagname(el)] = el
+                    el.set('fromgroup', 'true')
+                    # Just add it
+                    one.append(el)
     pass
