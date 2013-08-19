@@ -155,7 +155,7 @@
             <tr><th colspan="2">Geometry</th></tr>
         </thead>
         <tbody>
-            <tr><th style="width:125px;">Shape</th><td><xsl:value-of select="specimen:shape/."/></td></tr>
+            <tr><th style="width:125px;">Shape</th><td><xsl:apply-templates select="specimen:shape" mode="checkgroup"/><xsl:value-of select="specimen:shape/."/></td></tr>
             <xsl:for-each select="specimen:dimension">
                 <tr><th><xsl:value-of  select="@direction"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/>&#160;<xsl:value-of select="@units"/></td></tr>
             </xsl:for-each>
