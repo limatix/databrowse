@@ -15,6 +15,19 @@
             }
         ]]>
     </script>
+    <style>
+        .fromgroup {
+            color: blue;
+            font-weight: 900;
+        }
+        .override {
+            color: red;
+            font-weight: 900;
+        }
+    </style>
+    <xsl:if test="//@override">
+        <p class="notify-msg warning"><strong>Warning:</strong> Elements from group file are being overwritten by elements from the specimen file.</p>
+    </xsl:if>
     <div style="float:right; width:300px; margin-left: 15px;">
         <table class="cream" style="width:278px;">
             <thead>
@@ -66,6 +79,16 @@
     <xsl:call-template name="specimen-directions"/>
     <xsl:call-template name="specimen-notes"/>
     <xsl:call-template name="specimen-log"/>
+    <xsl:if test="//@override or //@fromgroup">
+        <div>
+            <xsl:if test="//@override">
+                <span class="override">Overwritten Fields</span>&#160;
+            </xsl:if>
+            <xsl:if test="//@fromgroup">
+                <span class="fromgroup">Fields from Group File</span>
+            </xsl:if>
+        </div>
+    </xsl:if>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" match="specimen:provenance">
     <table class="cream" style="width:399px;">
@@ -73,9 +96,9 @@
             <tr><th colspan="2">Provenance</th></tr>
         </thead>
         <tbody>
-            <tr><th style="width:125px;">Manufactured By</th><td><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
-            <tr><th>Source</th><td><xsl:value-of  select="specimen:source"/></td></tr>
-            <tr><th>In Charge</th><td><xsl:value-of  select="specimen:incharge"/></td></tr>
+            <tr><th style="width:125px;">Manufactured By</th><td><xsl:apply-templates select="specimen:manufacturedby" mode="checkgroup"/><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
+            <tr><th>Source</th><td><xsl:apply-templates select="specimen:source" mode="checkgroup"/><xsl:value-of  select="specimen:source"/></td></tr>
+            <tr><th>In Charge</th><td><xsl:apply-templates select="specimen:incharge" mode="checkgroup"/><xsl:value-of  select="specimen:incharge"/></td></tr>
         </tbody>
     </table>
 </xsl:template>
@@ -86,7 +109,7 @@
         </thead>
         <tbody>
             <xsl:for-each select="specimen:reference">
-                <tr><th><xsl:value-of  select="@face"/></th><td><xsl:value-of select="."/></td></tr>
+                <tr><th><xsl:value-of  select="@face"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -98,7 +121,7 @@
         </thead>
         <tbody>
             <xsl:for-each select="specimen:direction">
-                <tr><th><xsl:value-of  select="@name"/></th><td><xsl:value-of select="."/></td></tr>
+                <tr><th><xsl:value-of  select="@name"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -111,7 +134,7 @@
         </thead>
         <tbody>
             <xsl:for-each select="specimen:axesdefinition/*[1]/*">
-                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:value-of select="specimen:direction/@name"/></td></tr>
+                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:apply-templates select="specimen:direction" mode="checkgroup"/><xsl:value-of select="specimen:direction/@name"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -121,7 +144,7 @@
         </thead>
         <tbody>
             <xsl:for-each select="specimen:origin/*[1]/*">
-                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:value-of select="@face"/></td></tr>
+                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="@face"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -134,7 +157,7 @@
         <tbody>
             <tr><th style="width:125px;">Shape</th><td><xsl:value-of select="specimen:shape/."/></td></tr>
             <xsl:for-each select="specimen:dimension">
-                <tr><th><xsl:value-of  select="@direction"/></th><td><xsl:value-of select="."/>&#160;<xsl:value-of select="@units"/></td></tr>
+                <tr><th><xsl:value-of  select="@direction"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/>&#160;<xsl:value-of select="@units"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -156,7 +179,7 @@
                             <xsl:value-of select="$localname"/>                                    
                         </xsl:otherwise>
                     </xsl:choose>
-                </th><td><xsl:value-of select="."/><xsl:if test="@units">&#160;<xsl:value-of select="@units" /></xsl:if></td></tr>
+                </th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/><xsl:if test="@units">&#160;<xsl:value-of select="@units" /></xsl:if></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -198,7 +221,7 @@
                 <th>Date</th><th>Performed By</th><th>Action</th><th>Notes</th>
             </tr>
             <xsl:for-each select="specimen:actionlog/specimen:actionevent">
-                <tr>
+                <tr><xsl:apply-templates select="." mode="checkgroup"/>
                     <td><xsl:value-of select="specimen:date"/></td>
                     <td><xsl:value-of select="specimen:perfby"/></td>
                     <td><xsl:value-of select="specimen:action"/></td>
@@ -283,6 +306,16 @@
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:*" mode="full">
 </xsl:template>
-
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="*" mode="checkgroup">
+    <xsl:choose>
+        <xsl:when test="@fromgroup">
+            <xsl:attribute name="class">fromgroup</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@override">
+            <xsl:attribute name="class">override</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise/>
+    </xsl:choose>
+</xsl:template>
 
 
