@@ -129,7 +129,7 @@ def _combine_element(one, other):
     for el in one:
         mapping[tagname(el)] = el
     for el in [el for el in other if tagname(el) not in [NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groupid']]:
-        if len(el) == 0 and not in norecursion and not in mergechildren:
+        if len(el) == 0 and tagname(el) not in norecursion and  tagname(el) not in mergechildren:
             # Not nested
             if not tagname(el) in mapping:
                 # An element with this name is not in the mapping
