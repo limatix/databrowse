@@ -134,7 +134,7 @@
         </thead>
         <tbody>
             <xsl:for-each select="specimen:axesdefinition/*[1]/*">
-                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:apply-templates select="specimen:direction" mode="checkgroup"/><xsl:value-of select="specimen:direction/@name"/></td></tr>
+                <tr><th style="width:125px;"><xsl:value-of  select="local-name()"/></th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="specimen:direction/@name"/></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
