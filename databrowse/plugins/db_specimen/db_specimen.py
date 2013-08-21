@@ -40,7 +40,10 @@ class db_specimen(renderer_class):
     def getContent(self):
         if self._content_mode != "raw" and self._caller == "databrowse" and "ajax" not in self._web_support.req.form:
             specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
-            xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE)
+            if self._style_mode == "edit_specimen_data":
+                xml = etree.parse(self._fullpath)
+            else:
+                xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE)
             filerelpath = os.path.join(os.path.dirname(self._relpath), os.path.splitext(os.path.basename(self._relpath))[0] + "_files")
             filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
             xmlroot = xml.getroot()
