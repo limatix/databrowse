@@ -16,6 +16,14 @@
         <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
     </xsl:element>
     <style>
+        .dgcode {
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            max-width: 555px;
+        }
         .inlinelist {
             padding-left: 0px;
             padding-right: 0px;
@@ -225,7 +233,7 @@
                 <tr><th><abbr title="dc:clinfo">Checklist Name</abbr></th><td><xsl:value-of select="chx:clinfo"/></td></tr>
                 <tr><th><abbr title="dc:cltitle">Checklist Title</abbr></th><td><xsl:value-of select="chx:cltitle"/></td></tr>
                 <tr><th><abbr title="dc:measchecklist">Checklist Link</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:measchecklist"/></xsl:attribute><xsl:value-of select="dc:measchecklist"/></a></td></tr>
-                <xsl:if test="dc:dgsfile"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/></xsl:attribute><xsl:value-of select="dc:dgsfile"/></a></td></tr></xsl:if>
+                <xsl:if test="dc:dgsfile"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/></xsl:attribute><xsl:value-of select="dc:dgsfile"/></a><br/><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/>?content_mode=raw&amp;snapshot=1&amp;waveform=VibroFitImg</xsl:attribute></img></td></tr></xsl:if>
                 <xsl:if test="dc:setfile"><tr><th><abbr title="dc:setfile">Set File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:setfile"/></xsl:attribute><xsl:value-of select="dc:setfile"/></a></td></tr></xsl:if>
                 <tr><th><abbr title="dc:notes">Notes</abbr></th><td><xsl:call-template name="dc2-lf2p">
                         <xsl:with-param name="instr">
@@ -241,6 +249,13 @@
                         </xsl:when>
                         <xsl:when test="$localname = 'vibropowerplot'">
                             <tr><th><abbr title="dc:vibropowerplot">Vibrometer Power Plot</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div></td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'simulationoutput'">
+                            <tr><th><abbr title="dc:simulationoutput">Simulation Output</abbr></th><td>
+                                <pre class="prettyprint dgcode">
+                                    <xsl:value-of select="."/>
+                                </pre>
+                            </td></tr>
                         </xsl:when>
                         <xsl:otherwise>                            
                             <tr>
@@ -327,7 +342,7 @@
     <entry key="lmntoffset">Left Mount Offset</entry>
     <entry key="mounttype">Mount Type</entry>
     <entry key="neigs">Number of Eigenvalues</entry>
-    <entry key="rmountoffset">Right Mount Offset</entry>
+    <entry key="rmntoffset">Right Mount Offset</entry>
     <entry key="spclength">Specimen Length</entry>
     <entry key="spcmaterial">Specimen Material</entry>
     <entry key="spcmeshsize">Specimen Mesh Size</entry>
@@ -340,6 +355,25 @@
     <entry key="xducertype">Transducer Type</entry>
     <entry key="xducerxoffset">Transducer X Offset</entry>
     <entry key="xduceryoffset">Transducer Y Offset</entry>
+    <entry key="xducerzoffset">Transducer Z Offset</entry>
+    <entry key="vibrange">Vibrometer Range</entry>
+    <entry key="vib2range">Vibrometer 2 Range</entry>
+    <entry key="vib2signallevel">Vibrometer 2 Signal Level</entry>
+    <entry key="triggertimestamp">Trigger Timestamp</entry>
+    <entry key="simulation_xducertype">Simulation Transducer Type</entry>
+    <entry key="recordmeastimestamp">Save Measurement Timestamp</entry>
+    <entry key="loadcell">Load</entry>
+    <entry key="hostname">Host Name</entry>
+    <entry key="strain_ov_displacement">Dynamic Strain Coefficient</entry>
+    <entry key="simulationtype">Simulation Type</entry>
+    <entry key="simulationsteptime">Simulation Step Time</entry>
+    <entry key="simulationstarttime">Simulation Start Time</entry>
+    <entry key="simulationneigs">Simulation Frequency Count</entry>
+    <entry key="simulationeigsaround">Simulation Frequency Target</entry>
+    <entry key="simulationcrackx">Simulation Crack X</entry>
+    <entry key="simulationcracky">Simulation Crack Y</entry>
+    <entry key="simulationcrackz">Simulation Crack Z</entry>
+    <entry key="simulationendtime">Simulation End Time</entry>
     <entry key="processinglog">Processing Log</entry>
     <entry key="vibropower">Vibrometer Power</entry>
     <entry key="vibropowerplot">Vibrometer Power Plot</entry>
