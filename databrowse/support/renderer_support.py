@@ -132,7 +132,7 @@ class renderer_class(object):
         if custom is not None:
             formatstrings = custom
             pass
-        elif mode is "traditional":
+        elif mode == "traditional":
             formatstrings = [
                 (1024 ** 5, 'P'),
                 (1024 ** 4, 'T'),
@@ -141,7 +141,7 @@ class renderer_class(object):
                 (1024 ** 1, 'K'),
                 (1024 ** 0, 'B'),
             ]
-        elif mode is "alternative":
+        elif mode == "alternative":
             formatstrings = [
                 (1024 ** 5, ' PB'),
                 (1024 ** 4, ' TB'),
@@ -150,7 +150,7 @@ class renderer_class(object):
                 (1024 ** 1, ' KB'),
                 (1024 ** 0, (' byte', ' bytes')),
             ]
-        elif mode is "bitrate":
+        elif mode == "bitrate":
             formatstrings = [
                 (1024 ** 5, ' Pbps'),
                 (1024 ** 4, ' Tbps'),
@@ -159,7 +159,7 @@ class renderer_class(object):
                 (1024 ** 1, ' Kbps'),
                 (1024 ** 0, ' bps'),
             ]
-        elif mode is "frequency":
+        elif mode == "frequency":
             formatstrings = [
                 (1000 ** 5, ' PHz'),
                 (1000 ** 4, ' THz'),
@@ -168,7 +168,7 @@ class renderer_class(object):
                 (1000 ** 1, ' KHz'),
                 (1000 ** 0, ' Hz'),
             ]
-        elif mode is "time":
+        elif mode == "time":
             formatstrings = [
                 (4 ** 4, (' week', ' weeks')),
                 (7 ** 3, (' day', ' days')),
@@ -176,7 +176,7 @@ class renderer_class(object):
                 (60 ** 1, ' min'),
                 (60 ** 0, ' sec'),
             ]
-        elif mode is "verbose":
+        elif mode == "verbose":
             formatstrings = [
                 (1024 ** 5, (' petabyte', ' petabytes')),
                 (1024 ** 4, (' terabyte', ' terabytes')),
@@ -185,7 +185,7 @@ class renderer_class(object):
                 (1024 ** 1, (' kilobyte', ' kilobytes')),
                 (1024 ** 0, (' byte', ' bytes')),
             ]
-        elif mode is "iec":
+        elif mode == "iec":
             formatstrings = [
                 (1024 ** 5, 'Pi'),
                 (1024 ** 4, 'Ti'),
@@ -194,7 +194,7 @@ class renderer_class(object):
                 (1024 ** 1, 'Ki'),
                 (1024 ** 0, ''),
             ]
-        elif mode is "si":
+        elif mode == "si":
             formatstrings = [
                 (1000 ** 5, 'P'),
                 (1000 ** 4, 'T'),
@@ -255,7 +255,7 @@ class renderer_class(object):
 
     def isRaw(self):
         #print "isRaw being called"
-        if self._content_mode is "raw":
+        if self._content_mode == "raw":
             return True
         else:
             return False
@@ -272,7 +272,7 @@ class renderer_class(object):
         """ Return Full URL to a Relative Path """
         #print "getURL being called"
         # We need to tack in handler if handler is overridden
-        if self._handlers[-1] is not self.__class__.__name__ and "handler" not in kwargs:
+        if self._handlers[-1] != self.__class__.__name__ and "handler" not in kwargs:
             kwargs["handler"] = self.__class__.__name__
             pass
         elif "handler" in kwargs and kwargs["handler"] is None:
@@ -336,7 +336,7 @@ class renderer_class(object):
                 addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
                 pass
             returnlist = list(set(removelist + addlist))
-        exec "returnlist.sort(%s%s)" % ("reverse=True" if order is "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
         return returnlist
 
         pass
@@ -500,7 +500,7 @@ class renderer_class(object):
         # Let's first check if we have already loaded the standard stylesheets
         if filename is None:
             #print "Filename is still empty so let's see if we have loaded the default already"
-            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override is not True:
+            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override != True:
                 #print "We have loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
                 return
             else:

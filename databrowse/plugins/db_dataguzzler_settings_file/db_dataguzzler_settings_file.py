@@ -44,7 +44,7 @@ class db_dataguzzler_settings_file(renderer_class):
         else:
             if self._content_mode == "full":
                 icon = self._handler_support.GetIcon('application/x-dataguzzler-settings', 'set')
-                name = os.path.basename(self._relpath) if self._relpath is not '/' else os.path.basename(self._fullpath)
+                name = os.path.basename(self._relpath) if self._relpath != '/' else os.path.basename(self._fullpath)
                 downlink = self.getURL(self._relpath, content_mode="raw", download="true")
                 xmlroot = etree.Element('{%s}dgset' % self._namespace_uri, name=name, downlink=downlink, icon=icon)
 

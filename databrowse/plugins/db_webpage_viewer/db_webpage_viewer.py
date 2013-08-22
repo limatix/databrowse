@@ -37,7 +37,7 @@ class db_webpage_viewer(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode is "full":
+            if self._content_mode == "full":
                 xmlroot = etree.Element('{%s}dbhtml' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
                 if self.getSize() > 0:
                     f = open(self._fullpath, 'r')

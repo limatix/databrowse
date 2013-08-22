@@ -154,15 +154,15 @@ def application(environ, start_response):
             linkstring = db_web_support.siteurl
             itemslist = string.split(relpath, "/")[1:]
             count = 1
-            if itemslist[0] is not "":
+            if itemslist[0] != "":
                 topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (linkstring, db_web_support.resurl, linkstring)
                 pass
             for item in itemslist:
-                if item is not "" and count is not len(itemslist):
+                if item != "" and count != len(itemslist):
                     linkstring += "/" + item
                     topbarstring += '<a class="button" href="%s">%s</a>&gt;' % (linkstring, item)
                     pass
-                elif item is not "" and count is len(itemslist):
+                elif item != "" and count == len(itemslist):
                     linkstring += "/" + item
                     topbarstring += '<a class="button active" href="%s">%s</a>' % (linkstring, item)
                     pass
@@ -192,7 +192,7 @@ def application(environ, start_response):
             parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
             if "ajax" in db_web_support.req.form:
                 return renderer.getContent()
-            elif renderer.getContentMode() is "ajax":
+            elif renderer.getContentMode() == "ajax":
                 xml = etree.ElementTree(renderer.getContent())
                 style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))

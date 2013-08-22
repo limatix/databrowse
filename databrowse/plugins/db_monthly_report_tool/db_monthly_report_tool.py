@@ -47,7 +47,7 @@ class db_monthly_report_tool(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode is "full":
+            if self._content_mode == "full":
                 savedCWD = os.getcwd()
                 tempCWD = os.path.dirname(self._fullpath)
                 os.chdir(tempCWD)
@@ -62,7 +62,7 @@ class db_monthly_report_tool(renderer_class):
                 del module
                 del environcopy
                 return etree.XML(output)
-            elif self._content_mode is "raw":
+            elif self._content_mode == "raw":
                 savedCWD = os.getcwd()
                 tempCWD = os.path.dirname(self._fullpath)
                 os.chdir(tempCWD)

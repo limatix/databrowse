@@ -62,7 +62,7 @@ class db_directory(renderer_class):
         if "ajax" in self._web_support.req.form:
             xmlroot.set("ajaxreq", "True")
             pass
-        if recursion_depth is not 0:
+        if recursion_depth != 0:
             caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
             for item in dirlist:

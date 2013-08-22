@@ -861,9 +861,9 @@ class db_dataguzzler_data_file(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode is "full" or self._content_mode is "summary":
+            if self._content_mode == "full" or self._content_mode == "summary":
                 nestdepth = -1
-                if self._content_mode is "summary":
+                if self._content_mode == "summary":
                     nestdepth = 3
                     pass
 

@@ -35,7 +35,7 @@ class db_checklist_viewer(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode is "full":
+            if self._content_mode == "full":
                 etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
                 f = open(self._fullpath, 'r')
                 xml = etree.parse(f)

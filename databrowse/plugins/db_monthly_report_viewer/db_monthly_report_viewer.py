@@ -37,7 +37,7 @@ class db_monthly_report_viewer(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode is "full":
+            if self._content_mode == "full":
                 f = open(self._fullpath, 'r')
                 xmltree = etree.parse(f)
                 f.close()
