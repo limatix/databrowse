@@ -791,6 +791,7 @@ class db_dataguzzler_data_file(renderer_class):
                 RGBAmat2[:, 2] = RGBAmat[:, 1]
                 RGBAmat2[:, 3] = RGBAmat[:, 0]
                 pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+            self.plotroi(waveform)
             pylab.title(title)
             pylab.xlabel(coord[0] + " (" + units[0] + ")")
             pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -811,6 +812,7 @@ class db_dataguzzler_data_file(renderer_class):
                 RGBAmat2[:, 2] = RGBAmat[:, 1]
                 RGBAmat2[:, 3] = RGBAmat[:, 0]
                 pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+            self.plotroi(waveform)
             pylab.title(waveformname)
             pylab.xlabel(coord[0] + " (" + units[0] + ")")
             pylab.ylabel(coord[1] + " (" + units[1] + ")")
@@ -856,6 +858,22 @@ class db_dataguzzler_data_file(renderer_class):
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'png'))
         return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+
+    def plotroi(self, waveform):
+        ROIX1=dgm.GetMetaDatumWIDbl(waveform,"ROIX1",-1e12)
+        ROIX2=dgm.GetMetaDatumWIDbl(waveform,"ROIX2",1e12)
+        ROIY1=dgm.GetMetaDatumWIDbl(waveform,"ROIY1",-1e12)
+        ROIY2=dgm.GetMetaDatumWIDbl(waveform,"ROIY2",1e12)
+        if ROIX1 != -1e12 and ROIX2 != 1e12 and ROIY1 != -1e12 and ROIY2 != 1e12:
+            xlim = pylab.xlim()
+            ylim = pylab.ylim()
+            pylab.plot([ROIX1, ROIX2], [ROIY1, ROIY1], 'b-')
+            pylab.plot([ROIX1, ROIX2], [ROIY2, ROIY2], 'b-')
+            pylab.plot([ROIX1, ROIX1], [ROIY1, ROIY2], 'b-')
+            pylab.plot([ROIX2, ROIX2], [ROIY1, ROIY2], 'b-')
+            pylab.xlim(xlim)
+            pylab.ylim(ylim)
+        pass
 
     def getContent(self):
         if self._caller != "databrowse":
