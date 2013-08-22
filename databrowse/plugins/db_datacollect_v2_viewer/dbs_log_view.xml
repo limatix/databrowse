@@ -252,9 +252,9 @@
                         </xsl:when>
                         <xsl:when test="$localname = 'simulationoutput'">
                             <tr><th><abbr title="dc:simulationoutput">Simulation Output</abbr></th><td>
-                                <pre class="prettyprint dgcode">
+                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
                                     <xsl:value-of select="."/>
-                                </pre>
+                                </pre></xsl:if>
                             </td></tr>
                         </xsl:when>
                         <xsl:otherwise>                            
