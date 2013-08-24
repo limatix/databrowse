@@ -375,8 +375,8 @@
     <entry key="simulationcrackz">Simulation Crack Z</entry>
     <entry key="simulationendtime">Simulation End Time</entry>
     <entry key="processinglog">Processing Log</entry>
-    <entry key="vibropower">Vibrometer Power</entry>
-    <entry key="vibropowerplot">Vibrometer Power Plot</entry>
+    <entry key="vibropower">Thermal Power</entry>
+    <entry key="vibropowerplot">Thermal Power Plot</entry>
     <entry key="ppstrainmean">Strain Mean</entry>
     <entry key="ppstrainmedian">Strain Median</entry>
     <entry key="ppstrainstd">Strain St. Dev.</entry>
