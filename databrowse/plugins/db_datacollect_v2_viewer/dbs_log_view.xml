@@ -248,7 +248,7 @@
                             <tr><th><abbr title="dc:xducer">Transducer</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute><xsl:value-of select="."/></a></td></tr>
                         </xsl:when>
                         <xsl:when test="$localname = 'vibropowerplot'">
-                            <tr><th><abbr title="dc:vibropowerplot">Vibrometer Power Plot</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div></td></tr>
+                            <tr><th><abbr title="dc:vibropowerplot">Thermal Power Plot</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div></td></tr>
                         </xsl:when>
                         <xsl:when test="$localname = 'simulationoutput'">
                             <tr><th><abbr title="dc:simulationoutput">Simulation Output</abbr></th><td>
