@@ -46,17 +46,17 @@ class db_dataguzzler_settings_file(renderer_class):
                 icon = self._handler_support.GetIcon('application/x-dataguzzler-settings', 'set')
                 name = os.path.basename(self._relpath) if self._relpath != '/' else os.path.basename(self._fullpath)
                 downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-                xmlroot = etree.Element('{%s}dgset' % self._namespace_uri, name=name, downlink=downlink, icon=icon)
+                xmlroot = etree.Element('{%s}dgset' % self._namespace_uri, nsmap=self.nsmap, name=name, downlink=downlink, icon=icon)
 
                 f = open(self._fullpath, 'rb')
                 rawcontents = f.read()
                 contents = rawcontents.split("\r\n")[1]
                 contents = contents.split(";")
                 for item in contents:
-                    xmlchild = etree.SubElement(xmlroot, 'setting')
-                    name = etree.SubElement(xmlchild, 'name')
+                    xmlchild = etree.SubElement(xmlroot, 'setting', nsmap=self.nsmap)
+                    name = etree.SubElement(xmlchild, 'name', nsmap=self.nsmap)
                     name.text = item.split(" ")[0]
-                    value = etree.SubElement(xmlchild, 'value')
+                    value = etree.SubElement(xmlchild, 'value', nsmap=self.nsmap)
                     value.text = " ".join(item.split(" ")[1:])
 
                 return xmlroot

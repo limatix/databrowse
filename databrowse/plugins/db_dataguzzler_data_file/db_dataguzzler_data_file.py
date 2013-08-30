@@ -57,7 +57,7 @@ class db_dataguzzler_data_file(renderer_class):
 
         Chunk = dgf.nextchunk(dgfh)
         while Chunk:
-            newel = etree.Element("{%s}%s" % (self._namespace_uri, Chunk.Name))
+            newel = etree.Element("{%s}%s" % (self._namespace_uri, Chunk.Name), nsmap=self.nsmap)
             if (Chunk.Name in dgf_nestedchunks):
                 if nestdepth > 0:
                     nestedchunks = self.dumpxmlchunk(dgfh, nestdepth-1)
@@ -101,7 +101,7 @@ class db_dataguzzler_data_file(renderer_class):
                     ellist.append(newel)
                     Chunk = dgf.nextchunk(dgfh)
                     if Chunk.Name in ["DATARRYF", "DATARRYD"]:
-                        newel = etree.Element("{%s}%s" % (self._namespace_uri, "DATASVAL"))
+                        newel = etree.Element("{%s}%s" % (self._namespace_uri, "DATASVAL"), nsmap=self.nsmap)
                         if Chunk.Name == "DATARRYF":
                             dtype = 'f'
                             dsize = 4
@@ -891,12 +891,12 @@ class db_dataguzzler_data_file(renderer_class):
                     dgf.close(dgfh)
                     pass
                 if len(xmlchunk) > 1:
-                    xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ')
+                    xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ', nsmap=self.nsmap)
                     for x in xmlchunk:
                         xmlcontent.append(x)
                 elif len(xmlchunk) == 1:
                     if xmlchunk[0].xpath("local-name()") == "GUZZWFMD":
-                        xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ')
+                        xmlcontent = etree.Element('{http://thermal.cnde.iastate.edu/dataguzzler}DATAGUZZ', nsmap=self.nsmap)
                         xmlcontent.append(xmlchunk[0])
                     else:
                         xmlcontent = xmlchunk[0]
@@ -913,9 +913,9 @@ class db_dataguzzler_data_file(renderer_class):
                 dgzlink = self.getURL(self._relpath, content_mode="raw", dgzfile="true")
                 avilink = self.getURL(self._relpath, content_mode="raw", avifile="true")
 
-                etree.register_namespace("dbdg", "http://thermal.cnde.iastate.edu/databrowse/dataguzzler")
+                self.nsmap['dbdg'] = "http://thermal.cnde.iastate.edu/databrowse/dataguzzler"
 
-                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink, dgzlink=dgzlink, avilink=avilink)
+                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink, dgzlink=dgzlink, avilink=avilink)
                 xmlroot.append(xmlcontent)
 
                 return xmlroot

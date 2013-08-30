@@ -56,40 +56,40 @@ class db_SolidWorks_viewer(renderer_class):
                 src = self.getURL(self._relpath, content_mode="raw", thumbnail="medium")
                 downlink = self.getURL(self._relpath, content_mode="raw")
 
-                xmlroot = etree.Element('{%s}sdw' % self._namespace_uri, name=os.path.basename(self._relpath), src=src, resurl=self._web_support.resurl, downlink=downlink)
+                xmlroot = etree.Element('{%s}sdw' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), src=src, resurl=self._web_support.resurl, downlink=downlink)
 
-                xmlchild = etree.SubElement(xmlroot, "filename")
+                xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                 xmlchild.text = os.path.basename(self._fullpath)
 
-                xmlchild = etree.SubElement(xmlroot, "path")
+                xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                 xmlchild.text = os.path.dirname(self._fullpath)
 
-                xmlchild = etree.SubElement(xmlroot, "filesize")
+                xmlchild = etree.SubElement(xmlroot, "filesize", nsmap=self.nsmap)
                 xmlchild.text = self.ConvertUserFriendlySize(file_size)
 
-                xmlchild = etree.SubElement(xmlroot, "mtime")
+                xmlchild = etree.SubElement(xmlroot, "mtime", nsmap=self.nsmap)
                 xmlchild.text = file_mtime
 
-                xmlchild = etree.SubElement(xmlroot, "ctime")
+                xmlchild = etree.SubElement(xmlroot, "ctime", nsmap=self.nsmap)
                 xmlchild.text = file_ctime
 
-                xmlchild = etree.SubElement(xmlroot, "atime")
+                xmlchild = etree.SubElement(xmlroot, "atime", nsmap=self.nsmap)
                 xmlchild.text = file_atime
 
                 # File Permissions
-                xmlchild = etree.SubElement(xmlroot, "permissions")
+                xmlchild = etree.SubElement(xmlroot, "permissions", nsmap=self.nsmap)
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
                 username = pwd.getpwuid(st[ST_UID])[0]
                 groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner")
+                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                 xmlchild.text = "%s:%s" % (username, groupname)
 
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
-                xmlchild = etree.SubElement(xmlroot, "contenttype")
+                xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
                 return xmlroot
@@ -98,7 +98,7 @@ class db_SolidWorks_viewer(renderer_class):
             src = self.getURL(self._relpath, content_mode="raw", thumbnail="gallery")
             href = self.getURL(self._relpath)
             downlink = self.getURL(self._relpath, content_mode="raw")
-            xmlroot = etree.Element('{%s}sdw' % self._namespace_uri, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
+            xmlroot = etree.Element('{%s}sdw' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
             if "thumbnail" in self._web_support.req.form:

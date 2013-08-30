@@ -63,40 +63,40 @@ class db_default(renderer_class):
                     name = os.path.basename(self._relpath) if self._relpath != '/' else os.path.basename(self._fullpath)
                     if not os.path.isdir(self._fullpath):
                         downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, nsmap=self.nsmap, name=name, src=src, href=href, resurl=self._web_support.resurl, downlink=downlink, icon=icon)
                     else:
-                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, name=name, src=src, href=href, resurl=self._web_support.resurl, icon=icon)
+                        xmlroot = etree.Element('{%s}default' % self._namespace_uri, nsmap=self.nsmap, name=name, src=src, href=href, resurl=self._web_support.resurl, icon=icon)
 
-                    xmlchild = etree.SubElement(xmlroot, "filename")
+                    xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                     xmlchild.text = os.path.basename(self._fullpath)
 
-                    xmlchild = etree.SubElement(xmlroot, "path")
+                    xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                     xmlchild.text = os.path.dirname(self._fullpath)
 
-                    xmlchild = etree.SubElement(xmlroot, "size")
+                    xmlchild = etree.SubElement(xmlroot, "size", nsmap=self.nsmap)
                     xmlchild.text = self.ConvertUserFriendlySize(file_size)
 
-                    xmlchild = etree.SubElement(xmlroot, "mtime")
+                    xmlchild = etree.SubElement(xmlroot, "mtime", nsmap=self.nsmap)
                     xmlchild.text = file_mtime
 
-                    xmlchild = etree.SubElement(xmlroot, "ctime")
+                    xmlchild = etree.SubElement(xmlroot, "ctime", nsmap=self.nsmap)
                     xmlchild.text = file_ctime
 
-                    xmlchild = etree.SubElement(xmlroot, "atime")
+                    xmlchild = etree.SubElement(xmlroot, "atime", nsmap=self.nsmap)
                     xmlchild.text = file_atime
 
                     # Content Type
-                    xmlchild = etree.SubElement(xmlroot, "contenttype")
+                    xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                     xmlchild.text = contenttype
 
                     # File Permissions
-                    xmlchild = etree.SubElement(xmlroot, "permissions")
+                    xmlchild = etree.SubElement(xmlroot, "permissions", nsmap=self.nsmap)
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
                     username = pwd.getpwuid(st[ST_UID])[0]
                     groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner")
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                     xmlchild.text = "%s:%s" % (username, groupname)
 
                     return xmlroot

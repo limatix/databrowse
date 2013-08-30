@@ -67,40 +67,40 @@ class db_movie_viewer(renderer_class):
                 href = self.getURL(self._relpath, content_mode="raw")
                 downlink = self.getURL(self._relpath, content_mode="raw", download="true")
 
-                xmlroot = etree.Element('{%s}movie' % self._namespace_uri, name=os.path.basename(self._relpath), src=src, href=href, resurl=self._web_support.resurl, downlink=downlink)
+                xmlroot = etree.Element('{%s}movie' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), src=src, href=href, resurl=self._web_support.resurl, downlink=downlink)
 
-                xmlchild = etree.SubElement(xmlroot, "filename")
+                xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                 xmlchild.text = os.path.basename(self._fullpath)
 
-                xmlchild = etree.SubElement(xmlroot, "path")
+                xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                 xmlchild.text = os.path.dirname(self._fullpath)
 
-                xmlchild = etree.SubElement(xmlroot, "filesize")
+                xmlchild = etree.SubElement(xmlroot, "filesize", nsmap=self.nsmap)
                 xmlchild.text = self.ConvertUserFriendlySize(file_size)
 
-                xmlchild = etree.SubElement(xmlroot, "mtime")
+                xmlchild = etree.SubElement(xmlroot, "mtime", nsmap=self.nsmap)
                 xmlchild.text = file_mtime
 
-                xmlchild = etree.SubElement(xmlroot, "ctime")
+                xmlchild = etree.SubElement(xmlroot, "ctime", nsmap=self.nsmap)
                 xmlchild.text = file_ctime
 
-                xmlchild = etree.SubElement(xmlroot, "atime")
+                xmlchild = etree.SubElement(xmlroot, "atime", nsmap=self.nsmap)
                 xmlchild.text = file_atime
 
                 # File Permissions
-                xmlchild = etree.SubElement(xmlroot, "permissions")
+                xmlchild = etree.SubElement(xmlroot, "permissions", nsmap=self.nsmap)
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
                 username = pwd.getpwuid(st[ST_UID])[0]
                 groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner")
+                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                 xmlchild.text = "%s:%s" % (username, groupname)
 
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(self._fullpath)
-                xmlchild = etree.SubElement(xmlroot, "contenttype")
+                xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
                 probe = subprocess.Popen(("/usr/local/bin/mplayer", "-identify", "-frames", "0", "-ao", "null", self._fullpath), stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
@@ -116,46 +116,46 @@ class db_movie_viewer(renderer_class):
                 audio_bitrate = re.findall('ID_AUDIO_BITRATE=(.+?)\n', probe)
                 audio_nch = re.findall('ID_AUDIO_NCH=(.+?)\n', probe)
                 if length:
-                    xmlchild = etree.SubElement(xmlroot, "length")
+                    xmlchild = etree.SubElement(xmlroot, "length", nsmap=self.nsmap)
                     xmlchild.text = self.ConvertUserFriendlySize(float(length.group(1)), "time")
                 if re.search('Video stream found', probe):
-                    videochild = etree.SubElement(xmlroot, "video", video="True")
+                    videochild = etree.SubElement(xmlroot, "video", video="True", nsmap=self.nsmap)
                     if video_codec:
-                        xmlchild = etree.SubElement(videochild, "attr", name="Codec")
+                        xmlchild = etree.SubElement(videochild, "attr", name="Codec", nsmap=self.nsmap)
                         xmlchild.text = video_codec.group(1)
                     if video_bitrate:
-                        xmlchild = etree.SubElement(videochild, "attr", name="Bitrate")
+                        xmlchild = etree.SubElement(videochild, "attr", name="Bitrate", nsmap=self.nsmap)
                         xmlchild.text = self.ConvertUserFriendlySize(float(video_bitrate.group(1)), "bitrate", rounding=2)
                     if video_width:
-                        xmlchild = etree.SubElement(videochild, "attr", name="Width")
+                        xmlchild = etree.SubElement(videochild, "attr", name="Width", nsmap=self.nsmap)
                         xmlchild.text = video_width.group(1)
                     if video_height:
-                        xmlchild = etree.SubElement(videochild, "attr", name="Height")
+                        xmlchild = etree.SubElement(videochild, "attr", name="Height", nsmap=self.nsmap)
                         xmlchild.text = video_height.group(1)
                     if video_fps:
-                        xmlchild = etree.SubElement(videochild, "attr", name="FPS")
+                        xmlchild = etree.SubElement(videochild, "attr", name="FPS", nsmap=self.nsmap)
                         xmlchild.text = video_fps.group(1)
                     if video_aspect:
-                        xmlchild = etree.SubElement(videochild, "attr", name="Aspect Ratio")
+                        xmlchild = etree.SubElement(videochild, "attr", name="Aspect Ratio", nsmap=self.nsmap)
                         xmlchild.text = video_aspect.group(1)
                 else:
-                    videochild = etree.SubElement(xmlroot, "video", video="False")
+                    videochild = etree.SubElement(xmlroot, "video", video="False", nsmap=self.nsmap)
                 if re.search('Audio stream found', probe):
-                    audiochild = etree.SubElement(xmlroot, "audio", audio="True")
+                    audiochild = etree.SubElement(xmlroot, "audio", audio="True", nsmap=self.nsmap)
                     if audio_codec:
-                        xmlchild = etree.SubElement(audiochild, "codec")
+                        xmlchild = etree.SubElement(audiochild, "codec", nsmap=self.nsmap)
                         xmlchild.text = audio_codec.group(1)
                     if audio_rate:
-                        xmlchild = etree.SubElement(audiochild, "attr", name="Frequency")
+                        xmlchild = etree.SubElement(audiochild, "attr", name="Frequency", nsmap=self.nsmap)
                         xmlchild.text = self.ConvertUserFriendlySize(float(audio_rate[-1]), "frequency", rounding=2)
                     if audio_bitrate:
-                        xmlchild = etree.SubElement(audiochild, "attr", name="Bitrate")
+                        xmlchild = etree.SubElement(audiochild, "attr", name="Bitrate", nsmap=self.nsmap)
                         xmlchild.text = self.ConvertUserFriendlySize(float(audio_bitrate[-1]), "bitrate", rounding=2)
                     if audio_nch:
-                        xmlchild = etree.SubElement(audiochild, "attr", name="# of Channels")
+                        xmlchild = etree.SubElement(audiochild, "attr", name="# of Channels", nsmap=self.nsmap)
                         xmlchild.text = audio_nch[-1]
                 else:
-                    audiochild = etree.SubElement(xmlroot, "audio", audio="False")
+                    audiochild = etree.SubElement(xmlroot, "audio", audio="False", nsmap=self.nsmap)
 
                 return xmlroot
         elif self._content_mode == "summary" or self._content_mode == "title":
@@ -163,7 +163,7 @@ class db_movie_viewer(renderer_class):
             src = self.getURL(self._relpath, content_mode="raw", thumbnail="gallery")
             href = self.getURL(self._relpath, content_mode="raw")
             downlink = self.getURL(self._relpath, content_mode="raw", download="true")
-            xmlroot = etree.Element('{%s}movie' % self._namespace_uri, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
+            xmlroot = etree.Element('{%s}movie' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
             if "thumbnail" in self._web_support.req.form:

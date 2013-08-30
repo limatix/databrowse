@@ -51,6 +51,7 @@ class renderer_class(object):
     _default_style_mode = "list"
     _default_recursion_depth = 2
     _disable_load_style = False
+    nsmap = {}
 
     class RendererException(Exception):
         pass
@@ -98,13 +99,16 @@ class renderer_class(object):
         #print "self._content_mode = " + repr(self._content_mode)
         #print "self._style_mode = " + repr(self._style_mode)
         #print "self._recursion_depth = " + repr(self._recursion_depth)
+        self.nsmap = {}
+        self.nsmap['db'] = 'http://thermal.cnde.iastate.edu/databrowse'
 
         # Try to Load Style
         if not self._disable_load_style:
             #print "About to call self.loadStyle()"
             self.loadStyle()
             #print "About to call etree.register_namespace"
-            etree.register_namespace(self._namespace_local, self._namespace_uri)
+            self.nsmap[self._namespace_local] = self._namespace_uri
+            #etree.register_namespace(self._namespace_local, self._namespace_uri)
             pass
 
         pass

@@ -139,7 +139,7 @@ class db_checklist_editor(renderer_class):
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
             elif self._content_mode == "full":
-                etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
+                #etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
                 f = open(self._fullpath, 'r')
                 xml = etree.parse(f)
                 f.close()

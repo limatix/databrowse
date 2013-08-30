@@ -39,25 +39,25 @@ class db_directory(renderer_class):
         super(db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
-            topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', xmlns="http://www.w3.org/1999/xhtml")
-            navelem = etree.SubElement(topmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
-            title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
+            topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', nsmap=self.nsmap, xmlns="http://www.w3.org/1999/xhtml")
+            navelem = etree.SubElement(topmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem", nsmap=self.nsmap)
+            title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a", nsmap=self.nsmap)
             title.text = "View Options"
-            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true")
+            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true", nsmap=self.nsmap)
             if not "showhiddenfiles" in self._web_support.req.form:
-                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
-                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=""))
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem', nsmap=self.nsmap)
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=""), nsmap=self.nsmap)
                 menulink.text = "Show Hidden Files"
             else:
-                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
-                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=None))
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem', nsmap=self.nsmap)
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=None), nsmap=self.nsmap)
                 menulink.text = "Hide Hidden Files"
             self._web_support.menu.AddMenu(topmenu)
             pass
         else:
             link = self.getURL(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, name=os.path.basename(self._relpath), path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, href=link, resurl=self._web_support.resurl)
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, href=link, resurl=self._web_support.resurl)
             pass
         if "ajax" in self._web_support.req.form:
             xmlroot.set("ajaxreq", "True")
@@ -86,7 +86,7 @@ class db_directory(renderer_class):
                     overlay = "unreadable"
                 else:
                     overlay = "none"
-                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
+                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
                 if content is not None:
                     xmlchild.append(content)
                     pass
@@ -98,11 +98,11 @@ class db_directory(renderer_class):
             xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
             pass
         if self._caller == "databrowse" and self._web_support.checklistpath is not None:
-            chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri))
+            chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri), nsmap=self.nsmap)
             chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
             for item in [item for item in chxdirlist if item.endswith(".chx")]:
                 itemurl = self.getURL(os.path.join(self._web_support.checklistpath, item), handler=None)
-                etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), url=itemurl, name=item)
+                etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
                 pass
             pass
         self._xml = xmlroot

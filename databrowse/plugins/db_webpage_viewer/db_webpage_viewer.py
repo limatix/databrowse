@@ -38,14 +38,14 @@ class db_webpage_viewer(renderer_class):
             return None
         else:
             if self._content_mode == "full":
-                xmlroot = etree.Element('{%s}dbhtml' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
+                xmlroot = etree.Element('{%s}dbhtml' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
                 if self.getSize() > 0:
                     f = open(self._fullpath, 'r')
                     parser = etree.HTMLParser()
                     htmltree = etree.parse(f, parser)
                     f.close()
                     htmlroot = htmltree.getroot()
-                    xmlchild = etree.SubElement(xmlroot, "contents")
+                    xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
                     xmlchild.append(htmlroot)
                     pass
                 return xmlroot

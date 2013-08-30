@@ -56,7 +56,6 @@ class db_monthly_report_tool(renderer_class):
                 environcopy = copy.copy(self._web_support.req.environ)
                 environcopy['DATABROWSE_FILENAME'] = environcopy['SCRIPT_FILENAME']
                 environcopy['SCRIPT_FILENAME'] = self._fullpath
-                etree.register_namespace("monthlyrpt", "http://thermal.cnde.iastate.edu/monthly_rpt")
                 output = module.application(environcopy, self.dummy_start_response)
                 os.chdir(savedCWD)
                 del module
@@ -71,7 +70,6 @@ class db_monthly_report_tool(renderer_class):
                 environcopy = copy.copy(self._web_support.req.environ)
                 environcopy['DATABROWSE_FILENAME'] = environcopy['SCRIPT_FILENAME']
                 environcopy['SCRIPT_FILENAME'] = self._fullpath
-                etree.register_namespace("monthlyrpt", "http://thermal.cnde.iastate.edu/monthly_rpt")
                 output = module.application(environcopy, self._web_support.req.start_response)
                 os.chdir(savedCWD)
                 self._web_support.req.output_done = True

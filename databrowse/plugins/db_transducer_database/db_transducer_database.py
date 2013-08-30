@@ -80,7 +80,7 @@ class db_transducer_database(db_directory_module.db_directory):
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
             else:
-                xmlroot = etree.Element("{%s}transducerdb" % self._namespace_uri, templatefile=self.getURL("/transducers/src/transducer.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
+                xmlroot = etree.Element("{%s}transducerdb" % self._namespace_uri, nsmap=self.nsmap, templatefile=self.getURL("/transducers/src/transducer.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
                 return xmlroot
         pass
     pass

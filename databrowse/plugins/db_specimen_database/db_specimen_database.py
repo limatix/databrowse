@@ -124,9 +124,9 @@ class db_specimen_database(db_directory_module.db_directory):
                     return [self._web_support.req.return_page()]
             else:
                 if self._style_mode == "add_specimen":
-                    xmlroot = etree.Element("{%s}specimendb" % self._namespace_uri, templatefile=self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
+                    xmlroot = etree.Element("{%s}specimendb" % self._namespace_uri, nsmap=self.nsmap, templatefile=self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
                 elif self._style_mode == "add_specimen_group":
-                    xmlroot = etree.Element("{%s}specimendb" % self._namespace_uri, templatefile=self.getURL("/specimens/src/specimengroup.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
+                    xmlroot = etree.Element("{%s}specimendb" % self._namespace_uri, nsmap=self.nsmap, templatefile=self.getURL("/specimens/src/specimengroup.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
                 return xmlroot
         pass
     pass

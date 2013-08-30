@@ -88,60 +88,60 @@ class db_generic_binary_file(renderer_class):
 
                     downlink = self.getURL(self._relpath, content_mode="raw", download="true")
 
-                    xmlroot = etree.Element('{%s}binary' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
+                    xmlroot = etree.Element('{%s}binary' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon)
 
-                    xmlchild = etree.SubElement(xmlroot, "filename")
+                    xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                     xmlchild.text = os.path.basename(self._fullpath)
 
-                    xmlchild = etree.SubElement(xmlroot, "path")
+                    xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                     xmlchild.text = os.path.dirname(self._fullpath)
 
-                    xmlchild = etree.SubElement(xmlroot, "size")
+                    xmlchild = etree.SubElement(xmlroot, "size", nsmap=self.nsmap)
                     xmlchild.text = self.ConvertUserFriendlySize(file_size)
 
-                    xmlchild = etree.SubElement(xmlroot, "mtime")
+                    xmlchild = etree.SubElement(xmlroot, "mtime", nsmap=self.nsmap)
                     xmlchild.text = file_mtime
 
-                    xmlchild = etree.SubElement(xmlroot, "ctime")
+                    xmlchild = etree.SubElement(xmlroot, "ctime", nsmap=self.nsmap)
                     xmlchild.text = file_ctime
 
-                    xmlchild = etree.SubElement(xmlroot, "atime")
+                    xmlchild = etree.SubElement(xmlroot, "atime", nsmap=self.nsmap)
                     xmlchild.text = file_atime
 
                     # Content Type
-                    xmlchild = etree.SubElement(xmlroot, "contenttype")
+                    xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                     xmlchild.text = contenttype
 
                     # File Permissions
-                    xmlchild = etree.SubElement(xmlroot, "permissions")
+                    xmlchild = etree.SubElement(xmlroot, "permissions", nsmap=self.nsmap)
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
                     username = pwd.getpwuid(st[ST_UID])[0]
                     groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner")
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                     xmlchild.text = "%s:%s" % (username, groupname)
 
                     ajaxlink = self.getURL(self._relpath, content_mode="ajax")
-                    xmlchild = etree.SubElement(xmlroot, "contentinfo", ajaxlink=ajaxlink, offset=str(0), numofoffsets="20", size=str(file_size))
+                    xmlchild = etree.SubElement(xmlroot, "contentinfo", nsmap=self.nsmap, ajaxlink=ajaxlink, offset=str(0), numofoffsets="20", size=str(file_size))
 
                     # Contents of File
-                    xmlchild = etree.SubElement(xmlroot, "contents")
+                    xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
                     f = open(self._fullpath, 'rb')
                     myfilter = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
                     for line in range(0, file_size, 16)[:20]:
                         data = f.read(16)
-                        newtr = etree.SubElement(xmlchild, "bin")
-                        newtd = etree.SubElement(newtr, "offset")
+                        newtr = etree.SubElement(xmlchild, "bin", nsmap=self.nsmap)
+                        newtd = etree.SubElement(newtr, "offset", nsmap=self.nsmap)
                         newtd.text = "%08x" % line
-                        newtd = etree.SubElement(newtr, "hex")
+                        newtd = etree.SubElement(newtr, "hex", nsmap=self.nsmap)
                         for x in data:
-                            hexelem = etree.SubElement(newtd, "hexelem")
+                            hexelem = etree.SubElement(newtd, "hexelem", nsmap=self.nsmap)
                             hexelem.text = "%02x" % ord(x)
                             pass
-                        newtd = etree.SubElement(newtr, "str")
+                        newtd = etree.SubElement(newtr, "str", nsmap=self.nsmap)
                         for x in data:
-                            strelem = etree.SubElement(newtd, "strelem")
+                            strelem = etree.SubElement(newtd, "strelem", nsmap=self.nsmap)
                             strelem.text = "%s" % ((ord(x) <= 127 and myfilter[ord(x)]) or '.')
                             pass
                         pass
@@ -161,8 +161,8 @@ class db_generic_binary_file(renderer_class):
                 else:
                     lines = int(self._web_support.req.form['lines'].value)
                     pass
-                xmlroot = etree.Element('{%s}binary' % self._namespace_uri, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
-                xmlchild = etree.SubElement(xmlroot, "contents")
+                xmlroot = etree.Element('{%s}binary' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl)
+                xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
                 f = open(self._fullpath, 'rb')
                 myfilter = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
                 if offset is not 0:
@@ -170,17 +170,17 @@ class db_generic_binary_file(renderer_class):
                     pass
                 for line in range(offset, os.path.getsize(self._fullpath), 16)[:lines]:
                     data = f.read(16)
-                    newtr = etree.SubElement(xmlchild, "bin")
-                    newtd = etree.SubElement(newtr, "offset")
+                    newtr = etree.SubElement(xmlchild, "bin", nsmap=self.nsmap)
+                    newtd = etree.SubElement(newtr, "offset", nsmap=self.nsmap)
                     newtd.text = "%08x" % line
-                    newtd = etree.SubElement(newtr, "hex")
+                    newtd = etree.SubElement(newtr, "hex", nsmap=self.nsmap)
                     for x in data:
-                        hexelem = etree.SubElement(newtd, "hexelem")
+                        hexelem = etree.SubElement(newtd, "hexelem", nsmap=self.nsmap)
                         hexelem.text = "%02x" % ord(x)
                         pass
-                    newtd = etree.SubElement(newtr, "str")
+                    newtd = etree.SubElement(newtr, "str", nsmap=self.nsmap)
                     for x in data:
-                        strelem = etree.SubElement(newtd, "strelem")
+                        strelem = etree.SubElement(newtd, "strelem", nsmap=self.nsmap)
                         strelem.text = "%s" % ((ord(x) <= 127 and myfilter[ord(x)]) or '.')
                         pass
                     pass
