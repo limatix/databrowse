@@ -26,10 +26,11 @@ def dbh_directory_specimen(path, contenttype, extension):
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
         dirlist = os.listdir(path)
         count = 0
-        for item in dirlist:
-            if (os.path.splitext(item)[1].lower() in [".sdb"]):
+        newlist = [x for x in dirlist if (not ".bak" in x) and (not "_files" in x)]
+        for item in newlist:
+            if (os.path.splitext(item)[1].lower() in [".sdb", ".sdg"]):
                 count = count + 1
-        if count > (len(dirlist) * 0.25):
+        if count > (len(newlist) * 0.25):
             return "db_specimen_database"
         else:
             return False

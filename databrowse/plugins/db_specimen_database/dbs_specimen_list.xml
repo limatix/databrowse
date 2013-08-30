@@ -80,7 +80,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Group</th>
+                <th>Group(s)</th>
                 <th>Material</th>
                 <th>Shape</th>
                 <th>Dimensions</th>
@@ -93,17 +93,22 @@
                 <tr>
                     <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="specimen:specimenid/."/></a></td>
                     <td>
-                        <xsl:choose>
-                            <xsl:when test="specimen:groupid/@link">
-                                <a>
-                                    <xsl:attribute name="href"><xsl:value-of select="specimen:groupid/@link"/></xsl:attribute>
-                                    <xsl:value-of select="specimen:groupid/."/>
-                                </a>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="specimen:groupid/."/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:for-each select="specimen:groups/*">
+                            <xsl:choose>
+                                <xsl:when test="@link">
+                                    <a>
+                                        <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
+                                        <xsl:value-of select="."/>
+                                    </a>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="."/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:choose>
+                                <xsl:when test="position() != last()">, </xsl:when>
+                            </xsl:choose>
+                        </xsl:for-each>
                     </td>
                     <td><xsl:value-of select="specimen:physicalproperties/specimen:material/."/></td>
                     <td><xsl:value-of select="specimen:geometry/specimen:shape/."/></td>

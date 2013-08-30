@@ -106,6 +106,16 @@
                 window.location.href = window.location.href.replace(window.location.search, "");
             }			
 
+            function getxmldocstring(){
+            	algo = appController.getPreferredAlgo("save");
+				appController.curForm.setSerializer(appController.serializers[algo]);
+				var g = new xtiger.util.DOMLogger();
+				var f = appController.curForm.serializeData(g);
+				results = g.dump("*");
+				results = results.replace("<specimen>", '<specimen xmlns="http://thermal.cnde.iastate.edu/specimen">');
+				return results;
+            }		
+
 			function save () {
 				algo = appController.getPreferredAlgo("save");
 				appController.curForm.setSerializer(appController.serializers[algo]);

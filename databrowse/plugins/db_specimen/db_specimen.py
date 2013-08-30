@@ -44,19 +44,24 @@ class db_specimen(renderer_class):
                 xml = etree.parse(self._fullpath)
             else:
                 xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE)
-            filerelpath = os.path.join(os.path.dirname(self._relpath), os.path.splitext(os.path.basename(self._relpath))[0] + "_files")
-            filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
             xmlroot = xml.getroot()
-            if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
-                import databrowse.plugins.db_directory.db_directory as db_directory_module
-                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
-                content = renderer.getContent()
-                xmlroot.append(content)
-            group = xml.xpath('specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})
-            if len(group) > 0:
-                groupid = group[0].text
+            reldests = [x for x in xmlroot.xpath('specimen:reldests/specimen:reldest', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
+            for reldest in reldests:
+                filerelpath = os.path.join(os.path.dirname(self._relpath), reldest.text)
+                filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
+                if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
+                    import databrowse.plugins.db_directory.db_directory as db_directory_module
+                    renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen", "db_directory", style_mode="empty")
+                    content = renderer.getContent()
+                    reldest.set('link', self.getURL(filerelpath))
+                    if reldest.get('fromgroup'):
+                        content.set('fromgroup', reldest.get('fromgroup'))
+                    xmlroot.append(content)
+            groups = [x for x in xmlroot.xpath('specimen:groups/specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
+            for group in groups:
+                groupid = group.text
                 if os.access(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg'), os.R_OK) and os.path.exists(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg')):
-                    group[0].set('link', self.getURL('/specimens/' + groupid + '.sdg'))
+                    group.set('link', self.getURL('/specimens/' + groupid + '.sdg'))
             templatefile = self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
             xmlroot.set("templatefile", templatefile)
             xmlroot.set("barcode", self.getURL(self._relpath, content_mode="raw", barcode="barcode"))
@@ -65,11 +70,11 @@ class db_specimen(renderer_class):
         elif self._content_mode != "raw" and self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
             specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
             xml = ss.GetSpecimen(specimen, ss.OUTPUT_ELEMENT)
-            group = xml.xpath('specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})
-            if len(group) > 0:
-                groupid = group[0].text
+            groups = [x for x in xml.xpath('specimen:groups/specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
+            for group in groups:
+                groupid = group.text
                 if os.access(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg'), os.R_OK) and os.path.exists(os.path.join(self._web_support.dataroot, 'specimens/' + groupid + '.sdg')):
-                    group[0].set('link', self.getURL('/specimens/' + groupid + '.sdg'))
+                    group.set('link', self.getURL('/specimens/' + groupid + '.sdg'))
             return xml
         elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
             if "file" in self._web_support.req.form:

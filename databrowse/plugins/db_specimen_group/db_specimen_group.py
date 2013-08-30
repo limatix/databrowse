@@ -41,14 +41,17 @@ class db_specimen_group(renderer_class):
             f = open(self._fullpath, 'r')
             xml = etree.parse(f)
             f.close()
-            filerelpath = os.path.join(os.path.dirname(self._relpath), os.path.splitext(os.path.basename(self._relpath))[0] + "_files")
-            filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
             xmlroot = xml.getroot()
-            if os.path.exists(filefullpath) and self._style_mode == "view_specimen_data":
-                import db_directory.db_directory as db_directory_module
-                renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen_group", "db_directory", style_mode="empty")
-                content = renderer.getContent()
-                xmlroot.append(content)
+            reldests = [x for x in xmlroot.xpath('specimen:reldests/specimen:reldest', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
+            for reldest in reldests:
+                filerelpath = os.path.join(os.path.dirname(self._relpath), reldest.text)
+                filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
+                if os.path.exists(filefullpath) and self._style_mode == "view_specimen_group":
+                    import databrowse.plugins.db_directory.db_directory as db_directory_module
+                    renderer = db_directory_module.db_directory(filerelpath, filefullpath, self._web_support, self._handler_support, "db_specimen_group", "db_directory", style_mode="empty")
+                    content = renderer.getContent()
+                    reldest.set('link', self.getURL(filerelpath))
+                    xmlroot.append(content)
             templatefile = self.getURL("/specimens/src/specimengroup.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
             xmlroot.set("templatefile", templatefile)
             xmlroot.set("barcode", self.getURL(self._relpath, content_mode="raw", barcode="barcode"))

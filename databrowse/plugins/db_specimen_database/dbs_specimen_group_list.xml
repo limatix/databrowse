@@ -65,7 +65,9 @@
                     <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="specimen:groupid/."/></a></td>
                     <td><xsl:value-of select="specimen:provenance/specimen:source/."/></td>
                     <td><xsl:value-of select="specimen:provenance/specimen:incharge/."/></td>
-                    <td><xsl:value-of select="specimen:identifiertags/."/></td>
+                    <td><xsl:for-each select="specimen:identifiertags/*"><xsl:value-of select="."/><xsl:choose>
+                        <xsl:when test="position() != last()">,&#160;</xsl:when>
+                    </xsl:choose></xsl:for-each></td>
                 </tr>
             </xsl:for-each>
         </tbody>

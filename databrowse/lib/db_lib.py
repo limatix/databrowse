@@ -28,6 +28,11 @@ OUTPUT_ETREE = 2
 OUTPUT_STDOUT = 3
 
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE doc [
+<!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
+                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+%%iso-grk1;
+]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
@@ -44,6 +49,11 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 </xsl:stylesheet>'''
 
 localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE doc [
+<!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
+                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+%%iso-grk1;
+]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
@@ -61,6 +71,11 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 </xsl:stylesheet>'''
 
 ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE doc [
+<!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
+                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+%%iso-grk1;
+]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
@@ -141,7 +156,7 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
                 ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
 
     # Register Primary Namespace
-    etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
+    #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
     if output == OUTPUT_ETREE:
         return etree.ElementTree(renderer.getContent())

@@ -32,9 +32,12 @@ attributekeys = {
                   NSSTR + 'dimension': 'direction',
                   NSSTR + 'direction': 'name',
                   NSSTR + 'reference': 'face',
-                  NSSTR + 'plane': 'face'
+                  NSSTR + 'plane': 'face',
+                  NSSTR + 'geometry': 'component',
+                  NSSTR + 'physicalproperties': 'component',
+                  NSSTR + 'flawparameters': 'index'
                 }
-mergechildren = [NSSTR + 'actionlog', NSSTR + 'markings']
+mergechildren = [NSSTR + 'actionlog', NSSTR + 'markings', NSSTR + 'measurements', NSSTR + 'reldests']
 
 
 class SpecimenException(Exception):
@@ -61,9 +64,48 @@ def GetSpecimen(specimen, output=OUTPUT_STRING):
         raise SpecimenException('Unable to Read Specimen Data File')
 
     # Identify the Group
-    groupidelem = specimenxml.xpath("specimen:groupid", namespaces=NS)
+    groupidelem = specimenxml.xpath("specimen:groups/specimen:groupid", namespaces=NS)
     if len(groupidelem) > 1:
-        raise SpecimenException('Multiple Group IDs Found - Feature Not Implemented')
+        groups = {}
+        # Open all of the group files and load them into a dictionary
+        for group in [x.text for x in groupidelem]:
+            filename = os.path.join(specimendb, group + '.sdg')
+            if not os.path.exists(filename):
+                pass
+            elif not os.access(filename, os.R_OK):
+                raise SpecimenException('Unable to Access Group File ' + filename)
+            else:
+                try:
+                    f = open(filename, 'r')
+                    groups[group] = etree.XML(f.read())
+                    f.close()
+                except:
+                    raise SpecimenException('Unable to Read Specimen Group Data File' + filename)
+            pass
+        if len(groups) > 0:
+            # Let's try combining all of them and seeing if the override attribute shows up anywhere
+            groupnames = groups.keys()
+            groupxml = groups[groupnames[0]]
+            for groupname in groupnames[1:]:
+                _combine_element(groupxml, groups[groupname], groupname)
+            if len(groupxml.xpath("//@override", namespaces=NS)) > 0:
+                print etree.tostring(groupxml, pretty_print=True)
+                raise SpecimenException("Group File Conflict - Will Not Continue Until Conflict Is Resolved - Specimen " + specimen)
+
+            # Combine Trees
+            _combine_element(specimenxml, groupxml, groupnames[0])
+
+        # Output
+        if output == OUTPUT_STRING:
+            print etree.tostring(specimenxml, pretty_print=True)
+        elif output == OUTPUT_ELEMENT:
+            return specimenxml
+        elif output == OUTPUT_ETREE:
+            return specimenxml.getroottree()
+        else:
+            raise SpecimenException('Invalid Return Type')
+        pass
+        
     elif len(groupidelem) == 1:
         groupid = groupidelem[0].text
 
@@ -90,7 +132,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING):
             raise SpecimenException('Unable to Read Specimen Group Data File')
 
         # Combine Trees
-        _combine_element(specimenxml, groupxml)
+        _combine_element(specimenxml, groupxml, groupid)
 
         # Output
         if output == OUTPUT_STRING:
@@ -119,55 +161,63 @@ def GetSpecimen(specimen, output=OUTPUT_STRING):
 
 def tagname(el):
     if el.tag in attributekeys:
-        return el.tag + el.get(attributekeys[el.tag])
+        try:
+            return el.tag + el.get(attributekeys[el.tag])
+        except:
+            raise SpecimenException('Required attribute "' + attributekeys[el.tag] + '" missing from element "' + el.tag + '"')
     else:
         return el.tag
 
-def _combine_element(one, other):
+def _combine_element(one, other, group):
     """ Private Function to Recursively Combine etree Elements, Preferencing the First Element """
     mapping = {}
     for el in one:
         mapping[tagname(el)] = el
-    for el in [el for el in other if tagname(el) not in [NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groupid']]:
+    for el in [el for el in other if tagname(el) not in [NSSTR + 'notes', NSSTR + 'specimenslist', NSSTR + 'identifiertags', NSSTR + 'groups', NSSTR + 'groupid']]:
         if len(el) == 0 and tagname(el) not in norecursion and  tagname(el) not in mergechildren:
             # Not nested
             if not tagname(el) in mapping:
                 # An element with this name is not in the mapping
                 mapping[tagname(el)] = el
                 # Add it
-                el.set('fromgroup', 'true')
+                if not el.get('fromgroup'):
+                    el.set('fromgroup', group)
                 one.append(el)
             else:
-                mapping[tagname(el)].set('override', 'true')
+                mapping[tagname(el)].set('override', group)
 
         else:
             if tagname(el) in norecursion:
                 if not tagname(el) in mapping:
                      # Not in the mapping
                     mapping[tagname(el)] = el
-                    el.set('fromgroup', 'true')
+                    if not el.get('fromgroup'):
+                        el.set('fromgroup', group)
                     # Just add it
                     one.append(el)
                 else:
-                    mapping[tagname(el)].set('override', 'true')
+                    mapping[tagname(el)].set('override', group)
             elif tagname(el) in mergechildren:
                 if not tagname(el) in mapping:
                     mapping[tagname(el)] = el
                     for child in el:
-                        el.set('fromgroup', 'true')
+                        if not el.get('fromgroup'):
+                            el.set('fromgroup', group)
                     one.append(el)
                 else:
                     for child in el:
-                        child.set('fromgroup', 'true')
+                        if not el.get('fromgroup'):
+                            child.set('fromgroup', group)
                         mapping[tagname(el)].append(child)
             else:   
                 try:
                     # Recursively process the element, and update it in the same way
-                    _combine_element(mapping[tagname(el)], el)
+                    _combine_element(mapping[tagname(el)], el, group)
                 except KeyError:
                     # Not in the mapping
                     mapping[tagname(el)] = el
-                    el.set('fromgroup', 'true')
+                    if not el.get('fromgroup'):
+                        el.set('fromgroup', group)
                     # Just add it
                     one.append(el)
     pass
