@@ -93,7 +93,10 @@ class FileResolver(etree.Resolver):
         pass
 
     def resolve(self, url, pubid, context):
-        return self.resolve_filename(os.path.abspath(self._path + '/' + url), context)
+        if url.startswith('http://'):
+            return self.resolve_filename(url, context)
+        else:
+            return self.resolve_filename(os.path.abspath(self._path + '/' + url), context)
 
     pass
 
