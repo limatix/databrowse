@@ -56,7 +56,7 @@ class db_directory(renderer_class):
             self._web_support.menu.AddMenu(topmenu)
             pass
         else:
-            link = self.getURL(self._relpath)
+            link = self.getURL(self._relpath, handler=None)
             xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, href=link, resurl=self._web_support.resurl)
             pass
         if "ajax" in self._web_support.req.form:
@@ -72,7 +72,7 @@ class db_directory(renderer_class):
                 handler = handlers[-1]
                 if handler in self._handler_support.directoryplugins:
                     icon = self._handler_support.directoryplugins[handler]
-                if handler == "db_directory":
+                if handler in self._handler_support.directoryplugins:
                     renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
                 else:
                     exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
@@ -86,10 +86,15 @@ class db_directory(renderer_class):
                     overlay = "unreadable"
                 else:
                     overlay = "none"
-                xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
-                if content is not None:
-                    xmlchild.append(content)
-                    pass
+                if content is not None and content.tag.startswith("{%s}" % self._namespace_uri):
+                    content.set('icon', icon)
+                    content.set('overlay', overlay)
+                    xmlroot.append(content)
+                else:
+                    xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
+                    if content is not None:
+                        xmlchild.append(content)
+                        pass
                 pass
             pass
         else:
