@@ -24,6 +24,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Changelog:
 
+== v0.6 =======================================================================
+ * Databrowse Library Implemented
+ * Restructuring of Files for Packaging Completed
+ * Starting of Documentation
+ * Restructuring of Directory Plugin Output
+ * Complete Reworking of Speicmen Database Plugins
+ * Numerous Updates to Dataguzzler and DatacollectV2 Plugins
+ * All Use of etree.register_namespace Global Removed and Basic Namespace
+   Handling Implemented
+ * Numerous Bugfixes
+
 == v0.5 =======================================================================
 
  * Directory Restructuring For Distribution
