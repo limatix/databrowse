@@ -16,7 +16,20 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" databrowse.py - Library to Access Databrowse Functionality """
+"""
+Databrowse:  An Extensible Data Management Platform
+Copyright (C) 2012-2013 Iowa State University
+
+This module contains funcionality needed to access the Databrowse library from
+within Python scrips and other places where Python can be used.  The suggested
+method to import this module is the following:
+
+>>> from databrowse.lib import db_lib as dbl
+
+This module presently only contains two public functions allowing the capture
+of XML code.  This may change in the future, but for now, this is all that is
+really needed.
+"""
 
 import os
 from lxml import etree
@@ -27,7 +40,7 @@ OUTPUT_ELEMENT = 1
 OUTPUT_ETREE = 2
 OUTPUT_STDOUT = 3
 
-serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+_serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
                     "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
@@ -48,7 +61,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+_localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
                     "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
@@ -70,7 +83,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+_ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
                     "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
@@ -85,7 +98,7 @@ ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 </xsl:stylesheet>'''
 
 
-class FileResolver(etree.Resolver):
+class _FileResolver(etree.Resolver):
     _path = None
 
     def __init__(self, path):
@@ -102,7 +115,37 @@ class FileResolver(etree.Resolver):
 
 
 def GetXML(filename, output=OUTPUT_ELEMENT, **params):
-    """ Get XML Representation """
+    """
+    Get the XML representation of a file, as produced by the Databrowse library
+
+    Arguments:
+      filename - Relative or absolute path to file of interest
+      output   - Determines the type of output to be returned from the function
+                   dbl.OUTPUT_ELEMENT returns an LXML etree.Element
+                   dbl.OUTPUT_ETREE returns an LXML etree.ElementTree
+                   dbl.OUTPUT_STRING returns a string containing the XML
+                   dbl.OUTPUT_STDOUT prints the XML string and returns nothing
+      **params - A variable number of optional parameters that are treated the
+                 same way as query string values that would be POST or GET to
+                 the web server when Databrowse is being used from the web.
+
+    Usage:
+      >>> from databrowse.lib import db_lib as dbl
+      >>> dbl.GetXML('/tmp/emptyfile', output=dbl.OUTPUT_STDOUT)
+      <default:default>
+        <filename>emptyfile</filename>
+        <path>/tmp</path>
+        <size>0.0 byte</size>
+        <mtime>Tue Sep  3 10:12:40 2013</mtime>
+        <ctime>Tue Sep  3 10:12:40 2013</ctime>  
+        <atime>Tue Sep  3 10:12:42 2013</atime>
+        <contenttype>text/plain</contenttype>
+        <permissions>-rw-rw-r--</permissions>
+        <owner>user:user</owner>
+      </default:default>
+
+    See also: DebugGetXML()
+    """
 
     os.environ["HOME"] = "/home/www/.home"
 
@@ -170,9 +213,17 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         return renderer.getContent()
     elif output == OUTPUT_STDOUT:
         xmltree = etree.ElementTree(renderer.getContent())
-        print etree.tostring(xmltree)
+        print etree.tostring(xmltree, pretty_print=True)
     else:
         return etree.ElementTree(renderer.getContent())
 
 
-DebugGetXML = Debugger(GetXML)
+def DebugGetXML(filename, output=OUTPUT_ELEMENT, **params):
+    """
+    Function to start PDB Debugger while calling GetXML with provided params
+
+    See also:  GetXML()
+    """
+    Debug = Debugger(GetXML)
+    return Debug(filename, output, **params)
+    pass
