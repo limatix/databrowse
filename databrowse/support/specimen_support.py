@@ -35,9 +35,10 @@ attributekeys = {
                   NSSTR + 'plane': 'face',
                   NSSTR + 'geometry': 'component',
                   NSSTR + 'physicalproperties': 'component',
-                  NSSTR + 'flawparameters': 'index'
+                  NSSTR + 'flawparameters': 'index',
+                  NSSTR + 'fiducialmark': 'name'
                 }
-mergechildren = [NSSTR + 'actionlog', NSSTR + 'markings', NSSTR + 'measurements', NSSTR + 'reldests']
+mergechildren = [NSSTR + 'actionlog', NSSTR + 'identifiers', NSSTR + 'measurements', NSSTR + 'reldests']
 
 
 class SpecimenException(Exception):

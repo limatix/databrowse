@@ -143,7 +143,9 @@
             <tr><th style="width:125px;">Manufactured By</th><td><xsl:apply-templates select="specimen:manufacturedby" mode="checkgroup"/><xsl:value-of  select="specimen:manufacturedby"/></td></tr>
             <tr><th>Source</th><td><xsl:apply-templates select="specimen:source" mode="checkgroup"/><xsl:value-of  select="specimen:source"/></td></tr>
             <tr><th>In Charge</th><td><xsl:apply-templates select="specimen:incharge" mode="checkgroup"/><xsl:value-of  select="specimen:incharge"/></td></tr>
-            <tr><th>Export Control</th><td><xsl:apply-templates select="specimen:exportcontrolled" mode="checkgroup"/><xsl:value-of  select="specimen:exportcontrolled"/></td></tr>
+            <xsl:if test="specimen:exportcontrolled">
+                <tr><th>Export Control</th><td><xsl:apply-templates select="specimen:exportcontrolled" mode="checkgroup"/><xsl:value-of  select="specimen:exportcontrolled"/></td></tr>
+            </xsl:if>
         </tbody>
     </table>
 </xsl:template>
@@ -153,32 +155,81 @@
             <tr><th colspan="2">Specimen Markings</th></tr>
         </thead>
         <tbody>
-            <tr>
-                <th style="width:125px;">Fiducial Marks</th>
-                <td>
-                    <ul style="padding:0 0 0 12px; margin:0px">
-                        <xsl:for-each select="specimen:fiducialmarks">
-                            <li><span>
-                                <xsl:apply-templates select="." mode="checkgroup"/>
-                                <xsl:value-of select="."/>
-                            </span></li>
+            <xsl:if test="specimen:fiducialmarks">
+                <tr>
+                    <th style="width:125px;">Fiducial Marks</th>
+                    <td>
+                        <xsl:for-each select="specimen:fiducialmarks/specimen:fiducialmark">
+                            <table class="cream full-width" style="padding: 0px; margin: 5px -6px 5px 0px">
+                                <tbody>
+                                    <tr>                                    
+                                        <th width="45%">Mark Name</th>
+                                        <td>
+                                            <xsl:apply-templates select=".." mode="checkgroup"/>
+                                        <xsl:apply-templates select="." mode="checkgroup"/> <xsl:value-of select="@name"/></td>
+                                    </tr>
+                                    <xsl:if test="specimen:description">
+                                        <tr>
+                                            
+                                            <th>Description</th>
+                                            <td><xsl:apply-templates select=".." mode="checkgroup"/>
+                                            <xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="specimen:description"/></td>
+                                        </tr>                               
+                                    </xsl:if>
+                                    <tr>
+                                        
+                                        <th>Coord System</th>
+                                        <td><xsl:apply-templates select=".." mode="checkgroup"/>
+                                        <xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="specimen:location/@coordinate-frame"/></td>
+                                    </tr>
+                                    <tr>
+                                        
+                                        <th>Coordinates</th>
+                                        <td>
+                                            <xsl:apply-templates select=".." mode="checkgroup"/>
+                                        <xsl:apply-templates select="." mode="checkgroup"/>
+                                            <ul style="list-style-type:none; padding:0; margin:0">
+                                            <xsl:for-each select="specimen:location/*">
+                                                <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable> 
+                                                <li>
+                                                    <xsl:apply-templates select=".." mode="checkgroup"/>
+                                                    <xsl:apply-templates select="." mode="checkgroup"/>
+                                                    <xsl:choose>
+                                                        <xsl:when test="document('')/*/db:coordmap/db:entry[@key=$localname]">
+                                                            <xsl:value-of select="document('')/*/db:coordmap/db:entry[@key=$localname]"/>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:value-of select="$localname"/>                       
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                    &#160;=&#160;
+                                                    <xsl:value-of select="."/>&#160;<xsl:value-of select="@units"/>
+                                                </li>
+                                            </xsl:for-each>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </xsl:for-each>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <th style="width:125px;">Identifier Marks</th>
-                <td>
-                    <ul style="padding:0 0 0 12px; margin:0px">
-                        <xsl:for-each select="specimen:identifier">
-                            <li><span>
-                                <xsl:apply-templates select="." mode="checkgroup"/>
-                                <xsl:value-of select="."/>
-                            </span></li>
-                        </xsl:for-each>
-                    </ul>
-                </td>
-            </tr>
+                    </td>
+                </tr>
+            </xsl:if>
+            <xsl:if test="specimen:identifiers">
+                <tr>
+                    <th style="width:125px;">Identifier Marks</th>
+                    <td>
+                        <ul style="padding:0 0 0 12px; margin:0px">
+                            <xsl:for-each select="specimen:identifiers/specimen:identifier">
+                                <li><span>
+                                    <xsl:apply-templates select="." mode="checkgroup"/>
+                                    <xsl:value-of select="."/>
+                                </span></li>
+                            </xsl:for-each>
+                        </ul>
+                    </td>
+                </tr>
+            </xsl:if>
         </tbody>
     </table>
 </xsl:template>
@@ -261,7 +312,9 @@
         <tbody>
             <tr><th style="width:125px;">Component</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="@component"/></td></tr>
             <tr><th style="width:125px;">Shape</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:shape" mode="checkgroup"/><xsl:value-of select="specimen:shape/."/></td></tr>
-            <tr><th style="width:125px;">CAD File</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:cadfile" mode="checkgroup"/><xsl:value-of select="specimen:cadfile/."/></td></tr>
+            <xsl:if test="specimen:cadfile">
+                <tr><th style="width:125px;">CAD File</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:cadfile" mode="checkgroup"/><xsl:value-of select="specimen:cadfile/."/></td></tr>
+            </xsl:if>
             <tr><th style="width:125px;">Dimension Type</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="@dimensiontype"/></td></tr>
             <tr><th style="width:125px;">Coordinate Sys</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="@coordinatesystem"/></td></tr>
             <tr><th style="width:125px;">Dimensions</th><td><xsl:apply-templates select="." mode="checkgroup"/>
@@ -346,8 +399,10 @@
                     </xsl:for-each>
                 </ul>
             </td></tr>
-            <tr><th style="width:125px;">Stress Riser Type</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/@type"/></td></tr>
-            <tr><th style="width:125px;">Riser Depth</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser/specimen:depth" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/specimen:depth/."/>&#160;<xsl:value-of select="specimen:stressriser/specimen:depth/@units"/></td></tr>
+            <xsl:if test="specimen:stressriser/specimen:depth">
+                <tr><th style="width:125px;">Stress Riser Type</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/@type"/></td></tr>
+                <tr><th style="width:125px;">Riser Depth</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser/specimen:depth" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/specimen:depth/."/>&#160;<xsl:value-of select="specimen:stressriser/specimen:depth/@units"/></td></tr>
+            </xsl:if>
         </tbody>
     </table>
 </xsl:template>
