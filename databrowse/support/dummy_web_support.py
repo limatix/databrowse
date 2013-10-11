@@ -57,7 +57,7 @@ class wsgi_req:
         #    pass
         fs = None
         params['path'] = filename
-        os.environ['QUERY_STRING'] = '&'.join(['%s=%s' % (key, params[key]) for key in params])
+        os.environ['QUERY_STRING'] = str('&'.join(['%s=%s' % (key, params[key]) for key in params]))
         fs = cgi.FieldStorage(keep_blank_values=1)
         self.form = fs
 
