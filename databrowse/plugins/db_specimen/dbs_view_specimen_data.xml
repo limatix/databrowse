@@ -350,7 +350,7 @@
                             <xsl:value-of select="$localname"/>                                    
                         </xsl:otherwise>
                     </xsl:choose>
-                </th><td><xsl:apply-templates select=".." mode="checkgroup"/><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/><xsl:if test="@units">&#160;<xsl:value-of select="@units" /></xsl:if><div style="font-size:11px; line-height:11px"><ul style="list-style-type:none;padding:0px;margin:0px"><xsl:if test="@source"><li>&#160;&#160;Source: <xsl:value-of select="@source"/></li></xsl:if><xsl:if test="@meascondition"><li>&#160;&#160;Measurement Condition: <xsl:value-of select="@meascondition"/></li></xsl:if><xsl:if test="@measuredby"><li>&#160;&#160;Measured By: <xsl:value-of select="@measuredby"/></li></xsl:if></ul></div></td></tr>
+                </th><td><xsl:apply-templates select=".." mode="checkgroup"/><xsl:apply-templates select="." mode="checkgroup"/><xsl:value-of select="."/><xsl:if test="@units">&#160;<xsl:value-of select="@units" /></xsl:if><div style="font-size:11px; line-height:11px"><ul style="list-style-type:none;padding:0px;margin:0px"><xsl:if test="@source"><li>&#160;&#160;Source: <xsl:choose><xsl:when test="starts-with(string(@source),'http') or starts-with(string(@source),'www')"><a><xsl:attribute name="href"><xsl:value-of select="@source"/></xsl:attribute>link</a></xsl:when><xsl:otherwise><xsl:value-of select="@source"/></xsl:otherwise></xsl:choose></li></xsl:if><xsl:if test="@meascondition"><li>&#160;&#160;Measurement Condition: <xsl:value-of select="@meascondition"/></li></xsl:if><xsl:if test="@measuredby"><li>&#160;&#160;Measured By: <xsl:value-of select="@measuredby"/></li></xsl:if></ul></div></td></tr>
             </xsl:for-each>
         </tbody>
     </table>
@@ -542,6 +542,24 @@
                             <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
                         </img></a></div>
             </xsl:if>
+        </td>
+    </tr>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="dir:dir" mode="directory">
+    <tr>
+        <td style="word-wrap:break-word; word-break:break-all">
+            <a>
+                <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                <img style="vertical-align:text-top;">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                </img>
+            </a>
+        </td>
+        <td>
+            <a>
+                <xsl:apply-templates select=".." mode="checkgroup"/>
+                <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                <xsl:value-of select="@name"/></a><br/>
         </td>
     </tr>
 </xsl:template>
