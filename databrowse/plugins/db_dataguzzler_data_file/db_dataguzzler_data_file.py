@@ -735,6 +735,7 @@ class db_dataguzzler_data_file(renderer_class):
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
             waveformname = "Unnamed Waveform " + str(waveformnumber)
+            dgf.chunkdone(dgfh, chunk)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
