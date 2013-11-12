@@ -1,0 +1,188 @@
+#!/bin/sh
+
+# Configurable Parameters
+PYINSTALLPREFIX=/usr/local
+WSGIINSTALLLOCATION=/usr/local/databrowse
+
+# Colors
+Color_Off='\e[0m'       # Text Reset
+IRed='\e[1;91m'         # High Intensity Red
+Yellow='\e[0;33m'       # Yellow
+BBlue='\e[1;34m'        # Blue
+On_IYellow='\e[0;103m'  # Yellow High Intensity Background
+BGreen='\e[1;32m'       # Bold Green
+BRed='\e[1;31m'         # Bold Red
+
+clear
+echo -e "$Yellow╔═════════════════════════════════════════════════════════════════════════╗"
+echo -e "║  $IRed   _____          _          _                                        $Yellow ║"
+echo -e "║  $IRed  |  __ \        | |        | |                                       $Yellow ║"
+echo -e "║  $IRed  | |  | |  __ _ | |_  __ _ | |__   _ __  ___ __      __ ___   ___    $Yellow ║"
+echo -e "║  $IRed  | |  | | / _\` || __|/ _\` || '_ \ | '__|/ _  \\\ \ /\ / // __| / _ \  $Yellow  ║"
+echo -e "║  $IRed  | |__| || (_| || |_| (_| || |_) || |  | (_) |\ V  V / \__ \|  __/   $Yellow ║"
+echo -e "║  $IRed  |_____/  \__,_| \__|\__,_||_.__/ |_|   \___/  \_/\_/  |___/ \___|   $Yellow ║"
+echo -e "║                                                                         ║"
+echo -e "╚═════════════════════════════════════════════════════════════════════════╝$Color_Off"
+echo "                                                                           "
+echo "Databrowse: An Extensible Data Management Platform                         "
+echo "Copyright © 2012-2013 Iowa State University                                "
+echo "                                                                           "
+echo -e "See$BBlue COPYING$Color_Off for more information                                           "
+echo "                                                                           "
+#echo -e "$On_IYellow                                                                           "
+#echo -e "$On_IYellow$IRed INSTALLING DATABROWSE                                                     $Color_Off"
+#echo -e "$On_IYellow                                                                           $Color_Off"
+echo "Environment:                                                               "
+echo -e "  Python Install Prefix = $BBlue$PYINSTALLPREFIX$Color_Off                                 "
+echo -e "  WSGI Application Location = $BBlue$WSGIINSTALLLOCATION$Color_Off                         "
+echo "Pre-Installation Checks:                                                   "
+
+go_on=true
+
+# Check for Root Access
+if [ `whoami` != root ]; then
+    go_on=false
+    echo -e "  Root or Sudo =$BRed No $Color_Off                                        "
+else
+    echo -e "  Root or Sudo =$BGreen Yes $Color_Off                                     "
+fi
+
+# Make Sure Repository States Match - i.e. we don't need to call hg update
+hgtip=$(hg tip --template "{node|short}")
+hgid=$(hg identify -i | tr -d +)
+if [ $hgtip == $hgid ]; then
+    echo -e "  Mercurial Repo Up-to-Date = $BGreen Yes $Color_Off"
+else
+    go_on=false
+    echo -e "  Mercurial Repo Up-to-Date = $BRed No $Color_Off"
+fi
+
+# Check For Uncommitted Updates
+hgstatus=$(hg status | wc -l)
+if [ $hgstatus != 0 ]; then
+    go_on=false
+    echo -e "  All Changes Committed = $BRed No $Color_Off"
+else
+    echo -e "  All Changes Committed = $BGreen Yes $Color_Off"
+fi
+    
+
+# Prompt User to Continue
+if [ $go_on == false ]; then
+    echo -e "$BRed "
+    echo -en "Pre-Installation Check(s) Failed - Should We Continue Anyway? [y/N] $Color_Off"
+    read -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi    
+fi    
+
+echo "Pre-Installation Checks Complete"
+echo " "
+
+# Install Databrowse Python Library
+echo -e "$BGreen=== Installing Databrowse Python Library ==================================$Color_Off"
+python setup.py install --prefix=$PYINSTALLPREFIX
+if [ $? == 0 ]; then
+    pystatus=true
+    echo "Databrowse Python Library Install Complete"
+    echo " "
+else
+    pystatus=false
+    echo -en "$BRed"
+    echo -en "Databrowse Python Library Install Failed!  Continue Installation? [y/N]$Color_Off"
+    read -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi    
+fi
+
+# Install Databrowse WSGI Application
+echo -e "$BGreen=== Installing Databrowse WSGI Application ================================$Color_Off"
+rsync -avz --delete-after databrowse_wsgi/ $WSGIINSTALLLOCATION
+if [ $? == 0 ]; then
+    wsgistatus=true
+    echo "Databrowse Python WSGI Application Install Complete"
+    echo " "
+else
+    wsgistatus=false
+    echo -en "$BRed"
+    echo -en "Databrowse WSGI Application Install Failed!  Continue Configuration? [y/N]$Color_Off"
+    read -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi    
+fi
+
+# Configure Databrowse WSGI Application
+if [ -e /etc/databrowse_wsgi.conf ]; then
+    echo "Databrowse Python WSGI Application Already Configured"
+    echo " "
+    confstatus=true
+else
+    echo -e "$BGreen=== Configuring Databrowse WSGI Application ===============================$Color_Off"
+    rsync -avz databrowse_wsgi/web.sample.conf /etc/databrowse_wsgi.conf
+    if [ $? == 0 ]; then
+        echo -en "Sample Configuration File Copied to /etc/databrowse_wsgi.conf Successfully.  Edit now? [Y/n]"
+        read -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]
+        then
+            myeditor="${EDITOR:-vi}"
+            $myeditor /etc/databrowse_wsgi.conf
+            if [ $? == 0 ]; then
+                confstatus=true
+                echo "Databrowse Python WSGI Application Configuration Complete"
+                echo " "
+            else
+                confstatus=false
+                echo -en "$BRed"
+                echo -e "Databrowse Python Library Configuration Failed!$Color_Off"
+                echo " "
+            fi
+        else
+            confstatus=true
+            echo "Databrowse Python WSGI Application Configuration Complete"
+            echo " "
+        fi  
+    else
+        confstatus=false
+        echo -en "$BRed"
+        echo -e "Databrowse Python Library Configuration Failed!$Color_Off"
+        echo " "
+    fi
+fi
+
+echo "Databrowse Installation Complete!"
+echo ""
+echo "Installation Status:"
+echo -n "  Databrowse Python Library: "
+if [ $pystatus == true ]; then
+    echo -e "$BGreen Success $Color_Off"
+else
+    echo -e "$BRed Failed $Color_Off"
+fi
+echo -n "  Databrowse WSGI Application: "
+if [ $wsgistatus == true ]; then
+    echo -e "$BGreen Success $Color_Off"
+else
+    echo -e "$BRed Failed $Color_Off"
+fi
+echo -n "  Databrowse WSGI Configuration: "
+if [ $confstatus == true ]; then
+    echo -e "$BGreen Success $Color_Off"
+else
+    echo -e "$BRed Failed $Color_Off"
+fi
+
+
+
+
+
+                                                                  

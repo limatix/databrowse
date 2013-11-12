@@ -7,6 +7,6 @@ syntax: glob
 web.conf
 setuptools_hg-*
 hgtools-*
-build/lib.*
+build/lib/*
 *.egg-info*
 *.egg*
