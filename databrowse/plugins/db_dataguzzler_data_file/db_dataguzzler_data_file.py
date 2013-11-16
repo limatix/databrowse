@@ -226,6 +226,7 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Error: could not open \"%s\" for write" % outputfile)
         dgf.writewfm(outfile, waveform)
         dgf.close(outfile)
+        dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'dgz'))
         return (self.getCacheFileHandler('r', filename, 'dgz'), size)
@@ -332,6 +333,7 @@ class db_dataguzzler_data_file(renderer_class):
         f = self.getCacheFileHandler('w', filename, 'csv')
         numpy.savetxt(f, waveform.data, delimiter=",")
         f.close()
+        dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'csv'))
         return (self.getCacheFileHandler('r', filename, 'csv'), size)
@@ -438,6 +440,7 @@ class db_dataguzzler_data_file(renderer_class):
         f = self.getCacheFileHandler('w', filename, 'mat')
         sio.savemat(f, {'waveform': waveform})
         f.close()
+        dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'mat'))
         return (self.getCacheFileHandler('r', filename, 'mat'), size)
@@ -613,6 +616,7 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Only Three Dimensional Waveforms May Be Converted To Video")
 
         # Finish and Save
+        dgf.rewind(dgfh)
         dgf.close(dgfh)
         cachefile = self.getCacheFileName(filename, 'avi')
         if dimlen[2] > 10:
@@ -735,7 +739,6 @@ class db_dataguzzler_data_file(renderer_class):
             filename = "WAVEFORM"+str(waveformnumber)
             waveform = dgf.procGUZZWFMD(dgfh, None)
             waveformname = "Unnamed Waveform " + str(waveformnumber)
-            dgf.chunkdone(dgfh, chunk)
             pass
         else:
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
@@ -849,13 +852,17 @@ class db_dataguzzler_data_file(renderer_class):
             pylab.grid(True)
             pass
         else:
-            raise self.RendererException("Unrecognized Waveform Data")
+            pylab.xlabel('NaN')
+            pylab.ylabel('NaN')
+            pylab.grid(True)
+            pylab.title('No Figure')
 
         # Finish and Save
         f = self.getCacheFileHandler('w', filename, 'png')
         pylab.savefig(f)
         f.close()
         pylab.clf()
+        dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'png'))
         return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
