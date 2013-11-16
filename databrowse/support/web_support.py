@@ -78,31 +78,55 @@ class wsgi_req:
         """ Return Error Message """
         if status == 400:
             self.status = '400 Bad Request'
+            message = 'The server does not understand your request.  Please modify your query and try again.  Please contact the administrators for further assistance.'
         elif status == 401:
             self.status = '401 Unauthorized'
+            message = 'You have not been granted permission to access this system.  If you believe this mistake is in error, please contact the administrators for further assistance.'
         elif status == 403:
             self.status = '403 Forbidden'
+            message = 'The system is unable to access the requested file.  This is likely due to a file permissions error.  Ensure the web server process has read/write access to this file and try again.  Please contact the administrators for further assistance, if needed.'
         elif status == 404:
             self.status = '404 Page Not Found'
+            message = 'The system is unable to locate this file.  Please check the name and try again.  If you believe this mistake is in error, please contact the administrators for further assistance.'
         elif status == 405:
             self.status = '405 Method Not Allowed'
+            message = 'An error has occurred.  Please contact the administrators for further assistance.'
         elif status == 406:
             self.status = '406 Not Acceptable'
+            message = 'An error has occurred.  Please contact the administrators for further assistance.'
         elif status == 500:
             self.status = '500 Internal Server Error'
+            message = 'An error has occurred.  Please contact the administrators for further assistance.'
         elif status == 501:
             self.status = '501 Not Implemented'
+            message = 'This feature has not yet been implemented.  Please contact the administrators for further assistance.'
         elif status == 503:
             self.status = '503 Service Unavailable'
+            message = 'An error has occurred.  Please contact the administrators for further assistance.'
         else:
             self.status = '500 Internal Server Error'
+            message = 'An error has occurred.  Please contact the administrators for further assistance.'
 
         self.output_done = True
+        errormessage = '''\
+<?xml-stylesheet type="text/xsl" href="/dbres/db_web.xml"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+<body db:resdir="/dbres/">
+    <h1>%s</h1>
+    <p>%s</p>
+</body>
+<db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <db:navbar>
+        <db:navelem><a href="javascript:window.history.back()">Go Back</a></db:navelem>
+    </db:navbar>
+</db:navigation>
+</html>'''
+        errormessage = errormessage % (self.status, message)
         self.response_headers = {}
-        self.response_headers['Content-Type'] = 'text/html'
-        self.response_headers['Content-Length'] = str(len(self.status.encode('utf-8')))
+        self.response_headers['Content-Type'] = 'text/xml'
+        self.response_headers['Content-Length'] = str(len(errormessage))
         self.start_response(self.status, self.response_headers.items())
-        return [self.status.encode('utf-8')]
+        return [errormessage]
 
     pass
 
