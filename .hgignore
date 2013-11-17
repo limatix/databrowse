@@ -8,5 +8,6 @@ web.conf
 setuptools_hg-*
 hgtools-*
 build/lib/*
+build/*
 *.egg-info*
 *.egg*

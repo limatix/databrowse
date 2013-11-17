@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" xmlns:movie="http://thermal.cnde.iastate.edu/databrowse/movie" xmlns:sdw="http://thermal.cnde.iastate.edu/databrowse/solidworks" match="imgdir:dir" mode="title">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" xmlns:movie="http://thermal.cnde.iastate.edu/databrowse/movie" xmlns:svg="http://thermal.cnde.iastate.edu/databrowse/svg" xmlns:sdw="http://thermal.cnde.iastate.edu/databrowse/solidworks" match="imgdir:dir" mode="title">
     <style>
         #imglist {
             padding-left: 0px;
@@ -404,6 +404,65 @@
                                         </span>
                                         <span class="listitemoptionname">
                                             <a><xsl:attribute name="href"><xsl:value-of select="sdw:sdw/@downlink"/></xsl:attribute>Download File</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </xsl:when>
+                <xsl:when test="child::*[1][self::svg:svg]">
+                    <li>
+                        <div class="listitem">
+                            <div class="listitemheader">
+                                    <span class="listicon">
+                                        <img>
+                                            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/image-x-generic.png</xsl:attribute>
+                                        </img>
+                                    </span>
+                                    <span class="listitemtitle">
+                                        <a>
+                                            <xsl:attribute name="title"><xsl:value-of select="svg:svg/@name"/></xsl:attribute>
+                                            <xsl:attribute name="href"><xsl:value-of select="svg:svg/@link"/></xsl:attribute>
+                                            <xsl:value-of select="svg:svg/@name"/>
+                                        </a>
+                                    </span>
+                            </div>
+                            <div class="listitemcontents">
+                                <div class="listitemthumbnail">
+                                    <a>
+                                        <!--<xsl:attribute name="href"><xsl:value-of select="svg:svg/@link"/></xsl:attribute>-->
+                                        <xsl:attribute name="onclick">openimage('<xsl:value-of select="svg:svg/@name"/>','<xsl:value-of select="svg:svg/@href"/>')</xsl:attribute>
+                                        <img style="max-width:201px; max-height:201px">
+                                                <xsl:attribute name="src"><xsl:value-of select="svg:svg/@src"/></xsl:attribute>
+                                        </img>
+                                    </a>
+                                </div>
+                                <div class="listitemoptions">
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="svg:svg/@link"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="svg:svg/@link"/></xsl:attribute>View Details</a>
+                                        </span>
+                                    </div>
+                                    <div class="listitemoption">
+                                        <span class="listicon">
+                                            <a>
+                                                <xsl:attribute name="href"><xsl:value-of select="svg:svg/@downlink"/></xsl:attribute>
+                                                <img>
+                                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+                                                </img>
+                                            </a>
+                                        </span>
+                                        <span class="listitemoptionname">
+                                            <a><xsl:attribute name="href"><xsl:value-of select="svg:svg/@downlink"/></xsl:attribute>Download File</a>
                                         </span>
                                     </div>
                                 </div>

@@ -1,0 +1,109 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ExifIFD="http://ns.exiftool.ca/EXIF/ExifIFD/1.0/" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:IFD0="http://ns.exiftool.ca/EXIF/IFD0/1.0/" xmlns:svg="http://thermal.cnde.iastate.edu/databrowse/svg" match="svg:svg" mode="full">
+    <div class="grid-row">
+	    <div class="grid g-1-1">
+	    	<div style="width:300px; padding-right:5px; float:left">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+					<img style="border:1px solid #900; max-width:300px; max-height:300px" title="Click to View Image Full Size">
+		    			<xsl:attribute name="src"><xsl:value-of select="@src"/></xsl:attribute>
+					</img>
+				</a>
+	    	</div>
+		    <div>
+		    	<table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
+		    		<thead>
+		        		<tr class="dark-title">
+		        			<th style="width:8px">
+		        				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/image-x-generic.png</xsl:attribute></img>
+		        			</th>
+		        			<th colspan="2" style="word-wrap: break-word">
+		        				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+		        				<a>
+		        					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+		        					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+		        				</a>
+		        			</th>
+		        		</tr>
+		        	</thead>
+		        	<tbody>
+			        	<tr><td style="width:10px"></td><td style="width:100px">Content Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+			        	<tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+			        	<tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+		        		<tr><td></td><td>File Size: </td><td><xsl:value-of select="filesize"/></td></tr>
+		        		<tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+		        		<tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+		        		<tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+		        		<tr><td></td><td>Size: </td><td><xsl:value-of select="imgsize"/></td></tr>
+		        	</tbody>
+		    	</table>
+		    </div>
+		</div>
+	</div>
+    <div class="grid-row">
+    	<div class="grid g-1-1">
+    		<xsl:apply-templates select="dc:photometadata" mode="tags"/>
+    	</div>
+    </div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:svg="http://thermal.cnde.iastate.edu/databrowse/svg" xmlns:ExifIFD="http://ns.exiftool.ca/EXIF/ExifIFD/1.0/" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:IFD0="http://ns.exiftool.ca/EXIF/IFD0/1.0/" match="dc:photometadata" mode="tags">
+	<h3>Datacollect Photo Meta Data</h3>
+	<table class="cream full-width">
+		<thead>
+			<tr class="dark-title"><th>Tag Name</th><th>Data</th></tr>
+		</thead>
+		<tbody>
+			<xsl:for-each select="*">
+				<xsl:sort select="name()" order="descending"/>
+				<tr>
+					<td>
+						<xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+                        <xsl:choose>
+                            <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$localname"/>                                    
+                            </xsl:otherwise>
+                        </xsl:choose>: 
+					</td>
+					<td><xsl:value-of select='.'/></td>
+				</tr>
+			</xsl:for-each>
+		</tbody>
+	</table>
+</xsl:template>
+<db:fieldmap xmlns="http://thermal.cnde.iastate.edu/databrowse" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <entry key="photofilename">Photo File Name</entry>
+    <entry key="specimen">Specimen</entry>
+    <entry key="perfby">Performed By</entry>
+    <entry key="date">Date</entry>
+    <entry key="dest">Destination</entry>
+    <entry key="reqfilename">File Name Template</entry>
+    <entry key="comment">Comments</entry>
+    <entry key="reqtimestamp">Timestamp</entry>
+    <entry key="LightSource">Light Source</entry>
+    <entry key="ModifyDate">Modification Date</entry>
+    <entry key="ColorSpace">Color Space</entry>
+    <entry key="Software">Software</entry>
+    <entry key="ExifImageWidth">Width</entry>
+    <entry key="Flash">Flash</entry>
+    <entry key="Model">Model</entry>
+    <entry key="Orientation">Orientation</entry>
+    <entry key="DateTimeOriginal">Original Image Timestamp</entry>
+    <entry key="FNumber">F Stop</entry>
+    <entry key="ExifImageHeight">Height</entry>
+    <entry key="ExposureMode">Exposure Mode</entry>
+    <entry key="SceneCaptureType">Scene Mode</entry>
+    <entry key="BrightnessValue">Brightness Value</entry>
+    <entry key="FocalLength">Focal Length</entry>
+    <entry key="ExposureTime">Exposure</entry>
+    <entry key="Make">Camera Make</entry>
+    <entry key="WhiteBalance">White Balance</entry>
+    <entry key="ISO">ISO</entry>
+    <entry key="Sharpness">Sharpness</entry>
+    <entry key="GPSLongitudeRef">Longitude Reference</entry>
+    <entry key="GPSLatitudeRef">Latitude Reference</entry>
+    <entry key="GPSLongitude">Longitude</entry>
+    <entry key="GPSLatitude">Latitude</entry>
+    <entry key="GPSAltitude">Altitude</entry>
+</db:fieldmap>
