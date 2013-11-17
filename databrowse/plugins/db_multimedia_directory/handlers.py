@@ -27,7 +27,7 @@ def dbh_directory_image(path, contenttype, extension):
         dirlist = os.listdir(path)
         count = 0
         for item in dirlist:
-            if (os.path.splitext(item)[1].lower() in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".avi", ".mpg", ".mpeg", ".mpe", ".mpeg-1", ".mpeg-2", ".m1s", ".mpa", ".mp2", ".m2a", ".mp2v", ".m2v", ".m2s", ".mov", ".qt", ".asf", ".asx", ".wmv", ".wma", ".wmx", ".rm", ".ra", ".ram", ".rmvb", ".mp4", ".3gp", ".ogm", ".mkv", ".sldprt", ".sldasm", ".slddrw", ".pmd"]):
+            if (os.path.splitext(item)[1].lower() in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff", ".avi", ".mpg", ".mpeg", ".mpe", ".mpeg-1", ".mpeg-2", ".m1s", ".mpa", ".mp2", ".m2a", ".mp2v", ".m2v", ".m2s", ".mov", ".qt", ".asf", ".asx", ".wmv", ".wma", ".wmx", ".rm", ".ra", ".ram", ".rmvb", ".mp4", ".3gp", ".ogm", ".mkv", ".sldprt", ".sldasm", ".slddrw", ".pmd", ".svg"]):
                 count = count + 1
         if count > (len(dirlist) * 0.5):
             return "db_multimedia_directory"
