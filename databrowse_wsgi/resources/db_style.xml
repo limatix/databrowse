@@ -19,7 +19,7 @@
 	<db:sitetitle><a href="/">Thermography Research Group - Databrowse</a></db:sitetitle>
 
 	<!-- Site Tagline -->
-	<db:sitetitle></db:sitetitle>
+	<db:sitetagline><span></span></db:sitetagline>
 
 	<!-- NavBar Top -->
 	<!--<db:navbar>

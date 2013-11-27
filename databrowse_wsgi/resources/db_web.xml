@@ -79,8 +79,16 @@
 								    	<xsl:attribute name="alt">Iowa State University</xsl:attribute>
 								  	</xsl:element>
 								</a>
-								<div class="site-title sub-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
-								<div class="site-title sub-tagline"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
+								<div class="grids-fluid clearfix">
+									<div class="grid-right">
+										<div class="sub-title site-tagline"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
+									</div>
+									<div class="grid-left">
+										<div class="site-title sub-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
+									</div>
+								</div>
+								<!--<div class="site-title sub-title"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
+								<div class="site-title sub-tagline"><xsl:copy-of select="document('db_style.xml')/db:dbstyle/db:sitetagline/*"/></div>-->
 							</div>
 						</div>
 					</div>
