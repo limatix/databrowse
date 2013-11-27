@@ -11,3 +11,4 @@ build/lib/*
 build/*
 *.egg-info*
 *.egg*
+databrowse_wsgi/db_style.xml
