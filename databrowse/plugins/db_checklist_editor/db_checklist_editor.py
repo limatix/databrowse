@@ -41,7 +41,7 @@ class db_checklist_editor(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
+            if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form and self._style_mode == "fill_out_checklist":
                 if "filename" in self._web_support.req.form and "destination" in self._web_support.req.form and "file" in self._web_support.req.form:
                     filename = self._web_support.req.form["filename"].value
                     destination = self._web_support.req.form["destination"].value
@@ -161,6 +161,41 @@ class db_checklist_editor(renderer_class):
                 templatefile = self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
                 xmlroot.set("templatefile", templatefile)
                 return xmlroot
+            elif "ajax" in self._web_support.req.form and "save" in self._web_support.req.form and self._style_mode == "edit_checklist":
+                if "file" in self._web_support.req.form:
+                    filestring = self._web_support.req.form["file"].value
+                    fullfilename = self._fullpath
+                    # Let's check on the directory and make sure its writable and it exists
+                    if not os.access(os.path.dirname(fullfilename), os.W_OK):
+                        self._web_support.req.output = "Error Saving File:  Save Directory Not Writable " + os.path.dirname(fullfilename)
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
+                    elif not os.access(fullfilename, os.W_OK):
+                        self._web_support.req.output = "Error Saving File:  File Not Writable " + fullfilename
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
+                    else:
+                        #Let's check on the file and make sure its writable and doesn't exist
+                        if os.path.exists(fullfilename):
+                            # rename old version into .1 .2. .3 etc.
+                            filenum = 1
+                            while os.path.exists("%s.bak.%.2d" % (fullfilename, filenum)):
+                                filenum += 1
+                                pass
+                            os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
+                            pass
+
+                        f = open(fullfilename, "w")
+                        f.write(filestring)
+                        f.close
+                        self._web_support.req.output = "File Saved Successfully"
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
+                    pass
+                else:
+                    self._web_support.req.output = "Error Saving File: Incomplete Request"
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    return [self._web_support.req.return_page()]
             else:
                 raise self.RendererException("Invalid Content Mode")
 
