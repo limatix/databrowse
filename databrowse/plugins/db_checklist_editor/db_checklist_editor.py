@@ -138,29 +138,6 @@ class db_checklist_editor(renderer_class):
                     self._web_support.req.output = "Error Generating PDF: Incomplete Request"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
-            elif self._content_mode == "full" and self._style_mode == "fill_out_checklist":
-                #etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
-                f = open(self._fullpath, 'r')
-                xml = etree.parse(f)
-                f.close()
-                g = open('/usr/local/QAutils/checklist/chx2html.xsl', 'r')
-                xsltransform = etree.parse(g)
-                g.close()
-                transform = etree.XSLT(xsltransform)
-                if "dest" in self._web_support.req.form:
-                    transformedxml = transform(xml, dest=etree.XSLT.strparam(self._web_support.req.form['dest'].value))
-                else:
-                    transformedxml = transform(xml)
-                xmloutput = etree.XML(str(transformedxml))
-                return xmloutput
-            elif self._content_mode == "full" and self._style_mode =="edit_checklist":
-                f = open(self._fullpath, 'r')
-                xml = etree.parse(f)
-                f.close()
-                xmlroot = xml.getroot()
-                templatefile = self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
-                xmlroot.set("templatefile", templatefile)
-                return xmlroot
             elif "ajax" in self._web_support.req.form and "save" in self._web_support.req.form and self._style_mode == "edit_checklist":
                 if "file" in self._web_support.req.form:
                     filestring = self._web_support.req.form["file"].value
@@ -196,6 +173,29 @@ class db_checklist_editor(renderer_class):
                     self._web_support.req.output = "Error Saving File: Incomplete Request"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
+            elif self._content_mode == "full" and self._style_mode == "fill_out_checklist":
+                #etree.register_namespace("chx", "http://thermal.cnde.iastate.edu/checklist")
+                f = open(self._fullpath, 'r')
+                xml = etree.parse(f)
+                f.close()
+                g = open('/usr/local/QAutils/checklist/chx2html.xsl', 'r')
+                xsltransform = etree.parse(g)
+                g.close()
+                transform = etree.XSLT(xsltransform)
+                if "dest" in self._web_support.req.form:
+                    transformedxml = transform(xml, dest=etree.XSLT.strparam(self._web_support.req.form['dest'].value))
+                else:
+                    transformedxml = transform(xml)
+                xmloutput = etree.XML(str(transformedxml))
+                return xmloutput
+            elif self._content_mode == "full" and self._style_mode =="edit_checklist":
+                f = open(self._fullpath, 'r')
+                xml = etree.parse(f)
+                f.close()
+                xmlroot = xml.getroot()
+                templatefile = self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
+                xmlroot.set("templatefile", templatefile)
+                return xmlroot
             else:
                 raise self.RendererException("Invalid Content Mode")
 
