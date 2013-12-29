@@ -157,8 +157,20 @@ class db_data_table(renderer_class):
 
     class MyExt:
         _fullpath = '/'
-        def __init__(self, fullpath):
+        _namespaces = {'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'}
+        class AssertionException(Exception):
+            pass
+        def __init__(self, fullpath, namespaces=[]):
             self._fullpath = fullpath
+            if namespaces:
+                self._namespaces = {}
+                for ns in namespaces:
+                    self._namespaces[ns.get('local')] = ns.get('uri')
+                    pass
+                pass
+            else:
+                self._namespaces = {'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'}
+            pass
         def rowmatch(self, _, files, rowmatch):
             cwd = os.getcwd()
             os.chdir(os.path.dirname(self._fullpath))
@@ -166,7 +178,7 @@ class db_data_table(renderer_class):
             output = []
             for filename in filelist:
                 et = etree.parse(filename)
-                r = et.xpath(rowmatch[0], namespaces={'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'})
+                r = et.xpath(rowmatch[0], namespaces=self._namespaces)
                 for i in r:
                     output.append(i)
                     pass
@@ -174,11 +186,11 @@ class db_data_table(renderer_class):
             os.chdir(cwd)
             return output
         def xpath(self, _, xpathexpr, data):
-            return data[0].xpath(xpathexpr[0], namespaces={'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'})
+            return data[0].xpath(xpathexpr[0], namespaces=self._namespaces)
         def xmlassert(self, _, xpathexpr, data):
-            test = data[0].xpath(xpathexpr[0], namespaces={'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'})
+            test = data[0].xpath(xpathexpr[0], namespaces=self._namespaces)
             if not test:
-                raise Exception("Assertion Failed")
+                raise self.AssertionException('Assertion "%s" on %s failed' % (str(xpathexpr[0]), repr(data[0])))
             else:
                 pass
         def xmllistassert(self, _, xpathexpr, data):
@@ -186,9 +198,9 @@ class db_data_table(renderer_class):
             for item in data:
                 xml.append(item)
             xml = etree.ElementTree(xml)
-            test = xml.xpath(xpathexpr[0], namespaces={'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'})
+            test = xml.xpath(xpathexpr[0], namespaces=self._namespaces)
             if not test:
-                raise Exception("Assertion Failed")
+                raise self.AssertionException('Assertion "%s" on %s failed' % (str(xpathexpr[0]), repr(xml)))
             else:
                 pass
 
@@ -198,15 +210,17 @@ class db_data_table(renderer_class):
             return None
         else:
             if self._content_mode == "full":
-                ext_module = self.MyExt(self._fullpath)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 xml = etree.parse(self._fullpath)
+                namespaces = xml.xpath('namespaces/*')
+                ext_module = self.MyExt(self._fullpath, namespaces)
+                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 return xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions).getroot()
             elif self._content_mode == "raw" and 'filetype' in self._web_support.req.form and self._web_support.req.form['filetype'].value == "ods":
                 # File Generation
-                ext_module = self.MyExt(self._fullpath)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 xml = etree.parse(self._fullpath)
+                namespaces = xml.xpath('namespaces/*')
+                ext_module = self.MyExt(self._fullpath, namespaces)
+                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 base = xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions)
                 result = etree.tostring(base.xslt(etree.XML(self._ods_transform)))
                 filename = str(base.xpath('//@title')[0])
@@ -253,9 +267,10 @@ class db_data_table(renderer_class):
                     return iter(lambda: f.read(1024))
             elif self._content_mode == "raw" and 'filetype' in self._web_support.req.form and self._web_support.req.form['filetype'].value == "csv":
                 # File Generation
-                ext_module = self.MyExt(self._fullpath)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 xml = etree.parse(self._fullpath)
+                namespaces = xml.xpath('namespaces/*')
+                ext_module = self.MyExt(self._fullpath, namespaces)
+                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
                 base = xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions)
 
                 # File Creation
