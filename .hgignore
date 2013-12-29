@@ -9,6 +9,7 @@ setuptools_hg-*
 hgtools-*
 build/lib/*
 build/*
+dist/*
 *.egg-info*
 *.egg*
 databrowse_wsgi/db_style.xml
