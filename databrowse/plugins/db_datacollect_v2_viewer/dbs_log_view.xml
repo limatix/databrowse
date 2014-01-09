@@ -3,17 +3,39 @@
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/prettify/prettify.js</xsl:attribute>
     </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
     <script type="text/javascript" defer="true">
         <![CDATA[
             $(document).ready(function() {
                 prettyPrint();
+                $(".autoexp").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
             });         
         ]]>
     </script>
     <xsl:element name="link">
         <xsl:attribute name="type">text/css</xsl:attribute>
         <xsl:attribute name="rel">stylesheet</xsl:attribute>
-        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
     </xsl:element>
     <style>
         .dgcode {
@@ -23,6 +45,7 @@
             white-space: -o-pre-wrap;
             word-wrap: break-word;
             max-width: 555px;
+            max-height: 300px;
         }
         .inlinelist {
             padding-left: 0px;
@@ -38,6 +61,12 @@
         }
         .inlinelist li img {
             border: 1px solid #c00;
+        }
+        table.autoexp thead th {
+            text-align: center;
+        }
+        table.cream tbody td {
+            max-width: 534px;
         }
     </style>
     <div style="float:right;">
@@ -234,13 +263,14 @@
                 <tr><th><abbr title="dc:cltitle">Checklist Title</abbr></th><td><xsl:value-of select="chx:cltitle"/></td></tr>
                 <tr><th><abbr title="dc:measchecklist">Checklist Link</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:measchecklist"/></xsl:attribute><xsl:value-of select="dc:measchecklist"/></a></td></tr>
                 <xsl:if test="dc:dgsfile and not(dc:dgsfile='')"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/></xsl:attribute><xsl:value-of select="dc:dgsfile"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=VibroFitImg</xsl:attribute></img></p></td></tr></xsl:if>
+                <xsl:if test="dc:scanxy_outdgd and not(dc:scanxy_outdgd='')"><tr><th><abbr title="dc:scanxy_outdgd">ScanXY DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scanxy_outdgd"/></xsl:attribute><xsl:value-of select="dc:scanxy_outdgd"/></a></td></tr></xsl:if>                
                 <xsl:if test="dc:setfile and not(dc:setfile='')"><tr><th><abbr title="dc:setfile">Set File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:setfile"/></xsl:attribute><xsl:value-of select="dc:setfile"/></a></td></tr></xsl:if>
                 <tr><th><abbr title="dc:notes">Notes</abbr></th><td><xsl:call-template name="dc2-lf2p">
                         <xsl:with-param name="instr">
                             <xsl:value-of select="dc:notes"/>
                         </xsl:with-param>
                     </xsl:call-template></td></tr>
-                <xsl:for-each select="*[not(self::dc:measnum or self::chx:clinfo or self::chx:cltitle or self::dc:measphotos or self::dc:specimen or self::dc:date or self::dc:perfby or self::dc:measchecklist or self::dc:notes or self::dc:setfile or self::dc:dgsfile)]">
+                <xsl:for-each select="*[not(self::dc:measnum or self::chx:clinfo or self::chx:cltitle or self::dc:measphotos or self::dc:specimen or self::dc:date or self::dc:perfby or self::dc:measchecklist or self::dc:notes or self::dc:setfile or self::dc:dgsfile or self::dc:scanxy_outdgd)]">
                     <xsl:sort data-type="text" select="local-name()"/>
                     <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
                     <xsl:choose>
@@ -257,6 +287,28 @@
                                 </pre></xsl:if>
                             </td></tr>
                         </xsl:when>
+                        <xsl:when test="$localname = 'loadcalculation_out'">
+                            <tr><th><abbr title="dc:loadcalculation_out">Load Calculation Output</abbr></th><td>
+                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
+                                    <xsl:value-of select="."/>
+                                </pre></xsl:if>
+                            </td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'excitation'">
+                            <tr><th><abbr title="dc:excitation">Excitation</abbr></th><td>
+                                <xsl:choose>     
+                                    <xsl:when test="@dcv:exctype='sweep'">
+                                        SWEEP&#160;<xsl:value-of select="dcv:f0/." />&#160;<xsl:value-of select="dcv:f0/@dcv:units" />&#160;<xsl:value-of select="dcv:f1/." />&#160;<xsl:value-of select="dcv:f1/@dcv:units" />&#160;<xsl:value-of select="dcv:t0/." />&#160;<xsl:value-of select="dcv:t0/@dcv:units" />&#160;<xsl:value-of select="dcv:t1/." />&#160;<xsl:value-of select="dcv:t1/@dcv:units" />&#160;<xsl:value-of select="dcv:t2/." />&#160;<xsl:value-of select="dcv:t2/@dcv:units" />&#160;<xsl:value-of select="dcv:t3/." />&#160;<xsl:value-of select="dcv:t3/@dcv:units" />
+                                    </xsl:when>
+                                    <xsl:when test="@dcv:exctype='burst'">
+                                        BURST&#160;<xsl:value-of select="dcv:f0/." />&#160;<xsl:value-of select="dcv:f0/@dcv:units" />&#160;<xsl:value-of select="dcv:f1/@dcv:units" />&#160;<xsl:value-of select="dcv:t0/." />&#160;<xsl:value-of select="dcv:t0/@dcv:units" />&#160;<xsl:value-of select="dcv:t1/." />&#160;<xsl:value-of select="dcv:t1/@dcv:units" />&#160;<xsl:value-of select="dcv:t2/." />&#160;<xsl:value-of select="dcv:t2/@dcv:units" />&#160;<xsl:value-of select="dcv:t3/." />&#160;<xsl:value-of select="dcv:t3/@dcv:units" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="."/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td></tr>
+                        </xsl:when>
 			            <xsl:when test="$localname = 'scanxy_out'">
                             <tr><th><abbr title="dc:scanxy_out">XY Scan Output</abbr></th><td>
                                 <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
@@ -265,8 +317,9 @@
                             </td></tr>
                         </xsl:when>
 			            <xsl:when test="$localname = 'autoexp'">
-                            <tr><th><abbr title="dc:autoexp">Auto Table</abbr></th><td>
-				                <table class="cream">
+                            <tr><th><abbr title="dc:autoexp">Auto Table</abbr></th><td style="width:534px">
+				                <table class="cream autoexp">
+                                <xsl:attribute name="id">datatable_autoexp_<xsl:number/></xsl:attribute>
 				                    <thead><tr>
                                         <xsl:for-each select="dc:automeas[1]/*">
                                             <xsl:variable name="autoexpname"><xsl:value-of select="local-name()"/></xsl:variable>
@@ -282,6 +335,9 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </abbr>
+                                                <xsl:if test="normalize-space(@dcv:units)!=''">
+                                                    &#160;(<xsl:value-of select="@dcv:units"/>)
+                                                </xsl:if>
                                             </th>
                                         </xsl:for-each>
 				                    </tr></thead>
@@ -290,7 +346,7 @@
 					                        <tr>
                                                 <xsl:for-each select="*">
                                                     <td>
-                                                        <xsl:value-of select="." /> &#160;<xsl:value-of select="@dcv:units"/>
+                                                        <xsl:value-of select="." />
                                                     </td>                                
                                                 </xsl:for-each>
                                             </tr>
@@ -359,7 +415,7 @@
     <entry key="transducertemp">Transducer Temperature</entry>
     <entry key="triggercount">Trigger Count</entry>
     <entry key="triggerindex">Trigger Index</entry>
-    <entry key="vibsignallevel">Vibrometer Signal Level</entry>
+    <entry key="vibsignallevel">Vib Signal</entry>
     <entry key="view">View</entry>
     <entry key="xducer">Transducer</entry>
     <entry key="xduceroffset">Transducer Offset</entry>
@@ -398,9 +454,9 @@
     <entry key="xducerxoffset">Transducer X Offset</entry>
     <entry key="xduceryoffset">Transducer Y Offset</entry>
     <entry key="xducerzoffset">Transducer Z Offset</entry>
-    <entry key="vibrange">Vibrometer Range</entry>
-    <entry key="vib2range">Vibrometer 2 Range</entry>
-    <entry key="vib2signallevel">Vibrometer 2 Signal Level</entry>
+    <entry key="vibrange">Vib Range</entry>
+    <entry key="vib2range">Vib 2 Range</entry>
+    <entry key="vib2signallevel">Vib 2 Signal</entry>
     <entry key="triggertimestamp">Trigger Timestamp</entry>
     <entry key="simulation_xducertype">Simulation Transducer Type</entry>
     <entry key="recordmeastimestamp">Save Measurement Timestamp</entry>
@@ -422,4 +478,39 @@
     <entry key="ppstrainmean">Strain Mean</entry>
     <entry key="ppstrainmedian">Strain Median</entry>
     <entry key="ppstrainstd">Strain St. Dev.</entry>
+    <entry key="XPos">X</entry>
+    <entry key="GotXPos">Got X</entry>
+    <entry key="stepnum_x">X Step</entry>
+    <entry key="YPos">Y</entry>
+    <entry key="GotYPos">Got Y</entry>
+    <entry key="stepnum_y">Y Step</entry>
+    <entry key="dgdidx">Count</entry>
+    <entry key="blmountoffset">Bottom Left Mount Offset</entry>    
+    <entry key="brmountoffset">Bottom Right Mount Offset</entry>
+    <entry key="tlmountoffset">Top Left Mount Offset</entry>
+    <entry key="trmountoffset">Top Right Mount Offset</entry>
+    <entry key="calcstraincoeff">Calc Strain Coefficient?</entry>
+    <entry key="desiredbendingstress">Desired Bending Stress</entry>
+    <entry key="end_pos_x">End X Pos</entry>
+    <entry key="end_pos_y">End Y Pos</entry>
+    <entry key="exportresults">Export Results?</entry>
+    <entry key="lblockoffset">Left Block Offset</entry>
+    <entry key="rblockoffset">Right Block Offset</entry>
+    <entry key="majoraxis">Major Axis</entry>
+    <entry key="maxtemp">Max Temp</entry>
+    <entry key="measchannels">Saved Channels</entry>
+    <entry key="minoraxis">Minor Axis</entry>
+    <entry key="motioncontroller">Motion Controller</entry>
+    <entry key="pausescanning">Pause Scanning</entry>
+    <entry key="sleeptime">Sleep Time</entry>
+    <entry key="spcDensity">Specimen Density</entry>
+    <entry key="spcPoissonsRatio">Specimen Poisson's Ratio</entry>
+    <entry key="spcYoungsModulus">Specimen Young's Modulus</entry>
+    <entry key="start_pos_x">X Start Position</entry>
+    <entry key="start_pos_y">Y Start Position</entry>
+    <entry key="step_size_x">X Step Size</entry>
+    <entry key="step_size_y">Y Step Size</entry>
+    <entry key="vibmodule">Vibrometer Module</entry>
+    <entry key="xstartspccoords">X Start Coordinate</entry>
+    <entry key="ystartspccoords">Y Start Coordinate</entry>
 </db:fieldmap>
