@@ -257,6 +257,48 @@
                                 </pre></xsl:if>
                             </td></tr>
                         </xsl:when>
+			            <xsl:when test="$localname = 'scanxy_out'">
+                            <tr><th><abbr title="dc:scanxy_out">XY Scan Output</abbr></th><td>
+                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
+                                    <xsl:value-of select="."/>
+                                </pre></xsl:if>
+                            </td></tr>
+                        </xsl:when>
+			            <xsl:when test="$localname = 'autoexp'">
+                            <tr><th><abbr title="dc:autoexp">Auto Table</abbr></th><td>
+				                <table class="cream">
+				                    <thead><tr>
+                                        <xsl:for-each select="dc:automeas[1]/*">
+                                            <xsl:variable name="autoexpname"><xsl:value-of select="local-name()"/></xsl:variable>
+                                            <th>
+                                                <abbr>
+                                                    <xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+                                                    <xsl:choose>
+                                                        <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$autoexpname]">
+                                                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$autoexpname]"/>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:value-of select="$autoexpname"/>                                    
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </abbr>
+                                            </th>
+                                        </xsl:for-each>
+				                    </tr></thead>
+                                    <tbody>
+					                    <xsl:for-each select="dc:automeas">
+					                        <tr>
+                                                <xsl:for-each select="*">
+                                                    <td>
+                                                        <xsl:value-of select="." /> &#160;<xsl:value-of select="@dcv:units"/>
+                                                    </td>                                
+                                                </xsl:for-each>
+                                            </tr>
+                        				</xsl:for-each>
+				                    </tbody>
+                				</table>
+                            </td></tr>
+                        </xsl:when>
                         <xsl:otherwise>                            
                             <tr>
                                 <th><abbr><xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
