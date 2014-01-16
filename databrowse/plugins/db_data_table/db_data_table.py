@@ -35,19 +35,15 @@ class db_data_table(renderer_class):
     _default_style_mode = "view_table"
     _default_recursion_depth = 2
     _table_transform = r"""<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns="http://thermal.cnde.iastate.edu/databrowse/datatable" xmlns:dt="http://thermal.cnde.iastate.edu/databrowse/datatable" xmlns:my="http://thermal.cnde.iastate.edu/databrowse/datatable/functions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" exclude-result-prefixes="my">
+<xsl:stylesheet xmlns="http://thermal.cnde.iastate.edu/databrowse/datatable" xmlns:dt="http://thermal.cnde.iastate.edu/databrowse/datatable" %s xmlns:my="http://thermal.cnde.iastate.edu/databrowse/datatable/functions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dyn="http://exslt.org/dynamic" extension-element-prefixes="dyn my" version="1.0" exclude-result-prefixes="my">
     <xsl:output method='xml' indent='yes' omit-xml-declaration="no" version="1.0" media-type="application/xml" encoding="UTF-8"/>
     <xsl:template match="table">
         <dt:datatable>
             <xsl:variable name="files" select="@filenamematch" />
             <xsl:variable name="rowmatch" select="rowmatch/@select" />
-            <xsl:variable name="data" select="my:rowmatch($files, $rowmatch)" />
+            <xsl:variable name="data" select="my:data($files)" />
+            <xsl:variable name="assert" select="assert" />
             <xsl:variable name="cols" select="colspec"/>
-            <xsl:for-each select="assert">
-                <xsl:variable name="assert" select="@select" />
-                <!-- Doesn't Matter How We Do It - We Just Need to Execute the Assert Statement -->
-                <xsl:if test="my:xmllistassert($assert, $data)"/>
-            </xsl:for-each>
             <xsl:attribute name="title">
                 <xsl:choose>
                     <xsl:when test="@title"><xsl:value-of select="@title" /></xsl:when>
@@ -76,22 +72,38 @@ class db_data_table(renderer_class):
             </dt:header>
             <xsl:apply-templates select="$data" mode="data">
                 <xsl:with-param name="cols" select="$cols" />
+                <xsl:with-param name="rowmatch" select="$rowmatch" />
+                <xsl:with-param name="assert" select="$assert" />
             </xsl:apply-templates>
         </dt:datatable>
     </xsl:template>
     <xsl:template match="*" mode="data">
         <xsl:param name="cols" />
-        <xsl:variable name="data" select="." />
-        <dt:row>
-            <xsl:for-each select="$cols">
-                <xsl:for-each select="assert">
-                    <xsl:variable name="assert" select="@select" />
-                    <!-- Doesn't Matter How We Do It - We Just Need to Execute the Assert Statement -->
-                    <xsl:if test="my:xmlassert($assert, $data)"/>
-                </xsl:for-each>
-                <dt:data><xsl:if test="@type"><xsl:attribute name="type"><xsl:value-of select="@type"/></xsl:attribute></xsl:if><xsl:value-of select="my:xpath(@select, $data)"/></dt:data>
+        <xsl:param name="rowmatch" />
+        <xsl:param name="assert" />
+        <xsl:for-each select="dyn:evaluate($rowmatch)">
+            <xsl:variable name="data" select="." />
+            <xsl:for-each select="$assert">
+                <xsl:apply-templates mode="assert" select="$data">
+                    <xsl:with-param name="assert" select="$assert/@select"/>
+                </xsl:apply-templates>
             </xsl:for-each>
-        </dt:row>
+            <dt:row>
+                <xsl:for-each select="$cols">
+                    <dt:data><xsl:if test="@type"><xsl:attribute name="type"><xsl:value-of select="@type"/></xsl:attribute></xsl:if><xsl:apply-templates mode="value" select="$data"><xsl:with-param name="select" select="@select"/></xsl:apply-templates></dt:data>
+                </xsl:for-each>
+            </dt:row>
+        </xsl:for-each>
+    </xsl:template>
+    <xsl:template match="*" mode="value">
+        <xsl:param name="select"/>
+        <xsl:value-of select="dyn:evaluate($select)"/>
+    </xsl:template>
+    <xsl:template match="*" mode="assert">
+        <xsl:param name="assert"/>
+        <xsl:if test="not(dyn:evaluate($assert))">
+            <xsl:if test="my:xmlassert($assert)"/>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>
 """
@@ -160,49 +172,22 @@ class db_data_table(renderer_class):
         _namespaces = {'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'}
         class AssertionException(Exception):
             pass
-        def __init__(self, fullpath, namespaces=[]):
+        def __init__(self, fullpath):
             self._fullpath = fullpath
-            if namespaces:
-                self._namespaces = {}
-                for ns in namespaces:
-                    self._namespaces[ns.get('local')] = ns.get('uri')
-                    pass
-                pass
-            else:
-                self._namespaces = {'dc':'http://thermal.cnde.iastate.edu/datacollect', 'dcv': 'http://thermal.cnde.iastate.edu/dcvalue'}
             pass
-        def rowmatch(self, _, files, rowmatch):
+        def data(self, _, files):
             cwd = os.getcwd()
             os.chdir(os.path.dirname(self._fullpath))
             filelist = glob.glob(files[0])
             output = []
             for filename in filelist:
-                et = etree.parse(filename)
-                r = et.xpath(rowmatch[0], namespaces=self._namespaces)
-                for i in r:
-                    output.append(i)
-                    pass
+                e = etree.parse(filename).getroot()
+                output.append(e)
                 pass
             os.chdir(cwd)
             return output
-        def xpath(self, _, xpathexpr, data):
-            return data[0].xpath(xpathexpr[0], namespaces=self._namespaces)
-        def xmlassert(self, _, xpathexpr, data):
-            test = data[0].xpath(xpathexpr[0], namespaces=self._namespaces)
-            if not test:
-                raise self.AssertionException('Assertion "%s" on %s failed' % (str(xpathexpr[0]), repr(data[0])))
-            else:
-                pass
-        def xmllistassert(self, _, xpathexpr, data):
-            xml = etree.Element("root")
-            for item in data:
-                xml.append(item)
-            xml = etree.ElementTree(xml)
-            test = xml.xpath(xpathexpr[0], namespaces=self._namespaces)
-            if not test:
-                raise self.AssertionException('Assertion "%s" on %s failed' % (str(xpathexpr[0]), repr(xml)))
-            else:
-                pass
+        def xmlassert(self, _, assertstatement):
+            raise self.AssertionException('Assertion "%s" failed' % (str(assertstatement[0])))
 
 
     def getContent(self):
@@ -211,17 +196,17 @@ class db_data_table(renderer_class):
         else:
             if self._content_mode == "full":
                 xml = etree.parse(self._fullpath)
-                namespaces = xml.xpath('namespaces/*')
-                ext_module = self.MyExt(self._fullpath, namespaces)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                return xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions).getroot()
+                namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
+                ext_module = self.MyExt(self._fullpath)
+                extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
+                return xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions).getroot()
             elif self._content_mode == "raw" and 'filetype' in self._web_support.req.form and self._web_support.req.form['filetype'].value == "ods":
                 # File Generation
                 xml = etree.parse(self._fullpath)
-                namespaces = xml.xpath('namespaces/*')
-                ext_module = self.MyExt(self._fullpath, namespaces)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                base = xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions)
+                namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
+                ext_module = self.MyExt(self._fullpath)
+                extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
+                base = xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions)
                 result = etree.tostring(base.xslt(etree.XML(self._ods_transform)))
                 filename = str(base.xpath('//@title')[0])
 
@@ -268,10 +253,10 @@ class db_data_table(renderer_class):
             elif self._content_mode == "raw" and 'filetype' in self._web_support.req.form and self._web_support.req.form['filetype'].value == "csv":
                 # File Generation
                 xml = etree.parse(self._fullpath)
-                namespaces = xml.xpath('namespaces/*')
-                ext_module = self.MyExt(self._fullpath, namespaces)
-                extensions = etree.Extension(ext_module, ('rowmatch', 'xpath', 'xmlassert', 'xmllistassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                base = xml.xslt(etree.XML(self._table_transform % os.path.basename(self._fullpath)), extensions=extensions)
+                namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
+                ext_module = self.MyExt(self._fullpath)
+                extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
+                base = xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions)
 
                 # File Creation
                 f = tempfile.TemporaryFile()
