@@ -1,0 +1,95 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dt="http://thermal.cnde.iastate.edu/databrowse/datatable" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" match="dt:datatable" mode="full">
+	<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorder/media/js/ColReorder.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/js/ZeroClipboard.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/js/TableTools.js</xsl:attribute>
+    </xsl:element>
+    <!--<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
+    </xsl:element>-->
+    <!-- Add T<"clear"> to Beginning of sDom for TableTools -->
+    <script type="text/javascript" defer="true">
+    	resdir = '<xsl:value-of select="$resdir"/>';
+        <![CDATA[
+            $(document).ready(function() {
+                $('#datatable').dataTable({
+                    "sDom": 'RlCfrtip',
+                    "aoColumnDefs": [
+                        { "bVisible": false, "aTargets": [ 1 ] }
+                    ],
+                    "sScrollX": "764px",
+                    "bScrollCollapse": true,
+                    "sPaginationType": "full_numbers",
+                    "bStateSave": true,
+                    "oTableTools": {
+                    	"sSwfPath": resdir + "/DataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
+                    }
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/css/TableTools.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        #datatable {
+            white-space: nowrap;
+        }
+    </style>
+    <div style="float:right">
+    	<img>
+    		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+    	</img>
+    	<a><xsl:attribute name="href">?content_mode=raw&amp;filetype=ods&amp;custom_view=<xsl:value-of select="@custom_view"/></xsl:attribute>ods</a> | <a><xsl:attribute name="href">?content_mode=raw&amp;filetype=csv&amp;custom_view=<xsl:value-of select="@custom_view"/></xsl:attribute>csv</a>
+    </div>
+	<h1><xsl:value-of select="@title"/></h1>
+	<xsl:if test="dt:description">
+		<xsl:copy-of select="dt:description/node()" />
+	</xsl:if>
+	<table class="cream" id="datatable">
+		<thead>
+			<tr>
+				<xsl:for-each select="dt:header/dt:coldef">
+					<th><xsl:if test="@tooltip"><xsl:attribute name="title"><xsl:value-of select="@tooltip"/></xsl:attribute></xsl:if><xsl:value-of select="." /></th>
+				</xsl:for-each>
+			</tr>
+		</thead>
+		<tbody>
+			<xsl:for-each select="dt:row">
+				<tr>
+					<xsl:for-each select="dt:data">
+						<td><xsl:value-of select="." /></td>
+					</xsl:for-each>
+				</tr>
+			</xsl:for-each>
+		</tbody>
+	</table>
+</xsl:template>
