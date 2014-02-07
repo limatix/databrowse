@@ -189,7 +189,7 @@ def application(environ, start_response):
                     pass
                 count += 1
                 pass
-            topbarstring += "</div>"
+            topbarstring += "</div><div id='toggleexpand'><a onclick='togglefullwidth()' style='position:relative; top:-30px; right:-15px; float:right; cursor:pointer'><img src='%s/icons/gtk-fullscreen.png'/></a></div>" % db_web_support.resurl
 
             # If we are only requesting content or style, output them
             if "contentonly" in db_web_support.req.form:

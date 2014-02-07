@@ -61,7 +61,15 @@
     </xsl:element>
     <style>
         #datatable {
-            white-space: nowrap;
+            font-size: small;
+        }
+        table.cream thead th {
+            font-size: small;
+            text-align: center;
+            padding: 0 15px 0 0;
+        }
+        .sorting_asc, .sorting, .sorting_desc{
+            background-position-y: 0%;
         }
     </style>
     <div style="float:right">
