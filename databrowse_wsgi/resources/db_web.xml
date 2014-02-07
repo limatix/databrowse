@@ -48,7 +48,7 @@
 			    <script type="text/javascript" src="/dbres/jquery-1.9.1.min.js"/>
 			    <script type="text/javascript">
 			    	<![CDATA[
-			    		fullwidth = false;
+			    		var fullwidth = false;
 			    		function togglefullwidth() {
 			    			if (fullwidth == true) {
 			    				setnormalwidth();

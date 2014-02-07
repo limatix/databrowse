@@ -17,29 +17,32 @@
     </xsl:element>
     <xsl:element name="script">
         <xsl:attribute name="type">text/javascript</xsl:attribute>
-        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/js/TableTools.js</xsl:attribute>
-    </xsl:element>
-    <!--<xsl:element name="script">
-        <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
-    </xsl:element>-->
+    </xsl:element>
     <!-- Add T<"clear"> to Beginning of sDom for TableTools -->
     <script type="text/javascript" defer="true">
     	resdir = '<xsl:value-of select="$resdir"/>';
         <![CDATA[
             $(document).ready(function() {
-                $('#datatable').dataTable({
+                var table = $('#datatable').dataTable({
                     "sDom": 'RlCfrtip',
                     "aoColumnDefs": [
                         { "bVisible": false, "aTargets": [ 1 ] }
                     ],
-                    "sScrollX": "764px",
+                    "sScrollX": "100%",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
                     "bStateSave": true,
                     "oTableTools": {
                     	"sSwfPath": resdir + "/DataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf"
                     }
+                });
+
+            $(window).bind('resize', function () {
+                table.fnAdjustColumnSizing();
+                });
+            $("#toggleexpand a").bind('click', function() {
+                table.fnAdjustColumnSizing();
                 });
             });         
         ]]>
@@ -82,7 +85,7 @@
 	<xsl:if test="dt:description">
 		<xsl:copy-of select="dt:description/node()" />
 	</xsl:if>
-	<table class="cream" id="datatable">
+	<table class="cream full-width" id="datatable">
 		<thead>
 			<tr>
 				<xsl:for-each select="dt:header/dt:coldef">

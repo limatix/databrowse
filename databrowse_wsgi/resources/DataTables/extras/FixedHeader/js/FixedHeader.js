@@ -176,7 +176,7 @@ FixedHeader.prototype = {
 		s.bFooter = ($('>tfoot', s.nTable).length > 0) ? true : false;
 		
 		/* "Detect" browsers that don't support absolute positioing - or have bugs */
-		s.bUseAbsPos = (jQuery.browser.msie && (jQuery.browser.version=="6.0"||jQuery.browser.version=="7.0"));
+		s.bUseAbsPos = false;
 		
 		/* Add the 'sides' that are fixed */
 		if ( s.oSides.top )
@@ -264,8 +264,7 @@ FixedHeader.prototype = {
 		 * This is much slower since the position must be updated for each scroll, but widens
 		 * compatibility
 		 */
-		s.bUseAbsPos = (jQuery.browser.msie && 
-			(jQuery.browser.version=="6.0"||jQuery.browser.version=="7.0"));
+		s.bUseAbsPos = false;
 	},
 	
 	/*
