@@ -44,6 +44,9 @@
             $("#toggleexpand a").bind('click', function() {
                 table.fnAdjustColumnSizing();
                 });
+
+            togglefullwidth();
+            table.fnAdjustColumnSizing();
             });         
         ]]>
     </script>
@@ -68,11 +71,17 @@
         }
         table.cream thead th {
             font-size: small;
-            text-align: center;
-            padding: 0 15px 0 0;
+            padding: 1px 15px 1px 1px;
+            border: 1px solid #c1b78f;
+        }
+        table.cream td {
+            border: 1px solid #c1b78f;
         }
         .sorting_asc, .sorting, .sorting_desc{
             background-position-y: 0%;
+        }
+        table.dataTable td {
+            padding: 1px;
         }
     </style>
     <div style="float:right">
