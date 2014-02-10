@@ -168,7 +168,7 @@ def application(environ, start_response):
 
         if not renderer.isRaw():
             # Prepare Top Menu String
-            topbarstring = '<div class="pathbar">'
+            topbarstring = '<div class="pathbar"><div style="float:left">'
             linkstring = db_web_support.siteurl
             itemslist = string.split(relpath, "/")[1:]
             count = 1
@@ -189,7 +189,7 @@ def application(environ, start_response):
                     pass
                 count += 1
                 pass
-            topbarstring += "</div><div id='toggleexpand'><a onclick='togglefullwidth()' style='position:relative; top:-30px; right:-15px; float:right; cursor:pointer'><img src='%s/icons/gtk-fullscreen.png'/></a></div>" % db_web_support.resurl
+            topbarstring += "</div><div id='toggleexpand'><a onclick='togglefullwidth()' style='position:relative; right: 3px; top: 2px; float:right; cursor:pointer'><img src='%s/icons/gtk-fullscreen.png'/></a></div></div>" % db_web_support.resurl
 
             # If we are only requesting content or style, output them
             if "contentonly" in db_web_support.req.form:

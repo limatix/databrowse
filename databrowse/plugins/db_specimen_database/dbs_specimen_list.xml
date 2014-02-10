@@ -11,10 +11,10 @@
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
     </xsl:element>
-    <!--<xsl:element name="script">
+    <xsl:element name="script">
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
-    </xsl:element>-->
+    </xsl:element>
     <script type="text/javascript" defer="true">
         <![CDATA[
             var table;
@@ -26,14 +26,21 @@
                     } );
                 table = $('#specimentable').dataTable({
                     "sDom": 'RlCfrtip',
-                    "aoColumnDefs": [
-                        { "bVisible": false, "aTargets": [ 1 ] }
-                    ],
                     "sScrollX": "764px",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
                     "bStateSave": true
                 });
+
+                $(window).bind('resize', function () {
+                table.fnAdjustColumnSizing();
+                });
+                $("#toggleexpand a").bind('click', function() {
+                    table.fnAdjustColumnSizing();
+                    });
+
+                togglefullwidth();
+                table.fnAdjustColumnSizing();
             });    
             function printlabels() {
                     table.$('tr.row_selected').each(function(index,value) {
@@ -63,6 +70,7 @@
     <style>
         #specimentable {
             white-space: nowrap;
+            font-size: small;
         }
         .center {
             text-align: center;
@@ -73,6 +81,20 @@
 
         #specimentable tr.odd.row_selected td {
             background-color: rgb(235, 221, 177);
+        }
+        table.cream thead th {
+            font-size: small;
+            padding: 1px 15px 1px 1px;
+            border: 1px solid #c1b78f;
+        }
+        table.cream td {
+            border: 1px solid #c1b78f;
+        }
+        .sorting_asc, .sorting, .sorting_desc{
+            background-position-y: 0%;
+        }
+        table.dataTable td {
+            padding: 1px;
         }
     </style>
     <h1>Specimen Database</h1>

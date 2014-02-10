@@ -26,9 +26,6 @@
             $(document).ready(function() {
                 var table = $('#datatable').dataTable({
                     "sDom": 'RlCfrtip',
-                    "aoColumnDefs": [
-                        { "bVisible": false, "aTargets": [ 1 ] }
-                    ],
                     "sScrollX": "100%",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
