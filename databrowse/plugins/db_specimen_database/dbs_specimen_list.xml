@@ -70,7 +70,7 @@
     <style>
         #specimentable {
             white-space: nowrap;
-            font-size: small;
+            font-size: medium;
         }
         .center {
             text-align: center;
@@ -83,7 +83,7 @@
             background-color: rgb(235, 221, 177);
         }
         table.cream thead th {
-            font-size: small;
+            font-size: medium;
             padding: 1px 15px 1px 1px;
             border: 1px solid #c1b78f;
         }
