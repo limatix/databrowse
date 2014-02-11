@@ -105,7 +105,9 @@
                 <th>Group(s)</th>
                 <th>Material</th>
                 <th>Shape</th>
-                <th>Dimensions</th>
+                <th>Dimension 1</th>
+                <th>Dimension 2</th>
+                <th>Dimension 3</th>
                 <th>Crack Size</th>
                 <th>Crack Location</th>
             </tr>
@@ -134,9 +136,9 @@
                     </td>
                     <td><xsl:value-of select="specimen:physicalproperties/specimen:material/."/></td>
                     <td><xsl:value-of select="specimen:geometry/specimen:shape/."/></td>
-                    <td><xsl:for-each select="specimen:geometry/specimen:dimension">
-                        <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
-                    </xsl:for-each></td>
+                    <td><xsl:value-of select="specimen:geometry/specimen:dimension[1]" />&#160;<xsl:value-of select="specimen:geometry/specimen:dimension[1]/@units"/></td>
+                    <td><xsl:value-of select="specimen:geometry/specimen:dimension[2]" />&#160;<xsl:value-of select="specimen:geometry/specimen:dimension[2]/@units"/></td>
+                    <td><xsl:value-of select="specimen:geometry/specimen:dimension[3]" />&#160;<xsl:value-of select="specimen:geometry/specimen:dimension[3]/@units"/></td>
                     <td><xsl:value-of select="specimen:flawparameters/specimen:flawsize/."/>&#160;<xsl:value-of select="specimen:flawparameters/specimen:flawsize/@units"/></td>
                     <td><xsl:for-each select="specimen:flawparameters/specimen:location/*">
                         <xsl:value-of select="."/>&#160;<xsl:value-of select="@units" /><xsl:choose><xsl:when test="position() != last()"> x </xsl:when></xsl:choose>
