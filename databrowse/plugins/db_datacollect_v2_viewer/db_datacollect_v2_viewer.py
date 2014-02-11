@@ -266,10 +266,8 @@ class db_datacollect_v2_viewer(renderer_class):
                 filelist = glob.glob(filename)
                 for filename in filelist:
                     if filename == os.path.basename(self._fullpath):
-                        try:
-                            title = xml.xpath('@title')[0]
-                        except:
-                            title = os.path.splitext(item)[0]
+                        it = item if not item.startswith('.') else item[1:]
+                        title = " ".join([i[0].title()+i[1:] for i in os.path.splitext(it)[0].split("_")])
                         customitems[item] = title
                         pass
                     pass                    
