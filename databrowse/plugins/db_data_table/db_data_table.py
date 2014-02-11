@@ -90,12 +90,16 @@ class db_data_table(renderer_class):
             </xsl:for-each>
             <dt:row>
                 <xsl:for-each select="$cols">
-                    <dt:data><xsl:if test="@type"><xsl:attribute name="type"><xsl:value-of select="@type"/></xsl:attribute></xsl:if><xsl:apply-templates mode="value" select="$data"><xsl:with-param name="select" select="@select"/></xsl:apply-templates></dt:data>
+                    <dt:data><xsl:if test="@type"><xsl:attribute name="type"><xsl:value-of select="@type"/></xsl:attribute></xsl:if><xsl:if test="@url"><xsl:attribute name="url"><xsl:apply-templates mode="value" select="$data"><xsl:with-param name="select" select="@url"/></xsl:apply-templates></xsl:attribute></xsl:if><xsl:apply-templates mode="value" select="$data"><xsl:with-param name="select" select="@select"/></xsl:apply-templates></dt:data>
                 </xsl:for-each>
             </dt:row>
         </xsl:for-each>
     </xsl:template>
     <xsl:template match="*" mode="value">
+        <xsl:param name="select"/>
+        <xsl:value-of select="dyn:evaluate($select)"/>
+    </xsl:template>
+    <xsl:template match="*" mode="url">
         <xsl:param name="select"/>
         <xsl:value-of select="dyn:evaluate($select)"/>
     </xsl:template>
