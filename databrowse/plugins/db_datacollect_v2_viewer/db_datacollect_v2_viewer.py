@@ -108,7 +108,7 @@ class db_datacollect_v2_viewer(renderer_class):
                 root.set('filenamematch', os.path.basename(self._fullpath)) # Force it to only operate on this file
                 ext_module = db_data_table.MyExt(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form['custom_view'].value))
                 extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                root = xml.xslt(etree.XML(db_data_table._table_transform % (namespaces, self._web_support.req.form['custom_view'].value)), extensions=extensions).getroot()
+                root = xml.xslt(etree.XML(db_data_table._table_transform % (namespaces, self._web_support.siteurl, self.getURL(os.path.join(os.path.dirname(self._relpath), self._web_support.req.form['custom_view'].value)), self._web_support.req.form['custom_view'].value)), extensions=extensions).getroot()
                 root.set('custom_view', self._web_support.req.form['custom_view'].value)
                 return root
             elif self._content_mode == "raw":
@@ -124,7 +124,7 @@ class db_datacollect_v2_viewer(renderer_class):
                     root.set('filenamematch', os.path.basename(self._fullpath)) # Force it to only operate on this file
                     ext_module = db_data_table.MyExt(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form['custom_view'].value))
                     extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                    base = xml.xslt(etree.XML(db_data_table._table_transform % (namespaces, self._web_support.req.form['custom_view'].value)), extensions=extensions)
+                    base = xml.xslt(etree.XML(db_data_table._table_transform % (namespaces, self._web_support.siteurl, self.getURL(os.path.join(os.path.dirname(self._relpath), self._web_support.req.form['custom_view'].value)), self._web_support.req.form['custom_view'].value)), extensions=extensions)
                     filename = str(base.xpath('//@title')[0])
                     if self._web_support.req.form['filetype'].value == 'ods':
                         result = etree.tostring(base.xslt(etree.XML(db_data_table._ods_transform)))

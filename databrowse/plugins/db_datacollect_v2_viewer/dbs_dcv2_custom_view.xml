@@ -88,6 +88,11 @@
         }
     </style>
     <div style="float:right">
+        <a>
+            <xsl:attribute name="href"><xsl:value-of select="@sourcefile"/>?handler=db_plain_text_file&amp;style_mode=edit_text_file</xsl:attribute>
+            <img>
+                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/accessories-text-editor.png</xsl:attribute>
+            </img>Edit</a>&#160;&#160;&#160;
     	<img>
     		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
     	</img>

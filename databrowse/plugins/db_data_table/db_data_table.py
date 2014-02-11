@@ -37,8 +37,9 @@ class db_data_table(renderer_class):
     _table_transform = r"""<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns="http://thermal.cnde.iastate.edu/databrowse/datatable" xmlns:dt="http://thermal.cnde.iastate.edu/databrowse/datatable" %s xmlns:my="http://thermal.cnde.iastate.edu/databrowse/datatable/functions" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dyn="http://exslt.org/dynamic" extension-element-prefixes="dyn my" version="1.0" exclude-result-prefixes="my">
     <xsl:output method='xml' indent='yes' omit-xml-declaration="no" version="1.0" media-type="application/xml" encoding="UTF-8"/>
+    <xsl:variable name="siteurl" select="string('%s')" />
     <xsl:template match="table">
-        <dt:datatable>
+        <dt:datatable sourcefile="%s">
             <xsl:variable name="files" select="@filenamematch" />
             <xsl:variable name="rowmatch" select="rowmatch/@select" />
             <xsl:variable name="data" select="my:data($files)" />
@@ -158,7 +159,19 @@ class db_data_table(renderer_class):
                                                 <xsl:attribute name="office:value-type">string</xsl:attribute>
                                             </xsl:otherwise>
                                         </xsl:choose>
-                                        <text:p><xsl:value-of select="normalize-space(.)" /></text:p>
+                                        <text:p>
+                                            <xsl:choose>
+                                                <xsl:when test="@url">
+                                                    <text:a xlink:type="simple">
+                                                        <xsl:attribute name="xlink:href"><xsl:value-of select="@url"/></xsl:attribute>
+                                                        <xsl:value-of select="normalize-space(.)" />    
+                                                    </text:a>                                                    
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="normalize-space(.)" />
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </text:p>
                                     </table:table-cell>
                                 </xsl:for-each>
                             </table:table-row>
@@ -203,14 +216,14 @@ class db_data_table(renderer_class):
                 namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
                 ext_module = self.MyExt(self._fullpath)
                 extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                return xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions).getroot()
+                return xml.xslt(etree.XML(self._table_transform % (namespaces, self._web_support.siteurl, self.getURL(self._relpath), os.path.basename(self._fullpath))), extensions=extensions).getroot()
             elif self._content_mode == "raw" and 'filetype' in self._web_support.req.form and self._web_support.req.form['filetype'].value == "ods":
                 # File Generation
                 xml = etree.parse(self._fullpath)
                 namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
                 ext_module = self.MyExt(self._fullpath)
                 extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                base = xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions)
+                base = xml.xslt(etree.XML(self._table_transform % (namespaces, self._web_support.siteurl, self.getURL(self._relpath), os.path.basename(self._fullpath))), extensions=extensions)
                 result = etree.tostring(base.xslt(etree.XML(self._ods_transform)))
                 filename = str(base.xpath('//@title')[0])
 
@@ -260,7 +273,7 @@ class db_data_table(renderer_class):
                 namespaces = " ".join(["xmlns:" + str(item) + '="' + str(value) + '"' for item, value in xml.getroot().nsmap.iteritems()])
                 ext_module = self.MyExt(self._fullpath)
                 extensions = etree.Extension(ext_module, ('data', 'xmlassert'), ns='http://thermal.cnde.iastate.edu/databrowse/datatable/functions')
-                base = xml.xslt(etree.XML(self._table_transform % (namespaces, os.path.basename(self._fullpath))), extensions=extensions)
+                base = xml.xslt(etree.XML(self._table_transform % (namespaces, self._web_support.siteurl, self.getURL(self._relpath), os.path.basename(self._fullpath))), extensions=extensions)
 
                 # File Creation
                 f = tempfile.TemporaryFile()
