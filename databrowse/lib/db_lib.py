@@ -147,8 +147,6 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
     See also: DebugGetXML()
     """
 
-    os.environ["HOME"] = "/home/www/.home"
-
     import databrowse.support.dummy_web_support as db_web_support_module
 
     # Set up web_support class with environment information
