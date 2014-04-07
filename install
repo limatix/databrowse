@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Configurable Parameters
 PYINSTALLPREFIX=/usr/local
