@@ -39,7 +39,7 @@ class db_triggerlog(renderer_class):
             xml = etree.parse(f)
             f.close()
             return xml.getroot()
-        elif self._content_mode != "raw" and self._caller == "db_transducer_database" and self._style_mode == 'transducer_list':
+        elif self._content_mode != "raw" and self._caller == "db_triggerlog_database" and self._style_mode == 'view_trigger_log':
             f = open(self._fullpath, 'r')
             xml = etree.parse(f)
             f.close()

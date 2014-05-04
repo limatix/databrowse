@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tgl="http://thermal.cnde.iastate.edu/triggerlog" xmlns:tgldb="http://thermal.cnde.iastate.edu/databrowse/triggerlogdb" match="tgldb:dir" mode="title">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tgl="http://thermal.cnde.iastate.edu/triggerlog" xmlns:tgldb="http://thermal.cnde.iastate.edu/databrowse/triggerlogdb" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="tgldb:dir" mode="title">
     <xsl:element name="script">
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
@@ -11,24 +11,37 @@
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
     </xsl:element>
-    <!--<xsl:element name="script">
+    <xsl:element name="script">
         <xsl:attribute name="type">text/javascript</xsl:attribute>
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
-    </xsl:element>-->
+    </xsl:element>
     <script type="text/javascript" defer="true">
         <![CDATA[
+            var table;
             $(document).ready(function() {
-                $('#transducertable').dataTable({
+                $('#triggerlogtable tr').click( function() {
+                        $(this).toggleClass('row_selected');
+                        count = $('#specimentable tr.row_selected').length;
+                        $('#printbtn').text('Print Barcodes for ' + String(count) + ' Specimens')
+                    } );
+                table = $('#triggerlogtable').dataTable({
                     "sDom": 'RlCfrtip',
-                    "aoColumnDefs": [
-                        { "bVisible": false, "aTargets": [ 1 ] }
-                    ],
                     "sScrollX": "764px",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
                     "bStateSave": true
                 });
-            });         
+
+                $(window).bind('resize', function () {
+                table.fnAdjustColumnSizing();
+                });
+                $("#toggleexpand a").bind('click', function() {
+                    table.fnAdjustColumnSizing();
+                    });
+
+                togglefullwidth();
+                table.fnAdjustColumnSizing();
+            });           
         ]]>
     </script>
     <xsl:element name="link">
@@ -42,31 +55,66 @@
         <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
     </xsl:element>
     <style>
-        #transducertable {
+        #triggerlogtable {
             white-space: nowrap;
+            font-size: medium;
+        }
+        table.cream thead th {
+            font-size: medium;
+            padding: 1px 15px 1px 1px;
+            border: 1px solid #c1b78f;
+        }
+        table.cream td {
+            border: 1px solid #c1b78f;
+        }
+        .sorting_asc, .sorting, .sorting_desc{
+            background-position-y: 0%;
+        }
+        table.dataTable td {
+            padding: 1px;
         }
     </style>
-    <h1>Transducer Database</h1>
-    <table class="cream full-width" id="transducertable">
+    <h1>Trigger Log</h1>
+    <table class="cream full-width" id="triggerlogtable">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Manufacturer</th>
-                <th>Mfg Part No</th>
-                <th>Diameter</th>
-                <th>Length</th>
+                <th>Timestamp</th>
+                <th>Transducer</th>
+                <th>Specimen</th>
+                <th>Exc. Type</th>
+                <th>f0</th>
+                <th>f1</th>
+                <th>t0</th>
+                <th>t1</th>
+                <th>t2</th>
+                <th>t3</th>
+                <th>Amplitude</th>
+                <th>Energy</th>
             </tr>
         </thead>
         <tbody>
-            <xsl:for-each select="//transducer:transducer">
+            <xsl:for-each select="//tgl:trigger">
                 <tr>
-                    <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="transducer:id/."/></a></td>
-                    <td><xsl:value-of select="transducer:manufacturer/."/></td>
-                    <td><xsl:value-of select="transducer:mfgpartno/."/></td>
-                    <td><xsl:value-of select="transducer:stackgeometry/transducer:diameter/."/>&#160;
-                    <xsl:value-of select="transducer:stackgeometry/transducer:diameter/@units"/></td>
-                    <td><xsl:value-of select="transducer:stackgeometry/transducer:length/."/>&#160;
-                    <xsl:value-of select="transducer:stackgeometry/transducer:length/@units"/></td>
+                    <td><a><xsl:attribute name="href"><xsl:value-of select="../../@link"/></xsl:attribute><xsl:value-of select="tgl:timestamp/."/></a></td>
+                    <td><xsl:value-of select="tgl:transducer/."/></td>
+                    <td><xsl:value-of select="tgl:specimen/."/></td>
+                    <td><xsl:value-of select="tgl:excitation/@dcv:exctype"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:f0"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:f0/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:f1"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:f1/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:t0"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:t0/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:t1"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:t1/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:t2"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:t2/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:excitation/dcv:t3"/>&#160;
+                    <xsl:value-of select="tgl:excitation/dcv:t3/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:amplitude/."/>&#160;
+                    <xsl:value-of select="tgl:amplitude/@dcv:units"/></td>
+                    <td><xsl:value-of select="tgl:energy/."/>&#160;
+                    <xsl:value-of select="tgl:energy/@dcv:units"/></td>
                 </tr>
             </xsl:for-each>
         </tbody>

@@ -38,13 +38,12 @@ class db_triggerlog_database(db_directory_module.db_directory):
             self._namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dir"
             self._namespace_local = "dir"
             self._disable_load_style = True
-        if style_mode != "add_transducer":
-            tmpref = self.getDirectoryList
-            self.getDirectoryList = self.getTriggerlogDatabaseDirectoryList
-            super(db_triggerlog_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
-            self.getDirectoryList = tmpref
-        else:
-            super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+
+        tmpref = self.getDirectoryList
+        self.getDirectoryList = self.getTriggerlogDatabaseDirectoryList
+        super(db_triggerlog_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+        self.getDirectoryList = tmpref
+
         pass
 
     def getTriggerlogDatabaseDirectoryList(self, fullpath, sort=None, order="asc"):
@@ -56,9 +55,5 @@ class db_triggerlog_database(db_directory_module.db_directory):
         return returnlist
 
     def getContent(self):
-        if self._style_mode != "add_transducer":
-            return super(db_triggerlog_database, self).getContent()
-        else:
-            return None
-        pass
+        return super(db_triggerlog_database, self).getContent()
     pass
