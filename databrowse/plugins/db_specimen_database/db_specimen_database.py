@@ -41,9 +41,19 @@ class db_specimen_database(db_directory_module.db_directory):
             self._disable_load_style = True
         if style_mode not in ["add_specimen", "add_specimen_group"]:
             super(db_specimen_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+            self.getDirectoryList = self.getSpecimenDatabaseDirectoryList
         else:
             super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         pass
+
+    def getSpecimenDatabaseDirectoryList(self, fullpath, sort=None, order="asc"):
+        """ Build a Sorted List of Files with Appropriate Files Removed """
+        #print "getDirectoryList being called"
+        (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
+        reallist = os.listdir(fullpath)
+        returnlist = [n for n in reallist if n.endswith('.sdb') or n.endswith('.sdg')]
+        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        return returnlist
 
     def getContent(self):
         if self._style_mode not in ["add_specimen", "add_specimen_group"]:
