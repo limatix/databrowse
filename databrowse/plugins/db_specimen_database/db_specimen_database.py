@@ -51,7 +51,6 @@ class db_specimen_database(db_directory_module.db_directory):
     def getSpecimenDatabaseDirectoryList(self, fullpath, sort=None, order="asc"):
         """ Build a Sorted List of Files with Appropriate Files Removed """
         #print "getDirectoryList being called"
-        (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
         reallist = os.listdir(fullpath)
         returnlist = [n for n in reallist if n.endswith('.sdb') or n.endswith('.sdg')]
         exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")

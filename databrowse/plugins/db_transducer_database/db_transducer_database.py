@@ -39,10 +39,21 @@ class db_transducer_database(db_directory_module.db_directory):
             self._namespace_local = "dir"
             self._disable_load_style = True
         if style_mode != "add_transducer":
+            tmpref = self.getDirectoryList
+            self.getDirectoryList = self.getTransducerDatabaseDirectoryList
             super(db_transducer_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+            self.getDirectoryList = tmpref
         else:
             super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         pass
+
+    def getTransducerDatabaseDirectoryList(self, fullpath, sort=None, order="asc"):
+        """ Build a Sorted List of Files with Appropriate Files Removed """
+        #print "getDirectoryList being called"
+        reallist = os.listdir(fullpath)
+        returnlist = [n for n in reallist if n.endswith('.tdb')]
+        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        return returnlist
 
     def getContent(self):
         if self._style_mode != "add_transducer":
