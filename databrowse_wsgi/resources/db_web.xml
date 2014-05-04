@@ -25,6 +25,13 @@
 		</xsl:choose>
 	</xsl:variable>
 
+	<xsl:variable name="proctime">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:proctime"><xsl:value-of select="html:html/html:body/@db:proctime"/></xsl:when>
+			<xsl:otherwise/>
+		</xsl:choose>
+	</xsl:variable>
+
 	<!-- Begin Page Templates -->
 	<xsl:template match="/">
 		<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us">
@@ -163,6 +170,7 @@
 							</div>
 						</div>
 					</div>
+					<xsl:if test="$proctime"><div style="text-align:center; font-size:xx-small">Rendering Time: <xsl:value-of select="$proctime"/> s</div></xsl:if>
 					<div id="loading" style="display:none">Loading...</div>
 				</div>
 			</body>

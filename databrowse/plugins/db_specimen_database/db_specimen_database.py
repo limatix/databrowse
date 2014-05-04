@@ -40,8 +40,10 @@ class db_specimen_database(db_directory_module.db_directory):
             self._namespace_local = "dir"
             self._disable_load_style = True
         if style_mode not in ["add_specimen", "add_specimen_group"]:
-            super(db_specimen_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+            tmpref = self.getDirectoryList
             self.getDirectoryList = self.getSpecimenDatabaseDirectoryList
+            super(db_specimen_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+            self.getDirectoryList = tmpref
         else:
             super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         pass

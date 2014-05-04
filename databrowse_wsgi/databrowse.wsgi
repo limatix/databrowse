@@ -22,6 +22,7 @@ import sys
 import os
 import string
 from lxml import etree
+from time import time
 
 # Enable cgitb to provide better error message output
 import cgitb
@@ -36,10 +37,12 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
+    <xsl:variable name="proctime">%s</xsl:variable>
     <xsl:template match="/">
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
             <body>
                 <xsl:attribute name="db:resdir"><xsl:value-of select="$resdir"/></xsl:attribute>
+                <xsl:attribute name="db:proctime"><xsl:value-of select="$proctime"/></xsl:attribute>
                 %s
                 <xsl:apply-templates mode="%s"/>
             </body>
@@ -57,11 +60,13 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
+    <xsl:variable name="proctime">%s</xsl:variable>
     <xsl:template match="/">
         <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
             <body>
                 <xsl:attribute name="db:resdir"><xsl:value-of select="$resdir"/></xsl:attribute>
+                <xsl:attribute name="db:proctime"><xsl:value-of select="$proctime"/></xsl:attribute>
                 %s
                 <xsl:apply-templates mode="%s"/>
             </body>
@@ -111,6 +116,9 @@ def application(environ, start_response):
         #if os.path.dirname(environ['SCRIPT_FILENAME'] + '/support/') not in sys.path:
         #    sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
         #import web_support as db_web_support_module
+
+        starttime = time()
+
         import databrowse.support.web_support as db_web_support_module
 
         # Set up web_support class with environment information
@@ -166,6 +174,9 @@ def application(environ, start_response):
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
+        endtime = time()
+        runtime = "%.6f" % (endtime-starttime)
+
         if not renderer.isRaw():
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
@@ -198,7 +209,7 @@ def application(environ, start_response):
                 db_web_support.req.output = etree.tostring(xml)
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
-                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = style
                 return [db_web_support.req.return_page()]
@@ -219,14 +230,14 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = localwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = localwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 renderer.loadMenu()
@@ -236,7 +247,7 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 renderer.loadMenu()
@@ -366,8 +377,33 @@ class Debugger:
         pass
     pass
 
+class Profiler:
+    """ Code Used to Enable Profiling in Single Instance Apache Mode """
+
+    def __init__(self, object):
+        self.__object = object
+
+    def __call__(self, *args, **kwargs):
+        from pycallgraph import PyCallGraph
+        from pycallgraph.output import GraphvizOutput
+
+        with PyCallGraph(output=GraphvizOutput(output_file='/tmp/pycallgraph.svg', output_type='svg')):
+            return self.__object(*args, **kwargs)
+
+        pass
+
+
 # Uncomment this line to enable PDB
 # Apache must be ran in single instance mode using the following commands:
 #   sudo /etc/init.d/httpd stop
 #   httpd -X
 #application = Debugger(application)
+
+# Uncomment the below code to enable profiling
+# Apache must be ran in single instance mode using the following  commands:
+#   sudo /etc/init.d/httpd stop
+#   httpd -X
+#application = Profiler(application)
+
+
+
