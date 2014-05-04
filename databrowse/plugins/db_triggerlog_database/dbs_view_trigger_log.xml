@@ -1,0 +1,80 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tgl="http://thermal.cnde.iastate.edu/triggerlog" xmlns:tgldb="http://thermal.cnde.iastate.edu/databrowse/triggerlogdb" match="tgldb:dir" mode="title">
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorder/media/js/ColReorder.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
+    </xsl:element>
+    <!--<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
+    </xsl:element>-->
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                $('#transducertable').dataTable({
+                    "sDom": 'RlCfrtip',
+                    "aoColumnDefs": [
+                        { "bVisible": false, "aTargets": [ 1 ] }
+                    ],
+                    "sScrollX": "764px",
+                    "bScrollCollapse": true,
+                    "sPaginationType": "full_numbers",
+                    "bStateSave": true
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        #transducertable {
+            white-space: nowrap;
+        }
+    </style>
+    <h1>Transducer Database</h1>
+    <table class="cream full-width" id="transducertable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Manufacturer</th>
+                <th>Mfg Part No</th>
+                <th>Diameter</th>
+                <th>Length</th>
+            </tr>
+        </thead>
+        <tbody>
+            <xsl:for-each select="//transducer:transducer">
+                <tr>
+                    <td><a><xsl:attribute name="href"><xsl:value-of select="../@link"/></xsl:attribute><xsl:value-of select="transducer:id/."/></a></td>
+                    <td><xsl:value-of select="transducer:manufacturer/."/></td>
+                    <td><xsl:value-of select="transducer:mfgpartno/."/></td>
+                    <td><xsl:value-of select="transducer:stackgeometry/transducer:diameter/."/>&#160;
+                    <xsl:value-of select="transducer:stackgeometry/transducer:diameter/@units"/></td>
+                    <td><xsl:value-of select="transducer:stackgeometry/transducer:length/."/>&#160;
+                    <xsl:value-of select="transducer:stackgeometry/transducer:length/@units"/></td>
+                </tr>
+            </xsl:for-each>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tgl="http://thermal.cnde.iastate.edu/triggerlog" xmlns:tgldb="http://thermal.cnde.iastate.edu/databrowse/triggerlogdb" match="tgldb:dir" mode="summary">
+    <xsl:apply-templates select="tgldb:dir" mode="title"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tgl="http://thermal.cnde.iastate.edu/triggerlog" xmlns:tgldb="http://thermal.cnde.iastate.edu/databrowse/triggerlogdb" match="tgldb:dir" mode="detailed">
+    <xsl:apply-templates select="tgldb:dir" mode="title"/>
+</xsl:template>

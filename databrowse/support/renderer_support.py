@@ -522,7 +522,7 @@ class renderer_class(object):
             else:
                 # Unable to Find Stylesheet Anywhere - Return Error
                 #print "Unable to find stylesheet"
-                raise self.RendererException("Unable To Locate Stylesheet")
+                raise self.RendererException("Unable To Locate Stylesheet for Style Mode %s in %s" % (self._style_mode, self.__class__.__name__))
         else:
             # Lets load up whatever stylesheet we found
             f = open(filename, 'r')

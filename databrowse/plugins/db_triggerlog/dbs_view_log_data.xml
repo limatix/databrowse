@@ -1,0 +1,118 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="transducer:transducer" mode="full">
+    <script type="text/javascript">
+        var printurl = "<xsl:value-of select="@printbarcode"/>";
+        <![CDATA[
+            function printbarcode() {
+                $("#loading").text("Printing...");
+                $("#loading").fadeIn(500);
+                $.ajax({
+                    type: "POST",
+                    url: printurl
+                }).done(function(msg) { 
+                    alert(msg); 
+                    $("#loading").fadeOut(500);
+                }); 
+            }
+        ]]>
+    </script>
+    <div style="float:right; width:300px; margin-left: 15px;">
+        <table class="cream" style="width:278px;">
+            <thead>
+                <tr><th>Transducer Barcode</th></tr>
+            </thead>
+            <tbody>
+                <tr><td style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="@barcode"/></xsl:attribute></img><br/>
+                <a onclick="printbarcode()" style="cursor:pointer">Print Barcode on Label Printer</a></td></tr>
+            </tbody>
+        </table>
+        <xsl:if test="count(dir:dir/*)">
+            <table class="cream">
+                <thead>
+                    <tr><th colspan="2">Supporting Files</th></tr>
+                </thead>
+                <tbody>
+                    <xsl:apply-templates select="dir:dir/*" mode="directory"/>
+                </tbody>
+            </table>
+        </xsl:if>
+    </div>
+    <h1>Transducer Details</h1>
+    <table class="cream">
+        <tbody>
+            <tr><th>Transducer ID</th><td><xsl:value-of select="transducer:id"/></td></tr>
+            <tr><th>Manufacturer</th><td><xsl:value-of select="transducer:manufacturer"/></td></tr>
+            <tr><th>Manufacturer Part No</th><td><xsl:value-of select="transducer:mfgpartno"/></td></tr>
+            <tr><th>Diameter</th><td><xsl:value-of select="transducer:stackgeometry/transducer:diameter/."/>&#160;<xsl:value-of select="transducer:stackgeometry/transducer:diameter/@units"/></td></tr>
+            <tr><th>Length</th><td><xsl:value-of select="transducer:stackgeometry/transducer:length/."/>&#160;<xsl:value-of select="transducer:stackgeometry/transducer:length/@units"/></td></tr>
+        </tbody>
+    </table>
+    <h3>Modifications To Transducer</h3>
+    <xsl:apply-templates mode="full" />
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" match="transducer:connectoradded" mode="full">
+    <table class="cream">
+        <thead>
+            <tr><th colspan="2">Connector Added</th></tr>
+        </thead>
+        <tbody>
+            <tr><th>Date</th><td><xsl:value-of select="transducer:date"/></td></tr>
+            <tr><th>Notes</th><td><xsl:call-template name="transducer-lf2p">
+        <xsl:with-param name="instr">
+            <xsl:value-of select="transducer:notes"/>
+        </xsl:with-param>
+    </xsl:call-template></td></tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template name="transducer-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="transducer-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:image="http://thermal.cnde.iastate.edu/databrowse/image" match="dir:file" mode="directory">
+    <tr>
+        <td>
+            <a>
+                <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
+                <img style="vertical-align:text-top;">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                </img>
+            </a>
+        </td>
+        <td>
+            <a>
+                <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
+                <xsl:value-of select="@basename"/></a><br/>
+            <xsl:if test="image:image">
+                <div style="text-align:center;">
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="image:image/@href"/></xsl:attribute>
+                        <img style="border:1px solid #900">
+                            <xsl:attribute name="src"><xsl:value-of select="image:image/@src"/></xsl:attribute>
+                        </img></a></div>
+            </xsl:if>
+        </td>
+    </tr>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:transducer="http://thermal.cnde.iastate.edu/transducer" match="transducer:*" mode="full">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:*" mode="full">
+</xsl:template>
+
+
+
