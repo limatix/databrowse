@@ -31,7 +31,7 @@ cgitb.enable()
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "/dbres/iso-grk1.ent">
+                    "%s/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -54,7 +54,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "/dbres/iso-grk1.ent">
+                    "%s/dbres/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -78,7 +78,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "/dbres/iso-grk1.ent">
+                    "%s/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
@@ -209,7 +209,7 @@ def application(environ, start_response):
                 db_web_support.req.output = etree.tostring(xml)
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = style
                 return [db_web_support.req.return_page()]
@@ -223,21 +223,21 @@ def application(environ, start_response):
                 return renderer.getContent()
             elif renderer.getContentMode() == "ajax":
                 xml = etree.ElementTree(renderer.getContent())
-                style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = ajaxwrapper % (db_web_support.resurl, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
-                style = localwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = localwrapper % (db_web_support.resurl, db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 renderer.loadMenu()
@@ -247,7 +247,7 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
                 renderer.loadMenu()
