@@ -31,7 +31,7 @@ cgitb.enable()
 serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+                    "/dbres/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -54,7 +54,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+                    "/dbres/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -78,7 +78,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY %% iso-grk1 PUBLIC "ISO 8879:1986//ENTITIES Greek Letters//EN//XML"
-                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-grk1.ent">
+                    "/dbres/iso-grk1.ent">
 %%iso-grk1;
 ]>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
