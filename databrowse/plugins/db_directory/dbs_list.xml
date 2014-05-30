@@ -116,6 +116,13 @@
                               if(windowHeight < (y + menu_jquery.height())) {
                                    y -= menu_jquery.height();
                               }
+
+                              if (y < 0){
+                                y = 0;
+                              }
+                              if (x < 0){
+                                x = 0;
+                              }
                      
                               //position the menu
                               menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
@@ -151,11 +158,53 @@
                               clearContextMenu("filecontextmenu");
                               var menu = document.getElementById(menuname);
                               var parentmenu = document.getElementById(parentname);
+                              parentmenu_jquery = $("#"+parentname);
+                              menu_jquery = $("#"+menuname);
+
+                              x = parentmenu_jquery.position().left;
+                              y = parentmenu_jquery.position().top;
+
+
+                              
+                              
                      
                               //position the menu
                               menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
-                              menu.style.top = parentmenu.style.top;
-                              menu.style.left= parentmenu.style.left;
+                              
+
+                              //This section is necessary if you click on the far right edge or bottom
+                              //The 200 is arbitrary, choose whatever number you want based on how large your menu is
+                              if(window.innerWidth) {
+                                   windowWidth = window.innerWidth;
+                                   windowHeight = window.innerHeight;
+                              } else if(document.documentElement.clientWidth) {
+                                   windowWidth = document.documentElement.clientWidth;
+                                   windowHeight = document.documentElement.clientHeight;
+                              } else {
+                                   windowWidth = document.getElementsByTagName('body')[0].clientWidth;
+                                   windowHeight = document.getElementsByTagName('body')[0].clientHeight;
+                              }
+
+                              if(windowHeight < (menu_jquery.height())){
+                                    menu.style.height = windowHeight*0.85 + "px";
+                                    menu.style.overflowY = "scroll";
+                              }
+                              if(windowWidth < (x + menu_jquery.width())) {
+                                   x = x - menu_jquery.width();
+                              }
+                              if(windowHeight < (y + menu_jquery.height())) {
+                                   y -= menu_jquery.height();
+                              }
+
+                              if (y < 0){
+                                y = 0;
+                              }
+                              if (x < 0){
+                                x = 0;
+                              }
+
+                              menu.style.top = y+"px";
+                              menu.style.left= x+"px";
 
                               $('#'+menuname).slideDown(25);
                          }
