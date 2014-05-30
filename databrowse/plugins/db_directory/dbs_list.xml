@@ -88,6 +88,7 @@
                                     clearContextMenu("checklistmenu");
                               }
                               var menu = document.getElementById(menuname);
+                              menu_jquery = $("#"+menuname);
                                                    
                               if ("button" in event) {
                                 var x = event.clientX; //get X and Y coordinance for menu position
@@ -109,11 +110,11 @@
                                    windowWidth = document.getElementsByTagName('body')[0].clientWidth;
                                    windowHeight = document.getElementsByTagName('body')[0].clientHeight;
                               }
-                              if(windowWidth < (x + 200)) {
-                                   x = x - 200;
+                              if(windowWidth < (x + menu_jquery.width())) {
+                                   x = x - menu_jquery.width();
                               }
-                              if(windowHeight < (y + 200)) {
-                                   y -= 200;
+                              if(windowHeight < (y + menu_jquery.height())) {
+                                   y -= menu_jquery.height();
                               }
                      
                               //position the menu
