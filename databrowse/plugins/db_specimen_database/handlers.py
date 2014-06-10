@@ -30,7 +30,7 @@ def dbh_directory_specimen(path, contenttype, extension):
         for item in newlist:
             if (os.path.splitext(item)[1].lower() in [".sdb", ".sdg"]):
                 count = count + 1
-        if count > (len(newlist) * 0.25):
+        if count > 0:
             return "db_specimen_database"
         else:
             return False
