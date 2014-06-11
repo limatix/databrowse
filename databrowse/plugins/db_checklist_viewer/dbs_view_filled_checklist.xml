@@ -7,6 +7,7 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="html:img" mode="copy">
     <img>
         <xsl:attribute name="src"><xsl:value-of select="@src"/>?content_mode=raw</xsl:attribute>
+        <xsl:copy-of select="@*[name()!='src']"/>
     </img>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="html:head" mode="full">
