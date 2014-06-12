@@ -312,9 +312,6 @@ def application(environ, start_response):
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
-        endtime = time()
-        runtime = "%.6f" % (endtime-starttime)
-
         if not renderer.isRaw():
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
@@ -347,6 +344,8 @@ def application(environ, start_response):
                 db_web_support.req.output = etree.tostring(xml)
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
+                endtime = time()
+                runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = style
@@ -368,6 +367,8 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             elif "nopagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
+                endtime = time()
+                runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 db_web_support.req.output = etree.tostring(content)
@@ -375,6 +376,8 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             elif "localpagestyle" in db_web_support.req.form:
                 xml = etree.ElementTree(renderer.getContent())
+                endtime = time()
+                runtime = "%.6f" % (endtime-starttime)
                 style = localwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
@@ -385,6 +388,8 @@ def application(environ, start_response):
                 return [db_web_support.req.return_page()]
             else:
                 xml = etree.ElementTree(renderer.getContent())
+                endtime = time()
+                runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 content = xml.xslt(etree.XML(style, parser))
                 contentroot = content.getroot()
