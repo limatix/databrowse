@@ -110,8 +110,7 @@ class db_checklist_editor(renderer_class):
                             imagepath = image
                         else:
                             imagepath = os.path.abspath(os.path.dirname(self._fullpath) + '/' + image)
-                        print "Image Path: %s" % imagepath
-                        shutil.copy(imagepath, tempsavedir)
+                            shutil.copy(imagepath, tempsavedir)
                     f = open(fullfilename, "w")
                     f.write(filestring)
                     f.close()
