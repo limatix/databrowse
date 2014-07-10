@@ -1,18 +1,12 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml"  xmlns:html="http://www.w3.org/1999/xhtml" match="html:html" mode="full">
-	<xsl:apply-templates mode="strip"/>
+<xsl:strip-space elements="*"/>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" match="html:html" mode="full">
+    <xsl:apply-templates select="html:head" mode="full"/>
+    <xsl:apply-templates select="html:body" mode="full"/>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml"  xmlns:html="http://www.w3.org/1999/xhtml" match="/|comment()|processing-instruction()" mode="strip">
-	<xsl:copy>
-    	<xsl:apply-templates/>
-    </xsl:copy>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" match="@*|*|text()|processing-instruction()|comment()" mode="copy"><xsl:copy><xsl:apply-templates select="@*|*|text()|processing-instruction()|comment()" mode="copy"/></xsl:copy></xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" match="html:head" mode="full">
+    <xsl:apply-templates mode="copy"/>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml"  xmlns:html="http://www.w3.org/1999/xhtml" match="html:body/*" mode="strip">
-	<xsl:element namespace="http://www.w3.org/1999/xhtml" name="{local-name()}">
-    	<xsl:apply-templates select="@*|node()" mode="strip"/>
-	</xsl:element>
-</xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml"  xmlns:html="http://www.w3.org/1999/xhtml" match="html:body/@*" mode="strip">
-   	<xsl:attribute name="{local-name()}">
-   		<xsl:value-of select="."/>
-	</xsl:attribute>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" match="html:body" mode="full">
+    <xsl:apply-templates mode="copy"/>
 </xsl:template>
