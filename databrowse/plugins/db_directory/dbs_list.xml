@@ -87,6 +87,9 @@
                                     clearContextMenu("contextmenu");
                                     clearContextMenu("checklistmenu");
                               }
+                              $("div[id*=checklistmenu-subdir]").each(function() {
+                                    clearContextMenu($(this).attr('id'));
+                              });
                               var menu = document.getElementById(menuname);
                               menu_jquery = $("#"+menuname);
                                                    
@@ -161,8 +164,16 @@
                               parentmenu_jquery = $("#"+parentname);
                               menu_jquery = $("#"+menuname);
 
-                              x = parentmenu_jquery.position().left;
-                              y = parentmenu_jquery.position().top;
+                              //x = parentmenu_jquery.position().left;
+                              //y = parentmenu_jquery.position().top;
+
+                              if ("button" in event) {
+                                var x = event.clientX; //get X and Y coordinance for menu position
+                                var y = event.clientY;
+                              } else if ("button" in e) {
+                                var x = e.clientX; //get X and Y coordinance for menu position
+                                var y = e.clientY;
+                              }
 
 
                               
@@ -235,6 +246,9 @@
                             clearContextMenu("contextmenu");
                             clearContextMenu("filecontextmenu");
                             clearContextMenu("checklistmenu");
+                            $("div[id*=checklistmenu-subdir]").each(function() {
+                                clearContextMenu($(this).attr('id'));
+                            });
                         });
                     });
 
@@ -509,6 +523,15 @@
                     box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
                 }
                 #checklistmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                .checklistsubmenus {
                     display: none;
                     background-color: #ddd;
                     border: 1px solid #666;
@@ -834,16 +857,65 @@
             </div>
         </div>
         <div id="checklistmenu" class="menuitemcomponent" style="display:none">
-            <xsl:for-each select="/dir:dir/dir:chxlist/dir:chxfile">
-                <div class="menuitemcomponent contextmenuitem">
-                    <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu');</xsl:attribute>
-                    <img class="menuitemcomponent">
-                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
-                    </img>
-                    <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
-                </div>
+            <xsl:for-each select="/dir:dir/dir:chxlist/*">
+                <xsl:choose>
+                    <xsl:when test="local-name()='chxfile'">
+                        <div class="menuitemcomponent contextmenuitem">
+
+                            <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu');</xsl:attribute>
+                            <img class="menuitemcomponent">
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                            </img>
+                            <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                        </div>
+                    </xsl:when>
+                    <xsl:when test="local-name()='chxdir'">
+                        <div class="menuitemcomponent contextmenuitem">
+                            <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu-subdir<xsl:number count='//dir:chxdir' level='any'/>', 'contextmenu', 'l'); clearContextMenu('checklistmenu');</xsl:attribute>
+                            <img class="menuitemcomponent">
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder.png</xsl:attribute>
+                            </img>
+                            <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>                
             </xsl:for-each>
         </div>
+        <xsl:for-each select="//dir:chxdir">
+            <div class="menuitemcomponent checklistsubmenus" style="display:none">
+                <xsl:attribute name="id">checklistmenu-subdir<xsl:number count='//dir:chxdir' level='any'/></xsl:attribute>
+                <xsl:variable name="menunumber"><xsl:number count="//dir:chxdir" level='any'/></xsl:variable>
+                <div class="menuitemcomponent contextmenuitem">
+                    <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu', 'contextmenu', 'l'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                    <img class="menuitemcomponent">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/go-top.png</xsl:attribute>
+                    </img>
+                    <span class="menuitemcomponent">Back to Top Menu</span>
+                </div>                
+                <xsl:for-each select="*">
+                    <xsl:choose>
+                        <xsl:when test="local-name()='chxfile'">
+                            <div class="menuitemcomponent contextmenuitem">
+                                <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                                <img class="menuitemcomponent">
+                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                                </img>
+                                <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                            </div>
+                        </xsl:when>
+                        <xsl:when test="local-name()='chxdir'">
+                            <div class="menuitemcomponent contextmenuitem">
+                                <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu-subdir<xsl:number count='//dir:chxdir' level='any'/>', 'contextmenu', 'l'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                                <img class="menuitemcomponent">
+                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder.png</xsl:attribute>
+                                </img>
+                                <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                            </div>
+                        </xsl:when>
+                    </xsl:choose>    
+                </xsl:for-each>
+            </div>
+        </xsl:for-each>
         <div id="blackout">
         </div>
         <div id="uploadwindow">
