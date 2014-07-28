@@ -24,6 +24,14 @@
                         "bStateSave": false
                     });            
                 });
+                $(".opticalregistration").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
             });         
         ]]>
     </script>
@@ -149,6 +157,8 @@
         </ul>
     </xsl:if>
 </xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" match="dcp:process" mode="full">
+</xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:configstr" mode="full">
     <h3>Configuration</h3>
             <xsl:choose>
@@ -263,14 +273,22 @@
                 <tr><th><abbr title="dc:cltitle">Checklist Title</abbr></th><td><xsl:value-of select="chx:cltitle"/></td></tr>
                 <tr><th><abbr title="dc:measchecklist">Checklist Link</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:measchecklist"/></xsl:attribute><xsl:value-of select="dc:measchecklist"/></a></td></tr>
                 <xsl:if test="dc:dgsfile and not(dc:dgsfile='')"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/></xsl:attribute><xsl:value-of select="dc:dgsfile"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=VibroFitImg</xsl:attribute></img></p></td></tr></xsl:if>
-                <xsl:if test="dc:scanxy_outdgd and not(dc:scanxy_outdgd='')"><tr><th><abbr title="dc:scanxy_outdgd">ScanXY DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scanxy_outdgd"/></xsl:attribute><xsl:value-of select="dc:scanxy_outdgd"/></a></td></tr></xsl:if>                
+                <xsl:if test="dc:scanxy_outdgd and not(dc:scanxy_outdgd='')"><tr><th><abbr title="dc:scanxy_outdgd">ScanXY DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scanxy_outdgd"/></xsl:attribute><xsl:value-of select="dc:scanxy_outdgd"/></a></td></tr></xsl:if>      
+                <xsl:if test="dc:scan_outdgd and not(dc:scan_outdgd='')"><tr><th><abbr title="dc:scan_outdgd">Scan DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scan_outdgd"/></xsl:attribute><xsl:value-of select="dc:scan_outdgd"/></a></td></tr></xsl:if>  
+
+                <xsl:if test="dc:stitchedimagesfolder and not(dc:stitchedimagesfolder='')"><tr><th><abbr title="dc:stitchedimagesfolder">Stitched Images Folder</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitchedimagesfolder"/></xsl:attribute><xsl:value-of select="dc:stitchedimagesfolder"/></a></td></tr></xsl:if> 
+
+                <xsl:if test="dc:rawimagesfolder and not(dc:rawimagesfolder='')"><tr><th><abbr title="dc:rawimagesfolder">Raw Images Folder</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:rawimagesfolder"/></xsl:attribute><xsl:value-of select="dc:rawimagesfolder"/></a></td></tr></xsl:if> 
+
+                <xsl:if test="dc:stitcheddgsfile and not(dc:stitcheddgsfile='')"><tr><th><abbr title="dc:stitcheddgsfile">Stitched DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitcheddgsfile"/></xsl:attribute><xsl:value-of select="dc:stitcheddgsfile"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitcheddgsfile"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=GEVProc&amp;frame=0</xsl:attribute></img></p></td></tr></xsl:if>
+
                 <xsl:if test="dc:setfile and not(dc:setfile='')"><tr><th><abbr title="dc:setfile">Set File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:setfile"/></xsl:attribute><xsl:value-of select="dc:setfile"/></a></td></tr></xsl:if>
                 <tr><th><abbr title="dc:notes">Notes</abbr></th><td><xsl:call-template name="dc2-lf2p">
                         <xsl:with-param name="instr">
                             <xsl:value-of select="dc:notes"/>
                         </xsl:with-param>
                     </xsl:call-template></td></tr>
-                <xsl:for-each select="*[not(self::dc:measnum or self::chx:clinfo or self::chx:cltitle or self::dc:measphotos or self::dc:specimen or self::dc:date or self::dc:perfby or self::dc:measchecklist or self::dc:notes or self::dc:setfile or self::dc:dgsfile or self::dc:scanxy_outdgd)]">
+                <xsl:for-each select="*[not(self::dc:measnum or self::chx:clinfo or self::chx:cltitle or self::dc:measphotos or self::dc:specimen or self::dc:date or self::dc:perfby or self::dc:measchecklist or self::dc:notes or self::dc:setfile or self::dc:dgsfile or self::dc:scanxy_outdgd or self::dc:scan_outdgd or self::dc:stitchedimagesfolder or self::dc:rawimagesfolder or self::dc:stitcheddgsfile)]">
                     <xsl:sort data-type="text" select="local-name()"/>
                     <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
                     <xsl:choose>
@@ -287,11 +305,48 @@
                                 </pre></xsl:if>
                             </td></tr>
                         </xsl:when>
-                        <xsl:when test="$localname = 'loadcalculation_out'">
-                            <tr><th><abbr title="dc:loadcalculation_out">Load Calculation Output</abbr></th><td>
-                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
+                        <xsl:when test="contains($localname, '_out')">
+                            <tr>
+                                <th><abbr><xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+                                    <xsl:choose>
+                                        <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$localname"/>                                    
+                                        </xsl:otherwise>
+                                    </xsl:choose></abbr>
+                                </th>
+                                <td><xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
                                     <xsl:value-of select="."/>
-                                </pre></xsl:if>
+                                </pre></xsl:if></td>
+                            </tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'opticalregistration'">
+                            <tr><th><abbr title="dc:opticalregistration">Optical Registration</abbr></th><td>
+                                <table class="cream full-width">
+                                    <tbody>
+                                        <tr><th>Reference Frame</th><td colspan="2"><xsl:value-of select="@dc:refframe"/></td></tr>
+                                        <tr><th>Crack Position</th><th>X Position</th><th>Y Position</th></tr>
+                                        <tr><th>Start</th><td><xsl:value-of select="dc:crackposition/dc:startx"/>&#160;<xsl:value-of select="dc:crackposition/dc:startx/@dcv:units" /></td><td><xsl:value-of select="dc:crackposition/dc:starty"/>&#160;<xsl:value-of select="dc:crackposition/dc:starty/@dcv:units" /></td></tr>
+                                        <tr><th>End</th><td><xsl:value-of select="dc:crackposition/dc:endx"/>&#160;<xsl:value-of select="dc:crackposition/dc:endx/@dcv:units" /></td><td><xsl:value-of select="dc:crackposition/dc:endy"/>&#160;<xsl:value-of select="dc:crackposition/dc:endy/@dcv:units" /></td></tr>
+                                    </tbody>
+                                </table>
+                                <table class="cream opticalregistration">
+                                <xsl:attribute name="id">datatable_opticalregistration_<xsl:number/></xsl:attribute>
+                                    <thead>
+                                        <tr>
+                                            <th>Frame #</th><th>Shift X</th><th>Shift Y</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <xsl:for-each select="dc:registrations/dc:registration">
+                                            <tr>
+                                                <td><xsl:value-of select="@dc:frameno"/></td><td><xsl:value-of select="dc:shiftx"/>&#160;<xsl:value-of select="dc:shiftx/@dcv:units"/></td><td><xsl:value-of select="dc:shifty"/>&#160;<xsl:value-of select="dc:shifty/@dcv:units"/></td>
+                                            </tr>
+                                        </xsl:for-each>
+                                    </tbody>
+                                </table>-->
                             </td></tr>
                         </xsl:when>
                         <xsl:when test="$localname = 'excitation'">
@@ -307,13 +362,6 @@
                                         <xsl:value-of select="."/>
                                     </xsl:otherwise>
                                 </xsl:choose>
-                            </td></tr>
-                        </xsl:when>
-			            <xsl:when test="$localname = 'scanxy_out'">
-                            <tr><th><abbr title="dc:scanxy_out">XY Scan Output</abbr></th><td>
-                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
-                                    <xsl:value-of select="."/>
-                                </pre></xsl:if>
                             </td></tr>
                         </xsl:when>
 			            <xsl:when test="$localname = 'autoexp'">
@@ -483,6 +531,8 @@
     <entry key="stepnum_x">X Step</entry>
     <entry key="YPos">Y</entry>
     <entry key="GotYPos">Got Y</entry>
+    <entry key="GotStress">Got Stress</entry>
+    <entry key="stepnum_stress">Stress Step</entry>
     <entry key="stepnum_y">Y Step</entry>
     <entry key="dgdidx">Count</entry>
     <entry key="blmountoffset">Bottom Left Mount Offset</entry>    
@@ -513,4 +563,32 @@
     <entry key="vibmodule">Vibrometer Module</entry>
     <entry key="xstartspccoords">X Start Coordinate</entry>
     <entry key="ystartspccoords">Y Start Coordinate</entry>
+    <entry key="scanxy_out">Scan Output</entry>
+    <entry key="loadcalculation_out">Load Calculation</entry>
+    <entry key="scan_out">Scan Output</entry>
+    <entry key="calcdadN_out">da/dN Calculation</entry>
+    <entry key="calcload_out">Load Calculation</entry>
+    <entry key="copycycles_out">Copy Cycles Output</entry>
+    <entry key="copylength_out">Copy Length Output</entry>
+    <entry key="axis">Scan Axis</entry>
+    <entry key="focusaxis">Focus Axis</entry>
+    <entry key="start_pos">Start Position</entry>
+    <entry key="start_stress">Start Stress</entry>
+    <entry key="step_size">Position Step Size</entry>
+    <entry key="step_size_stress">Stress Step Size</entry>
+    <entry key="end_pos">End Position</entry>
+    <entry key="end_stress">End Stress</entry>
+    <entry key="spcflawsize">Flaw Size</entry>
+    <entry key="spcflawindex">Flaw Index</entry>
+    <entry key="spcfacemethod">Specimen Face Method</entry>
+    <entry key="couplantfacemethod">Couplant Face Method</entry>
+    <entry key="loadcelltrig">Load</entry>
+    <entry key="stitcheddgsfile">Stitched DGS File</entry>
+    <entry key="stitchedimagesfolder">Stitched Images Folder</entry>
+    <entry key="rawimagesfolder">Raw Images Folder</entry>
+    <entry key="nlayers_mount"># Mount Layers</entry>
+    <entry key="nlayers_xducer"># Xducer Layers</entry>
+    <entry key="opticalregistration">Optical Registration</entry>
+    <entry key="thermalregistration">Thermal Registration</entry>  
+    <entry key="yieldstress">Yield Stress</entry>  
 </db:fieldmap>
