@@ -32,6 +32,14 @@
                         "bStateSave": false
                     });            
                 });
+                $(".opticaltrace").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
             });         
         ]]>
     </script>
@@ -71,6 +79,12 @@
             border: 1px solid #c00;
         }
         table.autoexp thead th {
+            text-align: center;
+        }
+        table.opticalregistration thead th {
+            text-align: center;
+        }
+        table.opticaltrace thead th {
             text-align: center;
         }
         table.cream tbody td {
@@ -349,6 +363,30 @@
                                 </table>-->
                             </td></tr>
                         </xsl:when>
+                        <xsl:when test="$localname = 'opticaltrace'">
+                            <tr><th><abbr title="dc:opticaltrace">Optical Trace</abbr></th><td>
+                                <table class="cream full-width">
+                                    <tbody>
+                                        <tr><th>Reference Frame</th><td colspan="2"><xsl:value-of select="@dc:refframe"/></td></tr>
+                                    </tbody>
+                                </table>
+                                <table class="cream opticaltrace">
+                                <xsl:attribute name="id">datatable_opticaltrace_<xsl:number/></xsl:attribute>
+                                    <thead>
+                                        <tr>
+                                            <th>X Position</th><th>Y Position</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <xsl:for-each select="dc:cracktrace/dc:keypoint">
+                                            <tr>
+                                                <td><xsl:value-of select="dc:xpos"/>&#160;<xsl:value-of select="dc:xpos/@dcv:units"/></td><td><xsl:value-of select="dc:ypos"/>&#160;<xsl:value-of select="dc:ypos/@dcv:units"/></td>
+                                            </tr>
+                                        </xsl:for-each>
+                                    </tbody>
+                                </table>-->
+                            </td></tr>
+                        </xsl:when>
                         <xsl:when test="$localname = 'excitation'">
                             <tr><th><abbr title="dc:excitation">Excitation</abbr></th><td>
                                 <xsl:choose>     
@@ -541,6 +579,7 @@
     <entry key="trmountoffset">Top Right Mount Offset</entry>
     <entry key="calcstraincoeff">Calc Strain Coefficient?</entry>
     <entry key="desiredbendingstress">Desired Bending Stress</entry>
+    <entry key="actualbendingstress">Actual Bending Stress</entry>
     <entry key="end_pos_x">End X Pos</entry>
     <entry key="end_pos_y">End Y Pos</entry>
     <entry key="exportresults">Export Results?</entry>
