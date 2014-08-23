@@ -401,6 +401,8 @@
             </td></tr>
             <xsl:if test="specimen:stressriser/specimen:depth">
                 <tr><th style="width:125px;">Stress Riser Type</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/@type"/></td></tr>
+                <tr><th style="width:125px;">Riser Length</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser/specimen:length" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/specimen:length/."/>&#160;<xsl:value-of select="specimen:stressriser/specimen:length/@units"/></td></tr>
+                <tr><th style="width:125px;">Riser Width</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser/specimen:width" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/specimen:width/."/>&#160;<xsl:value-of select="specimen:stressriser/specimen:width/@units"/></td></tr>
                 <tr><th style="width:125px;">Riser Depth</th><td><xsl:apply-templates select="." mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser" mode="checkgroup"/><xsl:apply-templates select="specimen:stressriser/specimen:depth" mode="checkgroup"/><xsl:value-of select="specimen:stressriser/specimen:depth/."/>&#160;<xsl:value-of select="specimen:stressriser/specimen:depth/@units"/></td></tr>
             </xsl:if>
         </tbody>
