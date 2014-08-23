@@ -43,7 +43,7 @@ class db_specimen(renderer_class):
             if self._style_mode == "edit_specimen_data":
                 xml = etree.parse(self._fullpath)
             else:
-                xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE)
+                xml = ss.GetSpecimen(specimen, ss.OUTPUT_ETREE, os.path.dirname(self._fullpath))
             xmlroot = xml.getroot()
             reldests = [x for x in xmlroot.xpath('specimen:reldests/specimen:reldest', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
             for reldest in reldests:

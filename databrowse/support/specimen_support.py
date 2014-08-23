@@ -21,7 +21,7 @@
 import os
 from lxml import etree
 
-specimendb = '/databrowse/specimens'
+_specimendb = '/databrowse/specimens'
 NS = {"specimen": "http://thermal.cnde.iastate.edu/specimen"}
 NSSTR = "{http://thermal.cnde.iastate.edu/specimen}"
 OUTPUT_STRING = 0
@@ -46,7 +46,7 @@ class SpecimenException(Exception):
     pass
 
 
-def GetSpecimen(specimen, output=OUTPUT_STRING):
+def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
     """ Fetch the XML Representation of a Specimen with Specimen Group Data Integrated """
 
     # Locate the Speicmen File
