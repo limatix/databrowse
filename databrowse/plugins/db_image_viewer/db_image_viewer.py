@@ -152,6 +152,10 @@ class db_image_viewer(renderer_class):
             magicstore.load()
             contenttype = magicstore.file(self._fullpath)
             if "thumbnail" in self._web_support.req.form:
+                ext = os.path.splitext(self._fullpath)[1]
+                if ext == '.tif' or ext == '.tiff':
+                    ext = '.png'
+                    contenttype = 'image/png'
                 if self._web_support.req.form['thumbnail'].value == "small":
                     tagname = "small"
                     newsize = (150, 150)
@@ -167,9 +171,9 @@ class db_image_viewer(renderer_class):
                 else:
                     tagname = "small"
                     newsize = (150, 150)
-                if self.CacheFileExists(tagname):
-                    size = os.path.getsize(self.getCacheFileName(tagname))
-                    f = self.getCacheFileHandler('rb', tagname)
+                if self.CacheFileExists(tagname, extension=ext):
+                    size = os.path.getsize(self.getCacheFileName(tagname, extension=ext))
+                    f = self.getCacheFileHandler('rb', tagname, extension=ext)
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
@@ -184,8 +188,8 @@ class db_image_viewer(renderer_class):
                     img.thumbnail(newsize, Image.ANTIALIAS)
                     output = StringIO.StringIO()
                     img.save(output, format=format)
-                    f = self.getCacheFileHandler('wb', tagname)
-                    img.save(f, format=format)
+                    f = self.getCacheFileHandler('wb', tagname, extension=ext)
+                    img.save(f)
                     f.close()
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
