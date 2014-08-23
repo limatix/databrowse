@@ -69,7 +69,7 @@ class db_specimen(renderer_class):
             return xmlroot
         elif self._content_mode != "raw" and self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
             specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
-            xml = ss.GetSpecimen(specimen, ss.OUTPUT_ELEMENT)
+            xml = ss.GetSpecimen(specimen, ss.OUTPUT_ELEMENT, os.path.dirname(self._fullpath))
             groups = [x for x in xml.xpath('specimen:groups/specimen:groupid', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
             for group in groups:
                 groupid = group.text
