@@ -692,6 +692,9 @@ class db_dataguzzler_data_file(renderer_class):
                 ROICOORDX2 = int((ROIX2 - inival[0]) * (1/step[0]))
                 ROICOORDY1 = int((ROIY1 - inival[1]) * (1/step[1]))
                 ROICOORDY2 = int((ROIY2 - inival[1]) * (1/step[1]))
+                if ROICOORDY1 < ROICOORDY2:
+                    ROICOORDY1 = int((ROIY2 - inival[1]) * (1/step[1]))
+                    ROICOORDY2 = int((ROIY1 - inival[1]) * (1/step[1]))
             else:
                 ROICOORDX1 = None
                 ROICOORDX2 = None
