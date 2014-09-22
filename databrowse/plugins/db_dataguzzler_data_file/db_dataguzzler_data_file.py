@@ -681,9 +681,29 @@ class db_dataguzzler_data_file(renderer_class):
             mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
             waveform = wfmdict[waveformname]
 
+            (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
+
+            ROIX1=dgm.GetMetaDatumWIDbl(waveform,"ROIX1",-1e12)
+            ROIX2=dgm.GetMetaDatumWIDbl(waveform,"ROIX2",1e12)
+            ROIY1=dgm.GetMetaDatumWIDbl(waveform,"ROIY1",-1e12)
+            ROIY2=dgm.GetMetaDatumWIDbl(waveform,"ROIY2",1e12)
+            if ROIX1 != -1e12 and ROIX2 != 1e12 and ROIY1 != -1e12 and ROIY2 != 1e12:
+                ROICOORDX1 = int((ROIX1 - inival[0]) * (1/step[0]))
+                ROICOORDX2 = int((ROIX2 - inival[0]) * (1/step[0]))
+                ROICOORDY1 = int((ROIY1 - inival[1]) * (1/step[1]))
+                ROICOORDY2 = int((ROIY2 - inival[1]) * (1/step[1]))
+            else:
+                ROICOORDX1 = None
+                ROICOORDX2 = None
+                ROICOORDY1 = None
+                ROICOORDY2 = None
+
             # Add Simple Offsets
             if "IRstack" in wfmdict and wfmdict["IRstack"].data.size > 1:
-                mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
+                if ROICOORDX1 is not None and ROICOORDX2 is not None and ROICOORDY1 is not None and ROICOORDY2 is not None:
+                    mean = wfmdict['IRstack'].data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1, 0].mean(dtype=numpy.float64)
+                else:
+                    mean = wfmdict['IRstack'].data[:, :, 0].mean(dtype=numpy.float64)
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
             if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
@@ -775,8 +795,12 @@ class db_dataguzzler_data_file(renderer_class):
                 framenumber = int(self._web_support.req.form['frame'].value)
             filename = filename + "_" + str(framenumber)
             extent = [inival[0], waveform.data.shape[0] * step[0] + inival[0], inival[1], waveform.data.shape[1] * step[1] + inival[1]]
-            vmin = waveform.data.min()
-            vmax = waveform.data.max()
+            if ROICOORDX1 is not None and ROICOORDX2 is not None and ROICOORDY1 is not None and ROICOORDY2 is not None:
+                vmin = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1,:].min()
+                vmax = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1,:].max()
+            else:
+                vmin = waveform.data.min()
+                vmax = waveform.data.max()
             if "Coord3" in waveform.MetaData:
                 t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
                 title = waveformname + " (" + coord[2] + ": " + str(t[framenumber]) + " " + units[2] + ")"
@@ -801,8 +825,12 @@ class db_dataguzzler_data_file(renderer_class):
             pylab.ylabel(coord[1] + " (" + units[1] + ")")
         elif len(waveform.data.shape) == 2:     # 2D Waveforms
             extent = [inival[0], waveform.data.shape[0] * step[0] + inival[0], inival[1], waveform.data.shape[1] * step[1] + inival[1]]
-            vmin = waveform.data.min()
-            vmax = waveform.data.max()
+            if ROICOORDX1 is not None and ROICOORDX2 is not None and ROICOORDY1 is not None and ROICOORDY2 is not None:
+                vmin = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1].min()
+                vmax = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1].max()
+            else:
+                vmin = waveform.data.min()
+                vmax = waveform.data.max()
             pylab.imshow(waveform.data[:, :].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
             cb = pylab.colorbar()
             cb.set_label(coord[-1] + " (" + units[-1] + ")")

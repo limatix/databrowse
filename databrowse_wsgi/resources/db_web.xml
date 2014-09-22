@@ -116,7 +116,7 @@
 						</div>
 						<div class="isu-red-ribbon" id="ribbon" role="banner">
 							<div class="clearfix wrapper">
-								<form action="http://google.iastate.edu/search" class="isu-search-form" method="GET">
+								<form action="https://google.iastate.edu/search" class="isu-search-form" method="GET">
 									<input name="output" type="hidden" value="xml_no_dtd"/>
 									<input name="client" type="hidden" value="default_frontend"/>
 									<input name="sitesearch" type="hidden" value=""/>

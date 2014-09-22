@@ -428,6 +428,14 @@ class renderer_class(object):
         isDirectory = os.path.isdir(self._fullpath)
         for handler in reversed(self._handlers):
             dirlist = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.abspath(os.path.dirname(sys.modules['databrowse.plugins.' + handler].__file__) + '/')) if item.lower().startswith("dbs_")]
+            additionalitems = []
+            if isDirectory:
+                if os.path.exists(os.path.join(self._fullpath, '.databrowse', 'stylesheets', handler)):
+                    additionalitems = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.join(self._fullpath, '.databrowse', 'stylesheets', handler)) if item.lower().startswith("dbs_")]
+            else:
+                if os.path.exists(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)):
+                    additionalitems = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)) if item.lower().startswith("dbs_")]
+            dirlist = dirlist + additionalitems
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
             title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
