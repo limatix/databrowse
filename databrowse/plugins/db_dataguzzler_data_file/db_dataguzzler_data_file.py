@@ -710,14 +710,14 @@ class db_dataguzzler_data_file(renderer_class):
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
                 dgm.AddMetaDatumWI(wfmdict['IRstack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(mean)))
             if "DiffStack" in wfmdict and wfmdict["IRstack"].data.size > 1:
-                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
-                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(1)))
+                dgm.AddMetaDatumWI(wfmdict['DiffStack'], dgm.CreateMetaDatumDbl("ScopeOffset", float(0.5)))
             if "VibroFit" in wfmdict and wfmdict["IRstack"].data.size > 1:
-                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
-                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(1)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFit'], dgm.CreateMetaDatumDbl("ScopeOffset", float(0)))
             if "VibroFitImg" in wfmdict and wfmdict["IRstack"].data.size > 1:
                 dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeUnitsPerDiv", float(2)))
-                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(1)))
+                dgm.AddMetaDatumWI(wfmdict['VibroFitImg'], dgm.CreateMetaDatumDbl("ScopeOffset", float(0)))
 
             # Evaluate Processing Instructions, If Needed
             if "ProcExpr" in waveform.MetaData:
@@ -729,7 +729,7 @@ class db_dataguzzler_data_file(renderer_class):
                     inivalstepdimlen.append(dimlen[i])
                 waveform = dge.eval(waveform, wfmdict, ndim, *inivalstepdimlen, rgba=False)
             rgbawaveform = None
-            if "ProcRGBA" in wfmdict[waveformname].MetaData:
+            if "ProcRGBA" in wfmdict[waveformname].MetaData and waveformname != "DiffStack":
                 (ndim, dimlen, inival, step, bases) = dge.geom(wfmdict[waveformname])
                 inivalstepdimlen = []
                 for i in range(ndim):
@@ -799,10 +799,16 @@ class db_dataguzzler_data_file(renderer_class):
             filename = filename + "_" + str(framenumber)
             extent = [inival[0], waveform.data.shape[0] * step[0] + inival[0], inival[1], waveform.data.shape[1] * step[1] + inival[1]]
             if ROICOORDX1 is not None and ROICOORDX2 is not None and ROICOORDY1 is not None and ROICOORDY2 is not None:
-                vmin = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1,:].min()
+                if waveformname == "DiffStack":
+                    vmin = 0
+                else:
+                    vmin = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1,:].min()
                 vmax = waveform.data[ROICOORDX1:ROICOORDX2, ROICOORDY2:ROICOORDY1,:].max()
             else:
-                vmin = waveform.data.min()
+                if waveformname == "DiffStack":
+                    vmin = 0
+                else:
+                    vmin = waveform.data.min()
                 vmax = waveform.data.max()
             if "Coord3" in waveform.MetaData:
                 t = numpy.arange(0, waveform.data.shape[2], dtype='d') * step[2] + inival[2]
