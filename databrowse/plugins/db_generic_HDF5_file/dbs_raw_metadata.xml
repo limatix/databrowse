@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbhdf="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
     <table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
     	<thead>
         	<th style="width:8px">

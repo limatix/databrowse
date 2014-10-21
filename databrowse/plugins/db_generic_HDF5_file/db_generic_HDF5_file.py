@@ -98,7 +98,7 @@ class db_generic_HDF5_file(renderer_class):
                     # Contents of File
                     f = open(self._fullpath)
                     xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
-                    output, error = subprocess.Popen(['/usr/bin/h5dump', '-x', '-H', self._fullpath], sdout=subprocess.PIPE).communicate()
+                    output, error = subprocess.Popen(['/usr/bin/h5dump', '-x', '-H', self._fullpath], stdout=subprocess.PIPE).communicate()
                     xmlchild.append(etree.XML(output))
                     #xmlchild.text = f.read()
 
