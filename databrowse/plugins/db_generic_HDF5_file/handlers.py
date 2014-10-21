@@ -21,7 +21,7 @@
 
 def dbh_hdf5(path, contenttype, extension):
     """ Generic XML Handler - Returns xml_generic for all XML files """
-    if extension == "h5":
+    if extension == "h5" or extension == "dream3d":
         return "db_generic_HDF5_file"
     else:
         return False
