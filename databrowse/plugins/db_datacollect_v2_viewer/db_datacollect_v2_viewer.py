@@ -96,7 +96,6 @@ class db_datacollect_v2_viewer(renderer_class):
                         if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
                             url = self.getURL(relpath)
                             item.set('url', url)
-                f.close()
                 return xmlroot
             elif self._content_mode == "full" and self._style_mode == "dcv2_custom_view":
                 self._namespace_local = "dt"
