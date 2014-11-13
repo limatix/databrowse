@@ -197,8 +197,9 @@ class db_data_table(renderer_class):
             os.chdir(os.path.dirname(self._fullpath))
             filelist = glob.glob(files[0])
             output = []
+            p = etree.XMLParser(huge_tree=True)
             for filename in filelist:
-                e = etree.parse(filename).getroot()
+                e = etree.parse(filename, parser=p).getroot()
                 output.append(e)
                 pass
             os.chdir(cwd)
