@@ -341,6 +341,12 @@ class renderer_class(object):
                 pass
             returnlist = list(set(removelist + addlist))
         exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+
+        returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
+        returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
+        returnlist = returndirlist
+        returnlist.extend(returnfilelist)
+
         return returnlist
 
         pass
