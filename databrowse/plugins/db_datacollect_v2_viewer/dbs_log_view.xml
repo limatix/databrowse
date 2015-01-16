@@ -120,7 +120,7 @@
         </xsl:otherwise>
     </xsl:choose>
 </xsl:template> 
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:summary" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:summary" mode="full">
     <h3>Experiment Summary</h3>
     <table class="cream full-width">
         <thead>
@@ -171,9 +171,9 @@
         </ul>
     </xsl:if>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" match="dcp:process" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" match="dcp:process" mode="full">
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" match="dc:configstr" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:configstr" mode="full">
     <h3>Configuration</h3>
             <xsl:choose>
                 <xsl:when test="@fname and @url">
@@ -227,7 +227,7 @@
             <xsl:value-of select="."/>
         </pre>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://wwww.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dcp:provenance" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://wwww.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dcp:provenance" mode="full">
     <h3>Processed Log Details</h3>
     <table class="cream full-width">
         <thead>
@@ -249,7 +249,7 @@
         </tbody>
     </table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dc:measurement" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" mode="full">
     <h3>Measurement Summary</h3>
     <table class="cream full-width">
             <thead>
