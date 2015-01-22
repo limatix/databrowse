@@ -35,17 +35,21 @@
         <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
     </xsl:element>-->
     <script type="text/javascript" defer="true">
+    	resdir = "<xsl:value-of select="$resdir"/>";
         <![CDATA[
             $(document).ready(function() {
                 $('#dc2table').dataTable({
-                    "sDom": 'RlCfrtip',
+                    "sDom": 'T<"clear">RlCfrtip',
                     "aoColumnDefs": [
                         { "bVisible": false, "aTargets": [ 1 ] }
                     ],
                     "sScrollX": "764px",
                     "bScrollCollapse": true,
                     "sPaginationType": "full_numbers",
-                    "bStateSave": true
+                    "bStateSave": true,
+                    "tableTools": {
+         				"sSwfPath": resdir + "/DataTables/extras/TableTools/media/swf/copy_csv_xls.swf"
+        			}
                 });
             });         
         ]]>
