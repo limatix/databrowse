@@ -161,9 +161,16 @@
             <xsl:for-each select="dc:expphotos/dcv:photo">
                 <li>
                     <a>
-                        <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                        <xsl:choose>
+                            <xsl:when test="@xlink:href and not(@xlink:href='')">
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
                         <img>
-                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute></xsl:when><xsl:otherwise><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
                         </img>
                     </a>
                 </li>
@@ -263,11 +270,18 @@
                             <xsl:for-each select="dc:measphotos/dcv:photo">
                                 <li>
                                     <a>
-                                        <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
-                                        <img>
-                                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
-                                        </img>
-                                    </a>
+                                    <xsl:choose>
+                                        <xsl:when test="@xlink:href and not(@xlink:href='')">
+                                            <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute></xsl:when><xsl:otherwise><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                                    </img>
+                                </a>
                                 </li>
                             </xsl:for-each>
                         </ul>
