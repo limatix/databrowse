@@ -22,6 +22,13 @@ import databrowse.plugins.db_directory.db_directory as db_directory_module
 from lxml import etree
 import os
 
+try:
+    import databrowse.plugins.db_mercurial_repository.db_mercurial_repository as hgmodule
+    hgrepo = hgmodule.db_mercurial_repository
+    hgavailable = True
+except:
+    hgavailable = False
+
 
 class db_transducer_database(db_directory_module.db_directory):
     """ Image Directory Renderer """
@@ -43,6 +50,10 @@ class db_transducer_database(db_directory_module.db_directory):
             self.getDirectoryList = self.getTransducerDatabaseDirectoryList
             super(db_transducer_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
             self.getDirectoryList = tmpref
+            if hgavailable:
+                uncommitted = hgrepo.uncommittedlist(fullpath)
+                if len(uncommitted) > 0:
+                    self._xml.set('uncommitted', str(len(uncommitted)))
         else:
             super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         pass

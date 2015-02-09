@@ -97,6 +97,9 @@
             padding: 1px;
         }
     </style>
+    <xsl:if test="/specimendb:dir/@uncommitted">
+        <p class="notify-msg warning"><strong>Warning:</strong> Mercurial repository contains uncommitted changes to <xsl:value-of select="/specimendb:dir/@uncommitted"/> files.</p>
+    </xsl:if>
     <h1>Specimen Database</h1>
     <table class="cream full-width" id="specimentable">
         <thead>

@@ -30,6 +30,14 @@ class db_mercurial_repository(db_directory_module.db_directory):
     _default_style_mode = "view_repository"
     _default_recursion_depth = 1
 
+    @classmethod
+    def uncommittedlist(cls, path):
+        """ Check a path for uncommitted files """
+        try:
+            return [(item[0], item[2:]) for item in (subprocess.check_output(['/usr/bin/hg', '--cwd', path, 'status'], stderr=open(os.devnull))).split('\n') if len(item)>2]
+        except:
+            return []
+
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
         if caller == "databrowse":
             self._namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/hgdir"
@@ -44,7 +52,7 @@ class db_mercurial_repository(db_directory_module.db_directory):
 
         # Check for uncommitted changes - only if at top level - the only place we'd display this
         if caller == "databrowse":
-            uncommitted = [(item[0], item[2:]) for item in (subprocess.check_output(['/usr/bin/hg', '--cwd', fullpath, 'status'], stderr=open(os.devnull))).split('\n') if len(item)>2]
+            uncommitted = self.uncommittedlist(fullpath)
             if len(uncommitted) > 0:
                 self._xml.set('uncommitted', '%s' % len(uncommitted))
                 pass

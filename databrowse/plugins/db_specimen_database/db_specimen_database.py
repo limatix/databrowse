@@ -23,6 +23,13 @@ from lxml import etree
 import os
 from errno import EEXIST
 
+try:
+    import databrowse.plugins.db_mercurial_repository.db_mercurial_repository as hgmodule
+    hgrepo = hgmodule.db_mercurial_repository
+    hgavailable = True
+except:
+    hgavailable = False
+
 
 class db_specimen_database(db_directory_module.db_directory):
     """ Image Directory Renderer """
@@ -44,6 +51,10 @@ class db_specimen_database(db_directory_module.db_directory):
             self.getDirectoryList = self.getSpecimenDatabaseDirectoryList
             super(db_specimen_database, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
             self.getDirectoryList = tmpref
+            if hgavailable:
+                uncommitted = hgrepo.uncommittedlist(fullpath)
+                if len(uncommitted) > 0:
+                    self._xml.set('uncommitted', str(len(uncommitted)))
         else:
             super(db_directory_module.db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         pass
