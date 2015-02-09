@@ -21,6 +21,7 @@
 import databrowse.plugins.db_directory.db_directory as db_directory_module
 import subprocess
 import os
+import traceback
 
 
 class db_mercurial_repository(db_directory_module.db_directory):
@@ -36,6 +37,7 @@ class db_mercurial_repository(db_directory_module.db_directory):
         try:
             return [(item[0], item[2:]) for item in (subprocess.check_output(['/usr/bin/hg', '--cwd', path, 'status'], stderr=open(os.devnull))).split('\n') if len(item)>2]
         except:
+            traceback.print_exc()
             return []
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
