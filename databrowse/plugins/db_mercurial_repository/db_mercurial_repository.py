@@ -35,7 +35,7 @@ class db_mercurial_repository(db_directory_module.db_directory):
     def uncommittedlist(cls, path):
         """ Check a path for uncommitted files """
         try:
-            return [(item[0], item[2:]) for item in (subprocess.check_output(['/usr/bin/hg', '--cwd', path, 'status'], stderr=open(os.devnull))).split('\n') if len(item)>2]
+            return [(item[0], item[2:]) for item in (subprocess.Popen(['/usr/bin/hg', '--cwd', path, 'status'], stdout=subprocess.PIPE, stderr=open(os.devnull)).communicate()[0]).split('\n') if len(item)>2]
         except:
             traceback.print_exc()
             return []
