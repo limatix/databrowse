@@ -1,0 +1,1175 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:hgdir="http://thermal.cnde.iastate.edu/databrowse/hgdir" match="hgdir:dir" mode="detailed">
+    <xsl:call-template name="db_directory_mercurial-directorytree">
+        <xsl:with-param name="mode">detailed</xsl:with-param>
+    </xsl:call-template>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:hgdir="http://thermal.cnde.iastate.edu/databrowse/hgdir" match="hgdir:dir" mode="summary">
+    <xsl:call-template name="db_directory_mercurial-directorytree">
+        <xsl:with-param name="mode">summary</xsl:with-param>
+    </xsl:call-template>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:hgdir="http://thermal.cnde.iastate.edu/databrowse/hgdir" match="hgdir:dir" mode="title">
+    <xsl:call-template name="db_directory_mercurial-directorytree">
+        <xsl:with-param name="mode">title</xsl:with-param>
+    </xsl:call-template>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:hgdir="http://thermal.cnde.iastate.edu/databrowse/hgdir" name="db_directory_mercurial-directorytree">
+    <xsl:param name="mode"/>
+    <xsl:if test="@root='True' and not(@ajaxreq='True')">
+        <script type="text/javascript">
+            <![CDATA[
+                var relpath = "";
+                var fileuploaded = false;
+            ]]> 
+            var siteurl = "<xsl:value-of select="/hgdir:dir/@siteurl" />";
+            var dataroot = "<xsl:value-of select="/hgdir:dir/@dataroot" />";
+        </script>
+        <script type="text/javascript" DEFER="true">
+                <![CDATA[                 
+
+                    $.ImgToggle = function(img, resurl, origimg) {
+                        if(img.attr("src") == resurl + "/icons/folder-open.png") {
+                            img.attr("src", resurl + "/icons/" + origimg);
+                        }
+                        else {
+                            img.attr("src", resurl + "/icons/folder-open.png");
+                        }
+                    };
+                    $.AjaxRequest = function(id, img, requrl, resurl, origimg) {
+                        if(img.attr("src") == resurl + "/icons/folder-open.png"){
+                            img.attr("src", resurl + "/icons/" + origimg);
+                        }
+                        else if(id.html() != "") { 
+                            img.attr("src", resurl + "/icons/folder-open.png");
+                        }
+                        else {
+                            $.ajax({
+                                url: requrl,
+                                dataType: "xml",
+                                beforeSend: function ( xhr ) {
+                                    img.attr("src", resurl + "/icons/loading.gif");
+                                    $("#loading").fadeIn(100);
+                                }
+                            }).done(function ( data ) {
+                                text = $(data).find('ul.rootdir')
+                                id.html(text);
+                                img.attr("src", resurl + "/icons/folder-open.png");
+                                $("#loading").fadeOut();
+                            });
+                        }
+                    };
+                    function showContextMenu(event, menuname, click) {
+                         var clicktriggered; //will be set to true or false
+                         if ("button" in event) {
+                            if (click == "l"){
+                                clicktriggered = (event.button == 0);
+                            } else if (click == "r") {
+                                clicktriggered = (event.button == 2);
+                            } else if (click == "a") {
+                                clicktriggered = True;
+                            }                              
+                         } else if ("button" in e) {
+                            if (click == "l"){
+                                clicktriggered = (e.button == 1);
+                            } else if (click == "r") {
+                                clicktriggered = (e.button == 3);
+                            } else if (click == "a") {
+                                clicktriggered = True;
+                            }
+                         }
+                     
+                         if(clicktriggered) { //if the secondary mouse botton was clicked
+                              if (menuname == "contextmenu") {
+                                    clearContextMenu("filecontextmenu");
+                                    clearContextMenu("checklistmenu");
+                              }
+                              else if (menuname == "filecontextmenu") {
+                                    clearContextMenu("contextmenu");
+                                    clearContextMenu("checklistmenu");
+                              }
+                              $("div[id*=checklistmenu-subdir]").each(function() {
+                                    clearContextMenu($(this).attr('id'));
+                              });
+                              var menu = document.getElementById(menuname);
+                              menu_jquery = $("#"+menuname);
+                                                   
+                              if ("button" in event) {
+                                var x = event.clientX; //get X and Y coordinance for menu position
+                                var y = event.clientY;
+                              } else if ("button" in e) {
+                                var x = e.clientX; //get X and Y coordinance for menu position
+                                var y = e.clientY;
+                              }
+                     
+                              //This section is necessary if you click on the far right edge or bottom
+                              //The 200 is arbitrary, choose whatever number you want based on how large your menu is
+                              if(window.innerWidth) {
+                                   windowWidth = window.innerWidth;
+                                   windowHeight = window.innerHeight;
+                              } else if(document.documentElement.clientWidth) {
+                                   windowWidth = document.documentElement.clientWidth;
+                                   windowHeight = document.documentElement.clientHeight;
+                              } else {
+                                   windowWidth = document.getElementsByTagName('body')[0].clientWidth;
+                                   windowHeight = document.getElementsByTagName('body')[0].clientHeight;
+                              }
+                              if(windowWidth < (x + menu_jquery.width())) {
+                                   x = x - menu_jquery.width();
+                              }
+                              if(windowHeight < (y + menu_jquery.height())) {
+                                   y -= menu_jquery.height();
+                              }
+
+                              if (y < 0){
+                                y = 0;
+                              }
+                              if (x < 0){
+                                x = 0;
+                              }
+                     
+                              //position the menu
+                              menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
+                              menu.style.top = y+"px";
+                              menu.style.left= x+"px";
+
+                              $('#'+menuname).slideDown(25);
+                         }
+
+                    }
+                    function showSubMenu(event, menuname, parentname, click) {
+                         var clicktriggered; //will be set to true or false
+                         if ("button" in event) {
+                            if (click == "l"){
+                                clicktriggered = (event.button == 0);
+                            } else if (click == "r") {
+                                clicktriggered = (event.button == 2);
+                            } else if (click == "a") {
+                                clicktriggered = True;
+                            }                              
+                         } else if ("button" in e) {
+                            if (click == "l"){
+                                clicktriggered = (e.button == 1);
+                            } else if (click == "r") {
+                                clicktriggered = (e.button == 3);
+                            } else if (click == "a") {
+                                clicktriggered = True;
+                            }
+                         }
+
+                         if(clicktriggered) { //if the secondary mouse botton was clicked
+                              clearContextMenu("contextmenu");
+                              clearContextMenu("filecontextmenu");
+                              var menu = document.getElementById(menuname);
+                              var parentmenu = document.getElementById(parentname);
+                              parentmenu_jquery = $("#"+parentname);
+                              menu_jquery = $("#"+menuname);
+
+                              //x = parentmenu_jquery.position().left;
+                              //y = parentmenu_jquery.position().top;
+
+                              if ("button" in event) {
+                                var x = event.clientX; //get X and Y coordinance for menu position
+                                var y = event.clientY;
+                              } else if ("button" in e) {
+                                var x = e.clientX; //get X and Y coordinance for menu position
+                                var y = e.clientY;
+                              }
+
+
+                              
+                              
+                     
+                              //position the menu
+                              menu.style.position = "fixed"; // use fixed or it will not work when the window is scrolled
+                              
+
+                              //This section is necessary if you click on the far right edge or bottom
+                              //The 200 is arbitrary, choose whatever number you want based on how large your menu is
+                              if(window.innerWidth) {
+                                   windowWidth = window.innerWidth;
+                                   windowHeight = window.innerHeight;
+                              } else if(document.documentElement.clientWidth) {
+                                   windowWidth = document.documentElement.clientWidth;
+                                   windowHeight = document.documentElement.clientHeight;
+                              } else {
+                                   windowWidth = document.getElementsByTagName('body')[0].clientWidth;
+                                   windowHeight = document.getElementsByTagName('body')[0].clientHeight;
+                              }
+
+                              if(windowHeight < (menu_jquery.height())){
+                                    menu.style.height = windowHeight*0.85 + "px";
+                                    menu.style.overflowY = "scroll";
+                              }
+                              if(windowWidth < (x + menu_jquery.width())) {
+                                   x = x - menu_jquery.width();
+                              }
+                              if(windowHeight < (y + menu_jquery.height())) {
+                                   y -= menu_jquery.height();
+                              }
+
+                              if (y < 0){
+                                y = 0;
+                              }
+                              if (x < 0){
+                                x = 0;
+                              }
+
+                              menu.style.top = y+"px";
+                              menu.style.left= x+"px";
+
+                              $('#'+menuname).slideDown(25);
+                         }
+
+                    }
+                    function clearContextMenu(menuname) { //used to make the menu disappear
+                         //this function should be used at the beginning of any function that is called from the menu
+                         $('#'+menuname).slideUp(25);
+                    }
+                    
+                    $(document).ready(function() {
+                        $('#blackout').mouseup(function() {
+                            $("#blackout").fadeOut(25);
+                            $('#uploadwindow').slideUp(25);
+                            if(fileuploaded) {
+                                window.location.href = siteurl + "/" + relpath.slice(1);
+                            }
+                        });
+                        $("#closeuploadwindow").click(function() {
+                            $("#blackout").fadeOut(25);
+                            $('#uploadwindow').slideUp(25);
+                            if(fileuploaded) {
+                                window.location.href = siteurl + "/" + relpath.slice(1);
+                            }
+                        });
+                        $('html').click(function(e) {
+                            if($(e.target).is(".menuitemcomponent")) return;
+                            clearContextMenu("contextmenu");
+                            clearContextMenu("filecontextmenu");
+                            clearContextMenu("checklistmenu");
+                            $("div[id*=checklistmenu-subdir]").each(function() {
+                                clearContextMenu($(this).attr('id'));
+                            });
+                        });
+                    });
+
+                    function startchecklist(checklistname) {
+                        var PostForm = document.createElement("form");
+                        PostForm.method = "POST";
+                        PostForm.action = checklistname;
+                        var PostInput = document.createElement("input");
+                        PostInput.setAttribute("name", "dest");
+                        PostInput.setAttribute("value", relpath.slice(1));
+                        PostForm.appendChild(PostInput);
+                        document.body.appendChild(PostForm);
+                        PostForm.submit();
+                        document.body.removeChild(PostForm);
+                    }
+                    function openuploadwindow() {
+                        //var w = window.open('http://localhost/dbres/FileUpload/index.html');
+                        $('#uploaddir').html(relpath.slice(1));
+                        $('#blackout').fadeIn(25);
+                        $('#uploadwindow').slideDown(25);
+                        'use strict';
+                        $('#fileupload').fileupload({
+                            url: siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=upload"
+                        });
+                        $("#fileupload").bind("fileuploaddone", function(e, data) {
+                            fileuploaded = true;
+                        });
+                    }
+                    function newdirectory() {
+                        var newdirname = prompt("Type New Directory Name");
+                        if(newdirname) {
+                            var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
+                            $.ajax({
+                                type: "POST",
+                                url: ajaxurl,
+                                data: { dirname: newdirname }
+                            }).done(function(msg) {
+                                if(msg=="Directory Created Successfully") {
+                                    window.location.href = siteurl+"/"+relpath.slice(1)+"/"+newdirname;
+                                }
+                                else {
+                                    alert(msg);
+                                }
+                            });
+                        }
+                    }
+                    function renamefile() {
+                        var relpathlist = relpath.slice(1).split("/");
+                        var curname = relpathlist[relpathlist.length-1];
+                        var newdirname = prompt("Type New Name", curname);
+                        if(newdirname && newdirname != curname) {
+                            var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=rename";
+                            $.ajax({
+                                type: "POST",
+                                url: ajaxurl,
+                                data: { newname: newdirname }
+                            }).done(function(msg) {
+                                if(msg=="Item Renamed Successfully") {
+                                    if(window.location.href == siteurl+"/"+relpathlist.slice(0,-1).join("/")) {
+                                        window.location.reload(true);
+                                    }
+                                    else {
+                                    window.location.href = siteurl+"/"+relpathlist.slice(0,-1).join("/");
+                                    }
+                                }
+                                else {
+                                    alert(msg);
+                                }
+                            });
+                        }
+                    }
+                    function deletefile() {
+                        var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=delete";
+                        var relpathlist = relpath.slice(1).split("/");
+                        if(confirm('Are you sure you want to delete "'+relpath+'"?')) {
+                            $.ajax({
+                                type: "POST",
+                                url: ajaxurl,
+                            }).done(function(msg) {
+                                if(msg=="Item Moved To Trash Successfully") {
+                                    window.location.href = siteurl+"/"+relpathlist.slice(0,-1).join("/");
+                                }
+                                else {
+                                    alert(msg);
+                                }
+                            });
+                        }
+                    }
+                    function openiteminnewtab() {
+                        window.open(siteurl+"/"+relpath.slice(1));
+                    }
+                    function openiteminsftpclient() {
+                        window.open("sftp://"+location.hostname+dataroot+"/"+relpath.slice(1));
+                    }
+                    function openiteminsshclient() {
+                        window.open("ssh://"+location.hostname+dataroot+"/"+relpath.slice(1));
+                    }
+                    function displaylink() {
+                        window.prompt("Press Ctrl + C to Copy Link", siteurl+"/"+relpath.slice(1));
+                    }
+                    function displayproperties() {
+                        window.location.href = siteurl+"/"+relpath.slice(1)+"?handler=db_default"
+                    }
+                ]]> 
+        </script>
+        <link rel="stylesheet">
+            <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/FileUpload/css/jquery-ui.css</xsl:attribute>
+        </link>
+        <link rel="stylesheet">
+            <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/FileUpload/css/jquery.fileupload-ui.css</xsl:attribute>
+        </link>
+        <!-- The template to display files available for upload -->
+        <script id="template-upload" type="text/x-tmpl">
+            //<xsl:value-of select="'&lt;'" disable-output-escaping="yes"/>![CDATA[
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-upload fade">
+                    <td class="preview"><span class="fade"></span></td>
+                    <td class="name"><span>{%=file.name%}</span></td>
+                    <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                    {% if (file.error) { %}
+                        <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                    {% } else if (o.files.valid <xsl:value-of select="'&amp;'" disable-output-escaping="yes"/><xsl:value-of select="'&amp;'" disable-output-escaping="yes"/> !i) { %}
+                        <td>
+                            <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar" style="width:0%;"></div></div>
+                        </td>
+                        <td>{% if (!o.options.autoUpload) { %}
+                            <button class="btn success btn-primary start">
+                                <i class="icon-upload icon-white"></i>
+                                <span>Start</span>
+                            </button>
+                        {% } %}</td>
+                    {% } else { %}
+                        <td colspan="2"></td>
+                    {% } %}
+                    <td>{% if (!i) { %}
+                        <button class="btn error btn-warning cancel">
+                            <i class="icon-ban-circle icon-white"></i>
+                            <span>Cancel</span>
+                        </button>
+                    {% } %}</td>
+                </tr>
+            {% } %}
+            //]]<xsl:value-of select="'&gt;'" disable-output-escaping="yes"/>
+        </script>
+        <!-- The template to display files available for download -->
+        <script id="template-download" type="text/x-tmpl">
+            //<xsl:value-of select="'&lt;'" disable-output-escaping="yes"/>![CDATA[
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-download fade">
+                    {% if (file.error) { %}
+                        <td></td>
+                        <td class="name"><span>{%=file.name%}</span></td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                        <td>
+                        &lt;button class="btn error btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}&gt;
+                            <i class="icon-trash icon-white"></i>
+                            <span>Delete</span>
+                        &lt;/button&gt;
+                    </td>
+                    {% } else { %}
+                        <td class="preview">{% if (file.thumbnail_url) { %}
+                            &lt;a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}"&gt;&lt;img src="{%=file.thumbnail_url%}" /&gt;&lt;/a&gt;
+                        {% } %}</td>
+                        <td class="name">
+                            &lt;a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url<xsl:value-of select="'&amp;'" disable-output-escaping="yes"/><xsl:value-of select="'&amp;'" disable-output-escaping="yes"/>'gallery'%}" download="{%=file.name%}"&gt;{%=file.name%}&lt;/a&gt;
+                        </td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td colspan="3"></td>
+                    {% } %}
+                    
+                </tr>
+            {% } %}
+            //]]<xsl:value-of select="'&gt;'" disable-output-escaping="yes"/>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery-ui.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/tmpl.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/load-image.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/canvas-to-blob.min.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.iframe-transport.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-fp.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-ui.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/jquery.fileupload-jui.js</xsl:attribute>
+        </script>
+        <script type="text/javascript" defer="true">
+            <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/FileUpload/js/main.js</xsl:attribute>
+        </script>
+        <style>
+                ul.tree, ul.tree ul {
+                    list-style-type: none;
+                    margin: 0px;
+                    padding: 0 0px;
+                    background: url('<xsl:value-of select="/hgdir:dir/@resurl"/>/vline.png') repeat-y;
+                }
+                .item {
+                    margin: 0px;
+                    padding: 0 18px;
+                    line-height:20px;
+                    background: url('<xsl:value-of select="/hgdir:dir/@resurl"/>/node.png'), url('<xsl:value-of select="/hgdir:dir/@resurl"/>/vline.png');
+                    background-repeat: no-repeat, repeat-y;
+                }
+                ul.tree li:last-child{
+                    background: #fff url('<xsl:value-of select="/hgdir:dir/@resurl"/>/lastnode.png') no-repeat;
+                }
+                ul.root {
+                    margin: 0px;
+                    padding: 0px;
+                    list-style-type: none;
+                    margin-bottom: 0px;
+                    background: none;
+                }
+                ul.tree ul.rootdir {
+                    padding: 0 0px;
+                }                
+                li.subdir {
+                    margin: 0px;
+                    padding: 0 0px;
+                    line-height:20px;
+                    background: #fff none;
+                }
+                ul.tree li.subdir {
+                    background: #fff none;
+                }    
+                ul.tree li.rootdir {
+                    background: #fff none;
+                }
+                .icon {
+                    padding-right: 4px;
+                    position: relative;
+                }
+                .basename {
+                    font-weight: bold;
+                    padding-right: 4px;
+                }
+                .title {
+                    padding-right: 4px;
+                }
+                #contextmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                #filecontextmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                #checklistmenu {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                .checklistsubmenus {
+                    display: none;
+                    background-color: #ddd;
+                    border: 1px solid #666;
+                    min-width: 200px;
+                    min-height: 31px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                }
+                #uploadwindow {
+                    display: none;
+                    width: 962px;
+                    height: 500px;
+                    z-index: 100;
+                    box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.4);
+                    background-color: #fff;
+                    border: 1px solid #666;
+                    left: 50%;
+                    top: 50%;
+                    margin-left: -481px;
+                    margin-top: -250px;
+                    position: fixed;
+                    list-style: none;
+                    -moz-border-radius: 5px;
+                    border-radius: 5px;
+                }
+                #blackout {
+                    display: none;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 50;
+                    background-color: rgba(0,0,0,0.5);
+                    left: 0px;
+                    top: 0px;
+                    position: fixed;
+                }
+                #blackout:hover{
+                    cursor: pointer;
+                }
+                #uploadheader {
+                    width: 100%;
+                    background-color: #ccc;
+                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAbCAYAAAC9WOV0AAAAHklEQVQY02NhAAIWGMEIIpjgXCZcEoyoSnBKEG0oACP0AIWLLZ8oAAAAAElFTkSuQmCC");
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-position: bottom;
+                    background-repeat: repeat-x;
+                    border-bottom: 1px solid gray;
+                    position: relative; 
+                    overflow: hidden;
+                    vertical-align:middle;
+                    -moz-border-top-left-radius: 5px;
+                    border-top-left-radius: 5px;
+                    -moz-border-top-right-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+                #closeuploadwindow{
+                    z-index: 75;
+                    margin:3px;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                    border: 1px solid rgba(0,0,0,0);
+                }
+                #closeuploadwindow:hover{
+                    cursor: pointer;
+                    background-color: #eb958a;
+                    border: 1px solid #c96356;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                }
+                #closeuploadwindow:active{
+                    cursor: pointer;
+                    background-color: #e07373;
+                    border: 1px solid #c55353;
+                    -moz-border-radius: 16px;
+                    border-radius: 16px;
+                }
+                #uploadframe {
+                    position:relative;
+                    height: 459px;
+                    border: 0px;
+                    left: 0px;
+                    top: 0px;
+                    padding: 8px;
+                    overflow-y: scroll;
+                    -moz-border-bottom-left-radius: 5px;
+                    border-bottom-left-radius: 5px;
+                    -moz-border-bottom-right-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+                .contextmenuitem {
+                    background-color: #ddd;
+                    cursor: default;
+                    padding-left:5px;
+                    padding-top:5px;
+                    padding-bottom:5px;
+                    padding-right:5px;
+                    line-height:10px;
+                }
+                .contextmenuitem img {
+                    vertical-align: text-bottom;
+                    padding-right: 5px;
+                }
+                .contextmenuitem span {
+                    vertical-align: middle;
+                }
+                .contextmenuitem:hover {
+                    background-color: #cb182a;
+                    border-color: #200;
+                    color: #fff;
+                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAZCAYAAADwkER/AAAAIElEQVQY02NgYGBgZIIRTKgEM5yFTRZNHSMqC5ssumIAF1EAYnirD50AAAAASUVORK5CYII%3D");
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+                    background-position: bottom center;
+                    background-repeat: repeat-x;
+                }
+                .contextmenuseparator {
+                    height: 3px;
+                    cursor: default;
+                    line-height: 3px;
+                    padding-left:5px;
+                    padding-top:5px;
+                    padding-bottom:5px;
+                    padding-right:5px;
+                    vertical-align: middle;
+                }
+                .btn{
+                    background-color: #ededed;
+                    background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+                    border: 1px solid #aaa;
+                    border-radius: 2px;
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+                    color: #444;
+                    float: left;
+                    font-size: 13px;
+                    line-height: 1.5;
+                    margin-left: 3px;
+                    padding: 0 10px;
+                    text-decoration: none;
+                    text-shadow: 0 1px 0 #f0f0f0;
+                }
+
+                .btn:hover{
+                    background-color: #f2f2f2;
+                    color: #222;
+                }
+
+                .btn:active{
+                    background-color: #ddd;
+                    border-color: #888;
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+                    color: #222;
+                }
+
+                .btn.disabled{
+                    background-color: #f2f2f2;
+                    border-color: #ccc;
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+                    color: #aaa;
+                }
+
+                .btn.success,
+                .btn.info,
+                .btn.error{
+                    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+                    color: #fff;
+                    text-shadow: none;
+                }
+
+                .btn.success{
+                    background-color: #91a691;
+                    border-color: #4f6f4f;
+                }
+
+                .btn.info{
+                    background-color: #6e9bb3;
+                    border-color: #36627a;
+                }
+
+                .btn.error{
+                    background-color: #bc7979;
+                    border-color: #7b3131;
+                }
+
+                .btn.success:hover,
+                .btn.info:hover,
+                .btn.error:hover{
+                    background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                    background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                    background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+                }
+
+                .btn.success:active,
+                .btn.info:active,
+                .btn.error:active{
+                    background-image: -moz-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    background-image: -webkit-linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4) inset;
+                }
+        </style>
+        <div id="contextmenu" class="menuitemcomponent" style="display:none">
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminnewtab(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/tab-new.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in New Tab</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminsftpclient(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-remote.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in SFTP Client</span>
+            </div>
+            <!--<div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in SSH Client</span>
+            </div>-->
+            <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Get Link to this Folder</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="showSubMenu(event, 'checklistmenu', 'contextmenu', 'l'); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Start Checklist Here</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="openuploadwindow(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Upload File Here</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="newdirectory(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-new.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">New Folder Here</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="renamefile(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-open.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Rename Folder</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="deletefile(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Move Folder to Trash</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="displayproperties(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Folder Properties</span>
+            </div>
+        </div>
+        <div id="filecontextmenu" class="menuitemcomponent" style="display:none">
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminnewtab(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/tab-new.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open File in New Tab</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="openiteminsftpclient(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder-remote.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open File in SFTP Client</span>
+            </div>
+            <!--<div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Open Folder in SSH Client</span>
+            </div>-->
+            <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Get Link to this File</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="renamefile(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-open.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Rename File</span>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="deletefile(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Move File to Trash</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="displayproperties(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/document-properties.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">File Properties</span>
+            </div>
+        </div>
+        <div id="checklistmenu" class="menuitemcomponent" style="display:none">
+            <xsl:for-each select="/hgdir:dir/hgdir:chxlist/*">
+                <xsl:choose>
+                    <xsl:when test="local-name()='chxfile'">
+                        <div class="menuitemcomponent contextmenuitem">
+
+                            <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu');</xsl:attribute>
+                            <img class="menuitemcomponent">
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                            </img>
+                            <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                        </div>
+                    </xsl:when>
+                    <xsl:when test="local-name()='chxdir'">
+                        <div class="menuitemcomponent contextmenuitem">
+                            <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu-subdir<xsl:number count='//hgdir:chxdir' level='any'/>', 'contextmenu', 'l'); clearContextMenu('checklistmenu');</xsl:attribute>
+                            <img class="menuitemcomponent">
+                                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder.png</xsl:attribute>
+                            </img>
+                            <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                        </div>
+                    </xsl:when>
+                </xsl:choose>                
+            </xsl:for-each>
+        </div>
+        <xsl:for-each select="//hgdir:chxdir">
+            <div class="menuitemcomponent checklistsubmenus" style="display:none">
+                <xsl:attribute name="id">checklistmenu-subdir<xsl:number count='//hgdir:chxdir' level='any'/></xsl:attribute>
+                <xsl:variable name="menunumber"><xsl:number count="//hgdir:chxdir" level='any'/></xsl:variable>
+                <div class="menuitemcomponent contextmenuitem">
+                    <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu', 'contextmenu', 'l'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                    <img class="menuitemcomponent">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/go-top.png</xsl:attribute>
+                    </img>
+                    <span class="menuitemcomponent">Back to Top Menu</span>
+                </div>                
+                <xsl:for-each select="*">
+                    <xsl:choose>
+                        <xsl:when test="local-name()='chxfile'">
+                            <div class="menuitemcomponent contextmenuitem">
+                                <xsl:attribute name="onclick">startchecklist('<xsl:value-of select="@url"/>'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                                <img class="menuitemcomponent">
+                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/checkbox.png</xsl:attribute>
+                                </img>
+                                <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                            </div>
+                        </xsl:when>
+                        <xsl:when test="local-name()='chxdir'">
+                            <div class="menuitemcomponent contextmenuitem">
+                                <xsl:attribute name="onclick">showSubMenu(event, 'checklistmenu-subdir<xsl:number count='//hgdir:chxdir' level='any'/>', 'contextmenu', 'l'); clearContextMenu('checklistmenu-subdir<xsl:value-of select="$menunumber"/>');</xsl:attribute>
+                                <img class="menuitemcomponent">
+                                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/folder.png</xsl:attribute>
+                                </img>
+                                <span class="menuitemcomponent"><xsl:value-of select="@name"/></span>
+                            </div>
+                        </xsl:when>
+                    </xsl:choose>    
+                </xsl:for-each>
+            </div>
+        </xsl:for-each>
+        <div id="blackout">
+        </div>
+        <div id="uploadwindow">
+            <div id="uploadheader">            
+                <div style="float:left; padding-left:5px; vertical-align:middle;">
+                    <h3 style="margin-bottom:0px; margin-top:3px;vertical-align:middle">Upload Files to <span id="uploaddir"></span></h3>
+                </div>
+                <div style="float:right; vertical-align:middle;">
+                    <img id="closeuploadwindow" alt="X" title="Click to Close Upload Window" style="vertical-align:middle;">
+                        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/window-close.png</xsl:attribute>
+                    </img>
+                </div>
+            </div>
+            <div id="uploadframe">
+                <p>
+                    Use the buttons below to browse for and upload files.  
+                    Otherwise, drag and drop files from your desktop into this window to upload.
+                </p>
+                <!-- The file upload form used as target for the file upload widget -->
+                <form id="fileupload" method="POST" enctype="multipart/form-data">
+                    <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+                    <div class="row fileupload-buttonbar">
+                        <div class="span7">
+                            <!-- The fileinput-button span is used to style the file input field as button -->
+                            <span class="btn info btn-success fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Add files...</span>
+                                <input type="file" name="files[]" multiple="multiple" />
+                            </span>
+                            <button type="submit" class="btn success btn-primary start">
+                                <i class="icon-upload icon-white"></i>
+                                <span>Start upload</span>
+                            </button>
+                            <button type="reset" class="btn error btn-warning cancel">
+                                <i class="icon-ban-circle icon-white"></i>
+                                <span>Cancel upload</span>
+                            </button>
+                        </div>
+                        <!-- The global progress information -->
+                        <div class="span5 fileupload-progress fade">
+                            <!-- The global progress bar -->
+                            <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                                <div class="bar" style="width:0%;"></div>
+                            </div>
+                            <!-- The extended global progress information -->
+                            <div class="progress-extended">&#160;</div>
+                        </div>
+                    </div>
+                    <!-- The loading indicator is shown during file processing -->
+                    <div class="fileupload-loading"></div>
+                    <br />
+                    <!-- The table listing the files available for upload/download -->
+                    <table role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>
+                </form>
+            </div>
+            <!--<iframe name="uploadframe" id="uploadframe" src="http://localhost/dbres/FileUpload/index.html?uploadurl=http://localhost/databrowse/?handler=db_file_ops"/>-->
+        </div>
+        <xsl:if test="/hgdir:dir/@uncommitted">
+          <p class="notify-msg warning"><strong>Warning:</strong> Mercurial repository contains uncommitted changes to <xsl:value-of select="/hgdir:dir/@uncommitted"/> files.</p>
+        </xsl:if>
+    </xsl:if>
+    <xsl:choose>
+         <xsl:when test="@root='True'">
+            <ul class="tree root" id="tree">
+                <xsl:call-template name="db_directory_mercurial-treestructure">
+                    <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
+                </xsl:call-template>
+            </ul>
+         </xsl:when>
+         <xsl:otherwise>
+            <ul class="tree root">
+                <xsl:call-template name="db_directory_mercurial-treestructure">
+                    <xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param>
+                </xsl:call-template>
+            </ul>
+         </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:hgdir="http://thermal.cnde.iastate.edu/databrowse/hgdir" xmlns:imgdir="http://thermal.cnde.iastate.edu/databrowse/imgdir" name="db_directory_mercurial-treestructure">
+    <xsl:param name="mode"/>
+    <li>
+        <xsl:choose>
+            <xsl:when test="@root='True'">
+                <xsl:attribute name="class">rootdir</xsl:attribute>
+                <span class="icon">
+                    <img width="16px" height="16px">
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/folder-visiting.png</xsl:attribute>
+                    </img>
+                    <xsl:choose>
+                        <xsl:when test="@overlay='link'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='readonly'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='unreadable'">
+                            <img>
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
+                </span>
+                <span class="basename">
+                    <span style="overflow:hidden;max-width:670px;display:inline-block;text-overflow:ellipsis;white-space:nowrap;cursor:default">
+                        <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute><xsl:value-of select="@path"/></span>&#160;
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@uphref"/></xsl:attribute>
+                        <img alt="Up" title="Go Up One Directory Level">
+                            <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/up.png</xsl:attribute>
+                        </img>
+                    </a>
+                </span>
+            </xsl:when>
+            <xsl:when test="@ajax='True'">
+                <xsl:attribute name="class">subdir</xsl:attribute>
+                <span class="icon">
+                    <img  width="16px" height="16px" onclick="$(this).parent().next().next().toggle();$.AjaxRequest($(this).parent().next().next(),$(this),&apos;{@ajaxurl}&apos;,&apos;{/hgdir:dir/@resurl}&apos;,&apos;{@icon}&apos;);">
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                    </img>
+                    <xsl:choose>
+                        <xsl:when test="@overlay='link'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='readonly'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='unreadable'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
+                </span>
+                <span class="basename">
+                    <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute>
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </span>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:attribute name="class">subdir</xsl:attribute>
+                <span class="icon">
+                    <img  width="16px" height="16px" onclick="$(this).parent().next().next().toggle();$.ImgToggle($(this),&apos;{/hgdir:dir/@resurl}&apos;,&apos;{@icon}&apos;);">
+                        <xsl:attribute name="title"><xsl:value-of select="@path"/></xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                    </img>
+                    <xsl:choose>
+                        <xsl:when test="@overlay='link'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='readonly'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                        <xsl:when test="@overlay='unreadable'">
+                            <img onclick="$(this).prev().trigger('click')">
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                            </img>
+                        </xsl:when>
+                    </xsl:choose>
+                </span>
+                <span class="basename">
+                    <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "contextmenu", 'r');return true;</xsl:attribute>
+                    <a>
+                        <xsl:attribute name="href"><xsl:value-of select="@href"/></xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </span>
+            </xsl:otherwise>
+        </xsl:choose>
+        <ul>
+            <xsl:choose>
+                <xsl:when test="@root='True'">
+                    <xsl:attribute name="class">rootdir</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="class">subdir</xsl:attribute>
+                    <xsl:attribute name="style">display:none</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:for-each select="hgdir:*[not(local-name()='chxlist')]">
+                <li class="item">
+                    <xsl:if test="not(local-name()='dir')">
+                        <span class="icon">
+                            <img width="16px" height="16px">
+                                <xsl:attribute name="title"><xsl:value-of select="@basename"/></xsl:attribute>
+                                <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute>
+                            </img>
+                            <xsl:choose>
+                                <xsl:when test="@overlay='link'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-symbolic-link.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                                <xsl:when test="@overlay='readonly'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-readonly.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                                <xsl:when test="@overlay='unreadable'">
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="/hgdir:dir/@resurl"/>/icons/emblem-unreadable.png</xsl:attribute>
+                                        <xsl:attribute name="style">position:absolute; z-index:10; left:8px; top:8px;</xsl:attribute>
+                                    </img>
+                                </xsl:when>
+                            </xsl:choose>
+                        </span>
+                        <span class="basename">
+                            <xsl:attribute name="oncontextmenu">relpath="<xsl:value-of select="@relpath"/>";event.preventDefault();showContextMenu(event, "filecontextmenu", 'r');return true;</xsl:attribute>
+                            <a>
+                                <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
+                                <xsl:value-of select="@basename"/>
+                            </a>
+                        </span>
+                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$mode='title'">
+                            <xsl:apply-templates select="." mode="title"/>
+                        </xsl:when>
+                        <xsl:when test="$mode='summary'">
+                            <xsl:apply-templates select="." mode="summary"/>
+                        </xsl:when>
+                        <xsl:when test="$mode='detailed'">
+                            <xsl:apply-templates select="." mode="detailed"/>
+                        </xsl:when>
+                    </xsl:choose>          
+                </li>
+            </xsl:for-each>
+        </ul>
+    </li>
+</xsl:template>
