@@ -1,0 +1,15 @@
+New Databrowse Notes
+--------------------
+
+- Databrowse cetnered around library operation... generating XML representations of files and folders
+- Canonical naming to reference files
+- Generalized Caching Functionality
+  - Probably out of directory, but we need to figure out how to deal with security
+    It's easy when running as user, hard when running as web server
+- Should we use xmldoc?
+  + Provides Namespace Management
+  + Easy Handling of Locking, Contexts
+  + Numpy Matricies
+  - Too much overhead?
+- Provenance Tracking for Generated XML
+- Lazy Loading, Cross Links?
