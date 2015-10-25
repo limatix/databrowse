@@ -295,6 +295,9 @@
                             });
                         }
                     }
+                    function downloadzipfile() {
+                        window.open(siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=download");
+                    }
                     function renamefile() {
                         var relpathlist = relpath.slice(1).split("/");
                         var curname = relpathlist[relpathlist.length-1];
@@ -775,6 +778,12 @@
                 </img>
                 <span class="menuitemcomponent">Upload File Here</span>
             </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="downloadzipfile(); clearContextMenu('contextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Download Folder as ZIP File</span>
+            </div>
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
             </div>
@@ -845,6 +854,15 @@
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/user-trash.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Move File to Trash</span>
+            </div>
+            <div class="menuitemcomponent contextmenuseparator">
+                <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>
+            </div>
+            <div class="menuitemcomponent contextmenuitem" onclick="downloadzipfile(); clearContextMenu('filecontextmenu');">
+                <img class="menuitemcomponent">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+                </img>
+                <span class="menuitemcomponent">Download File in Zip Folder</span>
             </div>
             <div class="menuitemcomponent contextmenuseparator">
                 <div class="menuitemcomponent" style="width:100%;border-top:1px solid gray;height:1px;margin-top:0.5px;cursor:default;"/>

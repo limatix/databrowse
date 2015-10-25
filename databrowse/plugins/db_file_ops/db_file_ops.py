@@ -24,6 +24,7 @@ from databrowse.support.renderer_support import renderer_class
 import re
 import json
 import shutil
+import databrowse.support.zipstream as zipstream
 
 
 class db_file_ops(renderer_class):
@@ -92,6 +93,26 @@ class db_file_ops(renderer_class):
             self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
             self._web_support.req.output_done = True
             return [s]
+        elif operation == "download":
+            def zipdir(path, ziph):
+                for root, dirs, files in os.walk(path):
+                    for f in files:
+                        ziph.write(os.path.join(root, f))
+                        pass
+                    pass
+                pass
+            z = zipstream.ZipFile(mode='w', compression=zipstream.ZIP_DEFLATED, allowZip64=True)
+            if os.path.isdir(self._fullpath):
+                zipdir(self._fullpath, z)
+            else:
+                z.write(self._fullpath)
+            #s = sum(e.compress_size for e in z.infolist())
+            #self._web_support.req.response_headers['Content-Length'] = str(s)
+            self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath) + ".zip"
+            self._web_support.req.response_headers['Content-Type'] = 'application/zip'
+            self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+            self._web_support.req.output_done = True
+            return z
         elif operation == "newdir":
             outputmsg = ""
             if not os.path.isdir(self._fullpath):

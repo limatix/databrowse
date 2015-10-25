@@ -285,6 +285,8 @@ def application(environ, start_response):
                 return db_web_support.req.return_error(401)
             pass
 
+        relpath = '/'.join(relpath.split('\\'))
+
         # Import Plugin Directory
         #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
         #    sys.path.append(db_web_support.pluginpath)
@@ -420,7 +422,7 @@ def application(environ, start_response):
         <strong>Time:</strong> %s                                                       <br/>
         <strong>Hostname:</strong> %s                                                   <br/>
         <strong>Platform:</strong> %s <strong>Python:</strong> %s                       <br/>
-        <strong>PID:</strong> %s <strong>UID:</strong> %s <strong>GID:</strong> %s      <br/>
+        <strong>PID:</strong> %s                                                        <br/>
         <strong>Traceback:</strong>                                                     <br/>
         <pre style="overflow:auto">%s</pre>
         <strong>Environment:</strong>                                                   <br/>
@@ -492,7 +494,7 @@ def application(environ, start_response):
 
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
-            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), os.getuid(), os.getgid(), tracestring, keystring, inputstring, dirstring)
+            errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, keystring, inputstring, dirstring)
             start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage]
         pass

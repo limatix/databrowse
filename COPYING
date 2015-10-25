@@ -34,6 +34,10 @@ Portions of this software are adapted from images2gif.py:
 Copyright (C) 2012 Almar Klein, Ant1, Marius van Voorden
 License: BSD-3
 
+Portions of this software are adapted from python-zipstream-1.1.3:
+Copyright (C) 2015 Allan Lei
+License: GPL v3
+
 === GNU PUBLIC LICENSE v3 =====================================================
 
                     GNU GENERAL PUBLIC LICENSE
