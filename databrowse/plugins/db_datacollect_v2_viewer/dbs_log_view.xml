@@ -326,6 +326,9 @@
                         <xsl:when test="$localname = 'xducer' and @url">
                             <tr><th><abbr title="dc:xducer">Transducer</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute><xsl:value-of select="."/></a></td></tr>
                         </xsl:when>
+                        <xsl:when test="$localname = 'undistorted_png'">
+                            <tr><th><abbr title="dc:undistorted_png">Undistorted PNG</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="@xlink:href"/></xsl:attribute><xsl:value-of select="@xlink:href"/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="@xlink:href"/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div><br/><table class="cream"><thead><tr><th colspan="2">Image Information</th></tr></thead><tbody><tr><th>Units/Intensity</th><td><xsl:value-of select="@unitsperintensity"/></td></tr><tr><th>Frame Time</th><td><xsl:value-of select="@frametime"/></td></tr><tr><th>Channel</th><td><xsl:value-of select="@channel"/></td></tr><tr><th>Offset</th><td><xsl:value-of select="@offset"/></td></tr></tbody></table></td></tr>
+                        </xsl:when>
                         <xsl:when test="$localname = 'vibropowerplot'">
                             <tr><th><abbr title="dc:vibropowerplot">Thermal Power Plot</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div></td></tr>
                         </xsl:when>
@@ -647,4 +650,5 @@
     <entry key="opticalregistration">Optical Registration</entry>
     <entry key="thermalregistration">Thermal Registration</entry>  
     <entry key="yieldstress">Yield Stress</entry>  
+    <entry key="undistorted_png">Undistorted PNG</entry>
 </db:fieldmap>
