@@ -163,7 +163,7 @@ class db_dataguzzler_data_file(renderer_class):
 
             # Load Waveform
             filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
-            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh, memmapok=True)
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
@@ -273,7 +273,7 @@ class db_dataguzzler_data_file(renderer_class):
 
             # Load Waveform
             filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
-            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh, memmapok=True)
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
@@ -380,7 +380,7 @@ class db_dataguzzler_data_file(renderer_class):
 
             # Load Waveform
             filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
-            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh, memmapok=True)
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
@@ -488,7 +488,7 @@ class db_dataguzzler_data_file(renderer_class):
 
             # Load Waveform
             filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
-            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh, memmapok=True)
             waveform = wfmdict[waveformname]
 
             # Add Simple Offsets
@@ -678,7 +678,7 @@ class db_dataguzzler_data_file(renderer_class):
 
             # Load Waveform
             filename = "SNAPSHOT"+str(snapshotnumber)+"_"+waveformname
-            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh)
+            mdata, wfms, wfmdict = dgf.procSNAPSHOT(dgfh, memmapok=True)
             waveform = wfmdict[waveformname]
 
             (ndim, dimlen, inival, step, bases) = dge.geom(waveform)
