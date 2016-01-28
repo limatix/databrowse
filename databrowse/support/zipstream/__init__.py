@@ -262,7 +262,10 @@ class ZipFile(zipfile.ZipFile):
         else:
             zinfo.compress_type = compress_type
 
-        zinfo.file_size = 0
+        if st:
+        	zinfo.file_size = st[6]
+        else:
+        	zinfo.file_size = 0
         zinfo.flag_bits = 0x00
         zinfo.flag_bits |= 0x08                 # ZIP flag bits, bit 3 indicates presence of data descriptor
         zinfo.header_offset = self.fp.tell()    # Start of header bytes
