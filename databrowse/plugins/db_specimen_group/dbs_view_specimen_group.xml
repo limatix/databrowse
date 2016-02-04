@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="specimen:specimengroup" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:specimen="http://thermal.cnde.iastate.edu/specimen" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="specimen:specimengroup" mode="full">
     <xsl:if test="specimen:provenance/specimen:exportcontrolled and not(specimen:provenance/specimen:exportcontrolled/.='')">
         <p class="notify-msg error"><strong>ITAR Warning:</strong> Export control restrictions have been listed for this sample!</p>
     </xsl:if>
@@ -37,11 +37,11 @@
                                     <xsl:when test="@link">
                                         <a>
                                             <xsl:attribute name="href"><xsl:value-of select="@link"/></xsl:attribute>
-                                            <xsl:value-of select="."/>
+                                            <xsl:choose><xsl:when test="@xlink:href"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>
                                         </a>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="."/>
+                                        <xsl:choose><xsl:when test="@xlink:href"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </span></li>

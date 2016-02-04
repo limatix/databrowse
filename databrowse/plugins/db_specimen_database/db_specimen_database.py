@@ -76,6 +76,7 @@ class db_specimen_database(db_directory_module.db_directory):
                     filestring = self._web_support.req.form["file"].value
                     xml = etree.XML(filestring)
                     specimentag = xml.xpath("/specimen:specimen/specimen:specimenid/.", namespaces={"specimen": "http://thermal.cnde.iastate.edu/specimen"})
+                    dirtags = xml.xpath("/specimen:specimen/specimen:reldests/specimen:reldest", namespaces={"specimen":"http://thermal.cnde.iastate.edu/specimen"})
                     specimenid = specimentag[0].text
                     fullfilename = os.path.join(self._fullpath, specimenid + ".sdb")
                     # Let's check on the directory and make sure its writable and it exists
@@ -91,7 +92,14 @@ class db_specimen_database(db_directory_module.db_directory):
                             return [self._web_support.req.return_page()]
                         else:
                             try:
-                                os.makedirs(os.path.join(self._fullpath, specimenid + "_files"))
+                                for dirtag in dirtags:
+                                    newdirname = None
+                                    if dirtag.get('{http://www.w3.org/1999/xlink}href') is not None:
+                                        newdirname = dirtag.get('{http://www.w3.org/1999/xlink}href')
+                                    else:
+                                        newdirname = dirtag.text 
+                                    if newdirname is not None:
+                                        os.makedirs(os.path.join(self._fullpath, newdirname))
                             except OSError as err:
                                 if err.errno == EEXIST:  # Handle the Race Condition
                                     pass

@@ -44,7 +44,11 @@ class db_specimen_group(renderer_class):
             xmlroot = xml.getroot()
             reldests = [x for x in xmlroot.xpath('specimen:reldests/specimen:reldest', namespaces={'specimen': "http://thermal.cnde.iastate.edu/specimen"})]
             for reldest in reldests:
-                filerelpath = os.path.join(os.path.dirname(self._relpath), reldest.text)
+                if reldest.get('{http://www.w3.org/1999/xlink}href') is not None:
+                    reldesttext = reldest.get('{http://www.w3.org/1999/xlink}href')
+                else:
+                    reldesttext = reldest.text
+                filerelpath = os.path.join(os.path.dirname(self._relpath), reldesttext)
                 filefullpath = os.path.abspath(self._web_support.dataroot + '/' + filerelpath)
                 if os.path.exists(filefullpath) and self._style_mode == "view_specimen_group":
                     import databrowse.plugins.db_directory.db_directory as db_directory_module

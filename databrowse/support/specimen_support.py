@@ -62,7 +62,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
         specimenxml = etree.XML(f.read())
         f.close()
     except:
-        raise SpecimenException('Unable to Read Specimen Data File')
+        raise SpecimenException('Unable to Read Specimen Data File "%s"' % filename)
 
     # Identify the Group
     groupidelem = specimenxml.xpath("specimen:groups/specimen:groupid", namespaces=NS)
