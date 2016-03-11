@@ -1,12 +1,102 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbhdf="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
+    <style>
+                ul.tree, ul.tree ul {
+                    list-style-type: none;
+                    margin: 0px;
+                    padding: 0 0px;
+                    background: url('<xsl:value-of select="$resdir"/>/vline.png') repeat-y;
+                }
+                .item {
+                    margin: 0px;
+                    padding: 0 18px;
+                    line-height:20px;
+                    background: url('<xsl:value-of select="$resdir"/>/node.png'), url('<xsl:value-of select="$resdir"/>/vline.png');
+                    background-repeat: no-repeat, repeat-y;
+                }
+                ul.tree li:last-child{
+                    background: #fff url('<xsl:value-of select="$resdir"/>/lastnode.png') no-repeat;
+                }
+                ul.root {
+                    margin: 0px;
+                    padding: 0px;
+                    list-style-type: none;
+                    margin-bottom: 0px;
+                    background: none;
+                }
+                ul.tree ul.rootdir {
+                    padding: 0 0px;
+                }                
+                li.subdir {
+                    margin: 0px;
+                    padding: 0 0px;
+                    line-height:20px;
+                    background: #fff none;
+                }
+                ul.tree li.subdir {
+                    background: #fff none;
+                }    
+                ul.tree li.rootdir {
+                    background: #fff none;
+                }
+                .icon {
+                    padding-right: 4px;
+                    position: relative;
+                }
+                .basename {
+                    font-weight: bold;
+                    padding-right: 4px;
+                }
+                .title {
+                    padding-right: 4px;
+                }
+        </style>
+        <script type="text/javascript">
+            <![CDATA[
+
+                function loadimage(requrl)
+                {
+                    $("#imgdiv").html($("<img>").attr("src", requrl).attr("style", "width:100%"));
+                }
+
+            ]]>
+        </script>
     <xsl:apply-templates select="contents/hdf5:HDF5-File" />
 </xsl:template>
 <xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:HDF5-File">
-    <xsl:apply-templates select="hdf5:RootGoup" />
+    <xsl:apply-templates select="hdf5:RootGroup" />
+    <div id="imgdiv"></div>
 </xsl:template>
 <xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:RootGroup">
-    <xsl:apply-templates select="hdf5:Dataset" />
+    <ul id="tree" class="tree root">
+        <li class="rootdir">
+            <span class="icon">
+                <img height="16px" width="16px">
+                    <xsl:attribute name="src"><xsl:value-of select="$resdir" />/icons/folder-visiting.png</xsl:attribute>
+                </img>
+            </span>
+            <span class="basename">
+                <xsl:value-of select="@H5Path" />
+            </span>
+        </li>
+        <ul class="rootdir">
+            <xsl:apply-templates select="hdf5:Dataset" />
+        </ul>
+    </ul>    
 </xsl:template>
 <xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:Dataset">
-    <p><xsl:value-of select="@Name" /></p>
+    <li class="item">
+        <span class="icon">
+            <img height="16px" width="16px">
+                <xsl:attribute name="src"><xsl:value-of select="$resdir" />/icons/dataguzzler.png</xsl:attribute>
+            </img>
+        </span>
+        <span class="basename">
+            <a style="cursor:pointer">
+                <xsl:attribute name="onclick">
+                    loadimage([location.protocol, '//', location.host, location.pathname].join('') + '?handler=db_generic_HDF5_file&amp;content_mode=raw&amp;getimage=true&amp;hdfloc=' + '<xsl:value-of select="@H5Path"/>')
+                </xsl:attribute>
+                <xsl:value-of select="@Name" />
+            </a>
+        </span>
+    </li>
 </xsl:template>

@@ -28,6 +28,11 @@ from lxml import etree
 import subprocess
 from databrowse.support.renderer_support import renderer_class
 import magic
+import h5py
+import base64
+import matplotlib as mpl
+mpl.use('Agg')
+import pylab
 
 
 class db_generic_HDF5_file(renderer_class):
@@ -103,6 +108,48 @@ class db_generic_HDF5_file(renderer_class):
                     #xmlchild.text = f.read()
 
                     return xmlroot
+            elif self._content_mode == "raw" and self._web_support.req.form['getimage'].value == "true" and 'hdfloc' in self._web_support.req.form:
+                hdfpath = self._web_support.req.form['hdfloc'].value
+                tagname = base64.urlsafe_b64encode(hdfpath)
+                ext='png'
+                if self.CacheFileExists(tagname, extension=ext):
+                    size = os.path.getsize(self.getCacheFileName(tagname, extension=ext))
+                    f = self.getCacheFileHandler('rb', tagname, extension=ext)
+                    self._web_support.req.response_headers['Content-Type'] = 'image/png'
+                    self._web_support.req.response_headers['Content-Length'] = str(size)
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
+                else:
+                    print(self._fullpath)
+                    f = h5py.File(self._fullpath, 'r')
+                    data = f.get(self._web_support.req.form['hdfloc'].value)
+                    if len(data.value.shape) == 1:
+                        pylab.plot(data.value)
+                        imgf = self.getCacheFileHandler('w', tagname, 'png')
+                        pylab.savefig(imgf)
+                        imgf.close()
+                        pylab.clf()
+                    elif len(data.value.shape) == 2:
+                        pylab.imshow(data.value, origin='lower')
+                        imgf = self.getCacheFileHandler('w', tagname, 'png')
+                        pylab.savefig(imgf)
+                        imgf.close()
+                        pylab.clf()
+                    f.close()
+                    size = os.path.getsize(self.getCacheFileName(tagname, extension=ext))
+                    f = self.getCacheFileHandler('rb', tagname, extension=ext)
+                    self._web_support.req.response_headers['Content-Type'] = 'image/png'
+                    self._web_support.req.response_headers['Content-Length'] = str(size)
+                    self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                        return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                    else:
+                        return iter(lambda: f.read(1024))
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
                 magicstore = magic.open(magic.MAGIC_MIME)
