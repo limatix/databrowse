@@ -41,7 +41,7 @@ class db_generic_HDF5_file(renderer_class):
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/hdf5"
     _namespace_local = "dbhdf"
     _default_content_mode = "full"
-    _default_style_mode = "raw_metadata"
+    _default_style_mode = "view_data"
     _default_recursion_depth = 2
 
     def getContent(self):
