@@ -104,6 +104,7 @@ class db_generic_HDF5_file(renderer_class):
                     f = open(self._fullpath)
                     xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
                     output, error = subprocess.Popen(['/usr/bin/h5dump', '-x', '-H', self._fullpath], stdout=subprocess.PIPE).communicate()
+                    output = output.replace('xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd"', 'xmlns:hdf5="http://hdfgroup.org/DTDs/HDF5-File"')
                     xmlchild.append(etree.XML(output))
                     #xmlchild.text = f.read()
 

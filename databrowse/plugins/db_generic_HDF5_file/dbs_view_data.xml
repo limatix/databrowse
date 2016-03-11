@@ -1,4 +1,4 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbhdf="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:hdf5="http://hdfgroup.org/DTDs/HDF5-File" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbhdf="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
     <style>
                 ul.tree, ul.tree ul {
                     list-style-type: none;
@@ -62,11 +62,11 @@
         </script>
     <xsl:apply-templates select="contents/hdf5:HDF5-File" />
 </xsl:template>
-<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:HDF5-File">
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/DTDs/HDF5-File" match="hdf5:HDF5-File">
     <xsl:apply-templates select="hdf5:RootGroup" />
     <div id="imgdiv"></div>
 </xsl:template>
-<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:RootGroup">
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/DTDs/HDF5-File" match="hdf5:RootGroup">
     <ul id="tree" class="tree root">
         <li class="rootdir">
             <span class="icon">
@@ -83,7 +83,7 @@
         </ul>
     </ul>    
 </xsl:template>
-<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:Dataset">
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/DTDs/HDF5-File" match="hdf5:Dataset">
     <li class="item">
         <span class="icon">
             <img height="16px" width="16px">
