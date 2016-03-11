@@ -1,0 +1,12 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbhdf="http://thermal.cnde.iastate.edu/databrowse/hdf5" match="dbhdf:dbhdf" mode="full">
+    <xsl:apply-templates select="contents/hdf5:HDF5-File" />
+</xsl:template>
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:HDF5-File">
+    <xsl:apply-templates select="hdf5:RootGoup" />
+</xsl:template>
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:RootGroup">
+    <xsl:apply-templates select="hdf5:Dataset" />
+</xsl:template>
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" xmlns:hdf5="http://hdfgroup.org/HDF5/XML/schema/HDF5-File.xsd" match="hdf5:Dataset">
+    <p><xsl:value-of select="@Name" /></p>
+</xsl:template>
