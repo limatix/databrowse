@@ -129,12 +129,14 @@ class db_generic_HDF5_file(renderer_class):
                     f = h5py.File(self._fullpath, 'r')
                     data = f.get(self._web_support.req.form['hdfloc'].value)
                     if len(data.value.shape) == 1:
+                        plyab.figure()
                         pylab.plot(data.value)
                         imgf = self.getCacheFileHandler('w', tagname, 'png')
                         pylab.savefig(imgf)
                         imgf.close()
                         pylab.clf()
                     elif len(data.value.shape) == 2:
+                        plyab.figure()
                         pylab.imshow(data.value, origin='lower')
                         imgf = self.getCacheFileHandler('w', tagname, 'png')
                         pylab.savefig(imgf)
