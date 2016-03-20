@@ -49,9 +49,12 @@ class db_datacollect_v2_viewer(renderer_class):
                 p = etree.XMLParser(huge_tree=True)
                 xmlroot = etree.parse(self._fullpath, parser=p).getroot()
                 # Resolve URL to Files Directory
-                reldest = xmlroot.xpath('dc:summary/dc:reldest', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})[0].text
-                reldesturl = self.getURL(os.path.abspath(os.path.join(os.path.dirname(self._relpath), reldest)))
-                xmlroot.set('reldesturl', reldesturl)
+                try:
+	            reldest = xmlroot.xpath('dc:summary/dc:reldest', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})[0].text
+                    reldesturl = self.getURL(os.path.abspath(os.path.join(os.path.dirname(self._relpath), reldest)))
+                    xmlroot.set('reldesturl', reldesturl)
+                except:
+                    xmlroot.set('reldesturl', '')
                 # Resolve URLs for Config Files
                 configlist = xmlroot.xpath('dc:configstr', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})
                 for item in configlist:
