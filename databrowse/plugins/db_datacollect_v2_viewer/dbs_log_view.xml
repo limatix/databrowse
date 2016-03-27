@@ -1,4 +1,4 @@
-<xi:include href="/usr/local/QAutils/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xmlns(chx=http://thermal.cnde.iastate.edu/checklist) xmlns(dc=http://thermal.cnde.iastate.edu/datacollect) xmlns(dcv=http://thermal.cnde.iastate.edu/dcvalue) xmlns(xlink=http://www.w3.org/1999/xlink) xpointer(/xsl:stylesheet/node())" />
+<xsl:include href="/usr/local/QAutils/checklist/datacollect2.xsl"  />
 
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
     <xsl:element name="script">
