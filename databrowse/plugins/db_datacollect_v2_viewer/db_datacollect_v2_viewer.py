@@ -42,7 +42,7 @@ class db_datacollect_v2_viewer(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode == "full" and self._style_mode != "dcv2_custom_view":
+            if self._content_mode == "full" and self._style_mode in ['old_log_view','old_tabular_view']:
                 # Contents of File
                 #f = open(self._fullpath)
                 #xmlroot = etree.XML(f.read())
@@ -50,7 +50,7 @@ class db_datacollect_v2_viewer(renderer_class):
                 xmlroot = etree.parse(self._fullpath, parser=p).getroot()
                 # Resolve URL to Files Directory
                 try:
-	            reldest = xmlroot.xpath('dc:summary/dc:reldest', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})[0].text
+	               reldest = xmlroot.xpath('dc:summary/dc:reldest', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})[0].text
                     reldesturl = self.getURL(os.path.abspath(os.path.join(os.path.dirname(self._relpath), reldest)))
                     xmlroot.set('reldesturl', reldesturl)
                 except:
@@ -100,6 +100,44 @@ class db_datacollect_v2_viewer(renderer_class):
                             url = self.getURL(relpath)
                             item.set('url', url)
                 return xmlroot
+            elif self._content_mode == "full" and self._style_mode != 'dcv2_custom_view':
+                # Contents of File
+                #f = open(self._fullpath)
+                #xmlroot = etree.XML(f.read())
+                p = etree.XMLParser(huge_tree=True)
+                xmlroot = etree.parse(self._fullpath, parser=p).getroot()
+                
+                # TODO:  GET RID OF ALL OF THIS BELOW
+                # Resolve URLs for Config Files
+                configlist = xmlroot.xpath('dc:config/dc:configfile', namespaces={'dc': 'http://thermal.cnde.iastate.edu/datacollect'})
+                for item in configlist:
+                    try:
+                        xlink = item.get('{http://www.w3.org/1999/xlink}href')
+                        if xlink:
+                            path = os.path.realpath(fname)
+                            if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                                relpath = path.replace(self._web_support.dataroot, '')
+                                url = self.getURL(relpath)
+                                item.set('url', url)
+                    except:
+                        pass
+                # Resolve URLs for Specimen Database
+                specimenlist = xmlroot.xpath('//dc:specimen', namespaces={"dc": 'http://thermal.cnde.iastate.edu/datacollect', "dcv": 'http://thermal.cnde.iastate.edu/dcvalue'})
+                for item in specimenlist:
+                    if item.text:
+                        relpath = '/specimens/' + item.text + '.sdb'
+                        if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
+                            url = self.getURL(relpath)
+                            item.set('url', url)
+                # Resolve URLs for Transducer Database
+                transducerlist = xmlroot.xpath('//dc:xducer', namespaces={"dc": 'http://thermal.cnde.iastate.edu/datacollect', "dcv": 'http://thermal.cnde.iastate.edu/dcvalue'})
+                for item in transducerlist:
+                    if item.text:
+                        relpath = '/transducers/' + item.text + '.tdb'
+                        if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
+                            url = self.getURL(relpath)
+                            item.set('url', url)
+                return xmlroot            
             elif self._content_mode == "full" and self._style_mode == "dcv2_custom_view":
                 self._namespace_local = "dt"
                 self._namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/datatable"

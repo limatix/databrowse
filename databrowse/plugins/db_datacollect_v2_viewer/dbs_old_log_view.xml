@@ -1,0 +1,654 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                prettyPrint();
+                $(".autoexp").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+                $(".opticalregistration").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+                $(".opticaltrace").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        .dgcode {
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            max-width: 555px;
+            max-height: 300px;
+        }
+        .inlinelist {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .inlinelist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            padding: 0px;
+            margin-right: 5px;
+            vertical-align: top;
+        }
+        .inlinelist li img {
+            border: 1px solid #c00;
+        }
+        table.autoexp thead th {
+            text-align: center;
+        }
+        table.opticalregistration thead th {
+            text-align: center;
+        }
+        table.opticaltrace thead th {
+            text-align: center;
+        }
+        table.cream tbody td {
+            max-width: 534px;
+        }
+    </style>
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h1>Datacollect Experiment Log</h1>
+    <xsl:apply-templates mode="full"/>
+</xsl:template>
+<xsl:template name="dc2-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="dc2-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:summary" mode="full">
+    <h3>Experiment Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th width="20%">Item</th><th>Details</th></tr>
+        </thead>
+        <tbody>
+            <xsl:if test="dc:specimen">
+                <tr><th>Specimen: </th><td><xsl:value-of select="dc:specimen"/></td></tr>
+            </xsl:if>
+            <tr><th>Performed By: </th><td><xsl:value-of select="dc:perfby"/></td></tr>
+            <tr><th>Date: </th><td><xsl:value-of select="dc:date"/></td></tr>
+            <tr><th>Data Folder: </th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/></xsl:attribute><xsl:value-of select="dc:reldest"/></a></td></tr>
+            <tr>
+                <th>Goal: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:goal"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+            <tr>
+                <th>Experiment Notes: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:expnotes"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <xsl:if test="dc:expphotos and count(dc:expphotos/dcv:photo) > 0">
+    <h3>Experiment Photographs</h3>
+        <ul class="inlinelist">
+            <xsl:for-each select="dc:expphotos/dcv:photo">
+                <li>
+                    <a>
+                        <xsl:choose>
+                            <xsl:when test="@xlink:href and not(@xlink:href='')">
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <img>
+                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                        </img>
+                    </a>
+                </li>
+            </xsl:for-each>
+        </ul>
+    </xsl:if>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" match="dcp:process" mode="full">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:configstr" mode="full">
+    <h3>Configuration</h3>
+            <xsl:choose>
+                <xsl:when test="@fname and @url">
+                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                    <tt><xsl:value-of select="@fname"/></tt></a>
+                </xsl:when>
+                <xsl:when test="@fnames and @urls">
+                    <script type="text/javascript" defer="True">
+                            fnamelist<xsl:number/> = eval("<xsl:value-of select="@fnames" />");
+                            urllist<xsl:number/> = eval("<xsl:value-of select="@urls" />");
+                            string<xsl:number/> = "";
+                            if (fnamelist<xsl:number/>.length == urllist<xsl:number/>.length) {
+                                 for (i = 0; i&lt;fnamelist<xsl:number/>.length; i++) {
+                                    if (urllist<xsl:number/>[i] != '') {
+                                        if (string<xsl:number/> != ''){ 
+                                            string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                        }
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;a href="'+urllist<xsl:number/>[i]+'"&gt;' + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;&lt;/a&gt;';
+                                    }
+                                    else{
+                                        if (string<xsl:number/> != ''){ 
+                                            string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                        }
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;';
+                                    }
+                                }
+                            }
+                            else {
+                                for (i = 0; i&lt;fnamelist<xsl:number/>.length;  i++) {
+                                    if (string<xsl:number/> != ''){ 
+                                        string<xsl:number/> = string<xsl:number/> + '&lt;br/&gt;';
+                                    }
+                                    string<xsl:number/> = string<xsl:number/> + '&lt;tt&gt;'+fnamelist<xsl:number/>[i]+'&lt;/tt&gt;';
+                                }
+                            }
+                            $(function() {
+                                $('#configstr<xsl:number/>').html(string<xsl:number/>);
+                            });
+                    </script>
+                    <span><xsl:attribute name="id">configstr<xsl:number/></xsl:attribute>
+                    </span>
+                </xsl:when>
+                <xsl:when test="@fnames">
+                    <tt><xsl:value-of select="@fnames"/></tt>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tt><xsl:value-of select="@fname"/></tt>
+                </xsl:otherwise>
+            </xsl:choose>
+        <pre class="prettyprint" style="height:300px">
+            <xsl:value-of select="."/>
+        </pre>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://wwww.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:dcp="http://thermal.cnde.iastate.edu/datacollect/provenance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" match="dcp:provenance" mode="full">
+    <h3>Processed Log Details</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <tr><th colspan="2">Log Derived From:</th></tr>
+            <tr><th>File</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:file"/></td></tr>
+            <tr><th>Timestamp</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:filetimestamp"/></td></tr>
+            <tr><th>Filesize</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:filesize"/> bytes</td></tr>
+            <tr><th colspan="2">Log Generated By:</th></tr>
+            <tr><th>File</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:script"/></td></tr>
+            <tr><th>Timestamp</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:filetimestamp"/></td></tr>
+            <tr><th>Filesize</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:filesize"/> bytes</td></tr>
+            <tr><th colspan="2">Processing Controlled By:</th></tr>
+            <tr><th>User</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:username"/></td></tr>
+            <tr><th>Start Time</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:starttime"/></td></tr>
+            <tr><th>End Time</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:endtime"/></td></tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:dcv="http://thermal.cnde.iastate.edu/dcvalue" xmlns:chx="http://thermal.cnde.iastate.edu/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" mode="full">
+    <h3>Measurement Summary</h3>
+    <table class="cream full-width">
+            <thead>
+                <tr><th style="width:166px">Item</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <tr><th><abbr title="dc:measnum">Measurement #</abbr></th><td><xsl:value-of select="dc:measnum"/></td></tr>
+                <xsl:if test="dc:measphotos and count(dc:measphotos/*) > 0">
+                    <tr><th><abbr title="dc:measphotos">Measurement Photos</abbr></th><td>
+                        <ul class="inlinelist">
+                            <xsl:for-each select="dc:measphotos/dcv:photo">
+                                <li>
+                                    <a>
+                                    <xsl:choose>
+                                        <xsl:when test="@xlink:href and not(@xlink:href='')">
+                                            <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <img>
+                                        <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                                    </img>
+                                </a>
+                                </li>
+                            </xsl:for-each>
+                        </ul>
+                    </td></tr>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="dc:specimen/@url">
+                        <tr><th><abbr title="dc:specimen">Specimen</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:specimen/@url"/></xsl:attribute><xsl:value-of select="dc:specimen"/></a></td></tr>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr><th><abbr title="dc:specimen">Specimen</abbr></th><td><xsl:value-of select="dc:specimen"/></td></tr>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <tr><th><abbr title="dc:date">Date</abbr></th><td><xsl:value-of select="dc:date"/></td></tr>
+                <tr><th><abbr title="dc:perfby">Performed By</abbr></th><td><xsl:value-of select="dc:perfby"/></td></tr>
+                <tr><th><abbr title="dc:clinfo">Checklist Name</abbr></th><td><xsl:value-of select="chx:clinfo"/></td></tr>
+                <tr><th><abbr title="dc:cltitle">Checklist Title</abbr></th><td><xsl:value-of select="chx:cltitle"/></td></tr>
+                <xsl:if test="dc:measchecklist and not(dc:measchecklist='')"><tr><th><abbr title="dc:measchecklist">Checklist Link</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:measchecklist"/></xsl:attribute><xsl:value-of select="dc:measchecklist"/></a></td></tr></xsl:if>
+                <xsl:if test="dc:measchecklist/@xlink:href and not(dc:measchecklist/@xlink:href='')"><tr><th><abbr title="dc:measchecklist">Checklist Link</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:measchecklist/@xlink:href"/></xsl:attribute><xsl:value-of select="dc:measchecklist/@xlink:href"/></a></td></tr></xsl:if>
+                <xsl:if test="dc:dgsfile and not(dc:dgsfile='')"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/></xsl:attribute><xsl:value-of select="dc:dgsfile"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:dgsfile"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=IRimg</xsl:attribute></img></p></td></tr></xsl:if>
+                <xsl:if test="dc:dgsfile/@xlink:href and not(dc:dgsfile/@xlink:href='')"><tr><th><abbr title="dc:dgsfile">DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:dgsfile/@xlink:href"/></xsl:attribute><xsl:value-of select="substring-after(dc:dgsfile/@xlink:href,'/')"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="dc:dgsfile/@xlink:href"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=IRimg</xsl:attribute></img></p></td></tr></xsl:if>
+                <xsl:if test="dc:scanxy_outdgd and not(dc:scanxy_outdgd='')"><tr><th><abbr title="dc:scanxy_outdgd">ScanXY DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scanxy_outdgd"/></xsl:attribute><xsl:value-of select="dc:scanxy_outdgd"/></a></td></tr></xsl:if>      
+                <xsl:if test="dc:scan_outdgd and not(dc:scan_outdgd='')"><tr><th><abbr title="dc:scan_outdgd">Scan DGD File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:scan_outdgd"/></xsl:attribute><xsl:value-of select="dc:scan_outdgd"/></a></td></tr></xsl:if>  
+
+                <xsl:if test="dc:stitchedimagesfolder and not(dc:stitchedimagesfolder='')"><tr><th><abbr title="dc:stitchedimagesfolder">Stitched Images Folder</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitchedimagesfolder"/></xsl:attribute><xsl:value-of select="dc:stitchedimagesfolder"/></a></td></tr></xsl:if> 
+
+                <xsl:if test="dc:rawimagesfolder and not(dc:rawimagesfolder='')"><tr><th><abbr title="dc:rawimagesfolder">Raw Images Folder</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:rawimagesfolder"/></xsl:attribute><xsl:value-of select="dc:rawimagesfolder"/></a></td></tr></xsl:if> 
+
+                <xsl:if test="dc:stitcheddgsfile and not(dc:stitcheddgsfile='')"><tr><th><abbr title="dc:stitcheddgsfile">Stitched DGS File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitcheddgsfile"/></xsl:attribute><xsl:value-of select="dc:stitcheddgsfile"/></a><p style="text-align:center"><img width="75%"><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:stitcheddgsfile"/>?content_mode=raw&amp;image=image&amp;snapshot=1&amp;waveform=GEVProc&amp;frame=0</xsl:attribute></img></p></td></tr></xsl:if>
+
+                <xsl:if test="dc:setfile and not(dc:setfile='')"><tr><th><abbr title="dc:setfile">Set File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="dc:setfile"/></xsl:attribute><xsl:value-of select="dc:setfile"/></a></td></tr></xsl:if>
+                <xsl:if test="dc:setfile/@xlink:href and not(dc:setfile/@xlink:href='')"><tr><th><abbr title="dc:setfile">Set File</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:setfile/@xlink:href"/></xsl:attribute><xsl:value-of select="substring-after(dc:setfile/@xlink:href,'/')"/></a></td></tr></xsl:if>
+                <tr><th><abbr title="dc:notes">Notes</abbr></th><td><xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:notes"/>
+                        </xsl:with-param>
+                    </xsl:call-template></td></tr>
+                <xsl:for-each select="*[not(self::dc:measnum or self::chx:clinfo or self::chx:cltitle or self::dc:measphotos or self::dc:specimen or self::dc:date or self::dc:perfby or self::dc:measchecklist or self::dc:notes or self::dc:setfile or self::dc:dgsfile or self::dc:scanxy_outdgd or self::dc:scan_outdgd or self::dc:stitchedimagesfolder or self::dc:rawimagesfolder or self::dc:stitcheddgsfile)]">
+                    <xsl:sort data-type="text" select="local-name()"/>
+                    <xsl:variable name="localname"><xsl:value-of select="local-name()"/></xsl:variable>
+                    <xsl:choose>
+                        <xsl:when test="$localname = 'xducer' and @url">
+                            <tr><th><abbr title="dc:xducer">Transducer</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute><xsl:value-of select="."/></a></td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'undistorted_png'">
+                            <tr><th><abbr title="dc:undistorted_png">Undistorted PNG</abbr></th><td><div style="word-wrap:break-word;"><a><xsl:attribute name="href"><xsl:value-of select="@xlink:href"/></xsl:attribute><xsl:value-of select="@xlink:href"/></a></div><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="@xlink:href"/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div><br/><table class="cream"><thead><tr><th colspan="2">Image Information</th></tr></thead><tbody><tr><th>Units/Intensity</th><td><xsl:value-of select="@unitsperintensity"/></td></tr><tr><th>Frame Time</th><td><xsl:value-of select="@frametime"/></td></tr><tr><th>Channel</th><td><xsl:value-of select="@channel"/></td></tr><tr><th>Offset</th><td><xsl:value-of select="@offset"/></td></tr></tbody></table></td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'vibropowerplot'">
+                            <tr><th><abbr title="dc:vibropowerplot">Thermal Power Plot</abbr></th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a><br/><div style="text-align:center"><img><xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/>?content_mode=raw&amp;thumbnail=large</xsl:attribute></img></div></td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'simulationoutput'">
+                            <tr><th><abbr title="dc:simulationoutput">Simulation Output</abbr></th><td>
+                                <xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
+                                    <xsl:value-of select="."/>
+                                </pre></xsl:if>
+                            </td></tr>
+                        </xsl:when>
+                        <xsl:when test="contains($localname, '_out')">
+                            <tr>
+                                <th><abbr><xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+                                    <xsl:choose>
+                                        <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$localname"/>                                    
+                                        </xsl:otherwise>
+                                    </xsl:choose></abbr>
+                                </th>
+                                <td><xsl:if test="not(. = '')"><pre class="prettyprint dgcode">
+                                    <xsl:value-of select="."/>
+                                </pre></xsl:if></td>
+                            </tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'opticalregistration'">
+                            <tr><th><abbr title="dc:opticalregistration">Optical Registration</abbr></th><td>
+                                <table class="cream full-width">
+                                    <tbody>
+                                        <tr><th>Reference Frame</th><td colspan="2"><xsl:value-of select="@dc:refframe"/></td></tr>
+                                        <tr><th>Crack Position</th><th>X Position</th><th>Y Position</th></tr>
+                                        <tr><th>Start</th><td><xsl:value-of select="dc:crackposition/dc:startx"/>&#160;<xsl:value-of select="dc:crackposition/dc:startx/@dcv:units" /></td><td><xsl:value-of select="dc:crackposition/dc:starty"/>&#160;<xsl:value-of select="dc:crackposition/dc:starty/@dcv:units" /></td></tr>
+                                        <tr><th>End</th><td><xsl:value-of select="dc:crackposition/dc:endx"/>&#160;<xsl:value-of select="dc:crackposition/dc:endx/@dcv:units" /></td><td><xsl:value-of select="dc:crackposition/dc:endy"/>&#160;<xsl:value-of select="dc:crackposition/dc:endy/@dcv:units" /></td></tr>
+                                    </tbody>
+                                </table>
+                                <table class="cream opticalregistration">
+                                <xsl:attribute name="id">datatable_opticalregistration_<xsl:number/></xsl:attribute>
+                                    <thead>
+                                        <tr>
+                                            <th>Frame #</th><th>Shift X</th><th>Shift Y</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <xsl:for-each select="dc:registrations/dc:registration">
+                                            <tr>
+                                                <td><xsl:value-of select="@dc:frameno"/></td><td><xsl:value-of select="dc:shiftx"/>&#160;<xsl:value-of select="dc:shiftx/@dcv:units"/></td><td><xsl:value-of select="dc:shifty"/>&#160;<xsl:value-of select="dc:shifty/@dcv:units"/></td>
+                                            </tr>
+                                        </xsl:for-each>
+                                    </tbody>
+                                </table>-->
+                            </td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'opticaltrace'">
+                            <tr><th><abbr title="dc:opticaltrace">Optical Trace</abbr></th><td>
+                                <table class="cream full-width">
+                                    <tbody>
+                                        <tr><th>Reference Frame</th><td colspan="2"><xsl:value-of select="@dc:refframe"/></td></tr>
+                                    </tbody>
+                                </table>
+                                <table class="cream opticaltrace">
+                                <xsl:attribute name="id">datatable_opticaltrace_<xsl:number/></xsl:attribute>
+                                    <thead>
+                                        <tr>
+                                            <th>X Position</th><th>Y Position</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <xsl:for-each select="dc:cracktrace/dc:keypoint">
+                                            <tr>
+                                                <td><xsl:value-of select="dc:xpos"/>&#160;<xsl:value-of select="dc:xpos/@dcv:units"/></td><td><xsl:value-of select="dc:ypos"/>&#160;<xsl:value-of select="dc:ypos/@dcv:units"/></td>
+                                            </tr>
+                                        </xsl:for-each>
+                                    </tbody>
+                                </table>-->
+                            </td></tr>
+                        </xsl:when>
+                        <xsl:when test="$localname = 'excitation'">
+                            <tr><th><abbr title="dc:excitation">Excitation</abbr></th><td>
+                                <xsl:choose>     
+                                    <xsl:when test="@dcv:exctype='sweep'">
+                                        SWEEP&#160;<xsl:value-of select="dcv:f0/." />&#160;<xsl:value-of select="dcv:f0/@dcv:units" />&#160;<xsl:value-of select="dcv:f1/." />&#160;<xsl:value-of select="dcv:f1/@dcv:units" />&#160;<xsl:value-of select="dcv:t0/." />&#160;<xsl:value-of select="dcv:t0/@dcv:units" />&#160;<xsl:value-of select="dcv:t1/." />&#160;<xsl:value-of select="dcv:t1/@dcv:units" />&#160;<xsl:value-of select="dcv:t2/." />&#160;<xsl:value-of select="dcv:t2/@dcv:units" />&#160;<xsl:value-of select="dcv:t3/." />&#160;<xsl:value-of select="dcv:t3/@dcv:units" />
+                                    </xsl:when>
+                                    <xsl:when test="@dcv:exctype='burst'">
+                                        BURST&#160;<xsl:value-of select="dcv:f0/." />&#160;<xsl:value-of select="dcv:f0/@dcv:units" />&#160;<xsl:value-of select="dcv:f1/@dcv:units" />&#160;<xsl:value-of select="dcv:t0/." />&#160;<xsl:value-of select="dcv:t0/@dcv:units" />&#160;<xsl:value-of select="dcv:t1/." />&#160;<xsl:value-of select="dcv:t1/@dcv:units" />&#160;<xsl:value-of select="dcv:t2/." />&#160;<xsl:value-of select="dcv:t2/@dcv:units" />&#160;<xsl:value-of select="dcv:t3/." />&#160;<xsl:value-of select="dcv:t3/@dcv:units" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="."/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td></tr>
+                        </xsl:when>
+			            <xsl:when test="$localname = 'autoexp'">
+                            <tr><th><abbr title="dc:autoexp">Auto Table</abbr></th><td style="width:534px">
+				                <table class="cream autoexp">
+                                <xsl:attribute name="id">datatable_autoexp_<xsl:number/></xsl:attribute>
+				                    <thead><tr>
+                                        <xsl:for-each select="dc:automeas[1]/*">
+                                            <xsl:variable name="autoexpname"><xsl:value-of select="local-name()"/></xsl:variable>
+                                            <th>
+                                                <abbr>
+                                                    <xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+                                                    <xsl:choose>
+                                                        <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$autoexpname]">
+                                                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$autoexpname]"/>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:value-of select="$autoexpname"/>                                    
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </abbr>
+                                                <xsl:if test="normalize-space(@dcv:units)!=''">
+                                                    &#160;(<xsl:value-of select="@dcv:units"/>)
+                                                </xsl:if>
+                                            </th>
+                                        </xsl:for-each>
+				                    </tr></thead>
+                                    <tbody>
+					                    <xsl:for-each select="dc:automeas">
+					                        <tr>
+                                                <xsl:for-each select="*">
+                                                    <td>
+                                                        <xsl:value-of select="." />
+                                                    </td>                                
+                                                </xsl:for-each>
+                                            </tr>
+                        				</xsl:for-each>
+				                    </tbody>
+                				</table>
+                            </td></tr>
+                        </xsl:when>
+                        <xsl:otherwise>                            
+                            <tr>
+                                <th><abbr><xsl:attribute name="title"><xsl:value-of select="name()"/></xsl:attribute>
+                                    <xsl:choose>
+                                        <xsl:when test="document('')/*/db:fieldmap/db:entry[@key=$localname]">
+                                            <xsl:value-of select="document('')/*/db:fieldmap/db:entry[@key=$localname]"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$localname"/>                                    
+                                        </xsl:otherwise>
+                                    </xsl:choose></abbr>
+                                </th>
+                                <td><xsl:value-of select="."/><xsl:if test="@dcv:units">&#160;<xsl:value-of select="@dcv:units"/></xsl:if></td>
+                            </tr>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+            </tbody>
+        </table>
+</xsl:template>
+<db:fieldmap xmlns="http://thermal.cnde.iastate.edu/databrowse" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+    <entry key="aircyl">Air Cylinder</entry>
+    <entry key="amplitude">Amplitude</entry>
+    <entry key="clampoffset">Clamp Offset</entry>
+    <entry key="clamptorque">Clamp Torque</entry>
+    <entry key="clinfo">Checklist Name</entry>
+    <entry key="cltitle">Checklist Title</entry>
+    <entry key="coating">Coating</entry>
+    <entry key="couplant">Couplant</entry>
+    <entry key="crackheat">Crack Heating</entry>
+    <entry key="date">Date</entry>
+    <entry key="dgsfile">DGS File</entry>
+    <entry key="dynstress">Dynamic Stress</entry>
+    <entry key="elecenergy">Electrical Energy</entry>
+    <entry key="excitation">Excitation</entry>
+    <entry key="hae">HAE</entry>
+    <entry key="hit">Hit</entry>
+    <entry key="leftclampoffset">Left Clamp Offset</entry>
+    <entry key="measchecklist">Checklist Link</entry>
+    <entry key="meastype">Measurement Type</entry>
+    <entry key="measnum">Measurement Number</entry>
+    <entry key="measphotos">Measurement Photos</entry>
+    <entry key="notes">Notes</entry>
+    <entry key="orientation">Orientation</entry>
+    <entry key="pixelsperinch">Pixels/Inch</entry>
+    <entry key="resonantfrequency">Resonant Frequency</entry>
+    <entry key="run_basename">Run Basename</entry>
+    <entry key="setfile">Set File</entry>
+    <entry key="specimen">Specimen</entry>
+    <entry key="perfby">Taken By</entry>
+    <entry key="pressure">Pressure</entry>
+    <entry key="rightclampoffset">Right Clamp Offset</entry>
+    <entry key="timestamp">Timestamp</entry>
+    <entry key="transducerforce">Transducer Force</entry>
+    <entry key="transduceroffset">Transducer Offset</entry>
+    <entry key="transducerpressure">Transducer Pressure</entry>
+    <entry key="transducerserial">Transducer Serial</entry>
+    <entry key="transducertemp">Transducer Temperature</entry>
+    <entry key="triggercount">Trigger Count</entry>
+    <entry key="triggerindex">Trigger Index</entry>
+    <entry key="vibsignallevel">Vib Signal</entry>
+    <entry key="view">View</entry>
+    <entry key="xducer">Transducer</entry>
+    <entry key="xduceroffset">Transducer Offset</entry>
+    <entry key="analysisendval">Analysis End Time</entry>
+    <entry key="analysisstartval">Analysis Start Time</entry>
+    <entry key="analysisstepval">Analysis Step Length</entry>
+    <entry key="analysistype">Analysis Type</entry>
+    <entry key="couplantlength">Couplant Length</entry>
+    <entry key="couplantmaterial">Couplant Material</entry>
+    <entry key="couplantmeshsize">Couplant Mesh Size</entry>
+    <entry key="couplantmeshtype">Couplant Mesh Type</entry>
+    <entry key="couplantthickness">Couplant Thickness</entry>
+    <entry key="couplantwidth">Couplant Width</entry>
+    <entry key="crackx">Crack X</entry>
+    <entry key="cracky">Crack Y</entry>
+    <entry key="crackz">Crack Z</entry>
+    <entry key="eigsaround">Eigenvalues Near</entry>
+    <entry key="excitationamplitude">Excitation Amplitude</entry>
+    <entry key="laserx">Laser X</entry>
+    <entry key="lasery">Laser Y</entry>
+    <entry key="laserz">Laser Z</entry>
+    <entry key="lmntoffset">Left Mount Offset</entry>
+    <entry key="mounttype">Mount Type</entry>
+    <entry key="neigs">Number of Eigenvalues</entry>
+    <entry key="rmntoffset">Right Mount Offset</entry>
+    <entry key="spclength">Specimen Length</entry>
+    <entry key="spcmaterial">Specimen Material</entry>
+    <entry key="spcmeshsize">Specimen Mesh Size</entry>
+    <entry key="spcmeshtype">Specimen Mesh Type</entry>
+    <entry key="spcthickness">Specimen Thickness</entry>
+    <entry key="spcwidth">Specimen Width</entry>
+    <entry key="xducermeshsize">Transducer Mesh Size</entry>
+    <entry key="xducermeshtype">Transducer Mesh Type</entry>
+    <entry key="xducerpressure">Transducer Pressure</entry>
+    <entry key="xducertype">Transducer Type</entry>
+    <entry key="xducerxoffset">Transducer X Offset</entry>
+    <entry key="xduceryoffset">Transducer Y Offset</entry>
+    <entry key="xducerzoffset">Transducer Z Offset</entry>
+    <entry key="vibrange">Vib Range</entry>
+    <entry key="vib2range">Vib 2 Range</entry>
+    <entry key="vib2signallevel">Vib 2 Signal</entry>
+    <entry key="triggertimestamp">Trigger Timestamp</entry>
+    <entry key="simulation_xducertype">Simulation Transducer Type</entry>
+    <entry key="recordmeastimestamp">Save Measurement Timestamp</entry>
+    <entry key="loadcell">Load</entry>
+    <entry key="hostname">Host Name</entry>
+    <entry key="strain_ov_displacement">Dynamic Strain Coefficient</entry>
+    <entry key="simulationtype">Simulation Type</entry>
+    <entry key="simulationsteptime">Simulation Step Time</entry>
+    <entry key="simulationstarttime">Simulation Start Time</entry>
+    <entry key="simulationneigs">Simulation Frequency Count</entry>
+    <entry key="simulationeigsaround">Simulation Frequency Target</entry>
+    <entry key="simulationcrackx">Simulation Crack X</entry>
+    <entry key="simulationcracky">Simulation Crack Y</entry>
+    <entry key="simulationcrackz">Simulation Crack Z</entry>
+    <entry key="simulationendtime">Simulation End Time</entry>
+    <entry key="processinglog">Processing Log</entry>
+    <entry key="vibropower">Thermal Power</entry>
+    <entry key="vibropowerplot">Thermal Power Plot</entry>
+    <entry key="ppstrainmean">Strain Mean</entry>
+    <entry key="ppstrainmedian">Strain Median</entry>
+    <entry key="ppstrainstd">Strain St. Dev.</entry>
+    <entry key="XPos">X</entry>
+    <entry key="GotXPos">Got X</entry>
+    <entry key="stepnum_x">X Step</entry>
+    <entry key="YPos">Y</entry>
+    <entry key="GotYPos">Got Y</entry>
+    <entry key="GotStress">Got Stress</entry>
+    <entry key="stepnum_stress">Stress Step</entry>
+    <entry key="stepnum_y">Y Step</entry>
+    <entry key="dgdidx">Count</entry>
+    <entry key="blmountoffset">Bottom Left Mount Offset</entry>    
+    <entry key="brmountoffset">Bottom Right Mount Offset</entry>
+    <entry key="tlmountoffset">Top Left Mount Offset</entry>
+    <entry key="trmountoffset">Top Right Mount Offset</entry>
+    <entry key="calcstraincoeff">Calc Strain Coefficient?</entry>
+    <entry key="desiredbendingstress">Desired Bending Stress</entry>
+    <entry key="actualbendingstress">Actual Bending Stress</entry>
+    <entry key="end_pos_x">End X Pos</entry>
+    <entry key="end_pos_y">End Y Pos</entry>
+    <entry key="exportresults">Export Results?</entry>
+    <entry key="lblockoffset">Left Block Offset</entry>
+    <entry key="rblockoffset">Right Block Offset</entry>
+    <entry key="majoraxis">Major Axis</entry>
+    <entry key="maxtemp">Max Temp</entry>
+    <entry key="measchannels">Saved Channels</entry>
+    <entry key="minoraxis">Minor Axis</entry>
+    <entry key="motioncontroller">Motion Controller</entry>
+    <entry key="pausescanning">Pause Scanning</entry>
+    <entry key="sleeptime">Sleep Time</entry>
+    <entry key="spcDensity">Specimen Density</entry>
+    <entry key="spcPoissonsRatio">Specimen Poisson's Ratio</entry>
+    <entry key="spcYoungsModulus">Specimen Young's Modulus</entry>
+    <entry key="start_pos_x">X Start Position</entry>
+    <entry key="start_pos_y">Y Start Position</entry>
+    <entry key="step_size_x">X Step Size</entry>
+    <entry key="step_size_y">Y Step Size</entry>
+    <entry key="vibmodule">Vibrometer Module</entry>
+    <entry key="xstartspccoords">X Start Coordinate</entry>
+    <entry key="ystartspccoords">Y Start Coordinate</entry>
+    <entry key="scanxy_out">Scan Output</entry>
+    <entry key="loadcalculation_out">Load Calculation</entry>
+    <entry key="scan_out">Scan Output</entry>
+    <entry key="calcdadN_out">da/dN Calculation</entry>
+    <entry key="calcload_out">Load Calculation</entry>
+    <entry key="copycycles_out">Copy Cycles Output</entry>
+    <entry key="copylength_out">Copy Length Output</entry>
+    <entry key="axis">Scan Axis</entry>
+    <entry key="focusaxis">Focus Axis</entry>
+    <entry key="start_pos">Start Position</entry>
+    <entry key="start_stress">Start Stress</entry>
+    <entry key="step_size">Position Step Size</entry>
+    <entry key="step_size_stress">Stress Step Size</entry>
+    <entry key="end_pos">End Position</entry>
+    <entry key="end_stress">End Stress</entry>
+    <entry key="spcflawsize">Flaw Size</entry>
+    <entry key="spcflawindex">Flaw Index</entry>
+    <entry key="spcfacemethod">Specimen Face Method</entry>
+    <entry key="couplantfacemethod">Couplant Face Method</entry>
+    <entry key="loadcelltrig">Load</entry>
+    <entry key="stitcheddgsfile">Stitched DGS File</entry>
+    <entry key="stitchedimagesfolder">Stitched Images Folder</entry>
+    <entry key="rawimagesfolder">Raw Images Folder</entry>
+    <entry key="nlayers_mount"># Mount Layers</entry>
+    <entry key="nlayers_xducer"># Xducer Layers</entry>
+    <entry key="opticalregistration">Optical Registration</entry>
+    <entry key="thermalregistration">Thermal Registration</entry>  
+    <entry key="yieldstress">Yield Stress</entry>  
+    <entry key="undistorted_png">Undistorted PNG</entry>
+</db:fieldmap>

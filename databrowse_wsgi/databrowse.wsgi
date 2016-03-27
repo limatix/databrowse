@@ -80,7 +80,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY ohgr   "&#x03C9;"> <!-- GREEK SMALL LETTER OMEGA -->
 <!ENTITY OHgr   "&#x03A9;"> <!-- GREEK CAPITAL LETTER OMEGA -->
 ]>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
     <xsl:variable name="proctime">%s</xsl:variable>
@@ -149,7 +149,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY ohgr   "&#x03C9;"> <!-- GREEK SMALL LETTER OMEGA -->
 <!ENTITY OHgr   "&#x03A9;"> <!-- GREEK CAPITAL LETTER OMEGA -->
 ]>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
     <xsl:variable name="proctime">%s</xsl:variable>
@@ -219,7 +219,7 @@ ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY ohgr   "&#x03C9;"> <!-- GREEK SMALL LETTER OMEGA -->
 <!ENTITY OHgr   "&#x03A9;"> <!-- GREEK CAPITAL LETTER OMEGA -->
 ]>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" version="1.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="yes" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:template match="/">
         <xsl:apply-templates mode="%s"/>
