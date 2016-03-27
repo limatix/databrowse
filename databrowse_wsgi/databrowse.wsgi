@@ -363,7 +363,9 @@ def application(environ, start_response):
             elif renderer.getContentMode() == "ajax":
                 xml = etree.ElementTree(renderer.getContent())
                 style = ajaxwrapper % (renderer.getContentMode(), db_web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style, parser))
+                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree.xinclude()
+                content = xml.xslt(styletree.getroot())
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
@@ -372,7 +374,9 @@ def application(environ, start_response):
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style, parser))
+                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree.xinclude()
+                content = xml.xslt(styletree.getroot())
                 db_web_support.req.output = etree.tostring(content)
                 db_web_support.req.response_headers['Content-Type'] = 'application/xhtml+xml'
                 return [db_web_support.req.return_page()]
@@ -381,7 +385,9 @@ def application(environ, start_response):
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
                 style = localwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style, parser))
+                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree.xinclude()
+                content = xml.xslt(styletree.getroot())
                 contentroot = content.getroot()
                 renderer.loadMenu()
                 contentroot.append(db_web_support.menu.GetMenu())
@@ -393,7 +399,9 @@ def application(environ, start_response):
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
-                content = xml.xslt(etree.XML(style, parser))
+                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree.xinclude()
+                content = xml.xslt(styletree.getroot())
                 contentroot = content.getroot()
                 renderer.loadMenu()
                 contentroot.append(db_web_support.menu.GetMenu())
