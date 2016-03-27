@@ -134,7 +134,7 @@
             </xsl:if>
             <tr><th>Performed By: </th><td><xsl:value-of select="dc:perfby"/></td></tr>
             <tr><th>Date: </th><td><xsl:value-of select="dc:date"/></td></tr>
-            <tr><th>Data Folder: </th><td><a><xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/></xsl:attribute><xsl:value-of select="dc:reldest"/></a></td></tr>
+            <tr><th>Data Folder: </th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:dest/@xlink:href"/></xsl:attribute><xsl:value-of select="dc:dest/@xlink:href"/></a></td></tr>
             <tr>
                 <th>Goal: </th>
                 <td>
