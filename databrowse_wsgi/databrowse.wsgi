@@ -349,8 +349,12 @@ def application(environ, start_response):
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                parser = etree.XMLParser()
+                parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
+                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree.xinclude()
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
-                db_web_support.req.output = style
+                db_web_support.req.output = etree.tostring(styletree)
                 return [db_web_support.req.return_page()]
             else:
                 pass
