@@ -1,0 +1,250 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:checklist="http://limatix.org/checklist" match="checklist:checklist" mode="full">
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/loader.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/dom.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/parser.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/domdatasource.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/defaultbrowser.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/iebrowser.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/filterable.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/domlogger.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/core/forms.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/generator.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/xmlrobustloader.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/xmlloader.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/xmlserializer.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/repeat.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/choice.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/keyboard.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/tabgroupmgr.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/editor/classical/string.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/text.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/select.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/devices/popup.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/devices/text.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/devices/lens.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/devices/upload.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/link.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/richtext.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/video.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/photo.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/common.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/documentid.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/wiki.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/image.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/layout.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/video.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/debug.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/service.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/contribs/src/schemas/schemalogger.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/contribs/src/schemas/schemaserializer.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/services/service.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/services/common.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/services/debug.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/services/date.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/util/ioutils.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/util/debug.js</xsl:attribute></script>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/axel/axel.css</xsl:attribute></link>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/axel/bundles/photo/photo.css</xsl:attribute></link>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/editor/extras/editor.css</xsl:attribute></link>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/editor/extras/editor.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/config/templates.js</xsl:attribute></script>
+	<link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$resdir"/>/Axel/templates/Preview.css</xsl:attribute></link>
+  <!-- Place here optional AXEL code for making the template auto-editable -->
+		
+	<script type="text/javascript">
+		var resdir = "<xsl:value-of select="$resdir"/>";
+		var templateurl = "<xsl:value-of select="@templatefile"/>";
+		<![CDATA[
+			var appController;
+		
+			function initApp () {
+				var defaultTemplates = (typeof(getDefaultTemplates) != typeof(undefined))  ? getDefaultTemplates() : [];
+				// Application controller
+				appController = new viewerApp(resdir+"/Axel/templates/", defaultTemplates);
+				appController.setBase(resdir+'/Axel/axel/bundles')
+				appController.setXTigerStylesheet(resdir+'/Axel/axel/axel.css'); 
+
+				var result = new xtiger.util.Logger();
+				var xtDoc = xtiger.debug.loadDocument(templateurl, result);
+				if (xtDoc) {
+					appController.curForm = new xtiger.util.Form (xttMakeLocalURLFor(appController.baseUrl));
+					appController.curForm.setTemplateSource (xtDoc); 
+					appController.curForm.setTargetDocument (document, 'iframe', true)
+					appController.curForm.enableTabGroupNavigation (); 
+					appController.curForm.transform (result);
+				}
+				if (result.inError()) {	appController.log(result.printErrors(), 1); }
+				//appController.frameLoaded();
+				string = $('#string').html();
+				appController.handleInstanceData(string);
+			}
+
+			$(function () {
+				initApp();
+			});
+
+			window.onbeforeunload = function () {
+                return 'You are about to leave a page that may have unsaved data.';
+            }
+
+            // Error Saving Callback Function
+            function saveErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Saving File: " + errorThrown)
+            }
+
+            function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data);
+                if(data=="File Saved Successfully")
+                {
+                    window.onbeforeunload = null;
+                    window.location.href = window.location.href.replace(window.location.search, "");
+                }
+            }
+
+            function cancel() {
+            	window.onbeforeunload = null;
+                window.location.href = window.location.href.replace(window.location.search, "");
+            }	
+
+            function getxmldocstring(){
+            	algo = appController.getPreferredAlgo("save");
+				appController.curForm.setSerializer(appController.serializers[algo]);
+				var g = new xtiger.util.DOMLogger();
+				var f = appController.curForm.serializeData(g);
+				results = g.dump("*");
+				results = results.replace("<checklist", '<checklist xmlns="http://limatix.org/checklist" xmlns:chx="http://limatix.org/checklist" xmlns:dc="http://limatix.org/datacollect"');
+				return results;
+            }				
+
+			function save () {
+				algo = appController.getPreferredAlgo("save");
+				appController.curForm.setSerializer(appController.serializers[algo]);
+				var g = new xtiger.util.DOMLogger();
+				var f = appController.curForm.serializeData(g);
+				results = g.dump("*");
+				results = results.replace("<checklist", '<checklist xmlns="http://limatix.org/checklist" xmlns:chx="http://limatix.org/checklist" xmlns:dc="http://limatix.org/datacollect"');
+				// Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax&save";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax&save";
+                }
+
+                // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', results);
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
+                    dataType: "text",
+                    error: saveErrorCallback,
+                    processData: false,
+                    success: saveSuccessCallback,
+                    type: 'POST',
+                    url: ajaxurl
+                    });
+
+			}
+
+
+		]]>
+	</script>
+
+	<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
+	<h1>Edit Checklist</h1>
+	
+	<div id="iframe">
+		
+	</div>
+	<div id="string" style="display:none">
+		<xsl:apply-templates select="/" mode="copy"/>
+	</div>
+	<div id="formular" style="display:none">
+			<form id="formUrl" action="javascript:alert('Oops, something went wrong !')"
+				onsubmit="return appController.submitPage();">
+				<p>
+					<label>Page : <input id="url" type="text" name="url" maxlength="100" value=""/>
+					</label>
+					<input type="button" value="Browse"
+						onclick="appController.localFileDialog(&quot;open&quot;, &quot;*.xtd; *.xhtml; *.html; *.xml&quot;, &quot;Select an XTiger Forms template&quot; , &quot;url&quot;)"/>
+					<span style="position: absolute; right: 30px; margin-left: 5px">
+						<input type="submit" value="Visualize"/><input type="reset"
+							onclick="appController.resetView()"/>
+					</span>
+				</p>
+				<p>
+					<label>Page shortcut : <select id="templatesList"
+							onchange="appController.updateSelectedTemplate()"> </select>
+					</label>
+					<input type="button" value="Preferences"
+						onclick="appController.setPreferences();"/>
+					<span style="position: absolute; left: 46%">
+						<input type="button" id="previewToggle" value="Preview"
+							onclick="appController.doToggleViewMode();"/>
+					</span>
+					<span style="position: absolute; right: 30px">
+						<input type="button" value="Schema" onclick="appController.dumpSchema();"/>
+						<input type="button" value="Dump" onclick="appController.dump();"/>
+						<input type="button" value="Input"
+							onclick="appController.inputInstanceData();"/>
+						<input type="button" value="Save"
+							onclick="appController.localSaveInstanceData('fileName');"/>
+						<input type="button" value="Load"
+							onclick="appController.localLoadInstanceData('fileName');"/>
+					</span>
+				</p>
+				<p id="titleUrl" class="single-line">...</p>
+				<div id="preferences">
+					<p>
+						<label>Template repository : <input id="templateRepos" type="text"
+								name="templateRepos" maxlength="50" value=""/>
+						</label>
+						<input type="button" value="Browse"
+							onclick="appController.localFileDialog(&quot;folder&quot;, null, &quot;Select a folder that contains some XTiger Forms templates&quot;, &quot;templateRepos&quot;)"/>
+						<input type="button" value="Ok" onclick="appController.savePreferences()"/>
+						<input class="hide" type="button" value="Hide"
+							onclick="appController.hidePreferences()"/>
+						<span style="position: absolute; right: 30px">
+							<input type="radio" value="standard" name="algorithm" checked="true"/>
+							<label for="robust">Std</label>
+							<input type="radio" value="html" name="algorithm"/>
+							<label for="html">Html</label>
+							<input type="radio" value="robust" name="algorithm"/>
+							<label for="robust">Robust</label>
+						</span>
+					</p>
+					<p>
+						<label>File name <i>(paths relative to editor.xhtml)</i>: <input
+								id="fileName" type="text" name="fileName" maxlength="50" value=""/>
+						</label>
+						<input type="button" value="Save" onclick="appController.saveToFile()"/>
+						<input type="button" value="Load" onclick="appController.loadFromFile()"/>
+						<input type="button" value="Dump" onclick="appController.dumpToServer();"
+							disabled="disabled"/>
+						<i>(remote server only)</i>
+						<span style="position: absolute; right: 30px">
+							<input type="checkbox" value="Profile" name="profile"/>
+							<label for="profile">Profile</label>
+						</span>
+					</p>
+				</div>
+			</form>
+		</div>
+		<div class="btn-group clearfix" style="float:right"><a class="btn success" onclick="save()" style="cursor:pointer">Save</a><a class="btn error" style="cursor:pointer" onclick="cancel()">Cancel</a></div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:checklist="http://limatix.org/checklist" match="checklist:*" mode="copy">
+    <xsl:element name="{local-name()}" namespace="http://limatix.org/checklist">
+        <xsl:apply-templates select="@*|node()" mode="copy"/>
+    </xsl:element>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:checklist="http://limatix.org/checklist" match="@*|text()|comment()|processing-instruction()" mode="copy">
+    <xsl:copy>
+        <xsl:apply-templates select="@*|node()" mode="copy"/>
+    </xsl:copy>
+</xsl:template>
+

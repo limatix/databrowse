@@ -1,0 +1,18 @@
+<xsl:strip-space elements="*"/>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:html" mode="full">
+    <xsl:apply-templates select="html:head" mode="full"/>
+    <xsl:apply-templates select="html:body" mode="full"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="@*|*|text()|processing-instruction()|comment()" mode="copy"><xsl:copy><xsl:apply-templates select="@*|*|text()|processing-instruction()|comment()" mode="copy"/></xsl:copy></xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:img" mode="copy">
+    <img>
+        <xsl:attribute name="src"><xsl:value-of select="@src"/>?content_mode=raw</xsl:attribute>
+        <xsl:copy-of select="@*[name()!='src']"/>
+    </img>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:head" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:body" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>

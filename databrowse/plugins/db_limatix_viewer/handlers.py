@@ -16,12 +16,12 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/dbh__image.py - Generic Image Handler """
+""" plugins/handlers/dbh_xlg.py - XLG Handler """
 
 
-def dbh__image(path, contenttype, extension, roottag, nsurl):
-    """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
-    if extension.lower() in ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff"]:
-        return "db_image_viewer"
+def dbh_xlg_limatix(path, contenttype, extension, roottag, nsurl):
+    """ Generic XLG Handler - Returns xlg_viewer for all XLG files """
+    if (extension == "xlg" or extension == "xlp") and nsurl.startswith("http://limatix.org"):
+        return "db_limatix_viewer"
     else:
         return False

@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_pdf.py - Generic PDF Handler """
 
 
-def dbh_pdf(path, contenttype, extension):
+def dbh_pdf(path, contenttype, extension, roottag, nsurl):
     """ Generic PDF Handler - Returns pdf_viewer for all PDF files """
     if extension.lower() == 'pdf':
         return "db_PDF_viewer"

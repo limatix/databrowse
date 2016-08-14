@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__xml.py - Generic XML Handler """
 
 
-def dbh_hdf5(path, contenttype, extension):
+def dbh_hdf5(path, contenttype, extension, roottag, nsurl):
     """ Generic XML Handler - Returns xml_generic for all XML files """
     if extension == "h5" or extension == "dream3d" or contenttype.startswith('application/x-hdf'):
         return "db_generic_HDF5_file"

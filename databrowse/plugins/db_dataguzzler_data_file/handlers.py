@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_dataguzzler.py - Generic dataguzzler file Handler """
 
 
-def dbh_dataguzzler(path, contenttype, extension):
+def dbh_dataguzzler(path, contenttype, extension, roottag, nsurl):
     """ Generic Dataguzzler Handler - Returns db_dataguzzler for all dataguzzler files """
     if extension.lower() == "dgs" or extension.lower() == "dgz" or extension.lower() == "dga" or extension.lower() == "dgd":
         return "db_dataguzzler_data_file"

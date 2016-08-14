@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__image.py - Generic Image Handler """
 
 
-def dbh__svg_image(path, contenttype, extension):
+def dbh__svg_image(path, contenttype, extension, roottag, nsurl):
     """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
     if extension.lower() in ["svg"] or contenttype.startswith('image/svg+xml'):
         return "db_svg_viewer"

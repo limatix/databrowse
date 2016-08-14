@@ -21,7 +21,7 @@
 import os.path
 
 
-def dbh_wsgi_monthlyrpt(path, contenttype, extension):
+def dbh_wsgi_monthlyrpt(path, contenttype, extension, roottag, nsurl):
     """ Monthly Report WSGI Handler - Returns wsgi_monthly_rpt for Monthly Report """
     if os.path.basename(path) == "monthly_rpt.wsgi":
         return "db_monthly_report_tool"

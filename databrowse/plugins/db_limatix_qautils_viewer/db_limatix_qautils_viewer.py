@@ -16,12 +16,36 @@
 ## You should have received a copy of the GNU General Public License         ##
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.     ##
 ###############################################################################
-""" plugins/handlers/dbh__image.py - Generic Image Handler """
+""" plugins/renderers/db_checklist_viewer.py - Generic Checklist Files """
+
+from lxml import etree
+from databrowse.support.renderer_support import renderer_class
 
 
-def dbh__image(path, contenttype, extension, roottag, nsurl):
-    """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
-    if extension.lower() in ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff"]:
-        return "db_image_viewer"
-    else:
-        return False
+class db_limatix_qautils_viewer(renderer_class):
+    """ Generic Checklist Files """
+
+    _namespace_uri = "http://limatix.org/databrowse/checklist_chf"
+    _namespace_local = "chf"
+    _default_content_mode = "full"
+    _default_style_mode = "view_filled_checklist"
+    _default_recursion_depth = 2
+
+    def getContent(self):
+        if self._caller != "databrowse":
+            return None
+        else:
+            if self._content_mode == "full":
+                f = open(self._fullpath, 'r')
+                xml = etree.parse(f)
+                f.close()
+                g = open('/usr/local/limatix-qautils/checklist/chf2html.xsl', 'r')
+                xsltransform = etree.parse(g)
+                g.close()
+                transformedxml = xml.xslt(xsltransform,rawlink_postfix="'?content_mode=raw'")
+                xmloutput = etree.XML(str(transformedxml))
+                return xmloutput
+            else:
+                raise self.RendererException("Invalid Content Mode")
+
+    pass

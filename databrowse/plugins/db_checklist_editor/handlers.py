@@ -19,9 +19,9 @@
 """ plugins/handlers/dbh_checklist_1_chx.py - Generic Checklist Handler """
 
 
-def dbh_checklist_1_chx(path, contenttype, extension):
+def dbh_checklist_1_chx(path, contenttype, extension, roottag, nsurl):
     """ Generic Checklist Handler - Returns checlist for Checklist Files """
-    if extension.lower() == "chx" or extension.lower() == "chf" or extension.lower() == "plx" or extension.lower() == "plf":
+    if (extension.lower() == "chx" or extension.lower() == "chf" or extension.lower() == "plx" or extension.lower() == "plf") and nsurl.startswith('http://thermal.cnde.iastate.edu'):
         return "db_checklist_editor"
     else:
         return False

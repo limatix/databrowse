@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__xml.py - Generic XML Handler """
 
 
-def dbh_triggerlog(path, contenttype, extension):
+def dbh_triggerlog(path, contenttype, extension, roottag, nsurl):
     """ Generic XML Handler - Returns xml_generic for all XML files """
     if extension == "tgl":
         return "db_triggerlog"

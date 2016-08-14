@@ -19,6 +19,6 @@
 """ plugins/handlers/dbh___default.py - Default Handler """
 
 
-def dbh___default(path, contenttype, extension):
+def dbh___default(path, contenttype, extension, roottag, nsurl):
     """ Default Handler - Responds Default for All """
     return "db_default"

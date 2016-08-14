@@ -1,0 +1,146 @@
+<xsl:strip-space elements="*"/>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:html" mode="full">
+    <xsl:apply-templates select="html:head" mode="full"/>
+    <script type="text/javascript" DEFER='true'> <![CDATA[
+
+            var pdfbutton = document.createElement("button");
+            pdfbutton.name = "pdf";
+            pdfbutton.type = "button";
+            pdfbutton.setAttribute("onclick", "openpdf();");
+            pdfbutton.id = "pdfbutton";
+            pdfbutton.setAttribute("style", 'style="background-color: white; font-weight: normal; background-position: initial initial; background-repeat: initial initial;');
+            pdfbutton.textContent = "Open PDF";
+
+
+            $(document).ready(function() { $(pdfbutton).insertAfter("#resetbutton"); });
+
+            window.onbeforeunload = function () {
+                return 'You are about to leave a page that may have unsaved data.';
+            }
+
+            // Error Saving Callback Function
+            function saveErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Saving File: " + errorThrown)
+            }
+
+            function saveSuccessCallback (data, textStatus, jqXHR) {
+                alert(data);
+                if(data=="File Saved Successfully")
+                {
+                    saved=true;
+                    set_savecolor_and_allchecked_attribute();
+                    var filenameinput=document.getElementById("filenameinput");
+                    var destnameinput=document.getElementsByName("dest")[0];
+                    window.onbeforeunload = null
+                    window.location.href = "/databrowse/" + destnameinput.value + "/" + filenameinput.value;
+                }
+            }
+            
+            savexml = function() {
+                // Everything Here is the Same as in chx2html.xsl /////////
+                /* first filter checkitemnum attributes from <checkitem> tags */
+                var processor=new XSLTProcessor();
+                processor.importStylesheet(filternums_xsl_parsed);
+                //filteredchecklistxml=processor.transformToFragment(checklistxml,document);
+                var filteredchecklistxml=processor.transformToDocument(checklistxml);
+                var filenameinput=document.getElementById("filenameinput");
+                var destnameinput=document.getElementsByName("dest")[0];
+
+                // Get URL
+                if (window.location.search != '')
+                {
+                    ajaxurl = window.location.href + "&ajax&save";
+                }
+                else
+                {
+                    ajaxurl = window.location.href + "?ajax&save";
+                }
+
+                // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', (new XMLSerializer).serializeToString(filteredchecklistxml));
+                saveform.append('filename', filenameinput.value);
+                saveform.append('destination', destnameinput.value);
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
+                    dataType: "text",
+                    error: saveErrorCallback,
+                    processData: false,
+                    success: saveSuccessCallback,
+                    type: 'POST',
+                    url: ajaxurl
+                    });
+            }
+
+            openpdf = function() {
+                // Everything Here is the Same as in chx2html.xsl /////////
+                /* first filter checkitemnum attributes from <checkitem> tags */
+                var processor=new XSLTProcessor();
+                processor.importStylesheet(filternums_xsl_parsed);
+                //filteredchecklistxml=processor.transformToFragment(checklistxml,document);
+                var filteredchecklistxml=processor.transformToDocument(checklistxml);
+                var filenameinput=document.getElementById("filenameinput");
+                var destnameinput=document.getElementsByName("dest")[0];
+                var specimeninput=document.getElementsByName("specimen")[0];
+                var perfbyinput=document.getElementsByName("perfby")[0];
+                var dateinput=document.getElementsByName("date")[0];
+
+                // Get URL
+                if (window.location.search != '')
+                {
+                    posturl = window.location.href + "&ajax&pdf";
+                }
+                else
+                {
+                    posturl = window.location.href + "?ajax&pdf";
+                }
+
+                // New PDF Components //////////////////////////////////
+
+                data = {
+                    file: (new XMLSerializer).serializeToString(filteredchecklistxml),
+                    filename: filenameinput.value,
+                    dest: destnameinput.value,
+                    specimen: specimeninput.value,
+                    perfby: perfbyinput.value,
+                    date: dateinput.value
+                    };
+
+                var PostForm = document.createElement("form");
+                PostForm.method = "post";
+                PostForm.action = posturl;
+                PostForm.target = "_blank";
+                PostForm.onsubmit = "return window.open('','_blank','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550').blur()"
+                for (var k in data) {
+                    var PostInput = document.createElement("input");
+                    PostInput.setAttribute("name", k);
+                    PostInput.setAttribute("value", data[k]);
+                    PostForm.appendChild(PostInput);
+                }
+                document.body.appendChild(PostForm);
+                PostForm.submit();
+                window.focus();
+                document.body.removeChild(PostForm);
+
+            }
+
+        ]]>
+    </script>
+    <xsl:apply-templates select="html:body" mode="full"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="@*|*|text()|processing-instruction()|comment()" mode="copy"><xsl:copy><xsl:apply-templates select="@*|*|text()|processing-instruction()|comment()" mode="copy"/></xsl:copy></xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:img" mode="copy">
+    <img>
+        <xsl:attribute name="src"><xsl:value-of select="@src"/>?content_mode=raw</xsl:attribute>
+        <xsl:copy-of select="@*[name()!='src']"/>
+    </img>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:head" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:body" mode="full">
+    <xsl:apply-templates mode="copy"/>
+</xsl:template>

@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_old_DC_viewer.py - Datacollect v1 Handler """
 
 
-def dbh_old_DC_viewer(path, contenttype, extension):
+def dbh_old_DC_viewer(path, contenttype, extension, roottag, nsurl):
     """ Datacollect v1 Handler - Returns old_DC_viewer for all DC run files """
     if extension == "xml":
         f = open(path, 'r')

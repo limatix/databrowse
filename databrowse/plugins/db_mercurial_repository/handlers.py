@@ -22,7 +22,7 @@ import subprocess
 import os
 
 
-def dbh_directory_mercurial(path, contenttype, extension):
+def dbh_directory_mercurial(path, contenttype, extension, roottag, nsurl):
     """ Generic Image Directory Handler - Returns directory_image for all directories with more than 50 percent images """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
         if subprocess.call(['/usr/bin/hg', '--cwd', path, 'root'], stdout=open(os.devnull), stderr=open(os.devnull)) == 0:

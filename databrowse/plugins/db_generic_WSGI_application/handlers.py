@@ -21,7 +21,7 @@
 import os.path
 
 
-def dbh_wsgi(path, contenttype, extension):
+def dbh_wsgi(path, contenttype, extension, roottag, nsurl):
     """ Generic WSGI Handler - Returns wsgi_generic for all wsgi files """
     if extension.lower() == "wsgi" and os.path.basename(path) != "monthly_rpt.wsgi":
         return "db_generic_WSGI_application"

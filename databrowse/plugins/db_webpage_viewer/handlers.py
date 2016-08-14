@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_html.py - Generic Web Page Handler """
 
 
-def dbh_html(path, contenttype, extension):
+def dbh_html(path, contenttype, extension, roottag, nsurl):
     """ Generic Web Page Handler - Returns html_generic for Web Pages """
     if extension.lower() == "html" or extension.lower() == "htm":
         return "db_webpage_viewer"

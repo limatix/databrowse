@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_directory.py - Generic Directory Handler """
 
 
-def dbh_directory(path, contenttype, extension):
+def dbh_directory(path, contenttype, extension, roottag, nsurl):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
         return "db_directory"

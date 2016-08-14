@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__image.py - Generic Image Handler """
 
 
-def dbh_office(path, contenttype, extension):
+def dbh_office(path, contenttype, extension, roottag, nsurl):
     """ Generic Web Page Handler - Returns image_generic for Web browser supported images """
     if extension.lower() in ["odt", "doc", "docx", "ods", "xls", "xlst", "ppt", "odp", "pptx"]:
         return 'db_office_viewer'

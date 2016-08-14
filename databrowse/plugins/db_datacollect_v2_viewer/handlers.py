@@ -19,9 +19,9 @@
 """ plugins/handlers/dbh_xlg.py - XLG Handler """
 
 
-def dbh_xlg(path, contenttype, extension):
+def dbh_xlg(path, contenttype, extension, roottag, nsurl):
     """ Generic XLG Handler - Returns xlg_viewer for all XLG files """
-    if extension == "xlg" or extension == "xlp":
+    if (extension == "xlg" or extension == "xlp") and nsurl.startswith("http://thermal.cnde.iastate.edu"):
         return "db_datacollect_v2_viewer"
     else:
         return False

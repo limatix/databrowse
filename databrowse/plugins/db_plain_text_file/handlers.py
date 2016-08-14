@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__text.py - Generic Text Handler """
 
 
-def dbh__text(path, contenttype, extension):
+def dbh__text(path, contenttype, extension, roottag, nsurl):
     """ Generic Text Handler - Returns text_generic for all text files """
     if contenttype.startswith('text') or contenttype.startswith("application/xml"):
         return "db_plain_text_file"

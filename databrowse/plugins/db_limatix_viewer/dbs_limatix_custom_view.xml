@@ -1,0 +1,135 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dt="http://limatix.org/databrowse/datatable" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" match="dt:datatable" mode="full">
+	<xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorder/media/js/ColReorder.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/js/ColVis.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/js/ZeroClipboard.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/js/TableTools.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/extras/ColReorderWithResize/ColReorderWithResize.js</xsl:attribute>
+    </xsl:element>
+    <!-- Add T<"clear"> to Beginning of sDom for TableTools -->
+    <script type="text/javascript" defer="true">
+    	resdir = '<xsl:value-of select="$resdir"/>';
+        <![CDATA[
+            $(document).ready(function() {
+                var table = $('#datatable').dataTable({
+                    "sDom": 'RlCfrtip',
+                    "sScrollX": "100%",
+                    "sScrollY": String($(window).height() - 150) + "px",
+                    "bScrollCollapse": true,
+                    "bPaginate": false,
+                    "bStateSave": true,
+                });
+
+            $(window).bind('resize', function () {
+                table.fnAdjustColumnSizing();
+                table.fnSettings().oScroll.sY = String($(window).height() - 150) + "px";
+                table.fnDraw();
+                });
+            $("#toggleexpand a").bind('click', function() {
+                table.fnAdjustColumnSizing();
+                });
+
+            togglefullwidth();
+            table.fnAdjustColumnSizing();
+            $("html, body").animate({ scrollTop: $('#pagetitle').offset().top }, 1000);
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/TableTools/media/css/TableTools.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        #datatable {
+            font-size: small;
+        }
+        table.cream thead th {
+            font-size: small;
+            padding: 1px 15px 1px 1px;
+            border: 1px solid #c1b78f;
+        }
+        table.cream td {
+            border: 1px solid #c1b78f;
+        }
+        .sorting_asc, .sorting, .sorting_desc{
+            background-position-y: 0%;
+        }
+        table.dataTable td {
+            padding: 1px;
+            white-space: nowrap;
+        }
+    </style>
+    <div style="float:right">
+        <a>
+            <xsl:attribute name="href"><xsl:value-of select="@sourcefile"/>?handler=db_plain_text_file&amp;style_mode=edit_text_file</xsl:attribute>
+            <img>
+                <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/accessories-text-editor.png</xsl:attribute>
+            </img>Edit</a>&#160;&#160;&#160;
+    	<img>
+    		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>
+    	</img>
+    	<a><xsl:attribute name="href">?content_mode=raw&amp;filetype=ods&amp;custom_view=<xsl:value-of select="@custom_view"/></xsl:attribute>ods</a> | <a><xsl:attribute name="href">?content_mode=raw&amp;filetype=csv&amp;custom_view=<xsl:value-of select="@custom_view"/></xsl:attribute>csv</a>
+    </div>
+	<h1 id="pagetitle"><xsl:value-of select="@title"/></h1>
+	<xsl:if test="dt:description">
+		<xsl:copy-of select="dt:description/node()" />
+	</xsl:if>
+	<table class="cream" id="datatable">
+		<thead>
+			<tr>
+				<xsl:for-each select="dt:header/dt:coldef">
+					<th><xsl:if test="@tooltip"><xsl:attribute name="title"><xsl:value-of select="@tooltip"/></xsl:attribute></xsl:if><xsl:value-of select="." /></th>
+				</xsl:for-each>
+			</tr>
+		</thead>
+		<tbody>
+			<xsl:for-each select="dt:row">
+                <tr>
+                    <xsl:for-each select="dt:data">
+                        <td>
+                            <xsl:choose>
+                                <xsl:when test="@url">
+                                    <a>
+                                        <xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                                        <xsl:value-of select="."/>
+                                    </a>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="." />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </td>
+                    </xsl:for-each>
+                </tr>
+            </xsl:for-each>
+		</tbody>
+	</table>
+</xsl:template>

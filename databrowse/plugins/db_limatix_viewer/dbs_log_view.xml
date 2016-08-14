@@ -1,0 +1,232 @@
+<xi:include href="/usr/local/qautils-limatix/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xpointer(/xsl:stylesheet/node())" />
+
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/DataTables/media/js/jquery.dataTables.min.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                prettyPrint();
+                $(".autoexp").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+                $(".opticalregistration").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+                $(".opticaltrace").each(function(index) {
+                    $(this).dataTable({
+                        "sScrollX": "534px",
+                        "bScrollCollapse": true,
+                        "sPaginationType": "full_numbers",
+                        "bStateSave": false
+                    });            
+                });
+            });         
+        ]]>
+    </script>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/media/css/jquery.dataTables.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>/DataTables/extras/ColVis/media/css/ColVis.css</xsl:attribute>
+    </xsl:element>
+    <style>
+        .dgcode {
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            max-width: 555px;
+            max-height: 300px;
+        }
+        .inlinelist {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .inlinelist li {
+            overflow:auto;
+            display:inline-block; 
+            list-style-type:none; 
+            padding: 0px;
+            margin-right: 5px;
+            vertical-align: top;
+        }
+        .inlinelist li img {
+            border: 1px solid #c00;
+        }
+        table.autoexp thead th {
+            text-align: center;
+        }
+        table.opticalregistration thead th {
+            text-align: center;
+        }
+        table.opticaltrace thead th {
+            text-align: center;
+        }
+        table.cream tbody td {
+            max-width: 534px;
+        }
+    </style>
+    <div style="float:right;">
+        <a>
+            <xsl:attribute name="href">?content_mode=raw</xsl:attribute>
+            <img><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute></img>
+        </a>
+    </div>
+    <h1>Datacollect Experiment Log</h1>
+    <xsl:apply-templates mode="full"/>
+</xsl:template>
+<xsl:template name="dc2-lf2p"> <!-- Convert linefeeds to <p> </p> -->
+    <xsl:param name="instr"/>
+    <xsl:choose>
+        <xsl:when test="contains($instr,'&#x0a;')">
+            <p>
+                <xsl:value-of select="substring-before($instr,'&#x0a;')"/>
+            </p>
+            <xsl:call-template name="dc2-lf2p">
+                <xsl:with-param name="instr">
+                    <xsl:value-of select="substring-after($instr,'&#x0a;')"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <p>
+                <xsl:value-of select="$instr"/>
+            </p>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template> 
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:summary" mode="full">
+    <h3>Experiment Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th width="20%">Item</th><th>Details</th></tr>
+        </thead>
+        <tbody>
+            <xsl:if test="dc:specimen">
+                <tr><th>Specimen: </th><td><xsl:value-of select="dc:specimen"/></td></tr>
+            </xsl:if>
+            <tr><th>Performed By: </th><td><xsl:value-of select="dc:perfby"/></td></tr>
+            <tr><th>Date: </th><td><xsl:value-of select="dc:date"/></td></tr>
+            <tr><th>Data Folder: </th><td><a><xsl:attribute name="href"><xsl:value-of select="dc:dest/@xlink:href"/></xsl:attribute><xsl:value-of select="dc:dest/@xlink:href"/></a></td></tr>
+            <tr>
+                <th>Goal: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:goal"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+            <tr>
+                <th>Experiment Notes: </th>
+                <td>
+                    <xsl:call-template name="dc2-lf2p">
+                        <xsl:with-param name="instr">
+                            <xsl:value-of select="dc:expnotes"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <xsl:if test="dc:expphotos and count(dc:expphotos/dcv:photo) > 0">
+    <h3>Experiment Photographs</h3>
+        <ul class="inlinelist">
+            <xsl:for-each select="dc:expphotos/dcv:photo">
+                <li>
+                    <a>
+                        <xsl:choose>
+                            <xsl:when test="@xlink:href and not(@xlink:href='')">
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <img>
+                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                        </img>
+                    </a>
+                </li>
+            </xsl:for-each>
+        </ul>
+    </xsl:if>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dcp="http://limatix.org/datacollect/provenance" match="dcp:process" mode="full">
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" mode="full">
+    <h3>Configuration</h3>
+            <xsl:choose>
+                <xsl:when test="@xlink:href and @url">
+                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                    <tt><xsl:value-of select="@xlink:href"/></tt></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tt><xsl:value-of select="@xlink:href"/></tt>
+                </xsl:otherwise>
+            </xsl:choose>
+        <pre class="prettyprint" style="height:300px">
+            <xsl:value-of select="."/>
+        </pre>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://wwww.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:dcp="http://limatix.org/datacollect/provenance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:chx="http://limatix.org/checklist" match="dcp:provenance" mode="full">
+    <h3>Processed Log Details</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <tr><th colspan="2">Log Derived From:</th></tr>
+            <tr><th>File</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:file"/></td></tr>
+            <tr><th>Timestamp</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:filetimestamp"/></td></tr>
+            <tr><th>Filesize</th><td><xsl:value-of select="dcp:wasderivedfrom/dcp:filesize"/> bytes</td></tr>
+            <tr><th colspan="2">Log Generated By:</th></tr>
+            <tr><th>File</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:script"/></td></tr>
+            <tr><th>Timestamp</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:filetimestamp"/></td></tr>
+            <tr><th>Filesize</th><td><xsl:value-of select="dcp:wasgeneratedby/dcp:filesize"/> bytes</td></tr>
+            <tr><th colspan="2">Processing Controlled By:</th></tr>
+            <tr><th>User</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:username"/></td></tr>
+            <tr><th>Start Time</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:starttime"/></td></tr>
+            <tr><th>End Time</th><td><xsl:value-of select="dcp:wascontrolledby/dcp:endtime"/></td></tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" mode="full">
+    <h3>Measurement Summary</h3>
+    <table class="cream full-width">
+            <thead>
+                <tr><th style="width:166px">Item</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <xsl:apply-templates select="dc:*" />
+            </tbody>
+        </table>
+</xsl:template>

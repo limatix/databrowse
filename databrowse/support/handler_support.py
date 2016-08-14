@@ -24,6 +24,7 @@ import magic
 import ConfigParser
 import pkgutil
 import databrowse.plugins
+import re
 
 
 class handler_support:
@@ -95,9 +96,13 @@ class handler_support:
         magicstore.load()
         contenttype = magicstore.file(os.path.realpath(fullpath))   # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
+        if contenttype.startswith('application/xml'):
+            (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
+        else:
+            (roottag, nsurl) = ('','')
         handler = []
         for function in sorted(self._handlers):
-            temp = self._handlers[function](fullpath, contenttype, extension)
+            temp = self._handlers[function](fullpath, contenttype, extension, roottag, nsurl)
             if temp:
                 handler.append(temp)
             pass
@@ -109,9 +114,13 @@ class handler_support:
         magicstore.load()
         contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
         extension = os.path.splitext(fullpath)[1][1:]
+        if contenttype.startswith('application/xml'):
+            (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
+        else:
+            (roottag, nsurl) = ('','')
         handler = []
         for function in sorted(self._handlers):
-            temp = self._handlers[function](fullpath, contenttype, extension)
+            temp = self._handlers[function](fullpath, contenttype, extension, roottag, nsurl)
             if temp:
                 handler.append(temp)
             pass
@@ -148,5 +157,57 @@ class handler_support:
     def GetHiddenFileList(self):
         """ Return the list of files marked to be hidden """
         return (self._hiddenfiledb.items("Hidden"), self._hiddenfiledb.items("Shown"))
+
+    def GetXMLRootAndNamespace(self, filename):
+        """ Extract the root node name and namespace from an XML file without parsing the entire file """
+        f = open(filename)
+        flag = True
+        while flag:
+            while True:
+                c = f.read(1)
+                if c == '<':
+                    buf = c
+                    # Read Next Characters To Figure Out How To Proceed
+                    c = f.read(1)
+                    buf = buf + c
+                    if c == '!':
+                        # We Found A Comment - Warning!  This doesn't consider the possiblility of <![CDATA[]]>
+                        while buf[-3:] != '-->':
+                            c = f.read(1)
+                            buf = buf + c
+                            pass
+                    elif c == '?':
+                        # We Found a XML Declaration
+                        while buf[-2:] != '?>':
+                            c = f.read(1)
+                            buf = buf + c
+                            pass
+                    else:
+                        # We found the root tag... let's read in the rest
+                        # This also doesn't consider > that may appear in quotes or other weird situations
+                        while buf[-1] != '>':
+                            c = f.read(1)
+                            buf = buf + c
+                            pass
+                        flag = False
+                        break
+            pass
+        
+        # Let's parse the buffer
+        fullroot = buf[1:buf.find(' ')]
+        colonidx = fullroot.find(':')
+        if colonidx < 0:
+            roottag = fullroot
+            localns = ''
+        else:
+            roottag = fullroot[colonidx+1:]
+            localns = fullroot[:colonidx]
+        if localns == '':
+            t = re.search('xmlns=[\'"](.*?)[\'"]', buf)
+            nsurl = t.groups()[0]
+        else:
+            t = re.findall('xmlns:(.*?)=[\'"](.*?)[\'"]', buf)
+            nsurl = [x[1] for x in t if x[0] == localns][0]
+        return (roottag, nsurl)
 
     pass

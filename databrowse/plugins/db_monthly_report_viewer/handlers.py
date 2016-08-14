@@ -22,7 +22,7 @@ import os.path
 import fnmatch
 
 
-def dbh_xml_monthlyrpt(path, contenttype, extension):
+def dbh_xml_monthlyrpt(path, contenttype, extension, roottag, nsurl):
     """ Monthly Report XML Handler - Returns xml_monthly_rpt for Monthly Report """
     if fnmatch.fnmatch(os.path.basename(path), "monthlyrpt_*-*.xml"):
         return "db_monthly_report_viewer"

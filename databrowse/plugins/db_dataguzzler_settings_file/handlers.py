@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh___default.py - Default Handler """
 
 
-def dbh_dataguzzler_settings(path, contenttype, extension):
+def dbh_dataguzzler_settings(path, contenttype, extension, roottag, nsurl):
     """ Generic Dataguzzler Handler - Returns db_dataguzzler for all dataguzzler files """
     if extension.lower() == "set":
         return "db_dataguzzler_settings_file"

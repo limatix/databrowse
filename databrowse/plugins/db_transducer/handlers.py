@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh__xml.py - Generic XML Handler """
 
 
-def dbh_transducer(path, contenttype, extension):
+def dbh_transducer(path, contenttype, extension, roottag, nsurl):
     """ Generic XML Handler - Returns xml_generic for all XML files """
     if extension == "tdb":
         return "db_transducer"

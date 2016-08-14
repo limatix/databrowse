@@ -19,7 +19,7 @@
 """ plugins/handlers/dbh_data_table.py - Data Table Handler """
 
 
-def dbh_data_table(path, contenttype, extension):
+def dbh_data_table(path, contenttype, extension, roottag, nsurl):
     """ Data Table Handler - Returns data_table for all tbl files """
     if extension == "tbl":
         return "db_data_table"
