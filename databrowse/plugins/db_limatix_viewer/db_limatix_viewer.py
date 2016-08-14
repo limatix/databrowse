@@ -262,7 +262,7 @@ class db_limatix_viewer(renderer_class):
 
     def loadMenu(self):
         """ Load Menu Items for all current handlers """
-        newmenu = etree.Element('{http://limatix.org/databrowse}navbar')
+        newmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar')
         isDirectory = os.path.isdir(self._fullpath)
         for handler in reversed(self._handlers):
             #Back to Copied Code
@@ -275,7 +275,7 @@ class db_limatix_viewer(renderer_class):
                 if os.path.exists(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)):
                     additionalitems = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)) if item.lower().startswith("dbs_")]
             dirlist = dirlist + additionalitems
-            navelem = etree.SubElement(newmenu, "{http://limatix.org/databrowse}navelem")
+            navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
             title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
             navitems = etree.SubElement(navelem, "{http://limatix.org/databrowse}navdir", alwaysopen="true")
@@ -284,18 +284,18 @@ class db_limatix_viewer(renderer_class):
                     if not isDirectory and item not in self._handler_support.directorystylesheets:
                         link = self.getURL(self._relpath, handler=handler, style_mode=item)
                         if self._style_mode == item and self.__class__.__name__ == handler:
-                            itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem", selected="true")
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
                         else:
-                            itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem")
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
                         menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
                         menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
                         pass
                     elif isDirectory:
                         link = self.getURL(self._relpath, handler=handler, style_mode=item)
                         if self._style_mode == item and self.__class__.__name__ == handler:
-                            itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem", selected="true")
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
                         else:
-                            itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem")
+                            itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
                         menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
                         menuitem.text = " ".join([i[0].title()+i[1:] for i in item.split("_")])
                         pass
@@ -331,9 +331,9 @@ class db_limatix_viewer(renderer_class):
         for item in customitems:
             link = self.getURL(self._relpath, handler='db_datacollect_v2_viewer', style_mode='limatix_custom_view', custom_view=item)
             if self._style_mode == 'limatix_custom_view' and self._web_support.req.form['custom_view'].value == item:
-                itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem", selected="true")
+                itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem", selected="true")
             else:
-                itemelem = etree.SubElement(navitems, "{http://limatix.org/databrowse}navelem")
+                itemelem = etree.SubElement(navitems, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             menuitem = etree.SubElement(itemelem, "{http://www.w3.org/1999/xhtml}a", href=link)
             menuitem.text = customitems[item]
             pass
