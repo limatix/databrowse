@@ -204,7 +204,8 @@ class handler_support:
             localns = fullroot[:colonidx]
         if localns == '':
             t = re.search('xmlns=[\'"](.*?)[\'"]', buf)
-            nsurl = t.groups()[0]
+            if t is not None:
+                nsurl = t.groups()[0]
         else:
             t = re.findall('xmlns:(.*?)=[\'"](.*?)[\'"]', buf)
             nsurl = [x[1] for x in t if x[0] == localns][0]
