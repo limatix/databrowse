@@ -100,6 +100,8 @@ class db_checklist_editor(renderer_class):
                     fullfilename = os.path.join(tempsavedir, filename_nodir + ".chx")
                     os.mkdir(tempsavedir)
                     os.chdir(tempsavedir)
+                    # This is temporary and BAD!  Fix this line below
+                    filestring = filestring.replace('xmlns="http://thermal.cnde.iastate.edu/checklist"', 'xmlns="http://limatix.org/checklist"') 
                     chxparsed = etree.XML(filestring)
                     imagelist = chxparsed.xpath("//chx:checklist/chx:checkitem/chx:parameter[@name='image']", namespaces={"chx": "http://thermal.cnde.iastate.edu/checklist"})
                     for image in imagelist:
