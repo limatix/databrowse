@@ -194,6 +194,7 @@ class handler_support:
             pass
         
         # Let's parse the buffer
+        print(buf)
         fullroot = buf[1:buf.find(' ')]
         colonidx = fullroot.find(':')
         if colonidx < 0:
@@ -208,7 +209,7 @@ class handler_support:
                 nsurl = t.groups()[0]
             else:
                 nsurl = ''
-                print(buf)
+                print("Error")
         else:
             t = re.findall('xmlns:(.*?)=[\'"](.*?)[\'"]', buf)
             nsurl = [x[1] for x in t if x[0] == localns][0]
