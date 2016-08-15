@@ -206,6 +206,8 @@ class handler_support:
             t = re.search('xmlns=[\'"](.*?)[\'"]', buf)
             if t is not None:
                 nsurl = t.groups()[0]
+            else:
+                nsurl = ''
         else:
             t = re.findall('xmlns:(.*?)=[\'"](.*?)[\'"]', buf)
             nsurl = [x[1] for x in t if x[0] == localns][0]
