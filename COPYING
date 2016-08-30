@@ -1,6 +1,6 @@
 Databrowse:  An Extensible Data Management Platform
-Copyright (C) 2012, 2013 Iowa State University
-License: GPL v3               
+Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc.
+License: BSD-3               
 
 Portions of this software are adapted from gnome-icon-theme-3.7.4:
 Copyright (C) 2005-2013 The GNOME Project
@@ -37,6 +37,11 @@ License: BSD-3
 Portions of this software are adapted from python-zipstream-1.1.3:
 Copyright (C) 2015 Allan Lei
 License: GPL v3
+
+Portions of this software are adapted from exif-py-1.2.0:
+Copyright (c) 2002-2007 Gene Cash
+Copyright (c) 2007-2013 Ianaré Sévi and contributors
+License: BSD-3
 
 === GNU PUBLIC LICENSE v3 =====================================================
 
