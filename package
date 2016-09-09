@@ -1,8 +1,8 @@
 #!/bin/bash
 thisdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 dn=${thisdir##*/}
-vernum=$(hg id -r '::. and tag()' | tr " " "\n" | sed -n 2p)
-arname=$thisdir/../databrowse-$vernum.src.tar.gz
+#vernum=$(hg id -r '::. and tag()' | tr " " "\n" | sed -n 2p)
+arname=$thisdir/../$dn.src.tar.gz
 if [ -e $arname ]
 then
   rm $arname
