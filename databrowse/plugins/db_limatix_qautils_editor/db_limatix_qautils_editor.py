@@ -116,7 +116,7 @@ class db_limatix_qautils_editor(renderer_class):
                     f.close()
                     try:
                         os.environ["HOME"] = "/home/www/.home"
-                        chx2pdf = imp.load_source("chx2pdf", "/usr/local/limatix-qautils/bin/chx2pdf")
+                        chx2pdf = imp.load_source("chx2pdf", os.path.join(self._web_support.limatix_qautils, "bin/chx2pdf"))
                         chx2pdf.chx2pdf(fullfilename)
                     except Exception as err:
                         self._web_support.req.output = "Error Generating PDF:  " + str(err)
@@ -181,7 +181,7 @@ class db_limatix_qautils_editor(renderer_class):
                 f = open(self._fullpath, 'r')
                 xml = etree.parse(f)
                 f.close()
-                g = open('/usr/local/limatix-qautils/checklist/chx2html.xsl', 'r')
+                g = open(os.path.join(self._web_support.limatix_qautils, 'checklist/chx2html.xsl'), 'r')
                 xsltransform = etree.parse(g)
                 g.close()
                 transform = etree.XSLT(xsltransform)

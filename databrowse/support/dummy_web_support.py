@@ -196,6 +196,8 @@ class web_support:
     email_admin = None          # email:  admin email for alert reports, etc
     email_from = None           # email:  email address mail should appear from
     administrators = None       # dictionary containing administrator list
+    limatix_qautils = None      # Path to limatix-qautils
+    qautils = None              # Path to old checklist QAutils
     sitetitle = None            # site title
     shorttitle = None           # abbreviated site title
     remoteuser = None           # Username
@@ -275,6 +277,14 @@ class web_support:
 
         if self.email_from is None:
             self.emailfrom = "tylerl@iastate.edu"
+            pass
+
+        if self.limatix_qautils is None:
+            self.limatix_qautils = '/usr/local/limatix-qautils'
+            pass
+
+        if self.qautils is None:
+            self.qautils = '/usr/local/QAutils'
             pass
 
         if self.administrators is None:

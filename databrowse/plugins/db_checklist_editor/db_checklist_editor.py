@@ -103,7 +103,7 @@ class db_checklist_editor(renderer_class):
                     # This is temporary and BAD!  Fix this line below
                     filestring = filestring.replace('xmlns="http://thermal.cnde.iastate.edu/checklist"', 'xmlns="http://limatix.org/checklist"') 
                     chxparsed = etree.XML(filestring)
-                    imagelist = chxparsed.xpath("//chx:checklist/chx:checkitem/chx:parameter[@name='image']", namespaces={"chx": "http://thermal.cnde.iastate.edu/checklist"})
+                    imagelist = chxparsed.xpath("//chx:checklist/chx:checkitem/chx:parameter[@name='image']", namespaces={"chx": "http://limatix.org/checklist"})
                     for image in imagelist:
                         image = image.text
                         image = image.translate(None, "\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f")
@@ -118,7 +118,7 @@ class db_checklist_editor(renderer_class):
                     f.close()
                     try:
                         os.environ["HOME"] = "/home/www/.home"
-                        chx2pdf = imp.load_source("chx2pdf", "/usr/local/QAutils/bin/chx2pdf")
+                        chx2pdf = imp.load_source("chx2pdf", os.path.join(self._web_support.qautils, "bin/chx2pdf"))
                         chx2pdf.chx2pdf(fullfilename)
                     except Exception as err:
                         self._web_support.req.output = "Error Generating PDF:  " + str(err)
@@ -183,7 +183,7 @@ class db_checklist_editor(renderer_class):
                 f = open(self._fullpath, 'r')
                 xml = etree.parse(f)
                 f.close()
-                g = open('/usr/local/QAutils/checklist/chx2html.xsl', 'r')
+                g = open(os.path.join(self._web_support.qautils, 'checklist/chx2html.xsl'), 'r')
                 xsltransform = etree.parse(g)
                 g.close()
                 transform = etree.XSLT(xsltransform)

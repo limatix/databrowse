@@ -39,7 +39,7 @@ class db_limatix_qautils_viewer(renderer_class):
                 f = open(self._fullpath, 'r')
                 xml = etree.parse(f)
                 f.close()
-                g = open('/usr/local/limatix-qautils/checklist/chf2html.xsl', 'r')
+                g = open(os.path.join(self._web_support.limatix_qautils, 'checklist/chf2html.xsl'), 'r')
                 xsltransform = etree.parse(g)
                 g.close()
                 transformedxml = xml.xslt(xsltransform,rawlink_postfix="'?content_mode=raw'")
