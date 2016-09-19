@@ -127,8 +127,8 @@ if [ -e /etc/databrowse_wsgi.conf ]; then
     confstatus=true
 else
     echo -e "$BGreen=== Configuring Databrowse WSGI Application ===============================$Color_Off"
-    rsync -avz databrowse_wsgi/web.sample.conf /etc/databrowse_wsgi.conf
-    rsync -avz databrowse_wsgi/db_style.sample.xml /etc/databrowse_style.xml
+    rsync -avz databrowse_wsgi/databrowse_wsgi.sample.conf /etc/databrowse_wsgi.conf
+    rsync -avz databrowse_wsgi/databrowse_style.sample.xml /etc/databrowse_style.xml
     if [ $? == 0 ]; then
         echo -en "Sample Configuration File Copied to /etc Successfully.  Edit now? [Y/n]"
         read -n 1 -r

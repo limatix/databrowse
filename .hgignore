@@ -12,4 +12,5 @@ build/*
 dist/*
 *.egg-info*
 *.egg*
-databrowse_wsgi/db_style.xml
+databrowse_wsgi/databrowse_style.xml
+databrowse_wsgi/databrowse_wsgi.conf
