@@ -241,7 +241,7 @@ class web_support:
 
         # Try to Load Optional Configuration File
         try:
-            conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
+            conffile = file(os.path.join(os.path.dirname(self.reqfilename), "databrowse_wsgi.conf"))
             self.confstr = conffile.read()
             conffile.close()
             exec self.confstr
