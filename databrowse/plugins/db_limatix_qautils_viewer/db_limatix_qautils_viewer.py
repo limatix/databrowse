@@ -18,6 +18,7 @@
 ###############################################################################
 """ plugins/renderers/db_checklist_viewer.py - Generic Checklist Files """
 
+import os
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 
