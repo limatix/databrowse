@@ -6,10 +6,8 @@ include DEPENDENCIES
 include README
 include setup.py
 include TODO
-prune doc/Manual/*.aux
-prune doc/Manual/*.fdb*
-prune doc/Manual/*.fls
-prune doc/Manual/*.out
-prune doc/Manual/*.toc
-prune build
-prune dist
+exclude doc/Manual/*.aux
+exclude doc/Manual/*.fdb*
+exclude doc/Manual/*.fls
+exclude doc/Manual/*.out
+exclude doc/Manual/*.toc
