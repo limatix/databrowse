@@ -1,6 +1,6 @@
 """
 Databrowse:  An Extensible Data Management Platform
-Copyright (C) 2012-2013 Iowa State University
+Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc.
 
 This meta package contains all packages declared in the databrowse.plugins
 namespace.  Not all of these plugins may actually be physically contained in

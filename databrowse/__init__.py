@@ -1,6 +1,6 @@
 """
 Databrowse:  An Extensible Data Management Platform
-Copyright (C) 2012-2013 Iowa State University
+Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc.
 
 This package contains the entire Databrowse library.  Packages are namespaced
 to allow the installation of third-party plugins without needing to install

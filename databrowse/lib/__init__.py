@@ -1,6 +1,6 @@
 """
 Databrowse:  An Extensible Data Management Platform
-Copyright (C) 2012-2013 Iowa State University
+Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc.
 
 This package contains the Databrowse library used to call Databrowse from other
 Python scripts and anywhere else that Python code can be called.
