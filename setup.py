@@ -35,7 +35,7 @@ setup(
     url="http://thermal.cnde.iastate.edu",
     version='0.7.1',
     packages=find_packages(exclude=['databrowse_wsgi']),
-    package_data = {'':['*.conf']},
+    package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
     long_description=readfile('README'),
     zip_safe=False,
