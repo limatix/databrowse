@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.9.1)  19 SEP 2016 04:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.9.1)  19 SEP 2016 04:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1373,6 +1373,15 @@ Underfull \hbox (badness 10000) in paragraph at lines 1158--1161
 
  []
 
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+
+Underfull \hbox (badness 10000) in paragraph at lines 1162--1166
+
+ []
+
 [34
 
 ] [35
@@ -1396,16 +1405,16 @@ Missing character: There is no  in font cmr10!
 ] [50
 
 ] [51]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2374.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2379.
  [52]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2374.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2379.
  (./Manual.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2374.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2374.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2379.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2379.
 
 Package rerunfilecheck Info: File `Manual.out' has not changed.
 (rerunfilecheck)             Checksum: AF74BBF66C8288CEAA55C59F4B637B31;4485.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2374.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2379.
  ) 
 Here is how much of TeX's memory you used:
  7789 strings out of 493029
@@ -1427,7 +1436,7 @@ msfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on Manual.pdf (52 pages, 3918936 bytes).
+Output written on Manual.pdf (52 pages, 3918990 bytes).
 PDF statistics:
  919 PDF objects out of 1000 (max. 8388607)
  787 compressed objects within 8 object streams
