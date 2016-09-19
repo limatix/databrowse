@@ -34,9 +34,8 @@ setup(
     keywords="databrowse data management",
     url="http://thermal.cnde.iastate.edu",
     version='0.7.1',
-    tags='dev',
     packages=find_packages(exclude=['databrowse_wsgi']),
-    package_data = {'':['*.conf']}
+    package_data = {'':['*.conf']},
     license="BSD-3",
     long_description=readfile('README.md'),
     zip_safe=False,
