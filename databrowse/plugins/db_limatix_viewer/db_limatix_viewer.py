@@ -339,3 +339,88 @@ class db_limatix_viewer(renderer_class):
             pass
         self._web_support.menu.AddMenu(newmenu)
         pass
+
+    def loadStyleFunction(self):
+        """ Override Load Style Function to Replace URL """
+
+        # Get Variables Containing Search Locations Ready
+        #print "In loadStyleFunction"
+        #print "Path = " + self._fullpath
+        #print "Plugin = " + self.__class__.__name__
+        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) +
+                                     '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
+        defaultpath = os.path.abspath(os.path.dirname(sys.modules['databrowse.plugins.' + self.__class__.__name__].__file__) + '/dbs_' + self._style_mode + '.xml')
+        #print "Custom Search Path = " + custompath
+        #print "Default Search Path = " + defaultpath
+
+        # Look for Custom Stylesheets in a .databrowse folder relative to the current path
+        filename = custompath if os.path.exists(custompath) else None
+        #print "Looking For Custom File === Filename is now " + repr(filename)
+
+        # If we find one, see if its overriding the standard stylesheet and set a flag to remind us later
+        override = False
+        if filename is not None:
+            override = True if (os.path.exists(defaultpath) or hasattr(self, '_style_' + self._style_mode)) else False
+            pass
+        #print "Checking for Default Stylesheets === Override is now " + repr(override)
+
+        # Let's first check if we have already loaded the standard stylesheets
+        if filename is None:
+            #print "Filename is still empty so let's see if we have loaded the default already"
+            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override != True:
+                #print "We have loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                return
+            else:
+                # If not, let's look for normal stylesheets
+                #print "Not loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                filename = defaultpath if os.path.exists(defaultpath) else None
+                pass
+
+        # Let's check for a stylesheet in the current file
+        if filename is None:
+            #print "Filename is still none = looking for variable"
+            if hasattr(self, '_style_' + self._style_mode):
+                stylestring = getattr(self, '_style_' + self._style_mode)
+                pass
+            else:
+                # Unable to Find Stylesheet Anywhere - Return Error
+                #print "Unable to find stylesheet"
+                raise self.RendererException("Unable To Locate Stylesheet for Style Mode %s in %s" % (self._style_mode, self.__class__.__name__))
+        else:
+            # Lets load up whatever stylesheet we found
+            f = open(filename, 'r')
+            stylestring = f.read()
+            f.close()
+            pass
+
+        #print "Stylesheet Loaded Successfully:"
+        #print stylestring
+        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl"))
+
+        # If we set the flag earlier, we need to change the namespace
+        if override is True:
+            #print "Override is True = Lets Modify Our Stylesheet"
+            randomid = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
+            #print "Random ID is " + randomid
+            newnamespace = self._namespace_uri + randomid
+            newlocalns = self._namespace_local + randomid
+            #print "New namespace is " + newnamespace
+            newnamedtemplates = self.__class__.__name__ + '-' + randomid + '-'
+            #print "Named templates are now prefixed " + newnamedtemplates
+            stylestring = stylestring.replace(self._namespace_uri, newnamespace)
+            stylestring = stylestring.replace(self._namespace_local + ":", newlocalns + ":")
+            stylestring = stylestring.replace("xmlns:" + self._namespace_local, "xmlns:" + newlocalns)
+            #print "Namespace Changed:"
+            #print stylestring
+            stylestring = stylestring.replace(self.__class__.__name__ + '-', newnamedtemplates)
+            #print "Named Templates Updated:"
+            #print stylestring
+            self._namespace_uri = newnamespace
+            self._namespace_local = newlocalns
+            pass
+
+        #print "Adding Style"
+        self._web_support.style.AddStyle(self._namespace_uri, stylestring)
+
+        pass
+
