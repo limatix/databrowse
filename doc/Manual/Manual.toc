@@ -13,7 +13,7 @@
 \contentsline {subsection}{\numberline {3.2}Creating New Directories}{13}{subsection.3.2}
 \contentsline {subsection}{\numberline {3.3}Uploading Files}{14}{subsection.3.3}
 \contentsline {section}{\numberline {4}Databrowse Configuration Options}{15}{section.4}
-\contentsline {subsection}{\numberline {4.1}\texttt {web.conf}}{15}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.1}\texttt {databrowse\_wsgi.conf}}{15}{subsection.4.1}
 \contentsline {subsection}{\numberline {4.2}\texttt {iconmap.conf}}{16}{subsection.4.2}
 \contentsline {subsection}{\numberline {4.3}\texttt {hiddenfiles.conf}}{16}{subsection.4.3}
 \contentsline {section}{\numberline {5}Databrowse Library}{17}{section.5}

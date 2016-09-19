@@ -181,7 +181,7 @@ Obtain the Databrowse source from the Databrowse website or from the GitHub repo
 sudo python setup.py install
 \end{verbatim}
 
-This will install the Databrowse library components.  Ensure that the necessary Apache modules are running and available by running the following command for Debian platforms:
+This will install the Databrowse library components into the the Python site-packages directory.  Ensure that the necessary Apache modules are running and available by running the following command for Debian platforms:
 
 \begin{verbatim}
 sudo a2enmod wsgi
@@ -212,21 +212,21 @@ Alias /dbres /var/www/databrowse/resources
 <Location "/databrowse">
     # Implementation of proper user controls is strongly encouraged!
     # Regardless, REMOTE_USER header must be set.
-	AuthBasicFake demouser
+    AuthBasicFake demouser
 
-	# Require SSL is also Strongly Encouraged But Must Be Appropriately Configured
-	SSLRequireSSL
+    # Require SSL is also Strongly Encouraged But Must Be Appropriately Configured
+    SSLRequireSSL
 
-	Options FollowSymLinks
+    Options FollowSymLinks
 
-	# Rewrite Rules - No Modification Should Be Needed Unless You Change Location Above
-	RewriteEngine on
-	RedirectMatch ^databrowse$ /databrowse/
-	RewriteCond %{QUERY_STRING} path=
-	RewriteRule ^(.*)/databrowse\.wsgi(.*)$ $1/databrowse.wsgi [QSA]
-	RedirectMatch ^databrowse$ /databrowse/
-	RewriteCond %{QUERY_STRING} !path=
-	RewriteRule ^(.*)/databrowse\.wsgi(.*)$ $1/databrowse.wsgi?path=/$2 [QSA,L]
+    # Rewrite Rules - No Modification Should Be Needed Unless You Change Location Above
+    RewriteEngine on
+    RedirectMatch ^databrowse$ /databrowse/
+    RewriteCond %{QUERY_STRING} path=
+    RewriteRule ^(.*)/databrowse\.wsgi(.*)$ $1/databrowse.wsgi [QSA]
+    RedirectMatch ^databrowse$ /databrowse/
+    RewriteCond %{QUERY_STRING} !path=
+    RewriteRule ^(.*)/databrowse\.wsgi(.*)$ $1/databrowse.wsgi?path=/$2 [QSA,L]
 </Location>
 \end{verbatim}
 
@@ -240,13 +240,15 @@ The following command is required for Debian-based systems only and can be used 
 sudo a2ensite databrowse.conf
 \end{verbatim}
 
-Prior to restarting Apache, the files \texttt{web.conf} and \texttt{db\_style.xml} (or symbolic links to these files) must exist in the same directory as \texttt{databrowse.wsgi}.  It should be sufficient to simply rename the file \texttt{db\_style.sample.xml} to \texttt{db\_style.xml} until you are ready to customize the appearance of Databrowse.  The \texttt{web.conf} file will require some additional configuration.  A sample file \texttt{web.sample.conf} is provided.
+Prior to restarting Apache, the files \texttt{databrowse\_wsgi.conf} and \texttt{databrowse\_style.xml} (or symbolic links to these files) must exist in the same directory as \texttt{databrowse.wsgi}.  It should be sufficient to simply rename the file \texttt{databrowse\_style.sample.xml} to \texttt{databrowse\_style.xml} until you are ready to customize the appearance of Databrowse.  The \texttt{databrowse\_wsgi.conf} file will require some additional configuration.  A sample file \texttt{databrowse\_wsgi.sample.conf} is provided.
 
-The most critical line that must be changed in web.conf from the sample provided file is \texttt{self.dataroot}.  This should be set to the absolute path of the directory containing the data you wish Databrowse to serve.  Databrowse provides very simple checks to keep the user inside directories below this path; however, this should not be used as a method of security!  Symbolic links pointing out of this directory will be followed and there may be other methods available for a user to escape out of the data root path.
+The most critical line that must be changed in \texttt{databrowse\_wsgi.conf} from the sample provided file is \texttt{self.dataroot}.  This should be set to the absolute path of the directory containing the data you wish Databrowse to serve.  Databrowse provides very simple checks to keep the user inside directories below this path; however, this should not be used as a method of security!  Symbolic links pointing out of this directory will be followed and there may be other methods available for a user to escape out of the data root path.
 
 It is also worth noting that files contained within data root must be at least readable by the web server process owner.  To take advantage of the full capabilities of Databrowse, you will also want write access available to the web server process owner as well.  Again, use caution when using Databrowse, especially if you are not familiar with securely configuring Apache.  Additionally, if using SELinux or similar systems, you will need to make additional configuration changes to ensure the web server process has read/write access to all files in the data repository.
 
-Within \texttt{web.conf}, you will also want to ensure that \texttt{self.siteurl} and \texttt{self.resurl} are correct if you have changed any Apache settings from the defaults.  You should also ensure that the directory listed in \texttt{self.checklistpath} has been created within the data root directory.  This setting is related to the Checklist plugin, but, Databrowse presently will not run if this directory does not exist.  This will be corrected in future versions of Databrowse.
+Within \texttt{databrowse\_wsgi.conf}, you will also want to ensure that \texttt{self.siteurl} and \texttt{self.resurl} are correct if you have changed any Apache settings from the defaults.  You should also ensure that the directory listed in \texttt{self.checklistpath} has been created within the data root directory.  This setting is related to the Checklist plugin, but, Databrowse presently will not run if this directory does not exist.  This will be corrected in future versions of Databrowse.
+
+Please see Chapter \ref{ConfigOptions} for more information on these files.
 
 Restart the web server and Databrowse should now be ready for use:
 
@@ -415,12 +417,13 @@ The following steps can be used to upload files using Databrowse:
 
 \clearpage
 \section{Databrowse Configuration Options}
+\label{ConfigOptions}
 
 This section provides information about the various configuration options that can be used to customize the low level functionality of Databrowse.
 
-\subsection{\texttt{web.conf}}
+\subsection{\texttt{databrowse\_wsgi.conf}}
 
-The file \texttt{web.conf} (or a symbolic link to this file) must be contained inside the same folder as \path{databrowse.wsgi}.  This file is a Python script that can be used to run code during the start of a web request to the server.  It is ran within the context of the \texttt{web\_support.py} file contained within \texttt{databrowse/support} in the source distribution.  \texttt{web\_support.py} is actually a Python class which is instantiated with the configuration from \texttt{web.conf} and the default values contained within the class at the start of a request.  This code is ran directly during the call to \texttt{web\_support.\_\_init\_\_}.  Accordingly any Python code can be included within \texttt{web.conf} and it will be executed in this context.
+The file \texttt{databrowse\_wsgi.conf} (or a symbolic link to this file) must be contained inside the same folder as \path{databrowse.wsgi}.  This file is a Python script that can be used to run code during the start of a web request to the server.  It is ran within the context of the \texttt{web\_support.py} file contained within \texttt{databrowse/support} in the source distribution.  \texttt{web\_support.py} is actually a Python class which is instantiated with the configuration from \texttt{databrowse\_wsgi.conf} and the default values contained within the class at the start of a request.  This code is ran directly during the call to \texttt{web\_support.\_\_init\_\_}.  Accordingly any Python code can be included within \texttt{databrowse\_wsgi.conf} and it will be executed in this context.
 
 The following options can be set in this file:
 

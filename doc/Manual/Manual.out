@@ -13,7 +13,7 @@
 \BOOKMARK [2][-]{subsection.3.2}{Creating New Directories}{section.3}% 13
 \BOOKMARK [2][-]{subsection.3.3}{Uploading Files}{section.3}% 14
 \BOOKMARK [1][-]{section.4}{Databrowse Configuration Options}{}% 15
-\BOOKMARK [2][-]{subsection.4.1}{web.conf}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.1}{databrowse\137wsgi.conf}{section.4}% 16
 \BOOKMARK [2][-]{subsection.4.2}{iconmap.conf}{section.4}% 17
 \BOOKMARK [2][-]{subsection.4.3}{hiddenfiles.conf}{section.4}% 18
 \BOOKMARK [1][-]{section.5}{Databrowse Library}{}% 19
