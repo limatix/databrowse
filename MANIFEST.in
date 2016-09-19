@@ -1,9 +1,9 @@
-recursive-include databrowse/*
-recursive-include databrowse_wsgi/*
-recursive-include doc/*
+graft databrowse
+graft databrowse_wsgi
+graft doc
 include COPYING
 include DEPENDENCIES
-include README.md
+include README
 include setup.py
 include TODO
 prune doc/Manual/*.aux
