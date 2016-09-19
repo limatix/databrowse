@@ -1,1 +1,15 @@
 recursive-include databrowse/*
+recursive-include databrowse_wsgi/*
+recursive-include doc/*
+include COPYING
+include DEPENDENCIES
+include README.md
+include setup.py
+include TODO
+prune doc/Manual/*.aux
+prune doc/Manual/*.fdb*
+prune doc/Manual/*.fls
+prune doc/Manual/*.out
+prune doc/Manual/*.toc
+prune build
+prune dist
