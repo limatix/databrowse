@@ -39,9 +39,6 @@
 				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
 				<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
 				<title><xsl:if test="not($title='')"><xsl:value-of select="$title"/> - </xsl:if><xsl:value-of select="document('../databrowse_style.xml')/db:dbstyle/db:titlesuffix"/></title>
-				<link rel="shortcut icon" type="image/x-icon">
-					<xsl:attribute name="href"><xsl:value-of select="$resdir"/>favicon.ico</xsl:attribute>
-				</link>
 				<xsl:element name="link">
 			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css</xsl:attribute>
 				  	<xsl:attribute name="media">all</xsl:attribute>
@@ -106,43 +103,6 @@
 			</head>
 			<body>
 				<div class="pwrapper">
-					<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
-					<div class="hwrapper" id="header">
-						<div class="isu-dark-ribbon" id="top-strip">
-							<div class="clearfix wrapper">
-								<xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:topbarleft/*"/>
-							  	<xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:topbarright/*"/>
-							</div>
-						</div>
-						<div class="isu-red-ribbon" id="ribbon" role="banner">
-							<div class="clearfix wrapper">
-								<form action="https://google.iastate.edu/search" class="isu-search-form" method="GET">
-									<input name="output" type="hidden" value="xml_no_dtd"/>
-									<input name="client" type="hidden" value="default_frontend"/>
-									<input name="sitesearch" type="hidden" value=""/>
-									<input name="proxystylesheet" type="hidden" value="default_frontend"/>
-									<input accesskey="s" name="q" placeholder="Search" tabindex="1" type="text"/>
-									<input name="btnG" title="Search" type="submit" value=""/>
-								</form>
-								<a accesskey="1" class="nameplate" href="http://www.iastate.edu/">
-									<xsl:element name="img">
-										<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
-								    	<xsl:attribute name="alt">Iowa State University</xsl:attribute>
-								  	</xsl:element>
-								</a>
-								<div class="grids-fluid clearfix">
-									<div class="grid-right">
-										<div class="sub-title site-tagline"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
-									</div>
-									<div class="grid-left">
-										<div class="site-title sub-title"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
-									</div>
-								</div>
-								<!--<div class="site-title sub-title"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
-								<div class="site-title sub-tagline"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetagline/*"/></div>-->
-							</div>
-						</div>
-					</div>
 					<div class="clearfix cwrapper wrapper" id="container">
 						<div class="isu-sidebar" id="sidebar">
 							<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:navigation" mode="vert"/>
@@ -158,12 +118,6 @@
 					<div class="fwrapper wrapper">
 						<div class="clearfix isu-footer" id="footer" role="contentinfo">
 							<div class="pull-left first">
-								<a class="nameplate" href="/">
-							  		<xsl:element name="img">
-							    		<xsl:attribute name="alt">Iowa State University</xsl:attribute>
-							    		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>sprite.png</xsl:attribute>
-							  		</xsl:element>
-								</a>
 							</div>
 							<div class="pull-left last">
 						        <xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:footer/*"/>
