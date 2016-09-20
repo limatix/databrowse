@@ -36,10 +36,10 @@
 ###############################################################################
 """ test_db_default.py - Unit Tests for db_default """
 
-import unittest
+import unittest2
 from lxml import etree
 from databrowse.lib import db_lib as dbl
 
-class db_default_simpletest(unittest.TestCase):
+class db_default_simpletest(unittest2.TestCase):
     def runTest(self):
         self.assertIsInstance(dbl.GetXML('.', handler='db_default'), etree._Element)

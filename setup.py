@@ -39,7 +39,6 @@
 import os
 from setuptools import setup, find_packages
 
-
 def readfile(filename):
     """ Utility Function to Read the Readme File """
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
@@ -56,6 +55,7 @@ setup(
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
     long_description=readfile('README.md'),
+    test_suite='nose.collector',
     zip_safe=False,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
