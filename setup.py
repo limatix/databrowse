@@ -55,7 +55,7 @@ setup(
     packages=find_packages(exclude=['databrowse_wsgi']),
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
-    long_description=readfile('README'),
+    long_description=readfile('README.md'),
     zip_safe=False,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
