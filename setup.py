@@ -50,7 +50,7 @@ setup(
     author_email="tylerl@iastate.edu",
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
-    url="http://thermal.cnde.iastate.edu",
+    url="http://limatix.org",
     version='0.7.1',
     packages=find_packages(exclude=['databrowse_wsgi']),
     package_data = {'':['*.conf', '*.xml']},

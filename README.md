@@ -3,12 +3,12 @@ Databrowse:  An Extensible Data Management Platform
 Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc. 
 
 ## Documentation ##
-Please see the documentation in doc/Manual/Manual.pdf for more 
+Please see the documentation in [doc/Manual/Manual.pdf](https://github.com/limatix/databrowse/blob/master/doc/Manual/Manual.pdf) for more 
 information and installation instructions.
 
 ## License ##
 Databrowse is released under the BSD 3-Clause License.  Please see the file
-COPYING for more information.
+[COPYING](https://github.com/limatix/databrowse/blob/master/COPYING) for more information.
 
 ## Acknowledgments ##
 This material is based on work supported by the Air Force Research Laboratory
