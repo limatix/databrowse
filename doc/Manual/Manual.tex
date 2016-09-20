@@ -214,11 +214,9 @@ Alias /dbres /var/www/databrowse/resources
 
 <Location "/databrowse">
     # Implementation of proper user controls is strongly encouraged!
-    # Regardless, REMOTE_USER header must be set.
-    AuthBasicFake demouser
 
     # Require SSL is also Strongly Encouraged But Must Be Appropriately Configured
-    #SSLRequireSSL
+    # SSLRequireSSL
 
     Options FollowSymLinks
 
@@ -259,10 +257,16 @@ Within \texttt{databrowse\_wsgi.conf}, you will also want to ensure that \texttt
 
 Please see Chapter \ref{ConfigOptions} for more information on these files.
 
-Restart the web server and Databrowse should now be ready for use:
+Restart the web server and Databrowse should now be ready for use.  On Debian-based systems:
 
 \begin{verbatim}
 sudo service apache2 restart
+\end{verbatim}
+
+On Fedora-based systems:
+
+\begin{verbatim}
+sudo service httpd restart
 \end{verbatim}
 
 You should now be able to access Databrowse by visiting \url{http://localhost/databrowse} in your web browser.
