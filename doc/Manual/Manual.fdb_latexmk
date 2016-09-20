@@ -101,12 +101,12 @@
   "WebPage_Viewer.png" 1473459081 93084 3d9ecd31d683ac41e6ff9463963e894b ""
   "wrapfig.sty" 1473459081 26220 3701aebf80ccdef248c0c20dd062fea9 ""
   (generated)
-  "Manual.log"
   "Manual.toc"
+  "Manual.log"
+  "Manual.aux"
   "Manual.dvi"
   "Manual.out"
-  "Manual.aux"
-["pdflatex"] 1474332182 "Manual.tex" "Manual.pdf" "Manual" 1474332185
+["pdflatex"] 1474332182 "Manual.tex" "Manual.pdf" "Manual" 1474336897
   "/etc/texmf/web2c/texmf.cnf" 1472708001 1101 af7716885e081ab43982cab7b4672c1a ""
   "/home/tylerl/.texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1422515967 1461637 efa35947afa4605552cd9896a4070eb8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
@@ -226,8 +226,8 @@
   "WebPage_Viewer.png" 1473459081 93084 3d9ecd31d683ac41e6ff9463963e894b ""
   "wrapfig.sty" 1473459081 26220 3701aebf80ccdef248c0c20dd062fea9 ""
   (generated)
-  "Manual.out"
   "Manual.aux"
   "Manual.pdf"
-  "Manual.toc"
   "Manual.log"
+  "Manual.toc"
+  "Manual.out"
