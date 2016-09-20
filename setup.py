@@ -32,12 +32,13 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+## 19 Aug 2016; 88ABW-2016-4051.											 ##
 ###############################################################################
 """ setup.py - Main Install Script """
 
 import os
 from setuptools import setup, find_packages
+
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
@@ -50,7 +51,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.7.2',
+    version='0.7.1',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
