@@ -34,42 +34,12 @@
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
-""" setup.py - Main Install Script """
+""" test_db_default.py - Unit Tests for db_default """
 
-import os
-from setuptools import setup, find_packages
+import unittest
+from lxml import etree
+from databrowse.lib import db_lib as dbl
 
-
-def readfile(filename):
-    """ Utility Function to Read the Readme File """
-    return open(os.path.join(os.path.dirname(__file__), filename)).read()
-
-setup(
-    name="databrowse",
-    author="Tyler Lesthaeghe",
-    author_email="tylerl@iastate.edu",
-    description="An Extensible Data Management Platform",
-    keywords="databrowse data management",
-    url="http://limatix.org",
-    version='0.7.2',
-    packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data = {'':['*.conf', '*.xml']},
-    license="BSD-3",
-    long_description=readfile('README.md'),
-    zip_safe=False,
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Web Environment",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Natural Language :: English",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: JavaScript",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
-        "Topic :: Scientific/Engineering :: Information Analysis",
-        "Topic :: Software Development :: Libraries",
-        "Topic :: Utilities"
-    ]
-)
+class db_default_simpletest(unittest.TestCase):
+    def runTest(self):
+        self.assertIsInstance(dbl.GetXML('.', handler='db_default'), etree._Element)
