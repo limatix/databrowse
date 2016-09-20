@@ -11,3 +11,4 @@ exclude doc/Manual/*.fdb*
 exclude doc/Manual/*.fls
 exclude doc/Manual/*.out
 exclude doc/Manual/*.toc
+exclude install

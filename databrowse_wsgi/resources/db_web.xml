@@ -103,6 +103,21 @@
 			</head>
 			<body>
 				<div class="pwrapper">
+					<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
+					<div class="hwrapper" id="header">
+						<div class="isu-red-ribbon" id="ribbon" role="banner">
+							<div class="clearfix wrapper">
+								<div class="grids-fluid clearfix">
+									<div class="grid-right">
+										<div class="sub-title site-tagline"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
+									</div>
+									<div class="grid-left">
+										<div class="site-title sub-title"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="clearfix cwrapper wrapper" id="container">
 						<div class="isu-sidebar" id="sidebar">
 							<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:navigation" mode="vert"/>
