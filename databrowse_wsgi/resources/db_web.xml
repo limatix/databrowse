@@ -104,14 +104,14 @@
 			<body>
 				<div class="pwrapper">
 					<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
-					<div class="hwrapper" id="header">
+					<div class="fwrapper wrapper" id="header">
 						<div class="isu-red-ribbon" id="ribbon" role="banner">
 							<div class="clearfix wrapper">
 								<div class="grids-fluid clearfix">
-									<div class="grid-right">
+									<div class="grid-right" style="margin-right:10px;margin-top:15px;">
 										<div class="sub-title site-tagline"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
 									</div>
-									<div class="grid-left">
+									<div class="grid-left" style="margin-left:10px;margin-top:15px;">
 										<div class="site-title sub-title"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
 									</div>
 								</div>
