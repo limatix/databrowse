@@ -104,7 +104,7 @@ fi
 # Install Databrowse WSGI Application
 echo -e "$BGreen=== Installing Databrowse WSGI Application ================================$Color_Off"
 rsync -avz --no-r --delete-after databrowse_wsgi/* $WSGIINSTALLLOCATION/
-rsync -avz --delete-after /usr/local/src/databrowse_ISU_resources/resources $WSGIINSTALLLOCATION/resources
+rsync -avz --delete-after /usr/local/src/databrowse_ISU_resources/resources $WSGIINSTALLLOCATION/
 if [ $? == 0 ]; then
     wsgistatus=true
     echo "Databrowse Python WSGI Application Install Complete"
