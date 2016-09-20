@@ -163,7 +163,8 @@ The necessary minimum prerequisites can be installed using the following command
 \begin{verbatim}
 sudo apt-get install python2.7 python-lxml python-magic python-numpy python-pip libjpeg \
    libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev apache2 libapache2-mod-wsgi     \
-   libapache2-mod-rewrite
+   libapache2-mod-rewrite python-dev python-setuptools libtiff5-dev libjpeg8-dev        \
+   zlib1g-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
 sudo pip install pillow
 \end{verbatim}
 
@@ -172,10 +173,12 @@ And for Fedora-based platforms:
 \begin{verbatim}
 sudo yum install python python-lxml python-magic python2-numpy python-pip libjpeg-turbo \
    libjpeg-turbo-devel freetype freetype-devel zlib zlib-devel httpd mod_wsgi           \
+   python-devel redhat-rpm-config libtiff-devel libjpeg-devel zlib-devel freetype-devel \
+   lcms2-devel libwebp-devel tcl-devel tk-devel
 sudo pip install pillow
 \end{verbatim}
 
-Obtain the Databrowse source from the Databrowse website or from the GitHub repository (coming soon).  From within the root directory, run the following command:
+The package \texttt{redhat-rpm-config} is only required on Fedora 23 or later.  The command \texttt{dnf} may also be exchanged for \texttt{yum} on newer Fedora-based platforms as well.  Obtain the Databrowse source from the Databrowse website or from the GitHub repository (coming soon).  From within the root directory, run the following command:
 
 \begin{verbatim}
 sudo python setup.py install
@@ -188,7 +191,7 @@ sudo a2enmod wsgi
 sudo a2enmod rewrite
 \end{verbatim}
 
-And for Fedora platforms, both modules should be enabled by default.  Verify the presence of the following lines in the file \texttt{/etc/httpd/conf/httpd.conf} or in any files contained in \texttt{/etc/httpd/conf.d/}:
+And for Fedora platforms, both modules should be enabled by default.  Verify the presence of the following lines in the file \texttt{/etc/httpd/conf/httpd.conf} or in any files contained in \texttt{/etc/httpd/conf.d/} or \texttt{/etc/httpd/conf.modules.d}:
 
 \begin{verbatim}
 LoadModule rewrite_module modules/mod_rewrite.so
@@ -215,7 +218,7 @@ Alias /dbres /var/www/databrowse/resources
     AuthBasicFake demouser
 
     # Require SSL is also Strongly Encouraged But Must Be Appropriately Configured
-    SSLRequireSSL
+    #SSLRequireSSL
 
     Options FollowSymLinks
 

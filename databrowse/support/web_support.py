@@ -249,6 +249,7 @@ class web_support:
     stderr = None               # filehandle to server error log
     seo_urls = None             # Boolean indicating whether SEO URLs are enabled - requires URL rewrites
     debugging = None            # Boolean indicating whether debugging messages should be shown
+    requireuser = None          # Require Username
 
     def __init__(self, environ, start_response):
         self.req = wsgi_req(environ, start_response)
@@ -280,8 +281,14 @@ class web_support:
             self.logouturl = "http://localhost/logout"
             pass
 
-        if not environ["REMOTE_USER"]:
+        if self.requireuser is None:
+            self.requireuser = True
+            pass
+
+        if self.requireuser and not('REMOTE_USER' in environ):
             raise Exception("User Not Logged In")
+        elif not self.requireuser:
+            self.remoteuser = ""
         else:
             self.remoteuser = environ["REMOTE_USER"]
 
