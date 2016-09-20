@@ -13,5 +13,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: limatix/databrowse
-    branch: develop
     tags: true
