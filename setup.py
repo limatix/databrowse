@@ -52,10 +52,11 @@ setup(
     keywords="databrowse data management",
     url="http://limatix.org",
     version='0.7.1',
-    packages=find_packages(exclude=['databrowse_wsgi']),
+    packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
     long_description=readfile('README.md'),
+    test_suite='nose.collector',
     zip_safe=False,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
