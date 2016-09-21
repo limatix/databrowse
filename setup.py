@@ -52,6 +52,7 @@ setup(
     keywords="databrowse data management",
     url="http://limatix.org",
     version='0.7.3',
+    version='0.7.2',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
