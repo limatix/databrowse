@@ -3,7 +3,7 @@ graft databrowse_wsgi
 graft doc
 include COPYING
 include DEPENDENCIES
-include README
+include README.md
 include setup.py
 include TODO
 exclude doc/Manual/*.aux
