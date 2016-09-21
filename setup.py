@@ -58,6 +58,14 @@ setup(
     long_description=readfile('README.md'),
     test_suite='nose.collector',
     zip_safe=False,
+    install_requires=[
+        'lxml>=3.2.0',
+        'file-magic>=0.1',
+        'numpy>=1.8.0',
+        'pillow>=2.3.0',
+        'qrcode>=4.0',
+        'unittest2>=0.5.1'
+    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
