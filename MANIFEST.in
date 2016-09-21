@@ -4,6 +4,7 @@ graft doc
 include COPYING
 include DEPENDENCIES
 include README.md
+include requirements.txt
 include setup.py
 include TODO
 exclude doc/Manual/*.aux
