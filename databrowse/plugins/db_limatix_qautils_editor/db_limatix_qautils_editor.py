@@ -95,6 +95,10 @@ class db_limatix_qautils_editor(renderer_class):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         pass
+                    elif not os.path.isdir(fullpath)
+                        self._web_support.req.output = "Error Saving File:  Requested Save Directory is an Existing File " + fullpath
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
                     #Let's check on the file and make sure its writable and doesn't exist
                     if os.path.exists(fullfilename):
                         # rename old version into .1 .2. .3 etc.
