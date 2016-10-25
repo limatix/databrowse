@@ -70,6 +70,10 @@ class db_checklist_editor(renderer_class):
                         fullpath = os.path.abspath(self._web_support.dataroot + "/" + destination)
                     fullfilename = os.path.abspath(fullpath + "/" + filename)
                     fullpath = os.path.dirname(fullfilename)
+                    if filename == "":
+                        raise self.RendererException("Filename Cannot Be Blank")
+                    if os.path.exists(fullfilename) and os.path.isdir(fullfilename):
+                        raise self.RendererException("Full Path '%s' is an Existing Directory" % fullfilename)
                     if not fullpath.startswith(self._web_support.dataroot):
                         raise self.RendererException("Attempt to Save File Outside of Dataroot")
                     # Let's check on the directory and make sure its writable and it exists
