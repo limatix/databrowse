@@ -70,8 +70,18 @@ class db_limatix_qautils_editor(renderer_class):
                         fullpath = os.path.abspath(self._web_support.dataroot + "/" + destination)
                     fullfilename = os.path.abspath(fullpath + "/" + filename)
                     fullpath = os.path.dirname(fullfilename)
+                    if filename == "":
+                        self._web_support.req.output = "Error Saving File:  Filename Cannot Be Blank"
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]                        
+                    if os.path.exists(fullfilename) and os.path.isdir(fullfilename):
+                        self._web_support.req.output = "Error Saving File:  Full Path '%s' is an Existing Directory" % fullfilename
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
                     if not fullpath.startswith(self._web_support.dataroot):
-                        raise self.RendererException("Attempt to Save File Outside of Dataroot")
+                        self._web_support.req.output = "Error Saving File:  Attempt to Save File Outside of Dataroot"
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
                     # Let's check on the directory and make sure its writable and it exists
                     if not os.access(fullpath, os.W_OK) and os.path.exists(fullpath):
                         self._web_support.req.output = "Error Saving File:  Save Directory Not Writable " + fullpath
@@ -85,6 +95,10 @@ class db_limatix_qautils_editor(renderer_class):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         pass
+                    elif not os.path.isdir(fullpath):
+                        self._web_support.req.output = "Error Saving File:  Requested Save Directory is an Existing File " + fullpath
+                        self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                        return [self._web_support.req.return_page()]
                     #Let's check on the file and make sure its writable and doesn't exist
                     if os.path.exists(fullfilename):
                         # rename old version into .1 .2. .3 etc.

@@ -13,6 +13,8 @@ On_IYellow='\e[0;103m'  # Yellow High Intensity Background
 BGreen='\e[1;32m'       # Bold Green
 BRed='\e[1;31m'         # Bold Red
 
+git remote update
+
 clear
 echo -e "$Yellow╔═════════════════════════════════════════════════════════════════════════╗"
 echo -e "║  $IRed   _____          _          _                                        $Yellow ║"
@@ -48,24 +50,31 @@ else
 fi
 
 # Make Sure Repository States Match - i.e. we don't need to call hg update
-hgtip=$(hg tip --template "{node|short}")
-hgid=$(hg identify -i | tr -d +)
-if [ $hgtip == $hgid ]; then
-    echo -e "  Mercurial Repo Up-to-Date = $BGreen Yes $Color_Off"
+UPSTREAM=${1:-'@{u}'}
+LOCAL=$(git rev-parse @ 2>&1)
+REMOTE=$(git rev-parse "$UPSTREAM" 2>&1)
+BASE=$(git merge-base @ "$UPSTREAM" 2>&1)
+
+if [ "$LOCAL" = "$REMOTE" ]; then
+    echo -e "  Git Repo Up-to-Date = $BGreen Yes $Color_Off"
+elif [ "$LOCAL" = "$BASE" ]; then
+    go_on=false
+    echo -e "  Git Repo Up-to-Date = $BRed No, Need to Pull $Color_Off"
+elif [ "$REMOTE" = "$BASE" ]; then
+    go_on=false
+    echo -e "  Git Repo Up-to-Date = $BRed No, Need to Push $Color_Off"
 else
     go_on=false
-    echo -e "  Mercurial Repo Up-to-Date = $BRed No $Color_Off"
+    echo -e "  Git Repo Up-to-Date = $BRed No, Diverged $Color_Off"
 fi
 
 # Check For Uncommitted Updates
-hgstatus=$(hg status | wc -l)
-if [ $hgstatus != 0 ]; then
+if git diff-index --quiet HEAD --; then
+    echo -e "  All Changes Committed = $BGreen Yes $Color_Off"
+else
     go_on=false
     echo -e "  All Changes Committed = $BRed No $Color_Off"
-else
-    echo -e "  All Changes Committed = $BGreen Yes $Color_Off"
 fi
-    
 
 # Prompt User to Continue
 if [ $go_on == false ]; then
