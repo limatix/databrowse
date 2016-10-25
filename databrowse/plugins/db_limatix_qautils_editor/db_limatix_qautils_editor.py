@@ -95,7 +95,7 @@ class db_limatix_qautils_editor(renderer_class):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         pass
-                    elif not os.path.isdir(fullpath)
+                    elif not os.path.isdir(fullpath):
                         self._web_support.req.output = "Error Saving File:  Requested Save Directory is an Existing File " + fullpath
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
