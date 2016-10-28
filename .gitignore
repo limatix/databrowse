@@ -20,3 +20,4 @@ databrowse_wsgi/databrowse_wsgi.conf
 *.log
 *.out
 *.toc
+install
