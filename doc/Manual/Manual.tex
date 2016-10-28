@@ -216,6 +216,9 @@ Alias /dbres /var/www/databrowse/resources
     # Implementation of proper user controls is strongly encouraged!
 
     # Require SSL is also Strongly Encouraged But Must Be Appropriately Configured
+    # Also be sure to modify databrowse_wsgi.conf to reflect ``https'' 
+    # instead of ``http'' on all URLs
+    
     # SSLRequireSSL
 
     Options FollowSymLinks
@@ -246,6 +249,8 @@ Prior to restarting Apache, the files \texttt{databrowse\_wsgi.conf} and \texttt
 The most critical line that must be changed in \texttt{databrowse\_wsgi.conf} from the sample provided file is \texttt{self.dataroot}.  This should be set to the absolute path of the directory containing the data you wish Databrowse to serve.  Databrowse provides very simple checks to keep the user inside directories below this path; however, this should not be used as a method of security!  Symbolic links pointing out of this directory will be followed and there may be other methods available for a user to escape out of the data root path.
 
 Additionally, you may wish to set \texttt{self.requireuser=False} if you do not presently have authenticaion configured on Apache.  This may be okay if your Apache instance is only accessible from the local machine.  However, if it is accessible to the world, it is highly encouraged to correctly configure authentication.  See the previous warning about security.
+
+If you have SSL properly configured on your web server and you uncommented the \texttt{SSLRequireSSL} line in \texttt{databrowse.conf}, you should update all URLs in \texttt{databrowse\_wsgi.conf} to show \texttt{https} at the beginning instead of \texttt{http}.
 
 It is also worth noting that files contained within data root must be at least readable by the web server process owner.  To take advantage of the full capabilities of Databrowse, you will also want write access available to the web server process owner as well.  Again, use caution when using Databrowse, especially if you are not familiar with securely configuring Apache.  Additionally, if using SELinux or similar systems, you will need to make additional configuration changes to ensure the web server process has read/write access to all files in the data repository.  On newer Fedora systems, for example, if you set your \texttt{dataroot} to \texttt{/home/databrowse}, then you could run the following command to allow access to Apache:
 
