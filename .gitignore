@@ -14,3 +14,10 @@ dist/*
 *.egg*
 databrowse_wsgi/databrowse_style.xml
 databrowse_wsgi/databrowse_wsgi.conf
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+install
