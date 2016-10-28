@@ -221,6 +221,13 @@ Alias /dbres /var/www/databrowse/resources
     
     # SSLRequireSSL
 
+    # Suggest the following items to restrict to localhost
+    # Only disable if you know what you're doing and have Apache properly configured
+    # AND have authentication enabled on Databrowse
+    Order deny,allow
+    Deny from all
+    Allow from 127.0.0.1
+
     Options FollowSymLinks
 
     # Rewrite Rules - No Modification Should Be Needed Unless You Change Location Above
