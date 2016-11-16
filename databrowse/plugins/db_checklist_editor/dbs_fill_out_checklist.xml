@@ -89,6 +89,15 @@
                 var perfbyinput=document.getElementsByName("perfby")[0];
                 var dateinput=document.getElementsByName("date")[0];
 
+                if (specimeninput==null)
+                {
+                    var specimentext="disabled";
+                }
+                else
+                {
+                    var specimentext=specimeninput.value;
+                }
+
                 // Get URL
                 if (window.location.search != '')
                 {
@@ -105,7 +114,7 @@
                     file: (new XMLSerializer).serializeToString(filteredchecklistxml),
                     filename: filenameinput.value,
                     dest: destnameinput.value,
-                    specimen: specimeninput.value,
+                    specimen: specimentext,
                     perfby: perfbyinput.value,
                     date: dateinput.value
                     };
