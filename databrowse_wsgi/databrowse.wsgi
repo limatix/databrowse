@@ -497,7 +497,7 @@ def application(environ, start_response):
 
         # Return Proper Error so AJAX Works
         if "ajax" in form:
-            start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'})
+            start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'}.items())
             return ['500 Internal Server Error']
         else:
             # Now we can get a list of request variables
