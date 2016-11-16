@@ -147,12 +147,13 @@ class db_limatix_qautils_editor(renderer_class):
                             imagepath = image
                         else:
                             imagepath = os.path.abspath(os.path.dirname(self._fullpath) + '/' + image)
-                            shutil.copy(imagepath, tempsavedir)
+                        shutil.copy(imagepath, tempsavedir)
                     f = open(fullfilename, "w")
                     f.write(filestring)
                     f.close()
                     try:
                         os.environ["HOME"] = "/home/www/.home"
+                        os.environ["PATH"] = os.environ["PATH"] + ':/usr/local/bin'
                         chx2pdf = imp.load_source("chx2pdf", os.path.join(self._web_support.limatix_qautils, "bin/chx2pdf"))
                         chx2pdf.chx2pdf(fullfilename)
                     except Exception as err:
