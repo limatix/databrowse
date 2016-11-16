@@ -147,7 +147,10 @@ class db_limatix_qautils_editor(renderer_class):
                             imagepath = image
                         else:
                             imagepath = os.path.abspath(os.path.dirname(self._fullpath) + '/' + image)
-                        shutil.copy(imagepath, tempsavedir)
+                        try:
+                            shutil.copy(imagepath, tempsavedir)
+                        except:
+                            pass
                     f = open(fullfilename, "w")
                     f.write(filestring)
                     f.close()
