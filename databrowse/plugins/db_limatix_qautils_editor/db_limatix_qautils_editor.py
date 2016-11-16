@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -73,7 +73,7 @@ class db_limatix_qautils_editor(renderer_class):
                     if filename == "":
                         self._web_support.req.output = "Error Saving File:  Filename Cannot Be Blank"
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
-                        return [self._web_support.req.return_page()]                        
+                        return [self._web_support.req.return_page()]
                     if os.path.exists(fullfilename) and os.path.isdir(fullfilename):
                         self._web_support.req.output = "Error Saving File:  Full Path '%s' is an Existing Directory" % fullfilename
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
@@ -135,19 +135,28 @@ class db_limatix_qautils_editor(renderer_class):
                     chxparsed = etree.XML(filestring)
                     imagelist = chxparsed.xpath("//chx:checklist/chx:checkitem/chx:parameter[@name='image']", namespaces={"chx": "http://limatix.org/checklist"})
                     for image in imagelist:
-                        image = image.text
+                        if image.text is not None:
+                            image = image.text
+                        elif image.get('{http://www.w3.org/1999/xlink}href') is not None:
+                            image = image.get('{http://www.w3.org/1999/xlink}href')
+                        else:
+                            continue
                         image = image.translate(None, "\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f")
                         image = image.strip()
                         if image.startswith('/'):
                             imagepath = image
                         else:
                             imagepath = os.path.abspath(os.path.dirname(self._fullpath) + '/' + image)
+                        try:
                             shutil.copy(imagepath, tempsavedir)
+                        except:
+                            pass
                     f = open(fullfilename, "w")
                     f.write(filestring)
                     f.close()
                     try:
                         os.environ["HOME"] = "/home/www/.home"
+                        os.environ["PATH"] = os.environ["PATH"] + ':/usr/local/bin'
                         chx2pdf = imp.load_source("chx2pdf", os.path.join(self._web_support.limatix_qautils, "bin/chx2pdf"))
                         chx2pdf.chx2pdf(fullfilename)
                     except Exception as err:
