@@ -51,7 +51,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.7.5',
+    version='0.7.6',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
     package_data = {'':['*.conf', '*.xml']},
     license="BSD-3",
@@ -62,7 +62,7 @@ setup(
         'lxml>=3.2.0',
         'file-magic>=0.1',
         'numpy>=1.8.0',
-        'pillow>=2.3.0',
+        'pillow>=2.3.0,<4',
         'qrcode>=4.0',
         'unittest2>=0.5.1'
     ],
