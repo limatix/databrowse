@@ -27,6 +27,7 @@
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/richtext.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/video.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/photo.js</xsl:attribute></script>
+	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/plugins/checkdigit.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/common.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/documentid.js</xsl:attribute></script>
 	<script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$resdir"/>/Axel/src/filters/wiki.js</xsl:attribute></script>
