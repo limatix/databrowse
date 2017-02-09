@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -40,6 +40,7 @@ import databrowse.plugins.db_directory.db_directory as db_directory_module
 from lxml import etree
 import os
 from errno import EEXIST
+import databrowse.support.specimen_support as ss
 
 try:
     import databrowse.plugins.db_mercurial_repository.db_mercurial_repository as hgmodule
@@ -115,7 +116,7 @@ class db_specimen_database(db_directory_module.db_directory):
                                     if dirtag.get('{http://www.w3.org/1999/xlink}href') is not None:
                                         newdirname = dirtag.get('{http://www.w3.org/1999/xlink}href')
                                     else:
-                                        newdirname = dirtag.text 
+                                        newdirname = dirtag.text
                                     if newdirname is not None:
                                         os.makedirs(os.path.join(self._fullpath, newdirname))
                             except OSError as err:
@@ -170,6 +171,15 @@ class db_specimen_database(db_directory_module.db_directory):
                     self._web_support.req.output = "Error Saving File: Incomplete Request"
                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                     return [self._web_support.req.return_page()]
+            elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "checkdigit" in self._web_support.req.form:
+                if "specimen" in self._web_support.req.form:
+                    spcstr = self._web_support.req.form['specimen'].value
+                    chkdgt = ss.GenerateCheckdigit(spcstr)
+                    self._web_support.req.output = spcstr+chkdgt
+                    self._web_support.req.response_headers['Content-Type'] ='text/plain'
+                    return [self._web_support.req.return_page()]
+                else:
+                    raise self.RendererException('Incomplete Request')
             else:
                 if self._style_mode == "add_specimen":
                     xmlroot = etree.Element("{%s}specimendb" % self._namespace_uri, nsmap=self.nsmap, templatefile=self.getURL("/specimens/src/specimen.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml"))
