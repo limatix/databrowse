@@ -62,7 +62,7 @@ setup(
         'lxml>=3.2.0',
         'file-magic>=0.1',
         'numpy>=1.8.0',
-        'pillow>=2.3.0',
+        'pillow>=2.3.0,<4',
         'qrcode>=4.0',
         'unittest2>=0.5.1'
     ],
