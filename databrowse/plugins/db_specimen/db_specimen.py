@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -133,6 +133,15 @@ class db_specimen(renderer_class):
                 self._web_support.req.output = "Error Saving File: Incomplete Request"
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
+        elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "checkdigit" in self._web_support.req.form:
+            if "specimen" in self._web_support.req.form:
+                spcstr = self._web_support.req.form['specimen'].value
+                chkdgt = ss.GenerateCheckdigit(spcstr)
+                self._web_support.req.output = spcstr+chkdgt
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
+            else:
+                raise self.RendererException('Incomplete Request')
         elif self._content_mode != "raw" and "ajax" in self._web_support.req.form and "addactionitem" in self._web_support.req.form:
             if not "date" in self._web_support.req.form or self._web_support.req.form['date'].value == "":
                 self._web_support.req.output = "Date is a Required Field"
