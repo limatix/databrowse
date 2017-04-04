@@ -45,7 +45,7 @@ from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 import magic
-import Image
+from PIL import Image
 import StringIO
 import subprocess
 
