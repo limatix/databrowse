@@ -210,7 +210,7 @@ class db_movie_viewer(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
                     if self.CacheFileExists("full", "jpg"):
                         img = Image.open(self.getCacheFileHandler('rb', 'full', 'jpg'))
@@ -244,7 +244,7 @@ class db_movie_viewer(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
                     self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                     self._web_support.req.output_done = True

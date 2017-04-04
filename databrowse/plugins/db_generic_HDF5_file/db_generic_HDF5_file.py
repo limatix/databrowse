@@ -141,7 +141,7 @@ class db_generic_HDF5_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
                     print(self._fullpath)
                     f = h5py.File(self._fullpath, 'r')
@@ -170,7 +170,7 @@ class db_generic_HDF5_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
                 magicstore = magic.open(magic.MAGIC_MIME)
@@ -185,7 +185,7 @@ class db_generic_HDF5_file(renderer_class):
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:
                     return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                 else:
-                    return iter(lambda: f.read(1024))
+                    return iter(lambda: f.read(1024), '')
             else:
                 raise self.RendererException("Invalid Content Mode")
             pass
