@@ -116,6 +116,8 @@ class handler_support:
             contenttype = "directory"
         else:
             contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            if contenttype is None:
+                contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
         if contenttype.startswith('application/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
