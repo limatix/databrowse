@@ -112,7 +112,12 @@ class handler_support:
         """ Return the handler given a full path """
         magicstore = magic.open(magic.MAGIC_MIME)
         magicstore.load()
-        contenttype = magicstore.file(os.path.realpath(fullpath))   # real path to resolve symbolic links outside of dataroot
+        if os.path.isdir(os.path.realpath(fullpath)) is True:
+            contenttype = "directory"
+        else:
+            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            if contenttype is None:
+                contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
         if contenttype.startswith('application/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
@@ -130,7 +135,12 @@ class handler_support:
         """ Return the handler given a full path """
         magicstore = magic.open(magic.MAGIC_MIME)
         magicstore.load()
-        contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+        if os.path.isdir(os.path.realpath(fullpath)) is True:
+            contenttype = "directory"
+        else:
+            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            if contenttype is None:
+                contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
         if contenttype.startswith('application/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
