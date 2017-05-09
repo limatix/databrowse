@@ -42,7 +42,11 @@ import os
 def dbh_directory_triggerlog(path, contenttype, extension, roottag, nsurl):
     """ Generic Image Directory Handler - Returns directory_image for all directories with more than 50 percent images """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
-        dirlist = os.listdir(path)
+        try:
+            dirlist = os.listdir(path)
+        except OSError:
+            dirlist = []
+            pass
         count = 0
         for item in dirlist:
             if (os.path.splitext(item)[1].lower() in [".tgl"]):
