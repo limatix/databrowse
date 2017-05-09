@@ -95,7 +95,7 @@ class ClientHandler:
         relpath = os.path.relpath(parsedurl.path)
         fullpath = os.path.abspath(parsedurl.path)
         # print(relpath)
-        # print(fullpath)
+        print(fullpath)
 
         urlparams = {}
         if parsedurl.query != "":

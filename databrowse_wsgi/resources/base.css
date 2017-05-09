@@ -1680,9 +1680,9 @@ dl.table-layout > dd.sub-form{
 .isu-red-ribbon{
 	background-color: #cb1a2a;
 	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABVCAYAAACICo5oAAAAI0lEQVQoz2NhAAIWfAQLXi42gpUU80hSTIRt1DaPvq7HrQMAVaYBmH7x3TUAAAAASUVORK5CYII=");
-	background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);
-	background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);
-	background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);
+	/*background-image: -moz-linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);*/
+	/*background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);*/
+	/*background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.28)), url(../dbres/pattern-red.png);*/
 	background-position: bottom center;
 	background-repeat: repeat-x;
 	background-repeat: repeat-x, repeat;
