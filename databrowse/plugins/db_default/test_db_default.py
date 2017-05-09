@@ -32,54 +32,14 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
-""" plugins/renderers/db_old_DC_viewer.py - Old Data Collect Viewer """
+""" test_db_default.py - Unit Tests for db_default """
 
-import os
-import os.path
-from stat import *
+import unittest2
 from lxml import etree
-from databrowse.support.renderer_support import renderer_class
-import magic
+from databrowse.lib import db_lib as dbl
 
-
-class db_datacollect_v1_viewer(renderer_class):
-    """ Experiment Log Viewer """
-
-    _namespace_uri = "http://thermal.cnde.iastate.edu/datacollect"
-    _namespace_local = "dc"
-    _default_content_mode = "full"
-    _default_style_mode = "log_view"
-    _default_recursion_depth = 2
-
-    def getContent(self):
-        if self._caller != "databrowse":
-            return None
-        else:
-            if self._content_mode == "full":
-                # Contents of File
-                f = open(self._fullpath)
-                xmlroot = etree.XML(f.read())
-                f.close()
-                return xmlroot
-            elif self._content_mode == "raw":
-                size = os.path.getsize(self._fullpath)
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
-                f = open(self._fullpath, "rb")
-                self._web_support.req.response_headers['Content-Type'] = contenttype
-                self._web_support.req.response_headers['Content-Length'] = str(size)
-                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(self._fullpath)
-                self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
-                self._web_support.req.output_done = True
-                if 'wsgi.file_wrapper' in self._web_support.req.environ:
-                    return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
-                else:
-                    return iter(lambda: f.read(1024), '')
-            else:
-                raise self.RendererException("Invalid Content Mode")
-            pass
-
-    pass
+class db_default_simpletest(unittest2.TestCase):
+    def runTest(self):
+        self.assertIsInstance(dbl.GetXML('.', handler='db_default'), etree._Element)

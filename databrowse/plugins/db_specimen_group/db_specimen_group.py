@@ -38,7 +38,7 @@
 
 import os
 import qrcode
-import Image
+from PIL import Image
 import StringIO
 import subprocess
 from lxml import etree

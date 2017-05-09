@@ -228,7 +228,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         if 'wsgi.file_wrapper' in self._web_support.req.environ:
                             return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                         else:
-                            return iter(lambda: f.read(1024))
+                            return iter(lambda: f.read(1024), '')
                         pass
                     elif self._web_support.req.form['filetype'].value == 'csv':
                         # File Creation
@@ -252,7 +252,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         if 'wsgi.file_wrapper' in self._web_support.req.environ:
                             return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                         else:
-                            return iter(lambda: f.read(1024))
+                            return iter(lambda: f.read(1024), '')
                         pass
                     else:
                         raise self.RendererException('Invalid File Type')
@@ -271,7 +271,7 @@ class db_datacollect_v2_viewer(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
             else:
                 raise self.RendererException("Invalid Content Mode")
             pass

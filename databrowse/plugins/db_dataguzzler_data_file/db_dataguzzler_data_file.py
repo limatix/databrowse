@@ -1016,7 +1016,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "matfile" in self._web_support.req.form:
                     f = None
@@ -1042,7 +1042,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "csvfile" in self._web_support.req.form:
                     f = None
@@ -1068,7 +1068,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "dgzfile" in self._web_support.req.form:
                     f = None
@@ -1094,7 +1094,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "avifile" in self._web_support.req.form:
                     f = None
@@ -1120,7 +1120,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 else:
                     size = os.path.getsize(self._fullpath)
@@ -1136,7 +1136,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
             else:
                 raise self.RendererException("Invalid Content Mode")
             pass
