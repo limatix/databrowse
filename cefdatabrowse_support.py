@@ -445,9 +445,9 @@ def application(filename, params):
         # Something has gone terribly wrong, let's display some useful information to the user
         # Error Page Template
         errormessage = '''\
-<?xml-stylesheet type="text/xsl" href="/media/sf_UbuntuSharedFiles/databrowse/databrowse_wsgi/resources/db_cef.xml"?>
+<?xml-stylesheet type="text/xsl" href="{}/db_cef.xml"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-<body db:resdir="/media/sf_UbuntuSharedFiles/databrowse/databrowse_wsgi/resources">
+<body db:resdir="{}">
     <h1>500 Internal Server Error</h1>
     <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
     <p>
@@ -523,7 +523,7 @@ def application(filename, params):
 
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
-            errormessage = errormessage.format(err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, dirstring)
+            errormessage = errormessage.format(db_web_support.resurl, db_web_support.resurl, err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, dirstring)
             db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage, db_web_support.req.response_headers, db_web_support.req.status]
         pass
