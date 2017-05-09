@@ -364,7 +364,7 @@ class DatabrowseHandler:
         # print("Headers: %s" % response.GetHeaderMultimap())
         # print("Details: %s" % self._params)
         response.SetMimeType(self._params["headers"]["Content-Type"])
-        response.SetStatus(self._params["status"])
+        response.SetStatus(self._params["status"][0])
         response.SetStatusText(wrcResponse.GetStatusText())
         response.SetHeaderMap(self._params["headers"])
         # response.SetHeaderMap({"": self._params["params"]["extra"]})
@@ -555,7 +555,7 @@ class CefWidget(CefWidgetParent):
         rect = [0, 0, self.width(), self.height()]
         window_info.SetAsChild(self.getHandle(), rect)
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="http://home")
+                                             url="http://home/test")
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
