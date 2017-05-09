@@ -69,7 +69,7 @@ class wsgi_req:
         fs = cgi.FieldStorage(keep_blank_values=1)
         self.form = fs
         # print("Web Support params: %s" % params)
-        self.status = 200
+        self.status = [200, "OK"]
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
         self.output_done = False
@@ -91,32 +91,32 @@ class wsgi_req:
     def return_error(self, status=500):
         """ Return Error Message """
         if status == 400:
-            self.status = 'Bad Request'
+            self.status = [status, 'Bad Request']
         elif status == 401:
-            self.status = 'Unauthorized'
+            self.status = [status, 'Unauthorized']
         elif status == 403:
-            self.status = 'Forbidden'
+            self.status = [status, 'Forbidden']
         elif status == 404:
-            self.status = 'Page Not Found'
+            self.status = [status, 'Page Not Found']
         elif status == 405:
-            self.status = 'Method Not Allowed'
+            self.status = [status, 'Method Not Allowed']
         elif status == 406:
-            self.status = 'Not Acceptable'
+            self.status = [status, 'Not Acceptable']
         elif status == 500:
-            self.status = 'Internal Server Error'
+            self.status = [status, 'Internal Server Error']
         elif status == 501:
-            self.status = 'Not Implemented'
+            self.status = [status, 'Not Implemented']
         elif status == 503:
-            self.status = 'Service Unavailable'
+            self.status = [status, 'Service Unavailable']
         else:
-            self.status = 'Internal Server Error'
+            self.status = [status, 'Internal Server Error']
 
         #self.output_done = True
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
-        self.response_headers['Content-Length'] = str(len(self.status.encode('utf-8')))
+        self.response_headers['Content-Length'] = str(len(self.status[1].encode('utf-8')))
         #self.start_response(self.status, self.response_headers.items())
-        raise Exception(self.status)
+        raise Exception(self.status[1])
 
     pass
 
