@@ -70,7 +70,40 @@ class db_file_ops(renderer_class):
             if not os.path.isdir(self._fullpath):
                 raise self.RendererException("Uploads Must Be in Folder")
             elif not "files[]" in self._web_support.req.form:
-                raise self.RendererException("No Uploads Found")
+                if "extra" in self._web_support.req.form:
+                    uploadedfilepath = self._web_support.req.form["extra"].value[1:]
+                    filename = os.path.basename(uploadedfilepath)
+                    fullfilename = self._fullpath + "/" + filename
+                    w = open(uploadedfilepath, "r")
+                    f = open(fullfilename, "w")
+                    f.write(w.read())
+                    f.close
+                    w.close
+                    results = []
+                    result = {}
+                    result['name'] = re.sub(r'^.*\\', '', filename)
+                    # result['type'] = fieldStorage.type
+                    # result['size'] = self.get_file_size(fieldStorage.file)
+                    # result['delete_type'] = 'DELETE'
+                    # result['delete_url'] = self.getURL(os.path.join(self._relpath, fieldStorage.filename), handler=None)
+                    result['url'] = self.getURL(os.path.join(self._relpath, filename), handler=None)
+                    if os.path.splitext(filename)[1][1:] in ["png", "jpg", "jpeg", "gif", "bmp", "tif",
+                                                                          "tiff"]:
+                        result['thumbnail_url'] = self.getURL(os.path.join(self._relpath, filename),
+                                                              content_mode="raw", thumbnail="small", handler=None)
+                    results.append(result)
+                    resultwrapper = {'files': results}
+                    s = json.dumps(resultwrapper, separators=(',', ':'))
+                    # if 'HTTP_ACCEPT' in self._web_support.req.environ and 'application/json' in self._web_support.req.environ['HTTP_ACCEPT']:
+                    #    self._web_support.req.response_headers['Content-Type'] = 'application/json'
+                    # else:
+                    self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                    self._web_support.req.start_response(self._web_support.req.status,
+                                                         self._web_support.req.response_headers.items())
+                    self._web_support.req.output_done = True
+                    return [s]
+                else:
+                    raise self.RendererException("No Uploads Found")
             fieldStorage = self._web_support.req.form["files[]"]
             fullfilename = os.path.abspath(self._fullpath + "/" + fieldStorage.filename)
             if not fullfilename.startswith(self._web_support.dataroot):
