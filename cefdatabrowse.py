@@ -95,7 +95,7 @@ class ClientHandler:
         relpath = os.path.relpath(parsedurl.path)
         fullpath = os.path.abspath(parsedurl.path)
         # print(relpath)
-        # print(fullpath)
+        print(fullpath)
 
         urlparams = {}
         if parsedurl.query != "":
@@ -111,12 +111,13 @@ class ClientHandler:
         fs = request.GetPostData()
         # Handle editing of text files here
         if type(fs) == list:
-            text = fs[0].split("\r\n")
-            text = text[3:-2]
-            text = "\r\n".join(text)
-            urlparams.update({'extra': fs[0], 'file': text})
+            Postdata = fs[0].split("\r\n")
+            Postdata = Postdata[1:-2]
+            Contentdata = Postdata[0].split("; ")
+            com = Contentdata + [Postdata[1]] + [fs[1]]
+            print(com)
+            urlparams.update({'file': Postdata})
         else:
-            urlparams.update({"extra": ""})
             urlparams.update(fs)
 
         if "databrowse_wsgi/resources" not in fullpath:
