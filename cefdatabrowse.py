@@ -67,6 +67,7 @@ MAC = (platform.system() == "Darwin")
 # Configuration
 WIDTH = 800
 HEIGHT = 600
+scheme = "http://home"
 
 # OS differences
 CefWidgetParent = QWidget
@@ -554,7 +555,7 @@ class CefWidget(CefWidgetParent):
         rect = [0, 0, self.width(), self.height()]
         window_info.SetAsChild(self.getHandle(), rect)
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="http://home")
+                                             url=scheme)
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
@@ -638,7 +639,7 @@ class LoadHandler(object):
         self.navigation_bar.updateState()
 
     def OnLoadStart(self, browser, **_):
-        self.navigation_bar.url.setText(browser.GetUrl().replace("http://home", ""))
+        self.navigation_bar.url.setText(browser.GetUrl().replace(scheme, ""))
         if self.initial_app_loading:
             self.navigation_bar.cef_widget.setFocus()
             # Temporary fix no. 2 for focus issue on Linux (Issue #284)
@@ -730,7 +731,7 @@ class NavigationBar(QFrame):
         self.forward.setEnabled(browser.CanGoForward())
         self.reload.setEnabled(True)
         self.url.setEnabled(False)
-        self.url.setText(browser.GetUrl().replace("http://home", ""))
+        self.url.setText(browser.GetUrl().replace(scheme, ""))
 
     def createButton(self, name):
         resources = install + "/databrowse_app/resources"
