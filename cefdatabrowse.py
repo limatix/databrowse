@@ -467,7 +467,8 @@ class WebRequestClient:
 def main():
     check_versions()
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    cef.Initialize(None, None)
+    commandlineargs = {"allow-file-access-from-files": "", "disable-web-security": ""}
+    cef.Initialize(None, commandlineargs)
     app = CefApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()

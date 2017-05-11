@@ -171,11 +171,11 @@ class menu_support:
         self._menu = []
         topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', xmlns="http://www.w3.org/1999/xhtml")
         menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
-        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=siteurl)
+        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href="/")
         menulink.text = "Databrowse Home"
-        menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
-        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=logouturl)
-        menulink.text = "Logout " + username
+        # menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
+        # menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=logouturl)
+        # menulink.text = "Logout " + username
         self.AddMenu(topmenu)
 
     def AddMenu(self, xml):

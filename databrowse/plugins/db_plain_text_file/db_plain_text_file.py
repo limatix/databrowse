@@ -39,8 +39,8 @@
 import os
 import os.path
 import time
-import pwd
-import grp
+# import pwd
+# import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
