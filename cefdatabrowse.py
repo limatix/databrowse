@@ -132,8 +132,6 @@ class ClientHandler:
             self._AddStrongReference(resHandler)
             return resHandler
         else:
-            # request.SetUrl(parsedurl.path)
-            # details = {"type": 1, "url": parsedurl.path, "origin": origin, "params": params}
             resHandler = ResourceHandler()
             resHandler._clientHandler = self
             resHandler._browser = browser
@@ -467,7 +465,8 @@ class WebRequestClient:
 def main():
     check_versions()
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    commandlineargs = {"allow-file-access-from-files": "", "disable-web-security": ""}
+    commandlineargs = {"allow-file-access-from-files": "", "allow-file-access": "", "disable-web-security": "",
+                       "user-data-dir": ""}
     cef.Initialize(None, commandlineargs)
     app = CefApplication(sys.argv)
     main_window = MainWindow()

@@ -305,6 +305,7 @@ def application(filename, params):
 
         relpath = '/'.join(relpath.split('\\'))
         # print("relpath", relpath)
+        # print(fullpath)
         # Import Plugin Directory
         #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
         #    sys.path.append(db_web_support.pluginpath)
