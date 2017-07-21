@@ -39,8 +39,10 @@
 import os
 import os.path
 import time
-import pwd
-import grp
+import platform
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -65,7 +67,7 @@ class db_plain_text_file(renderer_class):
                     filestring = self._web_support.req.form["file"].value
                     # Let's check on the file and make sure its writable and it exists
                     if not os.access(self._fullpath, os.W_OK) and os.path.exists(self._fullpath):
-                        self._web_support.req.output = "Error Saving File:  File Not Writable " + fullpath
+                        self._web_support.req.output = "Error Saving File:  File Not Writable " + self._fullpath
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
                     #Let's check on the file and make sure its writable and doesn't exist
@@ -134,10 +136,11 @@ class db_plain_text_file(renderer_class):
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
-                    username = pwd.getpwuid(st[ST_UID])[0]
-                    groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                    xmlchild.text = "%s:%s" % (username, groupname)
+                    if platform.system() == "Linux":
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                        groupname = grp.getgrgid(st[ST_GID])[0]
+                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                        xmlchild.text = "%s:%s" % (username, groupname)
 
                     # Contents of File
                     f = open(self._fullpath)

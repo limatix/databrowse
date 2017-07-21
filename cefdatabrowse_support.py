@@ -286,7 +286,7 @@ def application(filename, params):
             relpath = '/'
             pass
         else:
-            fullpath = os.path.abspath(db_web_support.req.form["path"].value)
+            fullpath = os.path.splitdrive(os.path.abspath(db_web_support.req.form["path"].value))[1]
             if not fullpath.startswith(db_web_support.dataroot):
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
@@ -304,8 +304,9 @@ def application(filename, params):
             pass
 
         relpath = '/'.join(relpath.split('\\'))
+        fullpath = '/'.join(fullpath.split('\\'))
         # print("relpath", relpath)
-        # print(fullpath)
+        # print("fullpath", fullpath)
         # Import Plugin Directory
         #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
         #    sys.path.append(db_web_support.pluginpath)

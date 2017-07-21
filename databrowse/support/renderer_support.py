@@ -336,7 +336,7 @@ class renderer_class(object):
             return self.getURL(relpath, **kwargs)
             pass
         else:
-            relpath = os.path.abspath(relpath + '/../')
+            relpath = os.path.splitdrive(os.path.abspath(relpath + '/../'))[1]
             return self.getURL(relpath, **kwargs)
             pass
         pass
@@ -364,7 +364,6 @@ class renderer_class(object):
         returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
         returnlist = returndirlist
         returnlist.extend(returnfilelist)
-
         return returnlist
 
         pass
