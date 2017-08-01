@@ -31,7 +31,7 @@
 	<db:sitetitle><a href="/">Databrowse</a></db:sitetitle>
 
 	<!-- Site Tagline -->
-	<db:sitetagline><div id="sitetagline"></div><script type="text/javascript">$('#sitetagline').html(location.hostname);</script></db:sitetagline>
+	<db:sitetagline><div id="sitetagline"></div><script type="text/javascript">$('#sitetagline').html("");</script></db:sitetagline>  <!-- Replace "" with location.hostname -->
 
 	<!-- NavBar Top -->
 	<!--<db:navbar>
