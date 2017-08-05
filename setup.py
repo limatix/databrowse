@@ -64,7 +64,7 @@ setup(
         'numpy>=1.8.0',
         'pillow>=2.3.0,<4',
         'qrcode>=4.0',
-        'unittest2>=0.5.1'
+        #'unittest2>=0.5.1'
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",

@@ -39,7 +39,7 @@
 
 def dbh__xml(path, contenttype, extension, roottag, nsurl):
     """ Generic XML Handler - Returns xml_generic for all XML files """
-    if contenttype.startswith('application/xml') or extension == "xlg" or extension == "xml":
+    if contenttype.startswith('application/xml') or contenttype.startswith("text/xml") or extension == "xlg" or extension == "xml":
         return "db_generic_XML_file"
     else:
         return False

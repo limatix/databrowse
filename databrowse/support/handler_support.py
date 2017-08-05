@@ -119,7 +119,7 @@ class handler_support:
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
-        if contenttype.startswith('application/xml'):
+        if contenttype.startswith('application/xml') or contenttype.startswith('text/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
         else:
             (roottag, nsurl) = ('','')
@@ -142,7 +142,7 @@ class handler_support:
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
-        if contenttype.startswith('application/xml'):
+        if contenttype.startswith('application/xml') or contenttype.startswith('text/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
         else:
             (roottag, nsurl) = ('','')
