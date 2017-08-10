@@ -96,7 +96,8 @@ scheme = "http://home"
 # OS differences
 CefWidgetParent = QWidget
 if LINUX and (PYQT4 or PYSIDE):
-    install = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    import config
+    install = config.location
     sys.path.insert(0, install)
     # TODO: Remove before release
     sys.path.insert(0, r"/media/sf_UbuntuSharedFiles/dataguzzler-lib/python")
@@ -104,7 +105,8 @@ if LINUX and (PYQT4 or PYSIDE):
     CefWidgetParent = QX11EmbedContainer
 
 if WINDOWS:
-    install = os.path.splitdrive(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))[1]
+    import config
+    install = os.path.splitdrive(config.location)[1]
     sys.path.insert(0, install)
     # TODO: Remove before release
     sys.path.insert(0, r"C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
