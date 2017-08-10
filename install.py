@@ -120,16 +120,21 @@ class Install(QWidget):
                 self.output_text.setText(self.output_text.text() + ">Done\r\n")
                 self.output_text.repaint()
                 self.output_text.setText(self.output_text.text() + ">Running setup.py\r\n")
+
+                os.chdir(self.path + "/databrowse-feature-cefdatabrowse")
+                f = open(os.getcwd() + "/cefdatabrowse/config.py", "w")
+                f.write("location = '" + os.getcwd() + "'")
+                f.close()
+
                 qt_app.processEvents()
 
-                setup(self.path).run()
+                if f.closed:
+                    setup(self.path).run()
 
                 if setup.isFinished:
                     self.output_text.setText(self.output_text.text() + ">Done\r\n")
                     self.output_text.repaint()
                     qt_app.processEvents()
-
-
 
     def cancel_app(self):
         qt_app.quit()
@@ -193,9 +198,6 @@ class setup(QThread):
         self.path = path
 
     def run(self):
-        os.chdir(self.path + "/databrowse-feature-cefdatabrowse")
-        file = open(os.getcwd() + "/cefdatabrowse/config.txt", "w")
-        file.write(os.getcwd())
         import subprocess
         subprocess.call(['python', 'setup.py', 'install'])
 
