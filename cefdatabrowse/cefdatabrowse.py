@@ -47,6 +47,16 @@ import sys
 from urlparse import urlparse
 import cefdatabrowse_support as dbp
 
+usr_path = ""
+try:
+    if sys.argv[1] is not None:
+        if os.path.exists(sys.argv[1]):
+            usr_path = sys.argv[1]
+        else:
+            raise ValueError("Invalid command line path")
+except IndexError:
+    pass
+
 # GLOBALS
 PYQT4 = False
 PYQT5 = False
@@ -622,7 +632,7 @@ class CefWidget(CefWidgetParent):
         window_info = cef.WindowInfo()
         rect = [0, 0, self.width(), self.height()]
         window_info.SetAsChild(self.getHandle(), rect)
-        self.browser = cef.CreateBrowserSync(window_info, url=scheme)
+        self.browser = cef.CreateBrowserSync(window_info, url=scheme + usr_path)
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
