@@ -238,8 +238,7 @@ class ClientHandler:
         if resHandler._resourceHandlerId in self._resourceHandlers:
             del self._resourceHandlers[resHandler._resourceHandlerId]
         else:
-            print("_ReleaseStrongReference() FAILED: resource handler " \
-                    "not found, id = %s" % (resHandler._resourceHandlerId))
+            print("_ReleaseStrongReference() FAILED: resource handler not found, id = %s" % (resHandler._resourceHandlerId))
 
 
 class ResourceHandler:
@@ -719,7 +718,7 @@ class LoadHandler(object):
             if LINUX:
                 print("[qt.py] LoadHandler.OnLoadStart:"
                       " keyboard focus fix no. 2 (Issue #284)")
-                browser.SetFocus(True)
+                # browser.SetFocus(True)        -- Seems like this isn't necessary
             self.initial_app_loading = False
 
 
@@ -790,7 +789,7 @@ class NavigationBar(QFrame):
 
     def onGoUrl(self):
         if self.cef_widget.browser:
-            self.cef_widget.browser.LoadUrl(self.url.text())
+            self.cef_widget.browser.LoadUrl(scheme + self.url.text())
 
     def updateState(self):
         browser = self.cef_widget.browser
@@ -803,7 +802,7 @@ class NavigationBar(QFrame):
         self.back.setEnabled(browser.CanGoBack())
         self.forward.setEnabled(browser.CanGoForward())
         self.reload.setEnabled(True)
-        self.url.setEnabled(False)
+        self.url.setEnabled(True)
         self.url.setText(browser.GetUrl().replace(scheme, ""))
 
     def createButton(self, name):

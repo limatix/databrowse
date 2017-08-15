@@ -342,7 +342,7 @@ def application(filename, params):
             itemslist = string.split(relpath, "/")[1:]
             count = 1
             if itemslist[0] != "":
-                topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="/"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (db_web_support.resurl, linkstring)
+                topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="/"><img src="%s/icons/go-home.png"/></a><a class="button" href="/">/</a>&gt;' % (db_web_support.resurl)
                 pass
             for item in itemslist:
                 if item != "" and count != len(itemslist):
