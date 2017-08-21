@@ -611,7 +611,8 @@ class CefWidget(CefWidgetParent):
 
     def focusInEvent(self, event):
         # This event seems to never get called on Linux, as CEF is
-        # stealing all focus due to Issue #284.
+        # stealing all focus due to Issue #284
+        # https://github.com/cztomczak/cefpython/issues/284.
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSetFocus(self.getHandle(), 0, 0, 0)
@@ -619,7 +620,8 @@ class CefWidget(CefWidgetParent):
 
     def focusOutEvent(self, event):
         # This event seems to never get called on Linux, as CEF is
-        # stealing all focus due to Issue #284.
+        # stealing all focus due to Issue #284
+        # https://github.com/cztomczak/cefpython/issues/284.
         if self.browser:
             self.browser.SetFocus(False)
 
