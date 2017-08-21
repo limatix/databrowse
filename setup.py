@@ -39,6 +39,15 @@
 import os
 from setuptools import setup, find_packages
 
+search_dirs = [('databrowse_wsgi', []), ('databrowse_app', [])]
+for search_dir in range(0, len(search_dirs)):
+    for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
+        for file in files:
+            if dir not in dict(search_dirs):
+                search_dirs.append((dir, []))
+            idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
+            search_dirs[idx][1].append(os.path.join(dir, file))
+
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
@@ -53,7 +62,8 @@ setup(
     url="http://limatix.org",
     version='0.7.6',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data = {'':['*.conf', '*.xml']},
+    package_data={'': ['*.conf', '*.xml']},
+    data_files=search_dirs,
     license="BSD-3",
     long_description=readfile('README.md'),
     test_suite='nose.collector',
