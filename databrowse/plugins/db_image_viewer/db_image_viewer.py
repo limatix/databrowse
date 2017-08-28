@@ -39,6 +39,7 @@
 import os
 import os.path
 import time
+import platform
 import pwd
 import grp
 from stat import *
@@ -106,9 +107,12 @@ class db_image_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                 xmlchild.text = "%s:%s" % (username, groupname)
 
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if platform.system() is "Windows":
+                    contenttype = magic.from_file(self._fullpath, mime=True)
+                else:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(self._fullpath)
                 xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
@@ -166,9 +170,12 @@ class db_image_viewer(renderer_class):
             xmlroot = etree.Element('{%s}image' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
-            magicstore = magic.open(magic.MAGIC_MIME)
-            magicstore.load()
-            contenttype = magicstore.file(self._fullpath)
+            if platform.system() is "Windows":
+                contenttype = magic.from_file(self._fullpath, mime=True)
+            else:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(self._fullpath)
             if "thumbnail" in self._web_support.req.form:
                 ext = os.path.splitext(self._fullpath)[1]
                 if ext == '.tif' or ext == '.tiff':

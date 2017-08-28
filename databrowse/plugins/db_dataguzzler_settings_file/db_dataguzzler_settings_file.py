@@ -80,9 +80,12 @@ class db_dataguzzler_settings_file(renderer_class):
                 return xmlroot
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if platform.system() is "Windows":
+                    contenttype = magic.from_file(self._fullpath, mime=True)
+                else:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(self._fullpath)
                 f = open(self._fullpath, "rb")
                 if "ContentType" in self._web_support.req.form:
                     self._web_support.req.response_headers['Content-Type'] = self._web_support.req.form["ContentType"].value
