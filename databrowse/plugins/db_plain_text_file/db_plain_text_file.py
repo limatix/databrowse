@@ -99,9 +99,12 @@ class db_plain_text_file(renderer_class):
                     file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
                     file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                     file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-                    magicstore = magic.open(magic.MAGIC_MIME)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    if sys.platform is "Windows":
+                        contenttype = magic.from_file(self._fullpath, mime=True)
+                    else:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(self._fullpath)
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
 
@@ -151,9 +154,12 @@ class db_plain_text_file(renderer_class):
                     return xmlroot
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if sys.platform is "Windows":
+                    contenttype = magic.from_file(self._fullpath, mime=True)
+                else:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(self._fullpath)
                 f = open(self._fullpath, "rb")
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

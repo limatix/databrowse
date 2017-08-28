@@ -38,6 +38,7 @@
 
 import os
 import os.path
+import platform
 import magic
 import ConfigParser
 import pkgutil
@@ -110,12 +111,15 @@ class handler_support:
 
     def GetHandler(self, fullpath):
         """ Return the handler given a full path """
-        magicstore = magic.open(magic.MAGIC_MIME)
-        magicstore.load()
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            if platform.system() is "Windows":
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
+            else:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
@@ -133,12 +137,15 @@ class handler_support:
 
     def GetHandlerAndIcon(self, fullpath):
         """ Return the handler given a full path """
-        magicstore = magic.open(magic.MAGIC_MIME)
-        magicstore.load()
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            if platform.system() is "Windows":
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
+            else:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
