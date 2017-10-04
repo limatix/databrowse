@@ -44,6 +44,7 @@ import ConfigParser
 import pkgutil
 import databrowse.plugins
 import re
+import databrowse.support.databrowse_magic as dbmagic
 
 
 class handler_support:
@@ -141,7 +142,8 @@ class handler_support:
             contenttype = "directory"
         else:
             if platform.system() is "Windows":
-                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
+                # Redirect to windows magic system
+                contenttype = dbmagic.file_type(fullpath)
             else:
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()

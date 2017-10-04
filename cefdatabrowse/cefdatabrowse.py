@@ -101,7 +101,7 @@ MAC = (platform.system() == "Darwin")
 # Configuration
 WIDTH = 800
 HEIGHT = 600
-scheme = "http://home"
+scheme = "http://127.0.0.1"
 
 # OS differences
 CefWidgetParent = QWidget

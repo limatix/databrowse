@@ -46,6 +46,7 @@ if platform.system() == "Linux":
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
+import databrowse.support.databrowse_magic as dbmagic
 import magic
 
 
@@ -99,8 +100,8 @@ class db_plain_text_file(renderer_class):
                     file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
                     file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                     file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-                    if sys.platform is "Windows":
-                        contenttype = magic.from_file(self._fullpath, mime=True)
+                    if platform.system() is "Windows":
+                        contenttype = dbmagic.file_type(self._fullpath)
                     else:
                         magicstore = magic.open(magic.MAGIC_MIME)
                         magicstore.load()

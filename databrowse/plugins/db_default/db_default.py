@@ -40,8 +40,9 @@ import os
 import os.path
 import time
 import platform
-import pwd
-import grp
+if platform.system() is "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -116,10 +117,11 @@ class db_default(renderer_class):
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
-                    username = pwd.getpwuid(st[ST_UID])[0]
-                    groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                    xmlchild.text = "%s:%s" % (username, groupname)
+                    if platform.system() is "Linux":
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                        groupname = grp.getgrgid(st[ST_GID])[0]
+                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                        xmlchild.text = "%s:%s" % (username, groupname)
 
                     return xmlroot
             elif self._content_mode == "raw":
