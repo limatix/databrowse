@@ -230,3 +230,30 @@
             </tbody>
         </table>
 </xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:autoexp" mode="displaydcvalue">
+		    <table class="cream autoexp">
+                <xsl:attribute name="id">datatable_autoexp_<xsl:number/></xsl:attribute>
+                <thead>
+                    <tr>
+                        <xsl:for-each select="dc:automeas[1]/*">
+                            <xsl:variable name="autoexpname"><xsl:value-of select="local-name()"/></xsl:variable>
+                            <th>
+                                <xsl:value-of select="$autoexpname"/>
+                                <xsl:if test="normalize-space(@dcv:units)!=''">&#160;(<xsl:value-of select="@dcv:units"/>)</xsl:if>
+                            </th>
+                        </xsl:for-each>
+                    </tr>
+                </thead>
+                <tbody>
+				    <xsl:for-each select="dc:automeas">
+					    <tr>
+                            <xsl:for-each select="*">
+                                <td>
+                                    <xsl:value-of select="." />
+                                </td>
+                            </xsl:for-each>
+                        </tr>
+                    </xsl:for-each>
+				</tbody>
+            </table>
+</xsl:template>
