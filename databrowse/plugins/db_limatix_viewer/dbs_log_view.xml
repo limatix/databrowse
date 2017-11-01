@@ -181,6 +181,19 @@
     </xsl:if>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="lip:process" mode="full">
+    <h3>Processing Summary</h3>
+    <table class="cream full-width">
+        <thead>
+            <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <tr><th>Processing Script</th><td><a><xsl:attribute name="href"><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></a></td></tr>
+            <tr><th>Start Time</th><td><xsl:value-of select="lip:starttimestamp" /></td></tr>
+            <tr><th>Host</th><td><xsl:value-of select="lip:hostname/@username"/>@<xsl:value-of select="lip:hostname"/></td></tr>
+            <tr><th>Arguments</th><td><xsl:value-of select="lip:argv" /></td></tr>
+            <tr><th>Input File</th><td><a><xsl:attribute name="href"><xsl:value-of select="lip:inputfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:inputfile/@xlink:href" /></a></td></tr>
+        </tbody>
+    </table>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" mode="full">
     <h3>Configuration</h3>
