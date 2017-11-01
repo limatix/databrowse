@@ -38,7 +38,7 @@
 
 import os
 import qrcode
-import Image
+from PIL import Image
 import StringIO
 import subprocess
 from lxml import etree
@@ -213,7 +213,7 @@ class db_specimen(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
                     sf = open(self._fullpath, "r")
                     sdbfile = etree.parse(sf)

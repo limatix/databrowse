@@ -126,7 +126,7 @@ class db_office_viewer(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
                     self.PrepareCacheDir()
                     os.environ["HOME"] = "/home/www/.home"
@@ -143,7 +143,7 @@ class db_office_viewer(renderer_class):
                         if 'wsgi.file_wrapper' in self._web_support.req.environ:
                             return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                         else:
-                            return iter(lambda: f.read(1024))
+                            return iter(lambda: f.read(1024), '')
                     except Exception as err:
                         raise self.RendererException("Unable to Generate PDF File - Check File Permissions")
             else:
@@ -160,7 +160,7 @@ class db_office_viewer(renderer_class):
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:
                     return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                 else:
-                    return iter(lambda: f.read(1024))
+                    return iter(lambda: f.read(1024), '')
         else:
             raise self.RendererException("Invalid Content Mode")
         pass
