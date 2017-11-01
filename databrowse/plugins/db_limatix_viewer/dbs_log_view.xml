@@ -165,14 +165,14 @@
                     <a>
                         <xsl:choose>
                             <xsl:when test="@xlink:href and not(@xlink:href='')">
-                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="@xlink:href"/></xsl:attribute>
+                                <xsl:attribute name="href"><xsl:value-of select="@xlink:href"/></xsl:attribute>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:attribute name="href"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:value-of select="."/></xsl:attribute>
+                                <xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
                             </xsl:otherwise>
                         </xsl:choose>
                         <img>
-                            <xsl:attribute name="src"><xsl:value-of select="//dc:experiment/@reldesturl"/>/<xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
+                            <xsl:attribute name="src"><xsl:choose><xsl:when test="@xlink:href and not(@xlink:href='')"><xsl:value-of select="@xlink:href"/></xsl:when><xsl:otherwise><xsl:value-of select="."/></xsl:otherwise></xsl:choose>?content_mode=raw&amp;thumbnail=small</xsl:attribute>
                         </img>
                     </a>
                 </li>
