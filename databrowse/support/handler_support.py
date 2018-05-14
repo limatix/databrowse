@@ -38,13 +38,11 @@
 
 import os
 import os.path
-import platform
-import magic
 import ConfigParser
 import pkgutil
 import databrowse.plugins
 import re
-import databrowse.support.databrowse_magic as dbmagic
+import magic
 
 
 class handler_support:
@@ -115,12 +113,12 @@ class handler_support:
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            if platform.system() is "Windows":
-                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
-            else:
+            try:
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
+            except AttributeError:
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
@@ -141,13 +139,12 @@ class handler_support:
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            if platform.system() is "Windows":
-                # Redirect to windows magic system
-                contenttype = dbmagic.file_type(fullpath)
-            else:
+            try:
                 magicstore = magic.open(magic.MAGIC_MIME)
                 magicstore.load()
                 contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
+            except AttributeError:
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]

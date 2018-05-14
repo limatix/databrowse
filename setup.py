@@ -37,6 +37,7 @@
 """ setup.py - Main Install Script """
 
 import os
+import requirements as r
 from setuptools import setup, find_packages
 
 search_dirs = [('databrowse_wsgi', []), ('databrowse_app', [])]
@@ -53,6 +54,11 @@ def readfile(filename):
     """ Utility Function to Read the Readme File """
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
+
+with open(r.select_requirements_file(), 'r') as f:
+    reqs = f.read().splitlines()
+
+
 setup(
     name="databrowse",
     author="Tyler Lesthaeghe",
@@ -68,15 +74,7 @@ setup(
     long_description=readfile('README.md'),
     test_suite='nose.collector',
     zip_safe=False,
-    install_requires=[
-        'lxml>=3.2.0',
-        'file-magic>=0.1',
-        'numpy>=1.8.0',
-        'pillow>=2.3.0,<4',
-        'qrcode>=4.0',
-        'cefpython3>=57.0'
-        #'unittest2>=0.5.1'
-    ],
+    install_requires=reqs,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",

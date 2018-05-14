@@ -51,7 +51,7 @@ usr_path = ""
 try:
     if sys.argv[1] is not None:
         if os.path.exists(sys.argv[1]):
-            usr_path = sys.argv[1]
+            usr_path = os.path.splitdrive(sys.argv[1])[1]
         else:
             raise ValueError("Invalid command line path")
 except IndexError:
@@ -101,7 +101,8 @@ MAC = (platform.system() == "Darwin")
 # Configuration
 WIDTH = 800
 HEIGHT = 600
-scheme = "http://127.0.0.1"
+# TODO: Check this in linux
+scheme = "file://127.0.0.1"
 
 # OS differences
 CefWidgetParent = QWidget
@@ -109,7 +110,7 @@ if LINUX and (PYQT4 or PYSIDE):
     install = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     sys.path.insert(0, install)
     # TODO: Remove before release
-    sys.path.insert(0, r"/media/sf_UbuntuSharedFiles/dataguzzler-lib/python")
+    # sys.path.insert(0, r"/media/sf_UbuntuSharedFiles/dataguzzler-lib/python")
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
 
@@ -117,17 +118,20 @@ if WINDOWS:
     install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
     sys.path.insert(0, install)
     # TODO: Remove before release
-    sys.path.insert(0, r"C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
+    # sys.path.insert(0, r"C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
 
 
 class ClientHandler:
+
     # RequestHandler.GetResourceHandler()
     def GetResourceHandler(self, browser, frame, request):
         # Called on the IO thread before a resource is loaded.
         # To allow the resource to load normally return None.
         print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
-        # print(parsedurl)
+
+        if parsedurl.netloc != urlparse(scheme).netloc:
+            return None
 
         if LINUX:
             relpath = os.path.relpath(parsedurl.path)
@@ -138,8 +142,6 @@ class ClientHandler:
         else:
             relpath = None
             fullpath = None
-        # print(relpath)
-        # print(fullpath)
 
         urlparams = {}
         if parsedurl.query != "":
@@ -514,9 +516,7 @@ class WebRequestClient:
 def main():
     check_versions()
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    commandlineargs = {"allow-file-access-from-files": "", "allow-file-access": "", "disable-web-security": "",
-                       "user-data-dir": ""}
-    cef.Initialize(None, commandlineargs)
+    cef.Initialize(None)
     app = CefApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
@@ -799,7 +799,15 @@ class NavigationBar(QFrame):
 
     def onGoUrl(self):
         if self.cef_widget.browser:
-            self.cef_widget.browser.LoadUrl(scheme + self.url.text())
+            parse_text = urlparse(self.url.text())
+
+            if not self.url.text().startswith("/"):
+                self.url.setText("/" + self.url.text())
+
+            if parse_text.scheme == "":
+                self.url.setText(scheme + self.url.text())
+
+            self.cef_widget.browser.LoadUrl(self.url.text())
 
     def updateState(self):
         browser = self.cef_widget.browser
@@ -823,6 +831,7 @@ class NavigationBar(QFrame):
         button.setIcon(icon)
         button.setIconSize(pixmap.rect().size())
         return button
+
 
 if __name__ == '__main__':
     main()

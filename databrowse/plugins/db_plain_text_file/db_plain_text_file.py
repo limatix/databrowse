@@ -39,15 +39,17 @@
 import os
 import os.path
 import time
-import platform
-if platform.system() == "Linux":
-    import pwd
-    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
-import databrowse.support.databrowse_magic as dbmagic
-import magic
+
+import platform
+if platform.system() == "Windows":
+    import databrowse.support.databrowse_magic as dbmagic
+else:
+    import pwd
+    import grp
+    import magic
 
 
 class db_plain_text_file(renderer_class):

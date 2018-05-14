@@ -1,0 +1,8 @@
+lxml>=3.2.0
+numpy>=1.8.0
+pillow>=2.3.0,<4
+qrcode>=4.0
+unittest2>=0.5.1
+cefpython3>=57.0
+pyside>=1.2.4
+python-magic-bin>=0.4.14
