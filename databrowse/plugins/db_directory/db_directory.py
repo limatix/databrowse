@@ -96,41 +96,42 @@ class db_directory(renderer_class):
         if recursion_depth != 0:
             caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
-            for item in dirlist:
-                itemrelpath = os.path.join(self._relpath, item).replace("\\", "/")
-                itemfullpath = os.path.join(self._fullpath, item).replace("\\", "/")
-                try:
-                    (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
-                    handler = handlers[-1]
-                    if handler in self._handler_support.directoryplugins:
-                        icon = self._handler_support.directoryplugins[handler]
-                    if handler in self._handler_support.directoryplugins:
-                        renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
-                    else:
-                        exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-                        exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
-                    content = renderer.getContent()
-                    if os.path.islink(itemfullpath):
-                        overlay = "link"
-                    elif not os.access(itemfullpath, os.W_OK):
-                        overlay = "readonly"
-                    elif not os.access(itemfullpath, os.R_OK):
-                        overlay = "unreadable"
-                    else:
-                        overlay = "none"
-                    if content is not None and content.tag.startswith("{%s}" % self._namespace_uri):
-                        content.set('icon', icon)
-                        content.set('overlay', overlay)
-                        xmlroot.append(content)
-                    else:
-                        xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
-                        if content is not None:
-                            xmlchild.append(content)
-                            pass
-                    pass
-                except IOError:
-                    print("You don't have access to %s" % itemfullpath)
-            pass
+            if dirlist is not None:
+                for item in dirlist:
+                    itemrelpath = os.path.join(self._relpath, item).replace("\\", "/")
+                    itemfullpath = os.path.join(self._fullpath, item).replace("\\", "/")
+                    try:
+                        (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
+                        handler = handlers[-1]
+                        if handler in self._handler_support.directoryplugins:
+                            icon = self._handler_support.directoryplugins[handler]
+                        if handler in self._handler_support.directoryplugins:
+                            renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
+                        else:
+                            exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
+                            exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                        content = renderer.getContent()
+                        if os.path.islink(itemfullpath):
+                            overlay = "link"
+                        elif not os.access(itemfullpath, os.W_OK):
+                            overlay = "readonly"
+                        elif not os.access(itemfullpath, os.R_OK):
+                            overlay = "unreadable"
+                        else:
+                            overlay = "none"
+                        if content is not None and content.tag.startswith("{%s}" % self._namespace_uri):
+                            content.set('icon', icon)
+                            content.set('overlay', overlay)
+                            xmlroot.append(content)
+                        else:
+                            xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
+                            if content is not None:
+                                xmlchild.append(content)
+                                pass
+                        pass
+                    except IOError:
+                        print("You don't have access to %s" % itemfullpath)
+                pass
         else:
             #ajax url and what not
             xmlroot.set("ajax", "True")
