@@ -257,7 +257,6 @@ class web_support:
             pass
 
         if self.logouturl is None:
-            # TODO Figure out what to do with users
             self.logouturl = "http://localhost/logout"
             pass
 

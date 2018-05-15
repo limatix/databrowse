@@ -104,21 +104,22 @@ HEIGHT = 600
 # TODO: Check this in linux
 scheme = "file://127.0.0.1"
 
+dataroot = "/"
+
+if usr_path == "":
+    usr_path = dataroot
+
 # OS differences
 CefWidgetParent = QWidget
 if LINUX and (PYQT4 or PYSIDE):
     install = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
     sys.path.insert(0, install)
-    # TODO: Remove before release
-    # sys.path.insert(0, r"/media/sf_UbuntuSharedFiles/dataguzzler-lib/python")
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
 
 if WINDOWS:
     install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
     sys.path.insert(0, install)
-    # TODO: Remove before release
-    # sys.path.insert(0, r"C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
 
 
 class ClientHandler:
@@ -127,7 +128,7 @@ class ClientHandler:
     def GetResourceHandler(self, browser, frame, request):
         # Called on the IO thread before a resource is loaded.
         # To allow the resource to load normally return None.
-        print("GetResourceHandler(): url = %s" % request.GetUrl())
+        # print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
         if parsedurl.netloc != urlparse(scheme).netloc:
@@ -208,7 +209,7 @@ class ClientHandler:
             params = databrowsepaths.copy()
             params.update(urlparams)
             html = dbp.application(fullpath, params)
-            print("STATUS: %s" % html[2])
+            # print("STATUS: %s" % html[2])
             data = "".join(html[0])
             urlparams.update({'headers': html[1], "status": html[2]})
             # print("HTML Ouput: %s" % data)

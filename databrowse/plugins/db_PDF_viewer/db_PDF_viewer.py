@@ -72,12 +72,15 @@ class db_PDF_viewer(renderer_class):
                     file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
                     file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                     file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-                    if platform.system() is "Windows":
-                        contenttype = magic.from_file(self._fullpath, mime=True)
-                    else:
+                    try:
                         magicstore = magic.open(magic.MAGIC_MIME)
                         magicstore.load()
-                        contenttype = magicstore.file(self._fullpath)
+                        contenttype = magicstore.file(
+                            os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                    except AttributeError:
+                        contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                    if contenttype is None:
+                        contenttype = "text/plain"
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
 
@@ -122,12 +125,15 @@ class db_PDF_viewer(renderer_class):
                     return xmlroot
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
-                if platform.system() is "Windows":
-                    contenttype = magic.from_file(self._fullpath, mime=True)
-                else:
+                try:
                     magicstore = magic.open(magic.MAGIC_MIME)
                     magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 f = open(self._fullpath, "rb")
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

@@ -40,8 +40,9 @@ import os
 import os.path
 import platform
 import time
-import pwd
-import grp
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -104,12 +105,15 @@ class db_office_viewer(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                 xmlchild.text = "%s:%s" % (username, groupname)
 
-                if platform.system() is "Windows":
-                    contenttype = magic.from_file(self._fullpath, mime=True)
-                else:
+                try:
                     magicstore = magic.open(magic.MAGIC_MIME)
                     magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
@@ -151,12 +155,15 @@ class db_office_viewer(renderer_class):
                     except Exception as err:
                         raise self.RendererException("Unable to Generate PDF File - Check File Permissions")
             else:
-                if platform.system() is "Windows":
-                    contenttype = magic.from_file(self._fullpath, mime=True)
-                else:
+                try:
                     magicstore = magic.open(magic.MAGIC_MIME)
                     magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 size = os.path.getsize(self._fullpath)
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)
