@@ -59,6 +59,8 @@ class db_office_viewer(renderer_class):
     _default_style_mode = "preview_office_document"
     _default_recursion_depth = 2
 
+    _officepath = "/usr/bin/soffice"
+
     def getContent(self):
         if self._content_mode == "full":
             try:
@@ -100,10 +102,11 @@ class db_office_viewer(renderer_class):
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
-                username = pwd.getpwuid(st[ST_UID])[0]
-                groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                xmlchild.text = "%s:%s" % (username, groupname)
+                if platform.system() == "Linux":
+                    username = pwd.getpwuid(st[ST_UID])[0]
+                    groupname = grp.getgrgid(st[ST_GID])[0]
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                    xmlchild.text = "%s:%s" % (username, groupname)
 
                 try:
                     magicstore = magic.open(magic.MAGIC_MIME)
@@ -138,7 +141,11 @@ class db_office_viewer(renderer_class):
                 else:
                     self.PrepareCacheDir()
                     os.environ["HOME"] = "/home/www/.home"
-                    subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
+                    try:
+                        subprocess.call([self._officepath, "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
+                    except OSError as e:
+                        if e.errno == os.errno.ENOENT:
+                            raise self.RendererException("Libreoffice path not correct or not installed.")
                     try:
                         size = os.path.getsize(self.getCacheFileName(None, 'pdf'))
                         f = self.getCacheFileHandler('rb', None, 'pdf')

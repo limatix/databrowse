@@ -317,7 +317,7 @@ def application(filename, params):
         handler_support = handler_support_module.handler_support(db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
         handler = handlers[-1]
-        print("Selected Handler: %s" % handler)
+        # print("Selected Handler: %s" % handler)
 
         # Let's see if we want to override the default handler
         if "handler" in db_web_support.req.form:
@@ -325,7 +325,7 @@ def application(filename, params):
             pass
 
         # Get A Handle to The Rendering Plugin
-        caller = "databrowse"
+        caller = "cefdatabrowse"
         exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
         exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\

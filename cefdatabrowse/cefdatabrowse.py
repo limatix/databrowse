@@ -60,35 +60,43 @@ except IndexError:
 # GLOBALS
 PYQT4 = False
 PYQT5 = False
-PYSIDE = True
+PYSIDE = False
 
-if PYQT4 is True:
+try:
     # noinspection PyUnresolvedReferences
     from PyQt4.QtGui import *
     # noinspection PyUnresolvedReferences
     from PyQt4.QtCore import *
-elif PYQT5 is True:
-    # noinspection PyUnresolvedReferences
-    from PyQt5.QtGui import *
-    # noinspection PyUnresolvedReferences
-    from PyQt5.QtCore import *
-    # noinspection PyUnresolvedReferences
-    from PyQt5.QtWidgets import *
-elif PYSIDE is True:
-    # noinspection PyUnresolvedReferences
-    import PySide
-    # noinspection PyUnresolvedReferences
-    from PySide import QtCore
-    # noinspection PyUnresolvedReferences
-    from PySide.QtGui import *
-    # noinspection PyUnresolvedReferences
-    from PySide.QtCore import *
-else:
-    print("USAGE:")
-    print("  qt.py pyqt4")
-    print("  qt.py pyqt5")
-    print("  qt.py pyside")
-    sys.exit(1)
+
+    PYQT4 = True
+except Exception:
+    try:
+        # noinspection PyUnresolvedReferences
+        import PySide
+        # noinspection PyUnresolvedReferences
+        from PySide import QtCore
+        # noinspection PyUnresolvedReferences
+        from PySide.QtGui import *
+        # noinspection PyUnresolvedReferences
+        from PySide.QtCore import *
+
+        PYSIDE = True
+    except Exception:
+        try:
+            # noinspection PyUnresolvedReferences
+            from PyQt5.QtGui import *
+            # noinspection PyUnresolvedReferences
+            from PyQt5.QtCore import *
+            # noinspection PyUnresolvedReferences
+            from PyQt5.QtWidgets import *
+
+            PYQT5 = True
+        except Exception:
+            print("You need to install one of the following:")
+            print("pyqt4")
+            print("pyside")
+            print("pyqt5")
+            sys.exit(1)
 
 # Fix for PyCharm hints warnings when using static methods
 WindowUtils = cef.WindowUtils()
@@ -204,7 +212,7 @@ class ClientHandler:
         # print("_OnResourceResponse()")
         # print("data length = %s" % len(data))
         # Return the new data - you can modify it.
-        if handler is "databrowse":
+        if handler is "cefdatabrowse":
             databrowsepaths = {'install': install, 'path': fullpath}
             params = databrowsepaths.copy()
             params.update(urlparams)
@@ -383,7 +391,7 @@ class DatabrowseHandler:
         self._responseHeadersReadyCallback = callback
         self._webRequestClient = WebRequestClient()
         self._webRequestClient._resourceHandler = self
-        self._webRequestClient._filetype = "databrowse"
+        self._webRequestClient._filetype = "cefdatabrowse"
         # Need to set AllowCacheCredentials and AllowCookies for
         # the cookies to work during POST requests (Issue 127).
         # To skip cache set the SkipCache request flag.
@@ -524,6 +532,7 @@ def main():
     main_window.show()
     main_window.activateWindow()
     main_window.raise_()
+    main_window.setAttribute(Qt.WA_DeleteOnClose, True)
     app.exec_()
     app.stopTimer()
     del main_window  # Just to be safe, similarly to "del app"
@@ -539,6 +548,7 @@ def check_versions():
         print("[qt.py] PyQt {v1} (qt {v2})".format(
               v1=PYQT_VERSION_STR, v2=qVersion()))
     elif PYSIDE:
+        print("PyQt4 or PyQt5 is preferred.")
         print("[qt.py] PySide {v1} (qt {v2})".format(
               v1=PySide.__version__, v2=QtCore.__version__))
     # CEF Python version requirement

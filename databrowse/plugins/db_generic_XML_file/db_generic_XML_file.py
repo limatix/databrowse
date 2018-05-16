@@ -40,8 +40,9 @@ import os
 import os.path
 import time
 import platform
-import pwd
-import grp
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -58,7 +59,7 @@ class db_generic_XML_file(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full":
@@ -111,10 +112,11 @@ class db_generic_XML_file(renderer_class):
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
-                    username = pwd.getpwuid(st[ST_UID])[0]
-                    groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                    xmlchild.text = "%s:%s" % (username, groupname)
+                    if platform.system() == "Linux":
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                        groupname = grp.getgrgid(st[ST_GID])[0]
+                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                        xmlchild.text = "%s:%s" % (username, groupname)
 
                     # Contents of File
                     f = open(self._fullpath)

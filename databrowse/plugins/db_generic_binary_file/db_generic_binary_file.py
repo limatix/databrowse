@@ -40,8 +40,9 @@ import os
 import os.path
 import time
 import platform
-import pwd
-import grp
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -86,7 +87,7 @@ class db_generic_binary_file(renderer_class):
         f.close()
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full":
@@ -139,10 +140,11 @@ class db_generic_binary_file(renderer_class):
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
-                    username = pwd.getpwuid(st[ST_UID])[0]
-                    groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                    xmlchild.text = "%s:%s" % (username, groupname)
+                    if platform.system() == "Linux":
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                        groupname = grp.getgrgid(st[ST_GID])[0]
+                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                        xmlchild.text = "%s:%s" % (username, groupname)
 
                     ajaxlink = self.getURL(self._relpath, content_mode="ajax")
                     xmlchild = etree.SubElement(xmlroot, "contentinfo", nsmap=self.nsmap, ajaxlink=ajaxlink, offset=str(0), numofoffsets="20", size=str(file_size))

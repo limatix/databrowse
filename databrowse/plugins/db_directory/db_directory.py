@@ -49,7 +49,7 @@ class db_directory(renderer_class):
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dir"
     _namespace_local = "dir"
     _default_content_mode = "title"
-    _default_style_mode = "list_cef"
+    _default_style_mode = "list"
     _default_recursion_depth = 1
 
     def recursiveloop(self, dirname, chxlist):
@@ -67,8 +67,10 @@ class db_directory(renderer_class):
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
         """ Load all of the values provided by initialization """
+        if caller == "cefdatabrowse":
+            style_mode = "list_cef"
         super(db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
-        if caller == "databrowse":
+        if caller == "databrowse" or caller == "cefdatabrowse":
             uphref = self.getURLToParent(self._relpath)
             xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
             topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', nsmap=self.nsmap, xmlns="http://www.w3.org/1999/xhtml")
@@ -137,7 +139,7 @@ class db_directory(renderer_class):
             xmlroot.set("ajax", "True")
             xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
             pass
-        if self._caller == "databrowse" and self._web_support.checklistpath is not None:
+        if (self._caller == "databrowse" or self._caller == "cefdatabrowse") and self._web_support.checklistpath is not None:
             chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri), nsmap=self.nsmap)
             #chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
 

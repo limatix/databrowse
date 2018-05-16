@@ -39,8 +39,10 @@
 import os
 import os.path
 import time
-import pwd
-import grp
+import platform
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -57,7 +59,7 @@ class db_dataguzzler_settings_file(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full":
