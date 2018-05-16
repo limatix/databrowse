@@ -49,7 +49,7 @@ class db_directory(renderer_class):
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dir"
     _namespace_local = "dir"
     _default_content_mode = "title"
-    _default_style_mode = "list"
+    _default_style_mode = "list_cef"
     _default_recursion_depth = 1
 
     def recursiveloop(self, dirname, chxlist):
