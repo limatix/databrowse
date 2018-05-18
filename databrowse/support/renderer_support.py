@@ -336,7 +336,7 @@ class renderer_class(object):
             return self.getURL(relpath, **kwargs)
             pass
         else:
-            relpath = os.path.abspath(relpath + '/../')
+            relpath = os.path.splitdrive(os.path.abspath(relpath + '/../'))[1]
             return self.getURL(relpath, **kwargs)
             pass
         pass
@@ -345,28 +345,29 @@ class renderer_class(object):
         """ Build a Sorted List of Files with Appropriate Files Removed """
         #print "getDirectoryList being called"
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
-        reallist = os.listdir(fullpath)
-        if "showhiddenfiles" in self._web_support.req.form:
-            returnlist = reallist
-        else:
-            removelist = copy.copy(reallist)
-            for item in hiddenlist:
-                removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
-                pass
-            addlist = []
-            for item in shownlist:
-                addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
-                pass
-            returnlist = list(set(removelist + addlist))
-        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        try:
+            reallist = os.listdir(fullpath)
+            if "showhiddenfiles" in self._web_support.req.form:
+                returnlist = reallist
+            else:
+                removelist = copy.copy(reallist)
+                for item in hiddenlist:
+                    removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
+                    pass
+                addlist = []
+                for item in shownlist:
+                    addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
+                    pass
+                returnlist = list(set(removelist + addlist))
+            exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
 
-        returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
-        returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
-        returnlist = returndirlist
-        returnlist.extend(returnfilelist)
-
-        return returnlist
-
+            returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
+            returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
+            returnlist = returndirlist
+            returnlist.extend(returnfilelist)
+            return returnlist
+        except WindowsError:
+            print("You don't have access to %s" % fullpath)
         pass
 
     class CacheFileHandler(file):

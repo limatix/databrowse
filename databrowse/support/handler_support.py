@@ -38,11 +38,11 @@
 
 import os
 import os.path
-import magic
 import ConfigParser
 import pkgutil
 import databrowse.plugins
 import re
+import magic
 
 
 class handler_support:
@@ -110,16 +110,19 @@ class handler_support:
 
     def GetHandler(self, fullpath):
         """ Return the handler given a full path """
-        magicstore = magic.open(magic.MAGIC_MIME)
-        magicstore.load()
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            try:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
+            except AttributeError:
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
-        if contenttype.startswith('application/xml'):
+        if contenttype.startswith('application/xml') or contenttype.startswith('text/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
         else:
             (roottag, nsurl) = ('','')
@@ -133,16 +136,19 @@ class handler_support:
 
     def GetHandlerAndIcon(self, fullpath):
         """ Return the handler given a full path """
-        magicstore = magic.open(magic.MAGIC_MIME)
-        magicstore.load()
         if os.path.isdir(os.path.realpath(fullpath)) is True:
             contenttype = "directory"
         else:
-            contenttype = magicstore.file(os.path.realpath(fullpath))    # real path to resolve symbolic links outside of dataroot
+            try:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(os.path.realpath(fullpath))       # real path to resolve symbolic links outside of dataroot
+            except AttributeError:
+                contenttype = magic.from_file(os.path.realpath(fullpath), mime=True)
             if contenttype is None:
                 contenttype = "text/plain"
         extension = os.path.splitext(fullpath)[1][1:]
-        if contenttype.startswith('application/xml'):
+        if contenttype.startswith('application/xml') or contenttype.startswith('text/xml'):
             (roottag, nsurl) = self.GetXMLRootAndNamespace(fullpath)
         else:
             (roottag, nsurl) = ('','')

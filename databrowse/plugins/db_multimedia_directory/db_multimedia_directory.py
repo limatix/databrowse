@@ -47,7 +47,7 @@ class db_multimedia_directory(db_directory_module.db_directory):
     _default_recursion_depth = 1
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
-        if caller == "databrowse":
+        if caller == "databrowse" or caller == "cefdatabrowse":
             self._namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/imgdir"
             self._namespace_local = "imgdir"
         else:

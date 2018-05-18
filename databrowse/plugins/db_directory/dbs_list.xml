@@ -254,7 +254,7 @@
 
                     function startchecklist(checklistname) {
                         var PostForm = document.createElement("form");
-                        PostForm.method = "POST";
+                        PostForm.method = "GET";
                         PostForm.action = checklistname;
                         var PostInput = document.createElement("input");
                         PostInput.setAttribute("name", "dest");
@@ -282,7 +282,7 @@
                         if(newdirname) {
                             var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
                             $.ajax({
-                                type: "POST",
+                                type: "GET",
                                 url: ajaxurl,
                                 data: { dirname: newdirname }
                             }).done(function(msg) {
@@ -305,7 +305,7 @@
                         if(newdirname && newdirname != curname) {
                             var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=rename";
                             $.ajax({
-                                type: "POST",
+                                type: "GET",
                                 url: ajaxurl,
                                 data: { newname: newdirname }
                             }).done(function(msg) {
@@ -328,7 +328,7 @@
                         var relpathlist = relpath.slice(1).split("/");
                         if(confirm('Are you sure you want to delete "'+relpath+'"?')) {
                             $.ajax({
-                                type: "POST",
+                                type: "GET",
                                 url: ajaxurl,
                             }).done(function(msg) {
                                 if(msg=="Item Moved To Trash Successfully") {
@@ -462,17 +462,17 @@
                     list-style-type: none;
                     margin: 0px;
                     padding: 0 0px;
-                    background: url('<xsl:value-of select="/dir:dir/@resurl"/>/vline.png') repeat-y;
+                    <!--background: url('<xsl:value-of select="$resdir"/>/vline.png') repeat-y;-->
                 }
                 .item {
                     margin: 0px;
                     padding: 0 18px;
                     line-height:20px;
-                    background: url('<xsl:value-of select="/dir:dir/@resurl"/>/node.png'), url('<xsl:value-of select="/dir:dir/@resurl"/>/vline.png');
+                    <!--background: url('<xsl:value-of select="$resdir"/>/node.png'), url('<xsl:value-of select="$resdir"/>/vline.png');-->
                     background-repeat: no-repeat, repeat-y;
                 }
                 ul.tree li:last-child{
-                    background: #fff url('<xsl:value-of select="/dir:dir/@resurl"/>/lastnode.png') no-repeat;
+                    <!--background: #fff url('<xsl:value-of select="$resdir"/>/lastnode.png') no-repeat;-->
                 }
                 ul.root {
                     margin: 0px;
@@ -772,12 +772,12 @@
                 </img>
                 <span class="menuitemcomponent">Start Checklist Here</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onclick="openuploadwindow(); clearContextMenu('contextmenu');">
-                <img class="menuitemcomponent">
-                    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
-                </img>
-                <span class="menuitemcomponent">Upload File Here</span>
-            </div>
+            <!--<div class="menuitemcomponent contextmenuitem" onclick="openuploadwindow(); clearContextMenu('contextmenu');">-->
+                <!--<img class="menuitemcomponent">-->
+                    <!--<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>-->
+                <!--</img>-->
+                <!--<span class="menuitemcomponent">Upload File Here</span>-->
+            <!--</div>-->
             <div class="menuitemcomponent contextmenuitem" onclick="downloadzipfile(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/save.png</xsl:attribute>

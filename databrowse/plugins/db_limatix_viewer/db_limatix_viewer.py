@@ -37,6 +37,7 @@
 """ plugins/renderers/db_xlg_viewer.py - Experiment Log Viewer """
 
 import sys
+import platform
 import os
 import glob
 import zipfile
@@ -57,7 +58,7 @@ class db_limatix_viewer(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full" and self._style_mode in ['old_log_view','old_tabular_view']:
@@ -259,9 +260,15 @@ class db_limatix_viewer(renderer_class):
                     pass
                 else:
                     size = os.path.getsize(self._fullpath)
-                    magicstore = magic.open(magic.MAGIC_MIME)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    try:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(
+                            os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                    except AttributeError:
+                        contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                    if contenttype is None:
+                        contenttype = "text/plain"
                     f = open(self._fullpath, "rb")
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)

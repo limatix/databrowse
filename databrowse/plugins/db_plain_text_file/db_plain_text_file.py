@@ -39,12 +39,15 @@
 import os
 import os.path
 import time
-import pwd
-import grp
 from stat import *
 from lxml import etree
-from databrowse.support.renderer_support import renderer_class
 import magic
+from databrowse.support.renderer_support import renderer_class
+
+import platform
+if platform.system() == "Linux":
+    import pwd
+    import grp
 
 
 class db_plain_text_file(renderer_class):
@@ -57,7 +60,7 @@ class db_plain_text_file(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:
@@ -65,7 +68,7 @@ class db_plain_text_file(renderer_class):
                     filestring = self._web_support.req.form["file"].value
                     # Let's check on the file and make sure its writable and it exists
                     if not os.access(self._fullpath, os.W_OK) and os.path.exists(self._fullpath):
-                        self._web_support.req.output = "Error Saving File:  File Not Writable " + fullpath
+                        self._web_support.req.output = "Error Saving File:  File Not Writable " + self._fullpath
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
                     #Let's check on the file and make sure its writable and doesn't exist
@@ -97,9 +100,15 @@ class db_plain_text_file(renderer_class):
                     file_mtime = time.asctime(time.localtime(st[ST_MTIME]))
                     file_ctime = time.asctime(time.localtime(st[ST_CTIME]))
                     file_atime = time.asctime(time.localtime(st[ST_ATIME]))
-                    magicstore = magic.open(magic.MAGIC_MIME)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    try:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(
+                            os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                    except AttributeError:
+                        contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                    if contenttype is None:
+                        contenttype = "text/plain"
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
 
@@ -134,10 +143,11 @@ class db_plain_text_file(renderer_class):
                     xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                     # User and Group
-                    username = pwd.getpwuid(st[ST_UID])[0]
-                    groupname = grp.getgrgid(st[ST_GID])[0]
-                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                    xmlchild.text = "%s:%s" % (username, groupname)
+                    if platform.system() == "Linux":
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                        groupname = grp.getgrgid(st[ST_GID])[0]
+                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                        xmlchild.text = "%s:%s" % (username, groupname)
 
                     # Contents of File
                     f = open(self._fullpath)
@@ -148,9 +158,14 @@ class db_plain_text_file(renderer_class):
                     return xmlroot
             elif self._content_mode == "raw":
                 size = os.path.getsize(self._fullpath)
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                try:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 f = open(self._fullpath, "rb")
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

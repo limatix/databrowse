@@ -37,12 +37,27 @@
 """ setup.py - Main Install Script """
 
 import os
+import requirements as r
 from setuptools import setup, find_packages
+
+search_dirs = [('databrowse_wsgi', []), ('databrowse_app', [])]
+for search_dir in range(0, len(search_dirs)):
+    for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
+        for file in files:
+            if dir not in dict(search_dirs):
+                search_dirs.append((dir, []))
+            idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
+            search_dirs[idx][1].append(os.path.join(dir, file))
 
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
+
+
+with open(r.select_requirements_file(), 'r') as f:
+    reqs = f.read().splitlines()
+
 
 setup(
     name="databrowse",
@@ -53,19 +68,13 @@ setup(
     url="http://limatix.org",
     version='0.7.6',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data = {'':['*.conf', '*.xml']},
+    package_data={'': ['*.conf', '*.xml']},
+    data_files=search_dirs,
     license="BSD-3",
     long_description=readfile('README.md'),
     test_suite='nose.collector',
     zip_safe=False,
-    install_requires=[
-        'lxml>=3.2.0',
-        'file-magic>=0.1',
-        'numpy>=1.8.0',
-        'pillow>=2.3.0,<4',
-        'qrcode>=4.0',
-        'unittest2>=0.5.1'
-    ],
+    install_requires=reqs,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
@@ -80,5 +89,10 @@ setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities"
-    ]
+    ],
+    entry_points={
+        'gui_scripts': [
+            'databrowse = cefdatabrowse.cefdatabrowse:main'
+        ]
+    }
 )

@@ -31,18 +31,13 @@
                 }
 
                 // New Saving Components //////////////////////////////////
-                saveform = new FormData();
-                saveform.append('file', $('#contents').val());
                 $.ajax({
                     async: 'false',
-                    cache: 'false',
-                    contentType: false,
-                    data: saveform,
+                    data: {file: $('#contents').val()},
                     dataType: "text",
                     error: saveErrorCallback,
-                    processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
+                    type: 'GET',
                     url: ajaxurl
                     });
             }

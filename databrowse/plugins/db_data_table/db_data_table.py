@@ -227,7 +227,7 @@ class db_data_table(renderer_class):
 
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full":

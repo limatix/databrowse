@@ -38,9 +38,11 @@
 
 import os
 import os.path
+import platform
 import time
-import pwd
-import grp
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -56,6 +58,8 @@ class db_office_viewer(renderer_class):
     _default_content_mode = "full"
     _default_style_mode = "preview_office_document"
     _default_recursion_depth = 2
+
+    _officepath = "/usr/bin/soffice"
 
     def getContent(self):
         if self._content_mode == "full":
@@ -98,14 +102,21 @@ class db_office_viewer(renderer_class):
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
-                username = pwd.getpwuid(st[ST_UID])[0]
-                groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                xmlchild.text = "%s:%s" % (username, groupname)
+                if platform.system() == "Linux":
+                    username = pwd.getpwuid(st[ST_UID])[0]
+                    groupname = grp.getgrgid(st[ST_GID])[0]
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                    xmlchild.text = "%s:%s" % (username, groupname)
 
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                try:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
@@ -130,7 +141,11 @@ class db_office_viewer(renderer_class):
                 else:
                     self.PrepareCacheDir()
                     os.environ["HOME"] = "/home/www/.home"
-                    subprocess.call(["/usr/bin/soffice", "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
+                    try:
+                        subprocess.call([self._officepath, "--headless", "--convert-to", "pdf", "--outdir", self.getCacheDirName(), self._fullpath])
+                    except OSError as e:
+                        if e.errno == os.errno.ENOENT:
+                            raise self.RendererException("Libreoffice path not correct or not installed.")
                     try:
                         size = os.path.getsize(self.getCacheFileName(None, 'pdf'))
                         f = self.getCacheFileHandler('rb', None, 'pdf')
@@ -147,9 +162,15 @@ class db_office_viewer(renderer_class):
                     except Exception as err:
                         raise self.RendererException("Unable to Generate PDF File - Check File Permissions")
             else:
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                try:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 size = os.path.getsize(self._fullpath)
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)

@@ -39,8 +39,10 @@
 import os
 import os.path
 import time
-import pwd
-import grp
+import platform
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -98,14 +100,20 @@ class db_svg_viewer(renderer_class):
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
-                username = pwd.getpwuid(st[ST_UID])[0]
-                groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                xmlchild.text = "%s:%s" % (username, groupname)
-
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if platform.system() == "Linux":
+                    username = pwd.getpwuid(st[ST_UID])[0]
+                    groupname = grp.getgrgid(st[ST_GID])[0]
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                    xmlchild.text = "%s:%s" % (username, groupname)
+                try:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(
+                        os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
                 xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
@@ -130,9 +138,15 @@ class db_svg_viewer(renderer_class):
             xmlroot = etree.Element('{%s}svg' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), link=link, src=src, href=href, downlink=downlink)
             return xmlroot
         elif self._content_mode == "raw":
-            magicstore = magic.open(magic.MAGIC_MIME)
-            magicstore.load()
-            contenttype = magicstore.file(self._fullpath)
+            try:
+                magicstore = magic.open(magic.MAGIC_MIME)
+                magicstore.load()
+                contenttype = magicstore.file(
+                    os.path.realpath(self._fullpath))  # real path to resolve symbolic links outside of dataroot
+            except AttributeError:
+                contenttype = magic.from_file(os.path.realpath(self._fullpath), mime=True)
+            if contenttype is None:
+                contenttype = "text/plain"
             size = os.path.getsize(self._fullpath)
             f = open(self._fullpath, "rb")
             self._web_support.req.response_headers['Content-Type'] = contenttype

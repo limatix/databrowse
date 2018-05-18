@@ -57,7 +57,7 @@ class db_datacollect_v2_viewer(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse":
+        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
             return None
         else:
             if self._content_mode == "full" and self._style_mode in ['old_log_view','old_tabular_view']:
@@ -259,9 +259,12 @@ class db_datacollect_v2_viewer(renderer_class):
                     pass
                 else:
                     size = os.path.getsize(self._fullpath)
-                    magicstore = magic.open(magic.MAGIC_MIME)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    if platform.system() is "Windows":
+                        contenttype = magic.from_file(self._fullpath, mime=True)
+                    else:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(self._fullpath)
                     f = open(self._fullpath, "rb")
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)

@@ -39,8 +39,10 @@
 import os
 import os.path
 import time
-import pwd
-import grp
+import platform
+if platform.system() == "Linux":
+    import pwd
+    import grp
 from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -99,14 +101,18 @@ class db_SolidWorks_viewer(renderer_class):
                 xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
 
                 # User and Group
-                username = pwd.getpwuid(st[ST_UID])[0]
-                groupname = grp.getgrgid(st[ST_GID])[0]
-                xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                xmlchild.text = "%s:%s" % (username, groupname)
+                if platform.system() == "Linux":
+                    username = pwd.getpwuid(st[ST_UID])[0]
+                    groupname = grp.getgrgid(st[ST_GID])[0]
+                    xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
+                    xmlchild.text = "%s:%s" % (username, groupname)
 
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if platform.system() is "Windows":
+                    contenttype = magic.from_file(self._fullpath, mime=True)
+                else:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(self._fullpath)
                 xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
                 xmlchild.text = contenttype
 
@@ -165,9 +171,12 @@ class db_SolidWorks_viewer(renderer_class):
                     self._web_support.req.output_done = True
                     return [output.getvalue()]
             else:
-                magicstore = magic.open(magic.MAGIC_MIME)
-                magicstore.load()
-                contenttype = magicstore.file(self._fullpath)
+                if platform.system() is "Windows":
+                    contenttype = magic.from_file(self._fullpath, mime=True)
+                else:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(self._fullpath)
                 size = os.path.getsize(self._fullpath)
                 self._web_support.req.response_headers['Content-Type'] = contenttype
                 self._web_support.req.response_headers['Content-Length'] = str(size)
