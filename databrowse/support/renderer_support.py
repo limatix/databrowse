@@ -461,14 +461,6 @@ class renderer_class(object):
                 if os.path.exists(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)):
                     additionalitems = [os.path.splitext(item)[0][4:] for item in os.listdir(os.path.join(os.path.dirname(self._fullpath), '.databrowse', 'stylesheets', handler)) if item.lower().startswith("dbs_")]
             dirlist = dirlist + additionalitems
-
-            for item in dirlist:
-                if item.endswith("_cef") and self._caller == "databrowse":
-                    dirlist.remove(item)
-                elif item.endswith("_cef") and self._caller == "cefdatabrowse":
-                    if item[:-4] in dirlist:
-                        dirlist.remove(item[:-4])
-
             navelem = etree.SubElement(newmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem")
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a")
             title.text = " ".join([i[0].title()+i[1:] for i in handler[3:].split("_")])
