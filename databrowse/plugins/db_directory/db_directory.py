@@ -67,8 +67,6 @@ class db_directory(renderer_class):
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
         """ Load all of the values provided by initialization """
-        if caller == "cefdatabrowse":
-            style_mode = "list_cef"
         super(db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
         if caller == "databrowse" or caller == "cefdatabrowse":
             uphref = self.getURLToParent(self._relpath)
