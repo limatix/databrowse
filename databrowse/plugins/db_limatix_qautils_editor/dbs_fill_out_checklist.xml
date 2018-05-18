@@ -32,7 +32,7 @@
                     var filenameinput=document.getElementById("filenameinput");
                     var destnameinput=document.getElementsByName("dest")[0];
                     window.onbeforeunload = null
-                    window.location.href = "/databrowse/" + destnameinput.value + "/" + filenameinput.value;
+                    window.location.href = destnameinput.value + "/" + filenameinput.value;
                 }
             }
             
@@ -57,20 +57,16 @@
                 }
 
                 // New Saving Components //////////////////////////////////
-                saveform = new FormData();
-                saveform.append('file', (new XMLSerializer).serializeToString(filteredchecklistxml));
-                saveform.append('filename', filenameinput.value);
-                saveform.append('destination', destnameinput.value);
                 $.ajax({
                     async: 'false',
                     cache: 'false',
-                    contentType: false,
-                    data: saveform,
+                    data: {file: (new XMLSerializer).serializeToString(filteredchecklistxml),
+                            filename: filenameinput.value,
+                            destination: destnameinput.value},
                     dataType: "text",
                     error: saveErrorCallback,
-                    processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
+                    type: 'GET',
                     url: ajaxurl
                     });
             }
@@ -119,7 +115,7 @@
                     };
 
                 var PostForm = document.createElement("form");
-                PostForm.method = "post";
+                PostForm.method = "GET";
                 PostForm.action = posturl;
                 PostForm.target = "_blank";
                 PostForm.onsubmit = "return window.open('','_blank','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550').blur()"

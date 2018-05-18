@@ -52,7 +52,7 @@
                     error: saveErrorCallback,
                     processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
+                    type: 'GET',
                     url: ajaxurl
                     });
             }

@@ -109,7 +109,6 @@ MAC = (platform.system() == "Darwin")
 # Configuration
 WIDTH = 800
 HEIGHT = 600
-# TODO: Check this in linux
 scheme = "file://127.0.0.1"
 
 dataroot = "/"
@@ -128,6 +127,7 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
     sys.path.insert(0, install)
+sys.path.insert(0, "C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
 
 
 class ClientHandler:

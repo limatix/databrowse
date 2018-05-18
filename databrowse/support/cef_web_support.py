@@ -294,11 +294,11 @@ class web_support:
             pass
 
         if self.limatix_qautils is None:
-            self.limatix_qautils = '/usr/local/limatix-qautils'
+            self.limatix_qautils = 'C:\Users\Nate\Documents\Research\limatix-qautils'
             pass
 
         if self.qautils is None:
-            self.qautils = '/usr/local/QAutils'
+            self.qautils = 'C:\Users\Nate\Documents\Research\QAutils'
             pass
 
         if self.administrators is None:
