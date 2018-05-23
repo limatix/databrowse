@@ -53,9 +53,9 @@ import magic
 import numpy as np
 import collections
 from PIL import Image
-import matplotlib as mpl
-mpl.use('Agg')
-import pylab
+import matplotlib.pyplot as plt
+
+import pdb
 
 
 class db_sdt_viewer(renderer_class):
@@ -400,7 +400,7 @@ class db_sdt_viewer(renderer_class):
                 if "frame" in self._web_support.req.form:
                     fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)+"_Frame"+str(self._web_support.req.form['frame'].value)
                     if self.CacheFileExists(fprefix,'png'):
-                        f = self.getCacheFileHandler('r', fprefix, 'png')
+                        f = self.getCacheFileHandler('rb', fprefix, 'png')
                         contenttype='image/png'
                         size = os.path.getsize(self.getCacheFileName(fprefix,'png'))
                         pass
@@ -408,7 +408,7 @@ class db_sdt_viewer(renderer_class):
                 else:
                     fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     if self.CacheFileExists(fprefix, 'png'):
-                        f = self.getCacheFileHandler('r', fprefix, 'png')
+                        f = self.getCacheFileHandler('rb', fprefix, 'png')
                         contenttype='image/png'
                         size = os.path.getsize(self.getCacheFileName(fprefix,'png'))
                         pass
@@ -449,16 +449,16 @@ class db_sdt_viewer(renderer_class):
 
                     # Ascan
                     if shp[0] == 1 and shp[1] == 1 and shp[2] > 1:
-                        pylab.plot(ds['t'], ds['v'][0,0,:])
-                        pylab.xlabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        pylab.ylabel('Amplitude (%s)' % (vunits))
+                        plt.plot(ds['t'], ds['v'][0,0,:])
+                        plt.xlabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
+                        plt.ylabel('Amplitude (%s)' % (vunits))
                         #pylab.ylim([vmin, vmax])
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # Bscan
                     elif shp[0] > 1 and shp[1] == 1 and shp[2] > 1:
                         # Beware - this one probably doesn't work
                         # Also, this situation probably doesn't actually happen
-                        pylab.imshow(ds['v'][:,0,:], cmap='hsv',
+                        plt.imshow(ds['v'][:,0,:], cmap='hsv',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['t'][0],
@@ -471,14 +471,14 @@ class db_sdt_viewer(renderer_class):
                                 aunits = self.check_units(paramdict[i]['Sample Resolution'])[1]
                                 pass
                             pass
-                        pylab.xlabel('Position, %s (%s)' % (axis, aunits))
-                        pylab.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        cb = pylab.colorbar()
+                        plt.xlabel('Position, %s (%s)' % (axis, aunits))
+                        plt.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
+                        cb = plt.colorbar()
                         cb.set_label('Amplitude (%s)' % vunits)
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # Bscan
                     elif shp[1] > 1 and shp[0] == 1 and shp[2] > 1:
-                        pylab.imshow(ds['v'][0,:,:], cmap='hsv',
+                        plt.imshow(ds['v'][0,:,:], cmap='hsv',
                                      origin='lower', extent=[ds['y'][0],
                                                              ds['y'][-1],
                                                              ds['t'][0],
@@ -491,14 +491,14 @@ class db_sdt_viewer(renderer_class):
                                 aunits = self.check_units(paramdict[i]['Sample Resolution'])[1]
                                 pass
                             pass
-                        pylab.xlabel('Position, %s (%s)' % (axis, aunits))
-                        pylab.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        cb = pylab.colorbar()
+                        plt.xlabel('Position, %s (%s)' % (axis, aunits))
+                        plt.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
+                        cb = plt.colorbar()
                         cb.set_label('Amplitude (%s)' % vunits)
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # Gated CScan Output - i.e. Both Positions And No Time
                     elif shp[0] > 1 and shp[1] > 1 and shp[2] == 1:
-                        pylab.imshow(ds['v'][:,:,0], cmap='hsv',
+                        plt.imshow(ds['v'][:,:,0], cmap='hsv',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['y'][0],
@@ -518,9 +518,9 @@ class db_sdt_viewer(renderer_class):
                                 a2units = self.check_units(paramdict[i]['Sample Resolution'])[1]
                                 pass
                             pass
-                        pylab.xlabel('Position, %s (%s)' % (axis1, a1units))
-                        pylab.ylabel('Position, %s (%s)' % (axis2, a2units))
-                        cb = pylab.colorbar()
+                        plt.xlabel('Position, %s (%s)' % (axis1, a1units))
+                        plt.ylabel('Position, %s (%s)' % (axis2, a2units))
+                        cb = plt.colorbar()
                         cb.set_label('Amplitude, (%s)' % vunits)
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # CScan
@@ -529,7 +529,7 @@ class db_sdt_viewer(renderer_class):
                             frame = ds['v'].max(0).max(0).argmax()
                         else:
                             frame = int(self._web_support.req.form['frame'].value)
-                        pylab.imshow(ds['v'][:,:,frame], cmap='hsv',
+                        plt.imshow(ds['v'][:,:,frame], cmap='hsv',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['y'][0],
@@ -549,22 +549,21 @@ class db_sdt_viewer(renderer_class):
                                 a2units = self.check_units(paramdict[i]['Sample Resolution'])[1]
                                 pass
                             pass
-                        pylab.xlabel('Position, %s (%s)' % (axis1, a1units))
-                        pylab.ylabel('Position, %s (%s)' % (axis2, a2units))
-                        cb = pylab.colorbar()
+                        plt.xlabel('Position, %s (%s)' % (axis1, a1units))
+                        plt.ylabel('Position, %s (%s)' % (axis2, a2units))
+                        cb = plt.colorbar()
                         cb.set_label('Amplitude (%s)' % vunits)
-                        pylab.title('Time, t=%0.2f %s' % (ds['t'][frame],
+                        plt.title('Time, t=%0.2f %s' % (ds['t'][frame],
                                                               self.check_units(pd['Sample Resolution'])[1]))
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value+"_Frame%d"%frame)
 
-
-                    f = self.getCacheFileHandler('w',fprefix,'png')
-                    pylab.savefig(f)
+                    f = self.getCacheFileHandler('wb', fprefix, 'png')
+                    plt.savefig(f)
                     f.close()
-                    pylab.clf()
-                    size = os.path.getsize(self.getCacheFileName(fprefix,'png'))
+                    plt.clf()
+                    size = os.path.getsize(self.getCacheFileName(fprefix, 'png'))
                     contenttype='image/png'
-                    f = self.getCacheFileHandler('r',fprefix,'png')
+                    f = self.getCacheFileHandler('rb', fprefix, 'png')
 
                 self._web_support.req.response_headers['Content-Disposition'] = "filename=" + os.path.basename(f.name)
                 self._web_support.req.response_headers['Content-Type'] = contenttype
