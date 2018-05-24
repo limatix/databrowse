@@ -39,13 +39,41 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+WIDTH, HEIGHT, POS_X, POS_Y, dataroot = (800, 600, 0, 0, "/")
+
 from cefpython3 import cefpython as cef
 import ctypes
 import os
 import platform
 import sys
+import ConfigParser
 from urlparse import urlparse
 import cefdatabrowse_support as dbp
+
+
+def load_settings():
+    global WIDTH, HEIGHT, dataroot, POS_X, POS_Y
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    WIDTH = config.getint("databrowse", "WIDTH")
+    HEIGHT = config.getint("databrowse", "HEIGHT")
+    POS_X = config.getint("databrowse", "X")
+    POS_Y = config.getint("databrowse", "Y")
+    dataroot = config.get("databrowse", "dataroot")
+
+
+def save_settings():
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    config.set("databrowse", "WIDTH", WIDTH)
+    config.set("databrowse", "HEIGHT", HEIGHT)
+    config.set("databrowse", "X", POS_X)
+    config.set("databrowse", "Y", POS_Y)
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
+        config.write(configfile)
+
+
+load_settings()
 
 usr_path = ""
 try:
@@ -53,9 +81,12 @@ try:
         if os.path.exists(sys.argv[1]):
             usr_path = os.path.splitdrive(sys.argv[1])[1]
         else:
-            raise ValueError("Invalid command line path")
+            usr_path = dataroot
 except IndexError:
     pass
+
+if usr_path == "":
+    usr_path = os.path.splitdrive(os.getcwd())[1]
 
 # GLOBALS
 PYQT4 = False
@@ -107,14 +138,7 @@ LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
 # Configuration
-WIDTH = 800
-HEIGHT = 600
 scheme = "file://127.0.0.1"
-
-dataroot = "/"
-
-if usr_path == "":
-    usr_path = dataroot
 
 # OS differences
 CefWidgetParent = QWidget
@@ -213,7 +237,7 @@ class ClientHandler:
         # print("data length = %s" % len(data))
         # Return the new data - you can modify it.
         if handler is "cefdatabrowse":
-            databrowsepaths = {'install': install, 'path': fullpath}
+            databrowsepaths = {'dataroot': dataroot, 'install': install, 'path': fullpath}
             params = databrowsepaths.copy()
             params.update(urlparams)
             html = dbp.application(fullpath, params)
@@ -527,7 +551,7 @@ class WebRequestClient:
 def main():
     check_versions()
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    commandlineargs = {'allow-file-access-from-files': ''}
+    commandlineargs = {'allow-file-access-from-files': '', 'disable-web-security': ''}
     cef.Initialize(None, commandlineargs)
     app = CefApplication(sys.argv)
     main_window = MainWindow()
@@ -539,6 +563,7 @@ def main():
     app.stopTimer()
     del main_window  # Just to be safe, similarly to "del app"
     del app  # Must destroy app object before calling Shutdown
+    save_settings()
     cef.Shutdown()
 
 
@@ -678,9 +703,12 @@ class CefWidget(CefWidgetParent):
                 return ctypes.pythonapi.PyCapsule_GetPointer(
                         self.winId(), None)
 
-    def moveEvent(self, _):
+    def moveEvent(self, event):
+        global POS_X, POS_Y
         self.x = 0
         self.y = 0
+        POS_X = self.x
+        POS_Y = self.y
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)
@@ -690,7 +718,10 @@ class CefWidget(CefWidgetParent):
             self.browser.NotifyMoveOrResizeStarted()
 
     def resizeEvent(self, event):
+        global WIDTH, HEIGHT
         size = event.size()
+        WIDTH = self.window().size().width()
+        HEIGHT = self.window().size().height()
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)

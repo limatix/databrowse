@@ -237,11 +237,7 @@ class db_limatix_qautils_editor(renderer_class):
                 xml = etree.parse(f)
                 f.close()
                 xmlroot = xml.getroot()
-                if self._caller == "cefdatabrowse":
-                    xmlroot.set("local", "file://")
-                else:
-                    xmlroot.set("local", "")
-                templatefile = self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
+                templatefile = "/".join(os.path.abspath(self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")).split("\\"))
                 xmlroot.set("templatefile", templatefile)
                 return xmlroot
             else:

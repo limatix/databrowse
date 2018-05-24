@@ -72,6 +72,7 @@ class wsgi_req:
         self.status = [200, "OK"]
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
+        self.response_headers['Access-Control-Allow-Origin'] = '*'
         self.output_done = False
 
         if "debug" in self.form:
@@ -171,7 +172,7 @@ class menu_support:
         self._menu = []
         topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', xmlns="http://www.w3.org/1999/xhtml")
         menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
-        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href="/")
+        menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=siteurl)
         menulink.text = "Databrowse Home"
         # menuitem = etree.SubElement(topmenu, '{http://thermal.cnde.iastate.edu/databrowse}navelem')
         # menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=logouturl)
@@ -240,16 +241,17 @@ class web_support:
 
         # Set Default Configuration Options
 
-        self.dataroot = ""
+        self.dataroot = os.path.normpath(params['dataroot'])
 
         self.path = params['path']
 
         if self.siteurl is None:
-            self.siteurl = ""
+            self.siteurl = os.path.normpath(params['dataroot'])
             pass
 
         if self.resurl is None:
-            self.resurl = params['install'] + "/databrowse_wsgi/resources"
+            self.resurl = os.path.abspath(params['install'] + "/databrowse_wsgi/resources")
+            self.resurl = "/".join(self.resurl.split("\\"))
             pass
 
         if self.webdir is None:
@@ -281,28 +283,31 @@ class web_support:
             self.directorypluginpath = os.path.join(os.path.dirname(databrowse.support.__file__), "directoryplugins.conf")
             pass
 
+        if self.checklistpath is None:
+            self.checklistpath = r"/SOPs"
+
         if self.email_sendmail is None:
             self.email_sendmail = "/usr/lib/sendmail -i"
             pass
 
         if self.email_admin is None:
-            self.email_admin = "tylerl@iastate.edu"
+            self.email_admin = "scheirer@iastate.edu"
             pass
 
         if self.email_from is None:
-            self.emailfrom = "tylerl@iastate.edu"
+            self.emailfrom = "scheirer@iastate.edu"
             pass
 
         if self.limatix_qautils is None:
-            self.limatix_qautils = 'C:\Users\Nate\Documents\Research\limatix-qautils'
+            self.limatix_qautils = r'/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils'
             pass
 
         if self.qautils is None:
-            self.qautils = 'C:\Users\Nate\Documents\Research\QAutils'
+            self.qautils = r'/Users/nscheirer/Documents/dev/databrowse-utils/QAutils'
             pass
 
         if self.administrators is None:
-            self.administrators = {"sdh4": "Steve Holland", "tylerl": "Tyler Lesthaeghe"}
+            self.administrators = {"sdh4": "Steve Holland", "tylerl": "Tyler Lesthaeghe", "scheirer": "Nathan Scheirer"}
             pass
 
         if self.sitetitle is None:

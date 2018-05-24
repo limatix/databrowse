@@ -417,7 +417,7 @@ class db_datacollect_v2_viewer(renderer_class):
 
         #print "Stylesheet Loaded Successfully:"
         #print stylestring
-        stylestring = stylestring.replace('/usr/local/QAutils/checklist/datacollect2.xsl', os.path.join(self._web_support.qautils, "checklist/datacollect2.xsl"))
+        stylestring = stylestring.replace('/usr/local/QAutils/checklist/datacollect2.xsl', "/".join([self._web_support.qautils, "checklist/datacollect2.xsl"]))
 
         # If we set the flag earlier, we need to change the namespace
         if override is True:

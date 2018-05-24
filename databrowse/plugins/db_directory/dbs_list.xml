@@ -253,6 +253,7 @@
                     });
 
                     function startchecklist(checklistname) {
+                        console.log(checklistname);
                         var PostForm = document.createElement("form");
                         PostForm.method = "GET";
                         PostForm.action = checklistname;

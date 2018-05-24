@@ -53,7 +53,6 @@
 		
 	<script type="text/javascript">
 		var resdir = "<xsl:value-of select="$resdir"/>";
-		var local = "<xsl:value-of select="@local"/>";
 		var templateurl = "<xsl:value-of select="@templatefile"/>";
 		<![CDATA[
 			var appController;
@@ -61,7 +60,7 @@
 			function initApp () {
 				var defaultTemplates = (typeof(getDefaultTemplates) != typeof(undefined))  ? getDefaultTemplates() : [];
 				// Application controller
-				appController = new viewerApp(local+resdir+"/Axel/templates/", defaultTemplates);
+				appController = new viewerApp(resdir+"/Axel/templates/", defaultTemplates);
 				appController.setBase(resdir+'/Axel/axel/bundles')
 				appController.setXTigerStylesheet(resdir+'/Axel/axel/axel.css'); 
 

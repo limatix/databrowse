@@ -46,7 +46,7 @@ from time import time
 import cgitb
 cgitb.enable()
 
-serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -115,7 +115,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -185,7 +185,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+ajaxwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -298,6 +298,8 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
+                import pdb
+                pdb.set_trace()
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)

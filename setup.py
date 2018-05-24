@@ -91,7 +91,7 @@ setup(
         "Topic :: Utilities"
     ],
     entry_points={
-        'gui_scripts': [
+        'console_scripts': [
             'databrowse = cefdatabrowse.cefdatabrowse:main'
         ]
     }
