@@ -53,6 +53,7 @@
 		
 	<script type="text/javascript">
 		var resdir = "<xsl:value-of select="$resdir"/>";
+		var local = "<xsl:value-of select="@local"/>";
 		var templateurl = "<xsl:value-of select="@templatefile"/>";
 		<![CDATA[
 			var appController;
@@ -60,7 +61,7 @@
 			function initApp () {
 				var defaultTemplates = (typeof(getDefaultTemplates) != typeof(undefined))  ? getDefaultTemplates() : [];
 				// Application controller
-				appController = new viewerApp(resdir+"/Axel/templates/", defaultTemplates);
+				appController = new viewerApp(local+resdir+"/Axel/templates/", defaultTemplates);
 				appController.setBase(resdir+'/Axel/axel/bundles')
 				appController.setXTigerStylesheet(resdir+'/Axel/axel/axel.css'); 
 
@@ -134,18 +135,13 @@
                 }
 
                 // New Saving Components //////////////////////////////////
-                saveform = new FormData();
-                saveform.append('file', results);
                 $.ajax({
                     async: 'false',
-                    cache: 'false',
-                    contentType: false,
-                    data: saveform,
+                    data: {file: results},
                     dataType: "text",
                     error: saveErrorCallback,
-                    processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
+                    type: 'GET',
                     url: ajaxurl
                     });
 
