@@ -51,6 +51,11 @@ import string
 import random
 import copy
 import fnmatch
+import platform
+
+if platform.system() == "Linux":
+    class WindowsError:
+        pass
 
 
 class renderer_class(object):

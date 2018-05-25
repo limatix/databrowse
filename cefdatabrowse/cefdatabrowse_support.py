@@ -294,7 +294,10 @@ def application(filename, params):
                     relpath = '/'
                     pass
                 else:
-                    relpath = fullpath.replace(db_web_support.dataroot, '')
+		    if db_web_support.dataroot != "/":
+	                relpath = fullpath.replace(db_web_support.dataroot, '')
+		    else:
+			relpath = fullpath
                     pass
                 pass
             elif not os.path.exists(fullpath):
@@ -305,6 +308,9 @@ def application(filename, params):
 
         relpath = '/'.join(relpath.split('\\'))
         fullpath = '/'.join(fullpath.split('\\'))
+	#import pdb
+	#pdb.set_trace()
+
         # print("relpath", relpath)
         # print("fullpath", fullpath)
         # Import Plugin Directory
