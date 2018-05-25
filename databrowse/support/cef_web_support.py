@@ -39,6 +39,7 @@
 import os
 import os.path
 import cgi
+import platform
 from lxml import etree
 import databrowse.support
 
@@ -243,11 +244,10 @@ class web_support:
 
         self.dataroot = os.path.normpath(params['dataroot'])
 
-	import platform
-	if platform.system() == "Linux":
-	        self.path = "127.0.0.1/" + params['path']
-	else:
-		self.path = params['path']
+        if platform.system() == "Linux":
+            self.path = "127.0.0.1/" + params['path']
+        else:
+            self.path = params['path']
 
         if self.siteurl is None:
             self.siteurl = os.path.normpath(params['dataroot'])
