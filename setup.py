@@ -68,7 +68,7 @@ setup(
     url="http://limatix.org",
     version='0.7.6',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data={'': ['*.conf', '*.xml']},
+    package_data={'': ['*.conf', '*.xml', '.databrowse']},
     data_files=search_dirs,
     license="BSD-3",
     long_description=readfile('README.md'),

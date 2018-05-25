@@ -39,7 +39,7 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-WIDTH, HEIGHT, POS_X, POS_Y, dataroot = (800, 600, 0, 0, "/")
+WIDTH, HEIGHT, POS_X, POS_Y, dataroot, dataguzzlerlib = (800, 600, 0, 0, "/", None)
 
 from cefpython3 import cefpython as cef
 import ctypes
@@ -52,7 +52,7 @@ import cefdatabrowse_support as dbp
 
 
 def load_settings():
-    global WIDTH, HEIGHT, dataroot, POS_X, POS_Y
+    global WIDTH, HEIGHT, dataroot, POS_X, POS_Y, dataguzzlerlib
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     WIDTH = config.getint("databrowse", "WIDTH")
@@ -60,6 +60,7 @@ def load_settings():
     POS_X = config.getint("databrowse", "X")
     POS_Y = config.getint("databrowse", "Y")
     dataroot = config.get("databrowse", "dataroot")
+    dataguzzlerlib = config.get("databrowse", "dataguzzlerlib")
 
 
 def save_settings():
@@ -151,7 +152,7 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
     sys.path.insert(0, install)
-sys.path.insert(0, "C:\Users\Nate\Documents\UbuntuSharedFiles\dataguzzler-lib\python")
+sys.path.insert(0, dataguzzlerlib)
 
 
 class ClientHandler:
