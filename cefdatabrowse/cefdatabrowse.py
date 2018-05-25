@@ -48,6 +48,7 @@ import platform
 import sys
 import ConfigParser
 from urlparse import urlparse
+from urlparse import unquote
 import cefdatabrowse_support as dbp
 
 
@@ -767,7 +768,7 @@ class LoadHandler(object):
         self.navigation_bar.updateState()
 
     def OnLoadStart(self, browser, **_):
-        self.navigation_bar.url.setText(browser.GetUrl().replace(scheme, ""))
+        self.navigation_bar.url.setText(unquote(browser.GetUrl().replace(scheme, "")))
         if self.initial_app_loading:
             self.navigation_bar.cef_widget.setFocus()
             # Temporary fix no. 2 for focus issue on Linux (Issue #284)
@@ -867,7 +868,7 @@ class NavigationBar(QFrame):
         self.forward.setEnabled(browser.CanGoForward())
         self.reload.setEnabled(True)
         self.url.setEnabled(True)
-        self.url.setText(browser.GetUrl().replace(scheme, ""))
+        self.url.setText(unquote(browser.GetUrl().replace(scheme, "")))
 
     def createButton(self, name):
         resources = install + "/databrowse_app/resources"
