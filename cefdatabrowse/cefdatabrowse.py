@@ -55,7 +55,7 @@ import cefdatabrowse_support as dbp
 def load_settings():
     global WIDTH, HEIGHT, dataroot, POS_X, POS_Y, dataguzzlerlib
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
     WIDTH = config.getint("databrowse", "WIDTH")
     HEIGHT = config.getint("databrowse", "HEIGHT")
     POS_X = config.getint("databrowse", "X")
@@ -66,12 +66,12 @@ def load_settings():
 
 def save_settings():
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
     config.set("databrowse", "WIDTH", WIDTH)
     config.set("databrowse", "HEIGHT", HEIGHT)
     config.set("databrowse", "X", POS_X)
     config.set("databrowse", "Y", POS_Y)
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
+    with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
         config.write(configfile)
 
 
