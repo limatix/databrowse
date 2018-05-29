@@ -76,11 +76,13 @@ def save_settings():
 
 
 def update_dataroot(newdataroot):
+    global dataroot
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
     with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
         config.write(configfile)
+    dataroot = newdataroot
 
 
 load_settings()
@@ -93,6 +95,8 @@ try:
                 if sys.argv[2] is not None:
                     if os.path.exists(sys.argv[2]):
                         update_dataroot(sys.argv[2])
+                        print("Updated dataroot to: %s" % dataroot)
+                        sys.exit(0)
             except IndexError:
                 print("Dataroot is currently: %s" % dataroot)
                 sys.exit(0)
@@ -179,7 +183,7 @@ class ClientHandler:
     def GetResourceHandler(self, browser, frame, request):
         # Called on the IO thread before a resource is loaded.
         # To allow the resource to load normally return None.
-        print("GetResourceHandler(): url = %s" % request.GetUrl())
+        # print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
         if parsedurl.netloc != urlparse(scheme).netloc:
