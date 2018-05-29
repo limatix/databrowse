@@ -75,15 +75,32 @@ def save_settings():
         config.write(configfile)
 
 
+def update_dataroot(newdataroot):
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+    config.set("databrowse", "dataroot", newdataroot)
+    with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
+        config.write(configfile)
+
+
 load_settings()
 
 usr_path = ""
 try:
     if sys.argv[1] is not None:
-        if os.path.exists(sys.argv[1]):
-            usr_path = os.path.splitdrive(sys.argv[1])[1]
+        if sys.argv[1] == "-s":
+            try:
+                if sys.argv[2] is not None:
+                    if os.path.exists(sys.argv[2]):
+                        update_dataroot(sys.argv[2])
+            except IndexError:
+                print("Dataroot is currently: %s" % dataroot)
+                sys.exit(0)
         else:
-            usr_path = dataroot
+            if os.path.exists(sys.argv[1]):
+                usr_path = os.path.splitdrive(sys.argv[1])[1]
+            else:
+                usr_path = dataroot
 except IndexError:
     pass
 
