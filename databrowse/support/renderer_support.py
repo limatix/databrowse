@@ -350,6 +350,8 @@ class renderer_class(object):
         """ Build a Sorted List of Files with Appropriate Files Removed """
         #print "getDirectoryList being called"
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
+        if not os.path.exists(fullpath):
+            os.makedirs(fullpath)
         try:
             if os.path.exists(fullpath):
                 reallist = os.listdir(fullpath)
