@@ -100,6 +100,14 @@ try:
             except IndexError:
                 print("Dataroot is currently: %s" % dataroot)
                 sys.exit(0)
+        elif sys.argv[1] == "-e":
+            if platform.system() == "Linux":
+                os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse")))
+            elif platform.system() == "Windows":
+                os.system(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+            else:
+                print(open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), "rb").read())
+            sys.exit(0)
         else:
             if os.path.exists(sys.argv[1]):
                 usr_path = os.path.splitdrive(sys.argv[1])[1]
