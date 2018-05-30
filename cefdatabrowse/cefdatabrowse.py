@@ -102,9 +102,16 @@ try:
                 sys.exit(0)
         elif sys.argv[1] == "-e":
             if platform.system() == "Linux":
-                os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse")))
+                status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse")))
+                if status != 0:
+                    if status == 32512:
+                        raise Exception("%s: EDITOR not set" % status)
+                    else:
+                        raise Exception("%s: Could not open config file." % status)
             elif platform.system() == "Windows":
-                os.system(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+                status = os.system(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+                if status != 0:
+                    raise Exception("%s: Could not open config file." % status)
             else:
                 print(open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), "rb").read())
             sys.exit(0)
