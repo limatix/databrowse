@@ -242,7 +242,7 @@ class web_support:
 
         # Set Default Configuration Options
 
-        self.dataroot = os.path.normpath(params['dataroot'])
+        self.dataroot = params['dataroot']
 
         if platform.system() == "Linux":
             self.path = "127.0.0.1/" + params['path']
@@ -250,7 +250,7 @@ class web_support:
             self.path = params['path']
 
         if self.siteurl is None:
-            self.siteurl = os.path.normpath(params['dataroot'])
+            self.siteurl = params['dataroot']
             pass
 
         if self.resurl is None:
