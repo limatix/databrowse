@@ -204,26 +204,26 @@ class db_sdt_viewer(renderer_class):
     def scale_data(self, data, dtype, drange, undef_value=None):
         # Scale data based on the data type given
         if dtype == 'CHAR 8':
-            scaled_data = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**8))*data
-            undef_value = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**8))*undef_value
+            scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**8)))*data
+            undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**8)))*undef_value
             scaled_data[scaled_data == undef_value] = np.nan
             return scaled_data
 
         elif dtype == 'INTEGER 12':
-            scaled_data = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**12))*data
-            undef_value = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**12))*undef_value
+            scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**12)))*data
+            undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**12)))*undef_value
             scaled_data[scaled_data == undef_value] = np.nan
             return scaled_data
 
         elif dtype == 'INTEGER 16':
-            scaled_data = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**16))*data
-            undef_value = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**16))*undef_value
+            scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**16)))*data
+            undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**16)))*undef_value
             scaled_data[scaled_data == undef_value] = np.nan
             return scaled_data
 
         elif dtype == 'FLOAT 32':
-            scaled_data = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**32))*data
-            undef_value = ((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**32))*undef_value
+            scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**32)))*data
+            undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**32)))*undef_value
             scaled_data[scaled_data == undef_value] = np.nan
             return scaled_data
 
@@ -458,7 +458,7 @@ class db_sdt_viewer(renderer_class):
                     elif shp[0] > 1 and shp[1] == 1 and shp[2] > 1:
                         # Beware - this one probably doesn't work
                         # Also, this situation probably doesn't actually happen
-                        plt.imshow(ds['v'][:,0,:], cmap='hsv',
+                        plt.imshow(ds['v'][:,0,:], cmap='jet',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['t'][0],
@@ -478,7 +478,7 @@ class db_sdt_viewer(renderer_class):
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # Bscan
                     elif shp[1] > 1 and shp[0] == 1 and shp[2] > 1:
-                        plt.imshow(ds['v'][0,:,:], cmap='hsv',
+                        plt.imshow(ds['v'][0,:,:], cmap='jet',
                                      origin='lower', extent=[ds['y'][0],
                                                              ds['y'][-1],
                                                              ds['t'][0],
@@ -498,7 +498,7 @@ class db_sdt_viewer(renderer_class):
                         fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
                     # Gated CScan Output - i.e. Both Positions And No Time
                     elif shp[0] > 1 and shp[1] > 1 and shp[2] == 1:
-                        plt.imshow(ds['v'][:,:,0], cmap='hsv',
+                        plt.imshow(ds['v'][:,:,0], cmap='jet',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['y'][0],
@@ -529,7 +529,7 @@ class db_sdt_viewer(renderer_class):
                             frame = ds['v'].max(0).max(0).argmax()
                         else:
                             frame = int(self._web_support.req.form['frame'].value)
-                        plt.imshow(ds['v'][:,:,frame], cmap='hsv',
+                        plt.imshow(ds['v'][:,:,frame], cmap='jet',
                                      origin='lower', extent=[ds['x'][0],
                                                              ds['x'][-1],
                                                              ds['y'][0],
