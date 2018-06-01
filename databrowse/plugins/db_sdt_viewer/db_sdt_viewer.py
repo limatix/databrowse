@@ -59,8 +59,6 @@ import collections
 from PIL import Image
 import matplotlib.pyplot as plt
 
-import pdb
-
 
 class db_sdt_viewer(renderer_class):
     """ SDT Renderer - Renders common data representations included in sdt files """

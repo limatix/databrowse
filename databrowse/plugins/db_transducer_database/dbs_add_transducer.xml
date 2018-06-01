@@ -124,21 +124,15 @@
                 }
 
                 // New Saving Components //////////////////////////////////
-                saveform = new FormData();
-                saveform.append('file', results);
                 $.ajax({
                     async: 'false',
-                    cache: 'false',
-                    contentType: false,
-                    data: saveform,
+                    data: {file: results},
                     dataType: "text",
                     error: saveErrorCallback,
-                    processData: false,
                     success: saveSuccessCallback,
-                    type: 'POST',
+                    type: 'GET',
                     url: ajaxurl
                     });
-
 			}
 
 

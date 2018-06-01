@@ -47,7 +47,7 @@
                     url = value.cells[0].children[0].href + '?content_mode=raw&printbarcode=printbarcode';
                     tag = value.cells[0].children[0].innerHTML;
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
                         url: url
                     }).done(function(msg) {
                         $("#loading").text(tag + ": "  + msg);

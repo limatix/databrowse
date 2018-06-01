@@ -76,7 +76,10 @@ class db_file_ops(renderer_class):
         if operation == "upload":
             if not os.path.isdir(self._fullpath):
                 raise self.RendererException("Uploads Must Be in Folder")
-            elif not "files[]" in self._web_support.req.form:
+            elif "files[]" not in self._web_support.req.form:
+                if self._caller == "cefdatabrowse":
+                    print("CEFDatabrowse cannot upload files currently.")
+                    return [""]
                 raise self.RendererException("No Uploads Found")
             fieldStorage = self._web_support.req.form["files[]"]
             fullfilename = os.path.abspath(self._fullpath + "/" + fieldStorage.filename)
@@ -177,8 +180,6 @@ class db_file_ops(renderer_class):
             else:
                 newpath = os.path.abspath(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form["newname"].value))
                 if not os.path.splitdrive(newpath)[1].startswith(os.path.normpath(self._web_support.dataroot)):
-                    import pdb
-                    pdb.set_trace()
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newpath):
                     outputmsg = "ERROR: File or Directory Already Exists"

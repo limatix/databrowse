@@ -286,8 +286,6 @@ def application(filename, params):
         else:
             fullpath = '/'.join(os.path.splitdrive(os.path.abspath(db_web_support.req.form["path"].value))[1].split('\\'))
             if not fullpath.startswith(db_web_support.dataroot):
-                import pdb
-                pdb.set_trace()
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:
@@ -301,7 +299,6 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
-                import pdb
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)
