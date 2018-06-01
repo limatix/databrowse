@@ -1,43 +1,55 @@
-# Copyright (c) 2012 The CEF Python authors - see the Authors file.
-# All rights reserved. Licensed under the BSD 3-clause license.
-# See project website: https://github.com/cztomczak/cefpython
-#
-# This product includes the following third party libraries:
-# * Chromium Embedded Framework licensed under the BSD 3-clause
-#   license. Website: https://bitbucket.org/chromiumembedded/cef
-#
-# Redistribution and use in source and binary forms, with
-# or without modification, are permitted provided that the
-# following conditions are met:
-#
-# * Redistributions of source code must retain the above
-#   copyright notice, this list of conditions and the
-#   following disclaimer.
-#
-# * Redistributions in binary form must reproduce the above
-#   copyright notice, this list of conditions and the
-#   following disclaimer in the documentation and/or other
-#   materials provided with the distribution.
-#
-# * Neither the name of Google Inc. nor the name Chromium
-#   Embedded Framework nor the name of CEF Python nor the
-#   names of its contributors may be used to endorse or
-#   promote products derived from this software without
-#   specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#!/usr/bin/env python
+###############################################################################
+## Databrowse:  An Extensible Data Management Platform                       ##
+## Copyright (C) 2012-2016 Iowa State University Research Foundation, Inc.   ##
+## All rights reserved.                                                      ##
+##                                                                           ##
+## Redistribution and use in source and binary forms, with or without        ##
+## modification, are permitted provided that the following conditions are    ##
+## met:                                                                      ##
+##   1. Redistributions of source code must retain the above copyright       ##
+##      notice, this list of conditions and the following disclaimer.        ##
+##   2. Redistributions in binary form must reproduce the above copyright    ##
+##      notice, this list of conditions and the following disclaimer in the  ##
+##      documentation and/or other materials provided with the distribution. ##
+##   3. Neither the name of the copyright holder nor the names of its        ##
+##      contributors may be used to endorse or promote products derived from ##
+##      this software without specific prior written permission.             ##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS       ##
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED ##
+## TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A           ##
+## PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER ##
+## OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,  ##
+## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
+## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
+## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
+## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
+## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
+##                                                                           ##
+## This material is based on work supported by the Air Force Research        ##
+## Laboratory under Contract #FA8650-10-D-5210, Task Order #023 and          ##
+## performed at Iowa State University.                                       ##
+##                                                                           ##
+## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+###############################################################################
+""" Main script for the standalone CEFPython based Databrowse Application"""
+
+'''
+Usage:
+databrowse [None/argument/path]
+    None -> Opens CEFDatabrowse in current directory
+    path -> a path to a file/directory that if exists CEFDatabrowse will be launched there 
+
+Arguments:
+databrowse -s [None/path]
+    None -> returns current dataroot path
+    path -> a path that if exists sets the dataroot to path
+
+databrowse -e
+    None -> opens the configuration file in the default text editor
+'''
 
 WIDTH, HEIGHT, POS_X, POS_Y, dataroot, dataguzzlerlib = (800, 600, 0, 0, "/", None)
 
@@ -52,6 +64,7 @@ from urlparse import unquote
 import cefdatabrowse_support as dbp
 
 
+# Load saved cef application settings
 def load_settings():
     global WIDTH, HEIGHT, dataroot, POS_X, POS_Y, dataguzzlerlib
     config = ConfigParser.ConfigParser()
@@ -87,6 +100,7 @@ def update_dataroot(newdataroot):
 
 load_settings()
 
+# Handle command line variables
 usr_path = ""
 try:
     if sys.argv[1] is not None:
@@ -189,11 +203,15 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
     sys.path.insert(0, install)
+
+# Append external libraries to path
 sys.path.insert(0, dataguzzlerlib)
 
 
+# Modified client handler from cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
+# Differentiates between resources and files that databrowse can analyze.
+# Parses web payloads and loads them into a python dictionary (replaces environ)
 class ClientHandler:
-
     # RequestHandler.GetResourceHandler()
     def GetResourceHandler(self, browser, frame, request):
         # Called on the IO thread before a resource is loaded.
@@ -236,6 +254,7 @@ class ClientHandler:
             urlparams.update({"extra": ""})
             urlparams.update(fs)
 
+        # Any resource files must be located in the databrowse_wsgi directory in the databrowse root source directory
         if "databrowse_wsgi" not in fullpath:
             resHandler = DatabrowseHandler()
             resHandler._clientHandler = self
@@ -274,15 +293,15 @@ class ClientHandler:
         # print("_OnResourceResponse()")
         # print("data length = %s" % len(data))
         # Return the new data - you can modify it.
+
+        # Call the databrowse library and return the generated html
         if handler is "cefdatabrowse":
             databrowsepaths = {'dataroot': dataroot, 'install': install, 'path': fullpath}
             params = databrowsepaths.copy()
             params.update(urlparams)
             html = dbp.application(fullpath, params)
-            # print("STATUS: %s" % html[2])
             data = "".join(html[0])
             urlparams.update({'headers': html[1], "status": html[2]})
-            # print("HTML Ouput: %s" % data)
             if "operation" in urlparams:
                 browser.Reload()
         else:
@@ -300,7 +319,6 @@ class ClientHandler:
             urlparams.update({'headers': {'Content-Type': mime}})
             data = "".join(html)
 
-        # print("HTML Ouput: %s" % data)
         return data
 
     # A strong reference to ResourceHandler must be kept
@@ -324,6 +342,7 @@ class ClientHandler:
             print("_ReleaseStrongReference() FAILED: resource handler not found, id = %s" % (resHandler._resourceHandlerId))
 
 
+# Typical resource handler provided by cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class ResourceHandler:
 
     # The methods of this class will always be called
@@ -427,6 +446,8 @@ class ResourceHandler:
         pass
 
 
+# Adapted resource handler to deal with the returned start resposne variables from databrowse
+# Based on the resource handler in cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class DatabrowseHandler:
 
     # The methods of this class will always be called
@@ -482,15 +503,10 @@ class DatabrowseHandler:
         #    redirectUrlOut[0] to the new url.
         assert self._webRequestClient._response, "Response object empty"
         wrcResponse = self._webRequestClient._response
-        # print("Mimetype: %s" % response.GetMimeType())
-        # print("Headers: %s" % response.GetHeaderMultimap())
-        # print("Details: %s" % self._params)
         response.SetMimeType(self._params["headers"]["Content-Type"])
         response.SetStatus(self._params["status"][0])
         response.SetStatusText(wrcResponse.GetStatusText())
         response.SetHeaderMap(self._params["headers"])
-        # response.SetHeaderMap({"": self._params["params"]["extra"]})
-        # print("HEADERS####: %s" % self._params["headers"])
         if wrcResponse.GetHeaderMultimap():
             response.SetHeaderMultimap(wrcResponse.GetHeaderMultimap())
         responseLengthOut[0] = self._webRequestClient._dataLength
@@ -536,6 +552,7 @@ class DatabrowseHandler:
         pass
 
 
+# Web request client as described in cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class WebRequestClient:
 
     _resourceHandler = None
@@ -561,8 +578,6 @@ class WebRequestClient:
         statusText = "Unknown"
         if web_request.GetRequestStatus() in cef.WebRequest.Status:
             statusText = cef.WebRequest.Status[web_request.GetRequestStatus()]
-        # print("status = %s" % statusText)
-        # print("error code = %s" % web_request.GetRequestError())
         # Emulate OnResourceResponse() in ClientHandler:
         self._response = web_request.GetResponse()
         # Are web_request.GetRequest() and
@@ -586,9 +601,12 @@ class WebRequestClient:
         self._resourceHandler._responseHeadersReadyCallback.Continue()
 
 
+# Main CEF function to initialize run and shutdown the CEF application
 def main():
     check_versions()
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    # Required chromium commandline arguments:
+    # Needed to allow local file operations and access
     commandlineargs = {'allow-file-access-from-files': '', 'disable-web-security': ''}
     cef.Initialize(None, commandlineargs)
     app = CefApplication(sys.argv)
@@ -605,6 +623,7 @@ def main():
     cef.Shutdown()
 
 
+# Check graphical framework version and CEFPython version
 def check_versions():
     print("[qt.py] CEF Python {ver}".format(ver=cef.__version__))
     print("[qt.py] Python {ver} {arch}".format(
@@ -617,7 +636,7 @@ def check_versions():
         print("[qt.py] PySide {v1} (qt {v2})".format(
               v1=PySide.__version__, v2=QtCore.__version__))
     # CEF Python version requirement
-    assert cef.__version__ >= "55.4", "CEF Python v55.4+ required to run this"
+    assert cef.__version__ >= "57.0", "CEF Python v55.4+ required to run this"
 
 
 class MainWindow(QMainWindow):

@@ -32,7 +32,7 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.					     ##
+## 19 Aug 2016; 88ABW-2016-4051.					                         ##
 ###############################################################################
 """ setup.py - Main Install Script """
 
@@ -40,6 +40,7 @@ import os
 import requirements as r
 from setuptools import setup, find_packages
 
+# Collect all databrowse static files required for CEFDatabrowse
 search_dirs = [('databrowse_wsgi', []), ('databrowse_app', [])]
 for search_dir in range(0, len(search_dirs)):
     for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
@@ -55,6 +56,7 @@ def readfile(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
 
+# Determine platform specific requirements
 with open(r.select_requirements_file(), 'r') as f:
     reqs = f.read().splitlines()
 

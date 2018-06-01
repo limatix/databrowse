@@ -34,7 +34,7 @@
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
-""" support/dummy_web_support.py - Classes to encapsulate Web/WSGI functionality """
+""" support/cef_web_support.py - Classes to encapsulate Web/WSGI functionality for CEF """
 
 import os
 import os.path
@@ -45,7 +45,7 @@ import databrowse.support
 
 
 class wsgi_req:
-    """ A simple wrapper for the wsgi request """
+    """ A simple wrapper for the CEF request """
 
     environ = []
 
@@ -162,7 +162,7 @@ class style_support:
 
 
 class menu_support:
-    """ Class containing support functionality for xslt stylesheet compliation """
+    """ Class containing support functionality for xslt stylesheet compilation """
 
     _menu = []
 
@@ -226,22 +226,9 @@ class web_support:
 
     def __init__(self, filename, params):
         self.req = wsgi_req(filename, params)
-        #self.reqfilename = self.req.filename
-        #self.webdir = os.path.dirname(self.reqfilename)
-        #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
 
-        # Try to Load Optional Configuration File
-        #try:
-            #conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
-            #self.confstr = conffile.read()
-            #conffile.close()
-            #exec self.confstr
-        #except:
-        #    pass
-
         # Set Default Configuration Options
-
         self.dataroot = params['dataroot']
 
         if platform.system() == "Linux":
@@ -265,15 +252,6 @@ class web_support:
         if self.logouturl is None:
             self.logouturl = "http://localhost/logout"
             pass
-
-        #if not environ["REMOTE_USER"]:
-        #    raise Exception("User Not Logged In")
-        #else:
-        #    self.remoteuser = environ["REMOTE_USER"]
-
-        #if self.pluginpath is None:
-        #    self.pluginpath = os.path.join(self.webdir, "plugins")
-        #    pass
 
         if self.icondbpath is None:
             self.icondbpath = os.path.join(os.path.dirname(databrowse.support.__file__), "iconmap.conf")

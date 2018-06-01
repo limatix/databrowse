@@ -43,6 +43,12 @@ Copyright (c) 2002-2007 Gene Cash
 Copyright (c) 2007-2013 Ianaré Sévi and contributors
 License: BSD-3
 
+Portions of this software are adapted from cefpython:
+Copyright (c) 2012 The CEF Python authors - see the Authors file in cefpython repository.
+All rights reserved. Licensed under the BSD 3-clause license.
+See project website: https://github.com/cztomczak/cefpython
+License: BSD-3
+
 === GNU PUBLIC LICENSE v3 =====================================================
 
                     GNU GENERAL PUBLIC LICENSE

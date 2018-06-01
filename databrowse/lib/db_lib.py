@@ -176,22 +176,32 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         relpath = '/'
         pass
     else:
-    	fullpath = os.path.abspath(db_web_support.req.form["path"].value)
+        fullpath = '/'.join(os.path.splitdrive(os.path.abspath(db_web_support.req.form["path"].value))[1].split('\\'))
         if not fullpath.startswith(db_web_support.dataroot):
+            import pdb
+            pdb.set_trace()
             return db_web_support.req.return_error(403)
         if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
             if fullpath == db_web_support.dataroot:
                 relpath = '/'
                 pass
             else:
-                relpath = fullpath.replace(db_web_support.dataroot, '')
+                if db_web_support.dataroot != "/":
+                    relpath = fullpath.replace(db_web_support.dataroot, '')
+                else:
+                    relpath = fullpath
                 pass
             pass
         elif not os.path.exists(fullpath):
+            import pdb
             return db_web_support.req.return_error(404)
         else:
             return db_web_support.req.return_error(401)
         pass
+
+    # Convert urls from windows style to unix style
+    relpath = '/'.join(relpath.split('\\'))
+    fullpath = '/'.join(fullpath.split('\\'))
 
     # Import Plugin Directory
     #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules

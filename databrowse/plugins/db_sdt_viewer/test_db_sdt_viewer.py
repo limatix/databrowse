@@ -43,7 +43,8 @@ import unittest2
 from lxml import etree
 from databrowse.lib import db_lib as dbl
 
+
 class db_sdt_viewer_simpletest(unittest2.TestCase):
     def runTest(self):
-        #self.assertIsInstance(dbl.GetXML('example.sdt', handler='db_sdt_viewer'), etree._Element)
+        self.assertIsInstance(dbl.GetXML(r'C:\Users\nscheirer\Documents\databrowsedemos\NASA\ADA_004\pre-holes_short_side.sdt', handler='db_sdt_viewer'), etree._Element)
         pass

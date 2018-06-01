@@ -32,9 +32,9 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.					     ##
+## 19 Aug 2016; 88ABW-2016-4051.					                         ##
 ###############################################################################
-""" databrowse.wsgi - Entry Point for Main Application """
+""" cefdatabrowse_support.py - Entry Point for CEFDatabrowse Application """
 
 import sys
 import os
@@ -263,18 +263,9 @@ class FileResolver(etree.Resolver):
 
 
 def application(filename, params):
-    """ Entry Point for WSGI Application """
-    # os.environ["HOME"] = "/media/sf_UbuntuSharedFiles/databrowse"
+    """ Entry Point for CEFDatabrowse Application """
     try:
-        # Add paths and import support modules
-        #if os.path.dirname(environ['SCRIPT_FILENAME']) not in sys.path:    Removed 8/5/13 - Transition to Installed Modules
-        #    sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']))
-        #if os.path.dirname(environ['SCRIPT_FILENAME'] + '/support/') not in sys.path:
-        #    sys.path.append(os.path.dirname(environ['SCRIPT_FILENAME']) + '/support/')
-        #import web_support as db_web_support_module
-
         starttime = time()
-
         import databrowse.support.cef_web_support as db_web_support_module
 
         # Set up web_support class with environment information
@@ -309,22 +300,15 @@ def application(filename, params):
                 return db_web_support.req.return_error(401)
             pass
 
+        # Convert urls from windows style to unix style
         relpath = '/'.join(relpath.split('\\'))
         fullpath = '/'.join(fullpath.split('\\'))
 
-        # print("relpath", relpath)
-        # print("fullpath", fullpath)
-        # Import Plugin Directory
-        #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
-        #    sys.path.append(db_web_support.pluginpath)
-
         # Determine handler for requested path
-        #import handler_support as handler_support_module
         import databrowse.support.handler_support as handler_support_module
         handler_support = handler_support_module.handler_support(db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
         handler = handlers[-1]
-        # print("Selected Handler: %s" % handler)
 
         # Let's see if we want to override the default handler
         if "handler" in db_web_support.req.form:
@@ -454,29 +438,33 @@ def application(filename, params):
         # Something has gone terribly wrong, let's display some useful information to the user
         # Error Page Template
         errormessage = '''\
-<?xml-stylesheet type="text/xsl" href="{}/db_cef.xml"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-<body db:resdir="{}">
-    <h1>500 Internal Server Error</h1>
-    <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
-    <p>
-        <strong>Error:</strong>  {}                                                     <br/>
-        <strong>Time:</strong> {}                                                       <br/>
-        <strong>Hostname:</strong> {}                                                   <br/>
-        <strong>Platform:</strong> {} <strong>Python:</strong> {}                       <br/>
-        <strong>PID:</strong> {}                                                        <br/>
-        <strong>Traceback:</strong>                                                     <br/>
-        <pre style="overflow:auto">{}</pre>
-        <strong>Dir()</strong>                                                          <br/>
-        <pre style="overflow:auto">{}</pre>
-    </p>
-</body>
-<db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-    <db:navbar>
-        <db:navelem><a href="javascript:window.history.back()">Go Back</a></db:navelem>
-    </db:navbar>
-</db:navigation>
-</html>'''
+        <?xml-stylesheet type="text/xsl" href="/dbres/db_web.xml"?>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+        <body db:resdir="/dbres/">
+            <h1>500 Internal Server Error</h1>
+            <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
+            <p>
+                <strong>Error:</strong>  %s                                                     <br/>
+                <strong>Time:</strong> %s                                                       <br/>
+                <strong>Hostname:</strong> %s                                                   <br/>
+                <strong>Platform:</strong> %s <strong>Python:</strong> %s                       <br/>
+                <strong>PID:</strong> %s                                                        <br/>
+                <strong>Traceback:</strong>                                                     <br/>
+                <pre style="overflow:auto">%s</pre>
+                <strong>Environment:</strong>                                                   <br/>
+                <pre style="overflow:auto">%s</pre>
+                <strong>Request Variables:</strong>                                             <br/>
+                <pre style="overflow:auto">%s</pre>
+                <strong>Dir()</strong>                                                          <br/>
+                <pre style="overflow:auto">%s</pre>
+            </p>
+        </body>
+        <db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+            <db:navbar>
+                <db:navelem><a href="javascript:window.history.back()">Go Back</a></db:navelem>
+            </db:navbar>
+        </db:navigation>
+        </html>'''
 
         # Import Modules Needed For All Of This - No need to import these things otherwise
         import traceback
@@ -484,15 +472,6 @@ def application(filename, params):
         import cgi
         import socket
         from time import gmtime, strftime
-
-        # Get Our Own FieldStorage Object
-        # fs = db_web_support.req.form['input'] if isinstance(db_web_support.req.form['input'], cgi.FieldStorage) else None
-        # if fs is None:
-        #     form = cgi.FieldStorage(fp=db_web_support.req.form["input"], environ=db_web_support.req.form, keep_blank_values=1)
-        #     pass
-        # else:
-        #     form = fs
-        #     pass
 
         # Get a Trace and Also Output a Copy of the Trace to the Server Log
         trace = StringIO.StringIO()
@@ -516,13 +495,13 @@ def application(filename, params):
             inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 
             # Get A List of Everything in Environ
-            # keystring = ""
-            # keys = db_web_support.req.environ.keys()
-            # keys.sort()
-            # for key in keys:
-            #     keystring = keystring + "%s:  %s \n" % (key, repr(db_web_support.req.environ[key]))
-            #     pass
-            # keystring = keystring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
+            keystring = ""
+            keys = db_web_support.req.environ.keys()
+            keys.sort()
+            for key in keys:
+                keystring = keystring + "%s:  %s \n" % (key, repr(db_web_support.req.environ[key]))
+                pass
+            keystring = keystring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Get a list of everything in dir()
             dirstring = ""
@@ -532,58 +511,7 @@ def application(filename, params):
 
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
-            errormessage = errormessage.format(db_web_support.resurl, db_web_support.resurl, err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, dirstring)
+            errormessage = errormessage.format(db_web_support.resurl, db_web_support.resurl, err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, keystring, inputstring, dirstring)
             db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage, db_web_support.req.response_headers, db_web_support.req.status]
         pass
-
-
-class Debugger:
-    """ Code Used To Enable PDB in Single Instance Apache Mode """
-
-    def __init__(self, object):
-        self.__object = object
-
-    def __call__(self, *args, **kwargs):
-        import pdb
-        import sys
-        debugger = pdb.Pdb()
-        debugger.use_rawinput = 0
-        debugger.reset()
-        sys.settrace(debugger.trace_dispatch)
-
-        try:
-            return self.__object(*args, **kwargs)
-        finally:
-            debugger.quitting = 1
-            sys.settrace(None)
-        pass
-    pass
-
-class Profiler:
-    """ Code Used to Enable Profiling in Single Instance Apache Mode """
-
-    def __init__(self, object):
-        self.__object = object
-
-    def __call__(self, *args, **kwargs):
-        from pycallgraph import PyCallGraph
-        from pycallgraph.output import GraphvizOutput
-
-        with PyCallGraph(output=GraphvizOutput(output_file='/tmp/pycallgraph.svg', output_type='svg')):
-            return self.__object(*args, **kwargs)
-
-        pass
-
-
-# Uncomment this line to enable PDB
-# Apache must be ran in single instance mode using the following commands:
-#   sudo /etc/init.d/httpd stop
-#   httpd -X
-#application = Debugger(application)
-
-# Uncomment the below code to enable profiling
-# Apache must be ran in single instance mode using the following  commands:
-#   sudo /etc/init.d/httpd stop
-#   httpd -X
-#application = Profiler(application)

@@ -35,7 +35,7 @@
 ##                                                                           ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.				             ##
+## 19 Aug 2016; 88ABW-2016-4051.				                             ##
 ###############################################################################
 """ db_sdt_viewer.py - SDT File Viewer """
 
@@ -59,7 +59,7 @@ import pdb
 
 
 class db_sdt_viewer(renderer_class):
-    """ Default Renderer - Basic Output for Any File """
+    """ SDT Renderer - Renders common data representations included in sdt files """
 
     _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/sdtfile"
     _namespace_local = "dbsdt"
@@ -74,10 +74,8 @@ class db_sdt_viewer(renderer_class):
                     'FLOAT 32': np.float32,
                     'CHAR 8': np.int8}
 
-
     def check_units(self, param):
         # Check whether the provided string is an integer, float, or a value with units
-
         try:
             intval = int(param)
             return intval, None

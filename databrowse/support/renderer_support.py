@@ -312,7 +312,6 @@ class renderer_class(object):
             del kwargs["showhiddenfiles"]
         # Build the URL
         if self._web_support.seo_urls is True:
-            print(relpath)
             url = self._web_support.siteurl + relpath
             if len(kwargs) > 0:
                 url = url + '?'
