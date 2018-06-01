@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -33,12 +33,13 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
-###############################################################################
-## Portions of this software are adapted from hurry.filesize-0.9:            ##
-## Copyright (C) 2009 Martijn Faassen, Startifact                            ##
-## CHANGE LOG:                                                               ##
-##     2013-03-30 - filesize.py condensed and adapted for use in the         ##
-##                  ConvertUserFriendlySize function                         ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ support/renderer_support.py - Encapsulation Class for Renderer Plugins """
 

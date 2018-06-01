@@ -33,8 +33,15 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
-""" requirements.py - File that determines current system and the required dependencies """
+""" requirements.py - Script that determines current system and the required dependencies """
 
 import sys
 import os
@@ -62,5 +69,9 @@ def select_requirements_file():
         return 'requirements/linux.txt'
     elif cygwin:
         return 'requirements/cygwin.txt'
+    elif solaris:
+        return 'requirements/solaris.txt'
+    elif posix:
+        return 'requirements/posix.txt'
     else:
         raise Exception('Unsupported OS/platform')

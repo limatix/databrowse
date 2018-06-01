@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -33,6 +33,13 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ support/cef_web_support.py - Classes to encapsulate Web/WSGI functionality for CEF """
 
@@ -78,16 +85,12 @@ class wsgi_req:
 
         if "debug" in self.form:
             self.response_headers["Content-Type"] = "text/plain"    # can switch to "text/plain" for debugging -- add ?debug to end of URL
-            # config.req.output=str(config.req.form)+str(config.req.form["debug"])
             pass
 
         pass
 
     def return_page(self):
         """ Send Webpage Output """
-        #self.response_headers['Content-Length'] = str(len(self.output))
-        #self.start_response(self.status, self.response_headers.items())
-        #self.output_done = True
         return self.output
 
     def return_error(self, status=500):
@@ -113,18 +116,16 @@ class wsgi_req:
         else:
             self.status = [status, 'Internal Server Error']
 
-        #self.output_done = True
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
         self.response_headers['Content-Length'] = str(len(self.status[1].encode('utf-8')))
-        #self.start_response(self.status, self.response_headers.items())
         raise Exception(self.status[1])
 
     pass
 
 
 class style_support:
-    """ Class containing support functionality for xslt stylesheet compliation """
+    """ Class containing support functionality for xslt stylesheet compilation """
 
     _style_dict = {}
 

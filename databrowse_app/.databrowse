@@ -4,5 +4,5 @@ height = 664
 x = 0
 y = 0
 dataroot = /Users/nscheirer
-dataguzzlerlib = C:\Users\nscheirer\Documents\dev\dataguzzler-lib\python
+dataguzzlerlib = /Users/nscheirer/Documents/dev/dataguzzler-lib/python
 

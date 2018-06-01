@@ -32,7 +32,14 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.					                         ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ setup.py - Main Install Script """
 
@@ -68,7 +75,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.7.6',
+    version='0.8.0',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
     package_data={'': ['*.conf', '*.xml', '.databrowse']},
     data_files=search_dirs,
@@ -80,6 +87,7 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
+        "Environment :: CEF Client",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Natural Language :: English",
