@@ -751,12 +751,12 @@
                 </img>
                 <span class="menuitemcomponent">Open Folder in SFTP Client</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
+            <!--<div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Open Folder in SSH Client</span>
-            </div>
+            </div>!-->
             <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
@@ -828,12 +828,12 @@
                 </img>
                 <span class="menuitemcomponent">Open File in SFTP Client</span>
             </div>
-            <div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
+            <!--<div class="menuitemcomponent contextmenuitem" onmouseup="openiteminsshclient()">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Open Folder in SSH Client</span>
-            </div>
+            </div>!-->
             <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('filecontextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
