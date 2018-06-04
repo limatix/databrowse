@@ -377,7 +377,7 @@ class renderer_class(object):
                 return returnlist
             else:
                 raise Exception("%s does not exist." % fullpath)
-        except WindowsError:
+        except Exception:
             print("You don't have access to %s" % fullpath)
         pass
 

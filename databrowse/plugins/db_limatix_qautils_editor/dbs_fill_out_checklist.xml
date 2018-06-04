@@ -32,7 +32,7 @@
                     var filenameinput=document.getElementById("filenameinput");
                     var destnameinput=document.getElementsByName("dest")[0];
                     window.onbeforeunload = null
-                    window.location.href = destnameinput.value + "/" + filenameinput.value;
+                    window.location.href = "/databrowse/" + destnameinput.value + "/" + filenameinput.value;
                 }
             }
             
