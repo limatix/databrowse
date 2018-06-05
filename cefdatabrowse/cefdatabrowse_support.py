@@ -299,6 +299,8 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
+                import pdb
+                pdb.set_trace()
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)
@@ -442,25 +444,25 @@ def application(filename, params):
         # Something has gone terribly wrong, let's display some useful information to the user
         # Error Page Template
         errormessage = '''\
-        <?xml-stylesheet type="text/xsl" href="/dbres/db_web.xml"?>
+        <?xml-stylesheet type="text/xsl" href="{}/db_web.xml"?>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
-        <body db:resdir="/dbres/">
+        <body db:resdir="{}/">
             <h1>500 Internal Server Error</h1>
             <p>An unhandled exception has occurred.  Notify the administrators for assistance.  Please make note of what you were doing, the steps to reproduce the error, and the approximate time.  More details are shown below:</p>
             <p>
-                <strong>Error:</strong>  %s                                                     <br/>
-                <strong>Time:</strong> %s                                                       <br/>
-                <strong>Hostname:</strong> %s                                                   <br/>
-                <strong>Platform:</strong> %s <strong>Python:</strong> %s                       <br/>
-                <strong>PID:</strong> %s                                                        <br/>
+                <strong>Error:</strong>  {}                                                     <br/>
+                <strong>Time:</strong> {}                                                       <br/>
+                <strong>Hostname:</strong> {}                                                   <br/>
+                <strong>Platform:</strong> {} <strong>Python:</strong> {}                       <br/>
+                <strong>PID:</strong> {}                                                        <br/>
                 <strong>Traceback:</strong>                                                     <br/>
-                <pre style="overflow:auto">%s</pre>
+                <pre style="overflow:auto">{}</pre>
                 <strong>Environment:</strong>                                                   <br/>
-                <pre style="overflow:auto">%s</pre>
+                <pre style="overflow:auto">{}</pre>
                 <strong>Request Variables:</strong>                                             <br/>
-                <pre style="overflow:auto">%s</pre>
+                <pre style="overflow:auto">{}</pre>
                 <strong>Dir()</strong>                                                          <br/>
-                <pre style="overflow:auto">%s</pre>
+                <pre style="overflow:auto">{}</pre>
             </p>
         </body>
         <db:navigation xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
@@ -500,12 +502,12 @@ def application(filename, params):
 
             # Get A List of Everything in Environ
             keystring = ""
-            keys = db_web_support.req.environ.keys()
-            keys.sort()
-            for key in keys:
-                keystring = keystring + "%s:  %s \n" % (key, repr(db_web_support.req.environ[key]))
-                pass
-            keystring = keystring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
+            # keys = db_web_support.req.environ.keys()
+            # keys.sort()
+            # for key in keys:
+            #     keystring = keystring + "%s:  %s \n" % (key, repr(db_web_support.req.environ[key]))
+            #     pass
+            # keystring = keystring.replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
 
             # Get a list of everything in dir()
             dirstring = ""

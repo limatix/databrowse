@@ -1,8 +1,12 @@
 [databrowse]
-width = 965
-height = 664
+width = 800
+height = 600
 x = 0
 y = 0
-dataroot = /Users/nscheirer
-dataguzzlerlib = /Users/nscheirer/Documents/dev/dataguzzler-lib/python
-
+dataroot = /
+dataguzzlerlib = /
+sendmail = /usr/lib/sendmail -i
+sops = /SOPs
+limatix-qautils = /
+qautils = /
+logout = /

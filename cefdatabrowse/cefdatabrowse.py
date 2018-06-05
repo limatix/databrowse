@@ -58,7 +58,7 @@ databrowse -e
     None -> opens the configuration file in the default text editor
 '''
 
-WIDTH, HEIGHT, POS_X, POS_Y, dataroot, dataguzzlerlib = (800, 600, 0, 0, "/", None)
+configdict = {}
 
 from cefpython3 import cefpython as cef
 import ctypes
@@ -73,22 +73,17 @@ import cefdatabrowse_support as dbp
 
 # Load saved cef application settings
 def load_settings():
-    global WIDTH, HEIGHT, dataroot, POS_X, POS_Y, dataguzzlerlib
+    global configdict
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
-    WIDTH = config.getint("databrowse", "WIDTH")
-    HEIGHT = config.getint("databrowse", "HEIGHT")
-    POS_X = config.getint("databrowse", "X")
-    POS_Y = config.getint("databrowse", "Y")
-    dataroot = config.get("databrowse", "dataroot")
-    dataguzzlerlib = config.get("databrowse", "dataguzzlerlib")
+    configdict.update(dict(config.items('databrowse')))
 
 
 def save_settings():
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
-    config.set("databrowse", "WIDTH", WIDTH)
-    config.set("databrowse", "HEIGHT", HEIGHT)
+    config.set("databrowse", "WIDTH", configdict['width'])
+    config.set("databrowse", "HEIGHT", configdict['height'])
     config.set("databrowse", "X", POS_X)
     config.set("databrowse", "Y", POS_Y)
     with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
@@ -96,13 +91,13 @@ def save_settings():
 
 
 def update_dataroot(newdataroot):
-    global dataroot
+    global configdict
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
     with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
         config.write(configfile)
-    dataroot = newdataroot
+    configdict['dataroot'] = newdataroot
 
 
 load_settings()
@@ -116,10 +111,10 @@ try:
                 if sys.argv[2] is not None:
                     if os.path.exists(sys.argv[2]):
                         update_dataroot(sys.argv[2])
-                        print("Updated dataroot to: %s" % dataroot)
+                        print("Updated dataroot to: %s" % configdict['dataroot'])
                         sys.exit(0)
             except IndexError:
-                print("Dataroot is currently: %s" % dataroot)
+                print("Dataroot is currently: %s" % configdict['dataroot'])
                 sys.exit(0)
         elif sys.argv[1] == "-e":
             if platform.system() == "Linux":
@@ -140,7 +135,7 @@ try:
             if os.path.exists(sys.argv[1]):
                 usr_path = os.path.splitdrive(sys.argv[1])[1]
             else:
-                usr_path = dataroot
+                usr_path = configdict['dataroot']
 except IndexError:
     pass
 
@@ -212,7 +207,7 @@ if WINDOWS:
     sys.path.insert(0, install)
 
 # Append external libraries to path
-sys.path.insert(0, dataguzzlerlib)
+sys.path.insert(0, configdict['dataguzzlerlib'])
 
 
 # Modified client handler from cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
@@ -303,7 +298,8 @@ class ClientHandler:
 
         # Call the databrowse library and return the generated html
         if handler is "cefdatabrowse":
-            databrowsepaths = {'dataroot': dataroot, 'install': install, 'path': fullpath}
+            databrowsepaths = {'install': install, 'path': fullpath}
+            databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
             params.update(urlparams)
             html = dbp.application(fullpath, params)
@@ -320,8 +316,7 @@ class ClientHandler:
                     pdb.set_trace()
                     raise IOError("Install location needs to be updated")
                 else:
-                    print("Different problem")
-                    raise IOError
+                    raise IOError("Unknown problem")
             mime = response.GetMimeType()
             urlparams.update({'headers': {'Content-Type': mime}})
             data = "".join(html)
@@ -657,7 +652,7 @@ class MainWindow(QMainWindow):
         self.setupLayout()
 
     def setupLayout(self):
-        self.resize(WIDTH, HEIGHT)
+        self.resize(int(configdict['width']), int(configdict['height']))
         self.cef_widget = CefWidget(self)
         self.navigation_bar = NavigationBar(self.cef_widget)
         layout = QGridLayout()
@@ -782,10 +777,10 @@ class CefWidget(CefWidgetParent):
             self.browser.NotifyMoveOrResizeStarted()
 
     def resizeEvent(self, event):
-        global WIDTH, HEIGHT
+        global configdict
         size = event.size()
-        WIDTH = self.window().size().width()
-        HEIGHT = self.window().size().height()
+        configdict['width'] = self.window().size().width()
+        configdict['height'] = self.window().size().height()
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)

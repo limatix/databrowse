@@ -251,7 +251,7 @@ class web_support:
             pass
 
         if self.logouturl is None:
-            self.logouturl = "http://localhost/logout"
+            self.logouturl = params['logout']
             pass
 
         if self.icondbpath is None:
@@ -267,10 +267,10 @@ class web_support:
             pass
 
         if self.checklistpath is None:
-            self.checklistpath = r"/SOPs"
+            self.checklistpath = params['sops']
 
         if self.email_sendmail is None:
-            self.email_sendmail = "/usr/lib/sendmail -i"
+            self.email_sendmail = params['sendmail']
             pass
 
         if self.email_admin is None:
@@ -282,11 +282,11 @@ class web_support:
             pass
 
         if self.limatix_qautils is None:
-            self.limatix_qautils = r'/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils'
+            self.limatix_qautils = params['limatix-qautils']
             pass
 
         if self.qautils is None:
-            self.qautils = r'/Users/nscheirer/Documents/dev/databrowse-utils/QAutils'
+            self.qautils = params['qautils']
             pass
 
         if self.administrators is None:
