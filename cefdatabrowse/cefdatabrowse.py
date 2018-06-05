@@ -218,7 +218,7 @@ class ClientHandler:
     def GetResourceHandler(self, browser, frame, request):
         # Called on the IO thread before a resource is loaded.
         # To allow the resource to load normally return None.
-        # print("GetResourceHandler(): url = %s" % request.GetUrl())
+        print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
         if parsedurl.netloc != urlparse(scheme).netloc:
@@ -298,7 +298,7 @@ class ClientHandler:
 
         # Call the databrowse library and return the generated html
         if handler is "cefdatabrowse":
-            databrowsepaths = {'install': install, 'path': fullpath}
+            databrowsepaths = {'install': install, 'path': fullpath, 'scheme': scheme}
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
             params.update(urlparams)

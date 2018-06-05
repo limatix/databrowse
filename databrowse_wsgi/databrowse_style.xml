@@ -19,7 +19,7 @@
 	<!-- Scripts Declared Inline at top of Head Section -->
 	<db:inlinescript>
 		<script type="text/javascript" src="{$resdir}uncryptmailto.js" defer="true"/>
-		<script type="text/javascript" src="{$resdir}jquery-1.9.1.min.js"/>
+		<script type="text/javascript" src="{$resdir}jquery-3.3.1.min.js"/>
 	</db:inlinescript>
 
 	</xsl:stylesheet>

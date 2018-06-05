@@ -232,10 +232,7 @@ class web_support:
         # Set Default Configuration Options
         self.dataroot = params['dataroot']
 
-        if platform.system() == "Linux":
-            self.path = "127.0.0.1/" + params['path']
-        else:
-            self.path = params['path']
+        self.path = params['scheme'] + params['path']
 
         if self.siteurl is None:
             self.siteurl = params['dataroot']
