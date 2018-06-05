@@ -312,8 +312,6 @@ class ClientHandler:
                 html = open(fullpath, "rb")
             except IOError:
                 if not os.path.exists(fullpath):
-                    import pdb
-                    pdb.set_trace()
                     raise IOError("Install location needs to be updated")
                 else:
                     raise IOError("Unknown problem")

@@ -54,10 +54,6 @@ import copy
 import fnmatch
 import platform
 
-if platform.system() == "Linux":
-    class WindowsError:
-        pass
-
 
 class renderer_class(object):
     """ Renderer Plugin Support - Encapsulation Class for Renderer Plugins """
@@ -353,32 +349,29 @@ class renderer_class(object):
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
         if not os.path.exists(fullpath):
             os.makedirs(fullpath)
-        try:
-            if os.path.exists(fullpath):
-                reallist = os.listdir(fullpath)
-                if "showhiddenfiles" in self._web_support.req.form:
-                    returnlist = reallist
-                else:
-                    removelist = copy.copy(reallist)
-                    for item in hiddenlist:
-                        removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
-                        pass
-                    addlist = []
-                    for item in shownlist:
-                        addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
-                        pass
-                    returnlist = list(set(removelist + addlist))
-                exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
-
-                returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
-                returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
-                returnlist = returndirlist
-                returnlist.extend(returnfilelist)
-                return returnlist
+        if os.path.exists(fullpath):
+            reallist = os.listdir(fullpath)
+            if "showhiddenfiles" in self._web_support.req.form:
+                returnlist = reallist
             else:
-                raise Exception("%s does not exist." % fullpath)
-        except Exception:
-            print("You don't have access to %s" % fullpath)
+                removelist = copy.copy(reallist)
+                for item in hiddenlist:
+                    removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
+                    pass
+                addlist = []
+                for item in shownlist:
+                    addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
+                    pass
+                returnlist = list(set(removelist + addlist))
+            exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+
+            returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
+            returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
+            returnlist = returndirlist
+            returnlist.extend(returnfilelist)
+            return returnlist
+        else:
+            raise Exception("%s does not exist." % fullpath)
         pass
 
     class CacheFileHandler(file):

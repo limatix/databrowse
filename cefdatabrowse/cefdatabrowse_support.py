@@ -299,8 +299,6 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
-                import pdb
-                pdb.set_trace()
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)
