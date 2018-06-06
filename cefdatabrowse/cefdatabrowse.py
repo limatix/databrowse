@@ -100,6 +100,9 @@ def update_dataroot(newdataroot):
     configdict['dataroot'] = newdataroot
 
 
+myappid = u'thermal.cnde.iastate.edu.databrowse'
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 load_settings()
 
 # Handle command line variables
@@ -809,7 +812,7 @@ class CefApplication(QApplication):
         self.timer.stop()
 
     def setupIcon(self):
-        icon_file = os.path.join(install + "/databrowse_app/resources", "{0}.png".format("pyside"))
+        icon_file = os.path.join(install + "/databrowse_app/resources/", "{0}.png".format("icon256"))
         if os.path.exists(icon_file):
             self.setWindowIcon(QIcon(icon_file))
 
