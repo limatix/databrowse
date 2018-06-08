@@ -69,7 +69,7 @@ class db_generic_WSGI_application(renderer_class):
         pass
 
     def getContent(self):
-        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
+        if self._caller != "databrowse":
             return None
         else:
             if self._content_mode == "full":

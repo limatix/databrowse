@@ -6,7 +6,7 @@
                 $("#loading").text("Printing...");
                 $("#loading").fadeIn(500);
                 $.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: printurl
                 }).done(function(msg) { 
                     alert(msg); 

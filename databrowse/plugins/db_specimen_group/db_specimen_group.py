@@ -62,7 +62,7 @@ class db_specimen_group(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._content_mode != "raw" and (self._caller == "databrowse" or self._caller == "cefdatabrowse") and "ajax" not in self._web_support.req.form:
+        if self._content_mode != "raw" and (self._caller == "databrowse") and "ajax" not in self._web_support.req.form:
             f = open(self._fullpath, 'r')
             xml = etree.parse(f)
             f.close()

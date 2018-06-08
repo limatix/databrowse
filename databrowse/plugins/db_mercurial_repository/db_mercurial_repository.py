@@ -66,7 +66,7 @@ class db_mercurial_repository(db_directory_module.db_directory):
             return []
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
-        if caller == "databrowse" or caller == "cefdatabrowse":
+        if caller == "databrowse":
             self._namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/hgdir"
             self._namespace_local = "hgdir"
         else:
@@ -78,7 +78,7 @@ class db_mercurial_repository(db_directory_module.db_directory):
         super(db_mercurial_repository, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
 
         # Check for uncommitted changes - only if at top level - the only place we'd display this
-        if caller == "databrowse" or caller == "cefdatabrowse":
+        if caller == "databrowse":
             uncommitted = self.uncommittedlist(fullpath)
             if len(uncommitted) > 0:
                 self._xml.set('uncommitted', '%s' % len(uncommitted))

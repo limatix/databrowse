@@ -74,9 +74,6 @@ class db_file_ops(renderer_class):
             operation = self._web_support.req.form['operation'].value
 
         if operation == "upload":
-            if self._caller == "cefdatabrowse":
-                print("CEFDatabrowse cannot upload files currently.")
-                return [""]
             if not os.path.isdir(self._fullpath):
                 raise self.RendererException("Uploads Must Be in Folder")
             elif "files[]" not in self._web_support.req.form:

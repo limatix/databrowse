@@ -100,7 +100,7 @@ def update_dataroot(newdataroot):
     configdict['dataroot'] = newdataroot
 
 
-myappid = u'thermal.cnde.iastate.edu.databrowse'
+myappid = u'limatix.org.databrowse'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 load_settings()
@@ -195,7 +195,7 @@ LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
 # Configuration
-scheme = "file://127.0.0.1"
+scheme = "http://127.0.0.1"
 
 # OS differences
 CefWidgetParent = QWidget
@@ -224,8 +224,6 @@ class ClientHandler:
         # print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
-        if parsedurl.netloc != urlparse(scheme).netloc:
-            return None
 
         if LINUX:
             relpath = os.path.relpath(parsedurl.path)
@@ -249,7 +247,10 @@ class ClientHandler:
                     urlparams[paramone] = paramone
 
         fs = request.GetPostData()
-        # Handle editing of text files here
+        print(fs)
+        # TODO: Handle POST data here
+        # Especially uploaded files because of this:
+        # [0608/110311.456:ERROR:request_impl.cc(785)] NOT IMPLEMENTED multi-part form data is not supported
         if type(fs) == list:
             text = fs[0].split("\r\n")
             text = text[3:-2]

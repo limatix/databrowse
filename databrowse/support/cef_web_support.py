@@ -240,7 +240,7 @@ class web_support:
 
         if self.resurl is None:
             self.resurl = os.path.abspath(params['install'] + "/databrowse_wsgi/resources")
-            self.resurl = "/".join(self.resurl.split("\\"))
+            self.resurl = params['scheme'] + "/".join(self.resurl.split("\\"))
             pass
 
         if self.webdir is None:

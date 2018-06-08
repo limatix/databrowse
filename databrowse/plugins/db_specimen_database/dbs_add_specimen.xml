@@ -146,7 +146,7 @@
                     error: saveErrorCallback,
                     processData: false,
                     success: saveSuccessCallback,
-                    type: 'GET',
+                    type: 'POST',
                     url: ajaxurl
                     });
 

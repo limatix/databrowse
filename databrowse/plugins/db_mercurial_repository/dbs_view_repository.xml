@@ -254,7 +254,7 @@
 
                     function startchecklist(checklistname) {
                         var PostForm = document.createElement("form");
-                        PostForm.method = "GET";
+                        PostForm.method = "POST";
                         PostForm.action = checklistname;
                         var PostInput = document.createElement("input");
                         PostInput.setAttribute("name", "dest");
@@ -282,7 +282,7 @@
                         if(newdirname) {
                             var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
                             $.ajax({
-                                type: "GET",
+                                type: "POST",
                                 url: ajaxurl,
                                 data: { dirname: newdirname }
                             }).done(function(msg) {
@@ -302,7 +302,7 @@
                         if(newdirname && newdirname != curname) {
                             var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=rename";
                             $.ajax({
-                                type: "GET",
+                                type: "POST",
                                 url: ajaxurl,
                                 data: { newname: newdirname }
                             }).done(function(msg) {
@@ -325,7 +325,7 @@
                         var relpathlist = relpath.slice(1).split("/");
                         if(confirm('Are you sure you want to delete "'+relpath+'"?')) {
                             $.ajax({
-                                type: "GET",
+                                type: "POST",
                                 url: ajaxurl,
                             }).done(function(msg) {
                                 if(msg=="Item Moved To Trash Successfully") {

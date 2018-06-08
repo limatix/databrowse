@@ -271,7 +271,7 @@ class db_sdt_viewer(renderer_class):
         return xmltree
 
     def getContent(self):
-        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
+        if self._caller != "databrowse":
             return None
         else:
             if self._content_mode == "full":

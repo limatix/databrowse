@@ -67,7 +67,7 @@ class db_plain_text_file(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
+        if self._caller != "databrowse":
             return None
         else:
             if "ajax" in self._web_support.req.form and "save" in self._web_support.req.form:

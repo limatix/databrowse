@@ -72,7 +72,7 @@ class db_generic_HDF5_file(renderer_class):
     _default_recursion_depth = 2
 
     def getContent(self):
-        if self._caller != "databrowse" and self._caller != "cefdatabrowse":
+        if self._caller != "databrowse":
             return None
         else:
             if self._content_mode == "full":

@@ -66,7 +66,7 @@
                     dataType: "text",
                     error: saveErrorCallback,
                     success: saveSuccessCallback,
-                    type: 'GET',
+                    type: 'POST',
                     url: ajaxurl
                     });
             }

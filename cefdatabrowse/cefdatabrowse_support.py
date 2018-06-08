@@ -292,10 +292,7 @@ def application(filename, params):
                     relpath = '/'
                     pass
                 else:
-                    if db_web_support.dataroot != "/":
-                        relpath = fullpath.replace(db_web_support.dataroot, '')
-                    else:
-                        relpath = fullpath
+                    relpath = fullpath.replace(db_web_support.dataroot, '')
                     pass
                 pass
             elif not os.path.exists(fullpath):
@@ -304,9 +301,7 @@ def application(filename, params):
                 return db_web_support.req.return_error(401)
             pass
 
-        # Convert urls from windows style to unix style
         relpath = '/'.join(relpath.split('\\'))
-        fullpath = '/'.join(fullpath.split('\\'))
 
         # Determine handler for requested path
         import databrowse.support.handler_support as handler_support_module
@@ -320,7 +315,7 @@ def application(filename, params):
             pass
 
         # Get A Handle to The Rendering Plugin
-        caller = "cefdatabrowse"
+        caller = "databrowse"
         exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
         exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
