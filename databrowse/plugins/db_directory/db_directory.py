@@ -60,21 +60,15 @@ class db_directory(renderer_class):
     _default_recursion_depth = 1
 
     def recursiveloop(self, dirname, chxlist):
-        if self._web_support.dataroot != "/":
-            chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
-        else:
-            chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.checklistpath + '/' + dirname))
+        chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
         for item in chxdirlist:
             if item.endswith(".chx"):
                 itemurl = self.getURL(os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item), handler=None)
-                itemurl = '/'.join(itemurl.split("\\"))
                 etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
                 pass
             if os.path.isdir(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
                 if len([x for x in self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(dirname + '/' + item))) if (x.endswith('.chx') or os.path.isdir(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(dirname + '/' + item + '/' + x))))]) > 0:
-                    subdirurl = self.getURL(os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item), handler=None)
-                    subdirurl = '/'.join(subdirurl.split("\\"))
-                    subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap, url=subdirurl, name=item)
+                    subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap, url=self.getURL(os.path.normpath(self._web_support.checklistpath + '/'  + dirname + '/' + item), handler=None), name=item)
                     self.recursiveloop(os.path.normpath(dirname + '/' + item), subchxlist)
                 pass
 
@@ -109,48 +103,44 @@ class db_directory(renderer_class):
         if recursion_depth != 0:
             caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
-            if dirlist is not None:
-                for item in dirlist:
-                    itemrelpath = os.path.join(self._relpath, item).replace("\\", "/")
-                    itemfullpath = os.path.join(self._fullpath, item).replace("\\", "/")
-                    try:
-                        (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
-                        handler = handlers[-1]
-                        if handler in self._handler_support.directoryplugins:
-                            icon = self._handler_support.directoryplugins[handler]
-                        if handler in self._handler_support.directoryplugins:
-                            renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
-                        else:
-                            exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-                            exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
-                        content = renderer.getContent()
-                        if os.path.islink(itemfullpath):
-                            overlay = "link"
-                        elif not os.access(itemfullpath, os.W_OK):
-                            overlay = "readonly"
-                        elif not os.access(itemfullpath, os.R_OK):
-                            overlay = "unreadable"
-                        else:
-                            overlay = "none"
-                        if content is not None and content.tag.startswith("{%s}" % self._namespace_uri):
-                            content.set('icon', icon)
-                            content.set('overlay', overlay)
-                            xmlroot.append(content)
-                        else:
-                            xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
-                            if content is not None:
-                                xmlchild.append(content)
-                                pass
+            for item in dirlist:
+                itemrelpath = "/".join([self._relpath, item])
+                itemfullpath = "/".join([self._fullpath, item])
+                (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
+                handler = handlers[-1]
+                if handler in self._handler_support.directoryplugins:
+                    icon = self._handler_support.directoryplugins[handler]
+                if handler in self._handler_support.directoryplugins:
+                    renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
+                else:
+                    exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
+                    exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                content = renderer.getContent()
+                if os.path.islink(itemfullpath):
+                    overlay = "link"
+                elif not os.access(itemfullpath, os.W_OK):
+                    overlay = "readonly"
+                elif not os.access(itemfullpath, os.R_OK):
+                    overlay = "unreadable"
+                else:
+                    overlay = "none"
+                if content is not None and content.tag.startswith("{%s}" % self._namespace_uri):
+                    content.set('icon', icon)
+                    content.set('overlay', overlay)
+                    xmlroot.append(content)
+                else:
+                    xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
+                    if content is not None:
+                        xmlchild.append(content)
                         pass
-                    except IOError:
-                        print("You don't have access to %s" % itemfullpath)
                 pass
+            pass
         else:
             #ajax url and what not
             xmlroot.set("ajax", "True")
             xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
             pass
-        if (self._caller == "databrowse") and self._web_support.checklistpath is not None:
+        if self._caller == "databrowse" and self._web_support.checklistpath is not None:
             chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri), nsmap=self.nsmap)
             #chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
 

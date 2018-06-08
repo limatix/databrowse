@@ -27,13 +27,6 @@
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
-## This material is based on work supported by the Air Force Research        ##
-## Laboratory under Contract #FA8650-10-D-5210, Task Order #023 and          ##
-## performed at Iowa State University.                                       ##
-##                                                                           ##
-## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.                                             ##
-##                                                                           ##
 ## This material is based on work supported by NASA under Contract           ##
 ## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
 ## to TRI Austin.                                                            ##
@@ -195,19 +188,15 @@ LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
 # Configuration
-scheme = "http://127.0.0.1"
+scheme = "http://localhost/"
 
 # OS differences
 CefWidgetParent = QWidget
+install = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+sys.path.insert(0, install)
 if LINUX and (PYQT4 or PYSIDE):
-    install = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-    sys.path.insert(0, install)
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
-
-if WINDOWS:
-    install = os.path.splitdrive(os.path.split(os.path.dirname(os.path.realpath(__file__)))[0])[1]
-    sys.path.insert(0, install)
 
 # Append external libraries to path
 sys.path.insert(0, configdict['dataguzzlerlib'])
@@ -224,16 +213,8 @@ class ClientHandler:
         # print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
-
-        if LINUX:
-            relpath = os.path.relpath(parsedurl.path)
-            fullpath = os.path.abspath(parsedurl.path)
-        elif WINDOWS:
-            relpath = os.path.relpath(parsedurl.path)
-            fullpath = os.path.splitdrive(os.path.abspath(parsedurl.path))[1]
-        else:
-            relpath = None
-            fullpath = None
+        relpath = os.path.relpath(parsedurl.path[1:])
+        fullpath = parsedurl.path[1:]
 
         urlparams = {}
         if parsedurl.query != "":
@@ -247,7 +228,7 @@ class ClientHandler:
                     urlparams[paramone] = paramone
 
         fs = request.GetPostData()
-        print(fs)
+        # print(fs)
         # TODO: Handle POST data here
         # Especially uploaded files because of this:
         # [0608/110311.456:ERROR:request_impl.cc(785)] NOT IMPLEMENTED multi-part form data is not supported
@@ -309,8 +290,8 @@ class ClientHandler:
             html = dbp.application(fullpath, params)
             data = "".join(html[0])
             urlparams.update({'headers': html[1], "status": html[2]})
-            if "operation" in urlparams:
-                browser.Reload()
+            # if "operation" in urlparams:
+            #     browser.Reload()
         else:
             try:
                 html = open(fullpath, "rb")
@@ -508,7 +489,7 @@ class DatabrowseHandler:
         assert self._webRequestClient._response, "Response object empty"
         wrcResponse = self._webRequestClient._response
         response.SetMimeType(self._params["headers"]["Content-Type"])
-        response.SetStatus(self._params["status"][0])
+        response.SetStatus(200)
         response.SetStatusText(wrcResponse.GetStatusText())
         response.SetHeaderMap(self._params["headers"])
         if wrcResponse.GetHeaderMultimap():

@@ -338,7 +338,7 @@ class renderer_class(object):
             return self.getURL(relpath, **kwargs)
             pass
         else:
-            relpath = os.path.splitdrive(os.path.abspath(relpath + '/../'))[1]
+            relpath = os.path.abspath(relpath + '/../')
             return self.getURL(relpath, **kwargs)
             pass
         pass
@@ -347,29 +347,28 @@ class renderer_class(object):
         """ Build a Sorted List of Files with Appropriate Files Removed """
         #print "getDirectoryList being called"
         (hiddenlist, shownlist) = self._handler_support.GetHiddenFileList()
-        if os.path.exists(fullpath):
-            reallist = os.listdir(fullpath)
-            if "showhiddenfiles" in self._web_support.req.form:
-                returnlist = reallist
-            else:
-                removelist = copy.copy(reallist)
-                for item in hiddenlist:
-                    removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
-                    pass
-                addlist = []
-                for item in shownlist:
-                    addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
-                    pass
-                returnlist = list(set(removelist + addlist))
-            exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
-
-            returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
-            returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
-            returnlist = returndirlist
-            returnlist.extend(returnfilelist)
-            return returnlist
+        reallist = os.listdir(fullpath)
+        if "showhiddenfiles" in self._web_support.req.form:
+            returnlist = reallist
         else:
-            raise Exception("%s does not exist." % fullpath)
+            removelist = copy.copy(reallist)
+            for item in hiddenlist:
+                removelist = [n for n in removelist if not fnmatch.fnmatch(n, item[1])]
+                pass
+            addlist = []
+            for item in shownlist:
+                addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
+                pass
+            returnlist = list(set(removelist + addlist))
+        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+
+        returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
+        returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
+        returnlist = returndirlist
+        returnlist.extend(returnfilelist)
+
+        return returnlist
+
         pass
 
     class CacheFileHandler(file):

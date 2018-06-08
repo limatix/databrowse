@@ -148,7 +148,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newdirpath = os.path.abspath(os.path.join(self._fullpath, self._web_support.req.form["dirname"].value))
-                if not os.path.splitdrive(newdirpath)[1].startswith(os.path.normpath(self._web_support.dataroot)):
+                if not newdirpath.startswith(self._web_support.dataroot):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newdirpath):
                     outputmsg = "ERROR: Directory Already Exists"
@@ -176,7 +176,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newpath = os.path.abspath(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form["newname"].value))
-                if not os.path.splitdrive(newpath)[1].startswith(os.path.normpath(self._web_support.dataroot)):
+                if not newpath.startswith(self._web_support.dataroot):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newpath):
                     outputmsg = "ERROR: File or Directory Already Exists"

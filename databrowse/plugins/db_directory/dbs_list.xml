@@ -280,7 +280,7 @@
                     function newdirectory() {
                         var newdirname = prompt("Type New Directory Name");
                         if(newdirname) {
-                            var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
+                            var ajaxurl = siteurl+"\\"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
                             $.ajax({
                                 type: "POST",
                                 url: ajaxurl,
@@ -756,7 +756,7 @@
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Open Folder in SSH Client</span>
-            </div>!-->
+            </div>-->
             <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('contextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>
@@ -833,7 +833,7 @@
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/utilities-terminal.png</xsl:attribute>
                 </img>
                 <span class="menuitemcomponent">Open Folder in SSH Client</span>
-            </div>!-->
+            </div>-->
             <div class="menuitemcomponent contextmenuitem" onclick="displaylink(); clearContextMenu('filecontextmenu');">
                 <img class="menuitemcomponent">
                     <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/edit-copy.png</xsl:attribute>

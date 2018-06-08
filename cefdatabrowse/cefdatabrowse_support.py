@@ -27,13 +27,6 @@
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
-## This material is based on work supported by the Air Force Research        ##
-## Laboratory under Contract #FA8650-10-D-5210, Task Order #023 and          ##
-## performed at Iowa State University.                                       ##
-##                                                                           ##
-## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.                                             ##
-##                                                                           ##
 ## This material is based on work supported by NASA under Contract           ##
 ## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
 ## to TRI Austin.                                                            ##
@@ -53,7 +46,7 @@ from time import time
 import cgitb
 cgitb.enable()
 
-serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -122,7 +115,7 @@ serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -179,7 +172,7 @@ localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
     <xsl:variable name="resdir">%s</xsl:variable>
     <xsl:variable name="proctime">%s</xsl:variable>
     <xsl:template match="/">
-        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_cef.xml"</xsl:processing-instruction>
+        <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
             <body>
                 <xsl:attribute name="db:resdir"><xsl:value-of select="$resdir"/></xsl:attribute>
@@ -192,7 +185,7 @@ localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-ajaxwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -271,10 +264,10 @@ class FileResolver(etree.Resolver):
 
 def application(filename, params):
     """ Entry Point for CEFDatabrowse Application """
-    try:
-        starttime = time()
-        import databrowse.support.cef_web_support as db_web_support_module
+    starttime = time()
+    import databrowse.support.dummy_web_support as db_web_support_module
 
+    try:
         # Set up web_support class with environment information
         db_web_support = db_web_support_module.web_support(filename, params)
 
@@ -284,8 +277,11 @@ def application(filename, params):
             relpath = '/'
             pass
         else:
-            fullpath = '/'.join(os.path.splitdrive(os.path.abspath(db_web_support.req.form["path"].value))[1].split('\\'))
+            fullpath = os.path.abspath(db_web_support.req.form["path"].value)
+            fullpath = '/'.join(fullpath.split('\\'))
             if not fullpath.startswith(db_web_support.dataroot):
+                import pdb
+                pdb.set_trace()
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:
@@ -296,6 +292,8 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
+                import pdb
+                pdb.set_trace()
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)
@@ -303,7 +301,12 @@ def application(filename, params):
 
         relpath = '/'.join(relpath.split('\\'))
 
+        # Import Plugin Directory
+        #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules
+        #    sys.path.append(db_web_support.pluginpath)
+
         # Determine handler for requested path
+        #import handler_support as handler_support_module
         import databrowse.support.handler_support as handler_support_module
         handler_support = handler_support_module.handler_support(db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
@@ -352,13 +355,11 @@ def application(filename, params):
 
             # If we are only requesting content or style, output them
             if "contentonly" in db_web_support.req.form:
-                print("Content only activated")
                 xml = etree.ElementTree(renderer.getContent())
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = etree.tostring(xml)
                 return [db_web_support.req.return_page()]
             elif "styleonly" in db_web_support.req.form:
-                print("Style only activated")
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
                 style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
@@ -483,7 +484,7 @@ def application(filename, params):
 
         # Return Proper Error so AJAX Works
         if "ajax" in db_web_support.req.form:
-            db_web_support.req.form.start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'}.items())
+            # db_web_support.req.form.start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'}.items())
             return ['500 Internal Server Error', db_web_support.req.response_headers]
         else:
             # Now we can get a list of request variables
@@ -511,6 +512,60 @@ def application(filename, params):
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
             errormessage = errormessage.format(db_web_support.resurl, db_web_support.resurl, err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, keystring, inputstring, dirstring)
-            db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
+            # db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage, db_web_support.req.response_headers, db_web_support.req.status]
         pass
+
+
+class Debugger:
+    """ Code Used To Enable PDB in Single Instance Apache Mode """
+
+    def __init__(self, object):
+        self.__object = object
+
+    def __call__(self, *args, **kwargs):
+        import pdb
+        import sys
+        debugger = pdb.Pdb()
+        debugger.use_rawinput = 0
+        debugger.reset()
+        sys.settrace(debugger.trace_dispatch)
+
+        try:
+            return self.__object(*args, **kwargs)
+        finally:
+            debugger.quitting = 1
+            sys.settrace(None)
+        pass
+    pass
+
+class Profiler:
+    """ Code Used to Enable Profiling in Single Instance Apache Mode """
+
+    def __init__(self, object):
+        self.__object = object
+
+    def __call__(self, *args, **kwargs):
+        from pycallgraph import PyCallGraph
+        from pycallgraph.output import GraphvizOutput
+
+        with PyCallGraph(output=GraphvizOutput(output_file='/tmp/pycallgraph.svg', output_type='svg')):
+            return self.__object(*args, **kwargs)
+
+        pass
+
+
+# Uncomment this line to enable PDB
+# Apache must be ran in single instance mode using the following commands:
+#   sudo /etc/init.d/httpd stop
+#   httpd -X
+#application = Debugger(application)
+
+# Uncomment the below code to enable profiling
+# Apache must be ran in single instance mode using the following  commands:
+#   sudo /etc/init.d/httpd stop
+#   httpd -X
+#application = Profiler(application)
+
+
+

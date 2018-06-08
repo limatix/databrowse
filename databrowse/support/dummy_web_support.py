@@ -53,8 +53,12 @@ import databrowse.support
 class wsgi_req:
     """ A simple wrapper for the wsgi request """
 
+    def start_response(self, status, headers):
+        for header in headers:
+            self.response_headers[header[0]] = header[1]
+        pass       # start_response function to call before finalization
+
     environ = None              # environment dictionary
-    start_response = None       # start_response function to call before finalization
     filename = None             # name of script that was called
     dirname = None              # name of directory containing script that was called
     unparsed_uri = None         # request URI
@@ -241,23 +245,21 @@ class web_support:
 
     def __init__(self, filename, params):
         self.req = wsgi_req(filename, params)
+        self.webdir = os.path.join(params["install"], "databrowse_wsgi")
         #self.reqfilename = self.req.filename
-        #self.webdir = os.path.dirname(self.reqfilename)
         #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
 
         # Try to Load Optional Configuration File
-        #try:
-            #conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
-            #self.confstr = conffile.read()
-            #conffile.close()
-            #exec self.confstr
-        #except:
-        #    pass
+        conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
+        self.confstr = conffile.read()
+        conffile.close()
+        exec self.confstr
 
         # Set Default Configuration Options
-
-        self.dataroot = '/'
+        if self.dataroot is None:
+            self.dataroot = '/'
+            pass
 
         if self.siteurl is None:
             self.siteurl = "http://localhost/databrowse"
