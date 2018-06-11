@@ -280,8 +280,6 @@ def application(filename, params):
             fullpath = os.path.abspath(db_web_support.req.form["path"].value)
             fullpath = '/'.join(fullpath.split('\\'))
             if not fullpath.startswith(db_web_support.dataroot):
-                import pdb
-                pdb.set_trace()
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:
@@ -292,8 +290,6 @@ def application(filename, params):
                     pass
                 pass
             elif not os.path.exists(fullpath):
-                import pdb
-                pdb.set_trace()
                 return db_web_support.req.return_error(404)
             else:
                 return db_web_support.req.return_error(401)
@@ -335,7 +331,7 @@ def application(filename, params):
             itemslist = string.split(relpath, "/")[1:]
             count = 1
             if itemslist[0] != "":
-                topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (db_web_support.dataroot, db_web_support.resurl, db_web_support.dataroot)
+                topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (db_web_support.siteurl, db_web_support.resurl, db_web_support.siteurl)
                 pass
             for item in itemslist:
                 if item != "" and count != len(itemslist):

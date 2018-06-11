@@ -80,7 +80,7 @@ class db_file_ops(renderer_class):
                 raise self.RendererException("No Uploads Found")
             fieldStorage = self._web_support.req.form["files[]"]
             fullfilename = os.path.abspath(self._fullpath + "/" + fieldStorage.filename)
-            if not fullfilename.startswith(self._web_support.dataroot):
+            if not fullfilename.startswith(os.path.normpath(self._web_support.dataroot)):
                 raise self.RendererException("Attempt to Save File Outside of Dataroot")
             # Let's check on the directory and make sure its writable and it exists
             if not os.access(self._fullpath, os.W_OK) and os.path.exists(self._fullpath):
@@ -148,7 +148,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newdirpath = os.path.abspath(os.path.join(self._fullpath, self._web_support.req.form["dirname"].value))
-                if not newdirpath.startswith(self._web_support.dataroot):
+                if not newdirpath.startswith(os.path.normpath(self._web_support.dataroot)):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newdirpath):
                     outputmsg = "ERROR: Directory Already Exists"
@@ -176,7 +176,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newpath = os.path.abspath(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form["newname"].value))
-                if not newpath.startswith(self._web_support.dataroot):
+                if not newpath.startswith(os.path.normpath(self._web_support.dataroot)):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newpath):
                     outputmsg = "ERROR: File or Directory Already Exists"

@@ -68,27 +68,27 @@ import cefdatabrowse_support as dbp
 def load_settings():
     global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     configdict.update(dict(config.items('databrowse')))
 
 
 def save_settings():
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     config.set("databrowse", "WIDTH", configdict['width'])
     config.set("databrowse", "HEIGHT", configdict['height'])
     config.set("databrowse", "X", POS_X)
     config.set("databrowse", "Y", POS_Y)
-    with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
         config.write(configfile)
 
 
 def update_dataroot(newdataroot):
     global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
-    with open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), 'wb') as configfile:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
         config.write(configfile)
     configdict['dataroot'] = newdataroot
 
@@ -114,18 +114,18 @@ try:
                 sys.exit(0)
         elif sys.argv[1] == "-e":
             if platform.system() == "Linux":
-                status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse")))
+                status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
                 if status != 0:
                     if status == 32512:
                         raise Exception("%s: EDITOR not set" % status)
                     else:
                         raise Exception("%s: Could not open config file." % status)
             elif platform.system() == "Windows":
-                status = os.system(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"))
+                status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
                 if status != 0:
                     raise Exception("%s: Could not open config file." % status)
             else:
-                print(open(os.path.join(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir), "databrowse_app/.databrowse"), "rb").read())
+                print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
             sys.exit(0)
         else:
             if os.path.exists(sys.argv[1]):
@@ -794,7 +794,7 @@ class CefApplication(QApplication):
         self.timer.stop()
 
     def setupIcon(self):
-        icon_file = os.path.join(install + "/databrowse_app/resources/", "{0}.png".format("icon256"))
+        icon_file = os.path.join(install + "/cefdatabrowse/resources/", "{0}.png".format("icon256"))
         if os.path.exists(icon_file):
             self.setWindowIcon(QIcon(icon_file))
 
@@ -911,7 +911,7 @@ class NavigationBar(QFrame):
         self.url.setText(unquote(browser.GetUrl().replace(scheme, "")))
 
     def createButton(self, name):
-        resources = install + "/databrowse_app/resources"
+        resources = install + "/cefdatabrowse/resources"
         pixmap = QPixmap(os.path.join(resources, "{0}.png".format(name)))
         icon = QIcon(pixmap)
         button = QPushButton()
