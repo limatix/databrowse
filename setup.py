@@ -48,7 +48,7 @@ import requirements as r
 from setuptools import setup, find_packages
 
 # Collect all databrowse static files required for CEFDatabrowse
-search_dirs = [('databrowse_wsgi', []), ('databrowse_app', [])]
+search_dirs = [('databrowse_wsgi', []), ('cefdatabrowse', [])]
 for search_dir in range(0, len(search_dirs)):
     for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
         for file in files:

@@ -120,7 +120,7 @@
                     };
 
                 var PostForm = document.createElement("form");
-                PostForm.method = "POST";
+                PostForm.method = "post";
                 PostForm.action = posturl;
                 PostForm.target = "_blank";
                 PostForm.onsubmit = "return window.open('','_blank','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550').blur()"

@@ -88,7 +88,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         fnames = item.get('fnames')
                         if fname:
                             path = os.path.realpath(fname)
-                            if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                 relpath = path.replace(self._web_support.dataroot, '')
                                 url = self.getURL(relpath)
                                 item.set('url', url)
@@ -99,7 +99,7 @@ class db_datacollect_v2_viewer(renderer_class):
                                 for fname in fnamelist:
                                     fname = fname.replace("'", "").replace('"', "").strip()
                                     path = os.path.realpath(fname)
-                                    if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                                    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                         relpath = path.replace(self._web_support.dataroot, '')
                                         url = self.getURL(relpath)
                                         urls.append(url)
@@ -140,7 +140,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         xlink = item.get('{http://www.w3.org/1999/xlink}href')
                         if xlink:
                             path = os.path.realpath(fname)
-                            if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                 relpath = path.replace(self._web_support.dataroot, '')
                                 url = self.getURL(relpath)
                                 item.set('url', url)

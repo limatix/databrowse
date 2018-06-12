@@ -78,7 +78,7 @@ class db_checklist_editor(renderer_class):
                         self._web_support.req.output = "Error Saving File:  Full Path '%s' is an Existing Directory" % fullfilename
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
-                    if not fullpath.startswith(self._web_support.dataroot):
+                    if not fullpath.startswith(os.path.normpath(self._web_support.dataroot)):
                         self._web_support.req.output = "Error Saving File:  Attempt to Save File Outside of Dataroot"
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]

@@ -280,7 +280,7 @@
                     function newdirectory() {
                         var newdirname = prompt("Type New Directory Name");
                         if(newdirname) {
-                            var ajaxurl = siteurl+"\\"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
+                            var ajaxurl = siteurl+"/"+relpath.slice(1)+"?handler=db_file_ops&operation=newdir";
                             $.ajax({
                                 type: "POST",
                                 url: ajaxurl,

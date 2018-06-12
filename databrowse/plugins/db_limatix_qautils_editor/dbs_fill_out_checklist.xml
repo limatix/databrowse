@@ -57,14 +57,18 @@
                 }
 
                 // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', (new XMLSerializer).serializeToString(filteredchecklistxml));
+                saveform.append('filename', filenameinput.value);
+                saveform.append('destination', destnameinput.value);
                 $.ajax({
                     async: 'false',
                     cache: 'false',
-                    data: {file: (new XMLSerializer).serializeToString(filteredchecklistxml),
-                            filename: filenameinput.value,
-                            destination: destnameinput.value},
+                    contentType: false,
+                    data: saveform,
                     dataType: "text",
                     error: saveErrorCallback,
+                    processData: false,
                     success: saveSuccessCallback,
                     type: 'POST',
                     url: ajaxurl
@@ -115,7 +119,7 @@
                     };
 
                 var PostForm = document.createElement("form");
-                PostForm.method = "GET";
+                PostForm.method = "post";
                 PostForm.action = posturl;
                 PostForm.target = "_blank";
                 PostForm.onsubmit = "return window.open('','_blank','toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,copyhistory=no,scrollbars=yes,width=800,height=550').blur()"

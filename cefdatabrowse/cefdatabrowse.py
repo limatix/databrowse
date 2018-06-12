@@ -58,6 +58,7 @@ import ctypes
 import os
 import platform
 import sys
+from re import search
 import ConfigParser
 from urlparse import urlparse
 from urlparse import unquote
@@ -228,18 +229,25 @@ class ClientHandler:
                     urlparams[paramone] = paramone
 
         fs = request.GetPostData()
-        # print(fs)
         # TODO: Handle POST data here
         # Especially uploaded files because of this:
         # [0608/110311.456:ERROR:request_impl.cc(785)] NOT IMPLEMENTED multi-part form data is not supported
-        if type(fs) == list:
-            text = fs[0].split("\r\n")
-            text = text[3:-2]
-            text = "\r\n".join(text)
-            urlparams.update({'extra': fs[0], 'file': text})
-        else:
-            urlparams.update({"extra": ""})
-            urlparams.update(fs)
+        if len(fs) > 0:
+            if type(fs) is list:
+                form = fs[0]
+                form_dict = {}
+                name = search(r"(?<= name=)\"([^\"]*)\"", form).group(0).strip('\"')
+                form_dict[name] = {}
+                form_dict[name]['name'] = name
+                form_dict[name]['filename'] = search(r"(?<= filename=)\"([^\"]*)\"", form).group(0).strip('\"')
+                form_dict[name]['type'] = "multipart/form-data"
+                upfile = open(fs[1][1:], 'rb')
+                form_dict[name]['file'] = upfile
+                form_dict[name]['value'] = upfile.read()
+                form_dict[name]['boundary'] = search(r"-([^\"]*)(?=\--)", fs[-1]).group(0)
+                urlparams.update(form_dict)
+            else:
+                urlparams.update(fs)
 
         # Any resource files must be located in the databrowse_wsgi directory in the databrowse root source directory
         if "databrowse_wsgi" not in fullpath:
@@ -294,9 +302,9 @@ class ClientHandler:
             #     browser.Reload()
         else:
             try:
-                html = open(fullpath, "rb")
+                html = open(unquote(fullpath), "rb")
             except IOError:
-                if not os.path.exists(fullpath):
+                if not os.path.exists(unquote(fullpath)):
                     raise IOError("Install location needs to be updated")
                 else:
                     raise IOError("Unknown problem")

@@ -50,6 +50,11 @@ from lxml import etree
 import databrowse.support
 
 
+class CefHttp:
+    def __init__(self):
+        pass
+
+
 class wsgi_req:
     """ A simple wrapper for the wsgi request """
 
@@ -84,10 +89,22 @@ class wsgi_req:
         #else:
         #    self.form = fs
         #    pass
-        fs = None
+        fs = {}
         params['path'] = filename
-        os.environ['QUERY_STRING'] = str('&'.join(['%s=%s' % (key, params[key]) for key in params]))
-        fs = cgi.FieldStorage(keep_blank_values=1)
+        resultset = [key for key, value in params.items() if key not in ['files[]']]
+        os.environ['QUERY_STRING'] = str('&'.join(['%s=%s' % (key, params[key]) for key in resultset]))
+
+        if "files[]" in params:
+            for var in params:
+                fp = CefHttp()
+                if var == "files[]":
+                    for fvar in params[var]:
+                        setattr(fp, fvar, params[var][fvar])
+                else:
+                    setattr(fp, "value", params[var])
+                fs[var] = fp
+        else:
+            fs = cgi.FieldStorage(keep_blank_values=1)
         self.form = fs
 
         self.status = '200 OK'

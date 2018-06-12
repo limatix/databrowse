@@ -46,7 +46,7 @@ from time import time
 import cgitb
 cgitb.enable()
 
-serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -115,7 +115,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -185,7 +185,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-ajaxwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
+ajaxwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -280,6 +280,8 @@ def application(filename, params):
             fullpath = os.path.abspath(db_web_support.req.form["path"].value)
             fullpath = '/'.join(fullpath.split('\\'))
             if not fullpath.startswith(db_web_support.dataroot):
+                print(fullpath)
+                print(db_web_support.dataroot)
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:
@@ -434,7 +436,7 @@ def application(filename, params):
         # Something has gone terribly wrong, let's display some useful information to the user
         # Error Page Template
         errormessage = '''\
-        <?xml-stylesheet type="text/xsl" href="{}/db_web.xml"?>
+        <?xml-stylesheet type="text/xsl" href="{}/db_cef.xml"?>
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
         <body db:resdir="{}/">
             <h1>500 Internal Server Error</h1>
@@ -508,7 +510,7 @@ def application(filename, params):
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
             errormessage = errormessage.format(db_web_support.resurl, db_web_support.resurl, err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, keystring, inputstring, dirstring)
-            # db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
+            db_web_support.req.start_response(200, {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
             return [errormessage, db_web_support.req.response_headers, db_web_support.req.status]
         pass
 
