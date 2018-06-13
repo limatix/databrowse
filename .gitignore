@@ -20,6 +20,5 @@ databrowse_wsgi/databrowse_wsgi.conf
 *.log
 *.out
 *.toc
-cefdatabrowse/.databrowse
 install
 .idea/
