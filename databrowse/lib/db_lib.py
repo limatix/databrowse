@@ -33,13 +33,6 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
-##                                                                           ##
-## This material is based on work supported by NASA under Contract           ##
-## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
-## to TRI Austin.                                                            ##
-##                                                                           ##
-## Approved for public release by TRI Austin: distribution unlimited;        ##
-## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """
 Databrowse:  An Extensible Data Management Platform
@@ -183,7 +176,7 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         relpath = '/'
         pass
     else:
-        fullpath = '/'.join(os.path.splitdrive(os.path.abspath(db_web_support.req.form["path"].value))[1].split('\\'))
+    	fullpath = os.path.abspath(db_web_support.req.form["path"].value)
         if not fullpath.startswith(db_web_support.dataroot):
             return db_web_support.req.return_error(403)
         if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
@@ -191,10 +184,7 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
                 relpath = '/'
                 pass
             else:
-                if db_web_support.dataroot != "/":
-                    relpath = fullpath.replace(db_web_support.dataroot, '')
-                else:
-                    relpath = fullpath
+                relpath = fullpath.replace(db_web_support.dataroot, '')
                 pass
             pass
         elif not os.path.exists(fullpath):
@@ -202,10 +192,6 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         else:
             return db_web_support.req.return_error(401)
         pass
-
-    # Convert urls from windows style to unix style
-    relpath = '/'.join(relpath.split('\\'))
-    fullpath = '/'.join(fullpath.split('\\'))
 
     # Import Plugin Directory
     #if db_web_support.pluginpath not in sys.path:    # Removed 8/5/13 - Transition to Installed Modules

@@ -33,13 +33,6 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
-##                                                                           ##
-## This material is based on work supported by NASA under Contract           ##
-## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
-## to TRI Austin.                                                            ##
-##                                                                           ##
-## Approved for public release by TRI Austin: distribution unlimited;        ##
-## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_directory_image.py - Basic Output for Any Folder """
 

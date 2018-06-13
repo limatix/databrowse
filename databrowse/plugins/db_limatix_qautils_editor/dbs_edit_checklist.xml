@@ -134,11 +134,16 @@
                 }
 
                 // New Saving Components //////////////////////////////////
+                saveform = new FormData();
+                saveform.append('file', results);
                 $.ajax({
                     async: 'false',
-                    data: {file: results},
+                    cache: 'false',
+                    contentType: false,
+                    data: saveform,
                     dataType: "text",
                     error: saveErrorCallback,
+                    processData: false,
                     success: saveSuccessCallback,
                     type: 'POST',
                     url: ajaxurl
