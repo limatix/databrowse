@@ -214,6 +214,9 @@ class ClientHandler:
         # print("GetResourceHandler(): url = %s" % request.GetUrl())
         parsedurl = urlparse(request.GetUrl())
 
+        if parsedurl.netloc != urlparse(scheme).netloc:
+            return None
+
         relpath = os.path.relpath(parsedurl.path[1:])
         fullpath = parsedurl.path[1:]
 
