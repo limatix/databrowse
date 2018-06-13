@@ -165,7 +165,7 @@
                 $('#blackout').fadeIn(25);  
                 var curwidth = $('#lightbox').width("auto");
                 var curheight = $('#lightbox').height("auto");              
-                $('#lightboximg').attr("src", src).load(function() {
+                $('#lightboximg').attr("src", src).on('load', function() {
                     var curwidth = $('#lightbox').width();
                     var curheight = $('#lightbox').height();
                     var maxwidth = document.documentElement.clientWidth - 40;
