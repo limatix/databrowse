@@ -63,7 +63,7 @@ class wsgi_req:
             self.response_headers[header[0]] = header[1]
         pass       # start_response function to call before finalization
 
-    environ = None              # environment dictionary
+    environ = {}              # environment dictionary
     filename = None             # name of script that was called
     dirname = None              # name of directory containing script that was called
     unparsed_uri = None         # request URI
@@ -268,26 +268,31 @@ class web_support:
         self.style = style_support()
 
         # Try to Load Optional Configuration File
-        conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
-        self.confstr = conffile.read()
-        conffile.close()
-        exec self.confstr
+        try:
+            conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
+            self.confstr = conffile.read()
+            conffile.close()
+            exec self.confstr
+        except Exception:
+            pass
 
         # Set Default Configuration Options
         if self.dataroot is None:
-            self.dataroot = '/'
+            self.dataroot = params.get("dataroot")
+            if self.dataroot is None:
+                self.dataroot = '/'
             pass
 
         if self.siteurl is None:
-            self.siteurl = "http://localhost/databrowse"
+            self.siteurl = "/".join(["http://127.0.0.1", self.dataroot])
             pass
 
         if self.resurl is None:
-            self.resurl = "http://localhost/dbres"
+            self.resurl = "/".join(["http://127.0.0.1", os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
             pass
 
         if self.logouturl is None:
-            self.logouturl = "http://localhost/logout"
+            self.logouturl = "http://127.0.0.1/logout"
             pass
 
         #if not environ["REMOTE_USER"]:
@@ -324,11 +329,15 @@ class web_support:
             pass
 
         if self.limatix_qautils is None:
-            self.limatix_qautils = '/usr/local/limatix-qautils'
+            self.limatix_qautils = params.get("limatix-qautils")
+            if self.limatix_qautils is None:
+                self.limatix_qautils = '/usr/local/limatix-qautils'
             pass
 
         if self.qautils is None:
-            self.qautils = '/usr/local/QAutils'
+            self.qautils = params.get("qautils")
+            if self.qautils is None:
+                self.qautils = '/usr/local/QAutils'
             pass
 
         if self.administrators is None:
