@@ -1,0 +1,8 @@
+[databrowse]
+width = 1025
+height = 709
+x = 0
+y = 0
+dataroot = C:/databrowse
+dataguzzlerlib = C:/Users/nscheirer/Documents/dev/dataguzzler-lib/python
+
