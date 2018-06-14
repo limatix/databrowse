@@ -330,7 +330,7 @@ class renderer_class(object):
             return self.getURL(relpath, **kwargs)
             pass
         else:
-            relpath = os.path.splitdrive(os.path.abspath(relpath + '/../'))[1]
+            relpath = os.path.normpath(relpath + '/../')
             return self.getURL(relpath, **kwargs)
             pass
         pass
