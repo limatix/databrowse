@@ -898,13 +898,9 @@ class NavigationBar(QFrame):
     def onGoUrl(self):
         if self.cef_widget.browser:
             url = str(self.url.text())
-            if url.startswith("/"):
-                parse_text = urlparse(url)
-
-                if parse_text.scheme == "":
-                    self.url.setText(scheme + url)
-                else:
-                    self.url.setText(url)
+            parse_text = urlparse(url)
+            if parse_text.netloc == "":
+                self.url.setText(scheme + url)
             self.cef_widget.browser.LoadUrl(str(self.url.text()))
 
     def updateState(self):
