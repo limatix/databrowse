@@ -266,6 +266,7 @@ class web_support:
         #self.reqfilename = self.req.filename
         #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
+        scheme = params.get("scheme")
 
         # Try to Load Optional Configuration File
         try:
@@ -284,15 +285,24 @@ class web_support:
             pass
 
         if self.siteurl is None:
-            self.siteurl = "/".join(["http://127.0.0.1", self.dataroot])
+            if scheme is not None:
+                self.siteurl = "/".join([scheme[:-1], self.dataroot])
+            else:
+                self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             pass
 
         if self.resurl is None:
-            self.resurl = "/".join(["http://127.0.0.1", os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
+            if scheme is not None:
+                self.resurl = "/".join([scheme[:-1], os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
+            else:
+                self.resurl = "/".join(["http://0.0.0.0", os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
             pass
 
         if self.logouturl is None:
-            self.logouturl = "http://127.0.0.1/logout"
+            if scheme is not None:
+                self.logouturl = "/".join([scheme[:-1], "logout"])
+            else:
+                self.logouturl = "http://0.0.0.0/logout"
             pass
 
         #if not environ["REMOTE_USER"]:

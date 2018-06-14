@@ -280,8 +280,6 @@ def application(filename, params):
             fullpath = os.path.abspath(db_web_support.req.form["path"].value)
             fullpath = '/'.join(fullpath.split('\\'))
             if not fullpath.startswith(db_web_support.dataroot):
-                print(fullpath)
-                print(db_web_support.dataroot)
                 return db_web_support.req.return_error(403)
             if os.access(fullpath, os.R_OK) and os.path.exists(fullpath):
                 if fullpath == db_web_support.dataroot:

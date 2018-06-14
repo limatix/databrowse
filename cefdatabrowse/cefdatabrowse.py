@@ -189,7 +189,7 @@ LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
 # Configuration
-scheme = "http://127.0.0.1/"
+scheme = "http://0.0.0.0/"
 
 # OS differences
 CefWidgetParent = QWidget
