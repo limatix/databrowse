@@ -237,18 +237,32 @@ class ClientHandler:
         # [0608/110311.456:ERROR:request_impl.cc(785)] NOT IMPLEMENTED multi-part form data is not supported
         if len(fs) > 0:
             if type(fs) is list:
-                form = fs[0]
-                form_dict = {}
-                name = search(r"(?<= name=)\"([^\"]*)\"", form).group(0).strip('\"')
-                form_dict[name] = {}
-                form_dict[name]['name'] = name
-                form_dict[name]['filename'] = search(r"(?<= filename=)\"([^\"]*)\"", form).group(0).strip('\"')
-                form_dict[name]['type'] = "multipart/form-data"
-                upfile = open(fs[1][1:], 'rb')
-                form_dict[name]['file'] = upfile
-                form_dict[name]['value'] = upfile.read()
-                form_dict[name]['boundary'] = search(r"-([^\"]*)(?=\--)", fs[-1]).group(0)
-                urlparams.update(form_dict)
+                if len(fs) == 1:
+                    form = fs[0]
+                    form_dict = {}
+                    boundary = search(r".+?(?=\r\n)", form).group(0)
+                    splitform = form.split(boundary)
+                    for frag in splitform:
+                        try:
+                            name = search(r"(?<= name=)\"([^\"]*)\"", frag).group(0).strip('\"')
+                            content = search(r"\r\n\r\n((.|\r\n)*)\r\n", frag).group(1)
+                            form_dict[name] = content
+                        except AttributeError:
+                            pass
+                    urlparams.update(form_dict)
+                else:
+                    form = fs[0]
+                    form_dict = {}
+                    name = search(r"(?<= name=)\"([^\"]*)\"", form).group(0).strip('\"')
+                    form_dict[name] = {}
+                    form_dict[name]['name'] = name
+                    form_dict[name]['filename'] = search(r"(?<= filename=)\"([^\"]*)\"", form).group(0).strip('\"')
+                    form_dict[name]['type'] = "multipart/form-data"
+                    upfile = open(fs[1][1:], 'rb')
+                    form_dict[name]['file'] = upfile
+                    form_dict[name]['value'] = upfile.read()
+                    form_dict[name]['boundary'] = search(r"-([^\"]*)(?=\--)", fs[-1]).group(0)
+                    urlparams.update(form_dict)
             else:
                 urlparams.update(fs)
 

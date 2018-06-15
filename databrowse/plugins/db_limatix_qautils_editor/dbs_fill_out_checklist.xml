@@ -32,7 +32,9 @@
                     var filenameinput=document.getElementById("filenameinput");
                     var destnameinput=document.getElementsByName("dest")[0];
                     window.onbeforeunload = null
-                    window.location.href = "/databrowse/" + destnameinput.value + "/" + filenameinput.value;
+                    var getUrl = window.location;
+                    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/" + destnameinput.value + "/" + filenameinput.value;
+                    window.location.href = baseUrl;
                 }
             }
             

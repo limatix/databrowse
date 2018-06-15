@@ -46,6 +46,7 @@
 import os
 import os.path
 import cgi
+import urllib
 from lxml import etree
 import databrowse.support
 
@@ -279,23 +280,26 @@ class web_support:
 
         # Set Default Configuration Options
         if self.dataroot is None:
-            self.dataroot = params.get("dataroot")
+            self.dataroot = os.path.normpath(params.get("dataroot"))
             if self.dataroot is None:
                 self.dataroot = '/'
             pass
 
         if self.siteurl is None:
             if scheme is not None:
-                self.siteurl = "/".join([scheme[:-1], self.dataroot])
+                self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot)[3:]])
             else:
                 self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             pass
 
         if self.resurl is None:
             if scheme is not None:
-                self.resurl = "/".join([scheme[:-1], os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
+                self.resurl = "/".join([scheme[:-1], urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
+                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")))[3:]])
             else:
-                self.resurl = "/".join(["http://0.0.0.0", os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")).replace("\\", "/")])
+                self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
+                    os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
+                    "databrowse_wsgi/resources")))[3:]])
             pass
 
         if self.logouturl is None:
