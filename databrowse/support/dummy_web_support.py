@@ -285,6 +285,9 @@ class web_support:
                 self.dataroot = '/'
             pass
 
+        if self.checklistpath is None:
+            self.checklistpath = "/SOPs"
+
         if self.siteurl is None:
             if scheme is not None:
                 self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot)[3:]])
