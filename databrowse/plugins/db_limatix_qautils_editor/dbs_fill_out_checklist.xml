@@ -1,8 +1,9 @@
 <xsl:strip-space elements="*"/>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:chx="http://limatix.org/checklist" match="html:html" mode="full">
     <xsl:apply-templates select="html:head" mode="full"/>
-    <script type="text/javascript" DEFER='true'> <![CDATA[
-
+    <script type="text/javascript" DEFER='true'>
+        var dataroot = "<xsl:value-of select="$dataroot"/>";
+        <![CDATA[
             var pdfbutton = document.createElement("button");
             pdfbutton.name = "pdf";
             pdfbutton.type = "button";
@@ -33,7 +34,7 @@
                     var destnameinput=document.getElementsByName("dest")[0];
                     window.onbeforeunload = null
                     var getUrl = window.location;
-                    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/" + destnameinput.value + "/" + filenameinput.value;
+                    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + dataroot + "/" + destnameinput.value + "/" + filenameinput.value;
                     window.location.href = baseUrl;
                 }
             }
