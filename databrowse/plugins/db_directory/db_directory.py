@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,12 +32,20 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_directory.py - Basic Output for Any Folder """
 
 import os
 import os.path
+import urllib
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 
@@ -56,7 +64,7 @@ class db_directory(renderer_class):
         chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
         for item in chxdirlist:
             if item.endswith(".chx"):
-                itemurl = self.getURL(os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item), handler=None)
+                itemurl = self.getURL(os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item).replace("\\", "/"), handler=None)
                 etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
                 pass
             if os.path.isdir(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
@@ -97,8 +105,11 @@ class db_directory(renderer_class):
             caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
             for item in dirlist:
-                itemrelpath = os.path.join(self._relpath, item)
-                itemfullpath = os.path.join(self._fullpath, item)
+                if self._relpath != "/":
+                    itemrelpath = "/".join([self._relpath, item])
+                else:
+                    itemrelpath = self._relpath + item
+                itemfullpath = "/".join([self._fullpath, item])
                 (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
                 handler = handlers[-1]
                 if handler in self._handler_support.directoryplugins:

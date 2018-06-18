@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,7 +32,14 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_xlg_viewer.py - Experiment Log Viewer """
 
@@ -81,7 +88,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         fnames = item.get('fnames')
                         if fname:
                             path = os.path.realpath(fname)
-                            if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                 relpath = path.replace(self._web_support.dataroot, '')
                                 url = self.getURL(relpath)
                                 item.set('url', url)
@@ -92,7 +99,7 @@ class db_datacollect_v2_viewer(renderer_class):
                                 for fname in fnamelist:
                                     fname = fname.replace("'", "").replace('"', "").strip()
                                     path = os.path.realpath(fname)
-                                    if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                                    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                         relpath = path.replace(self._web_support.dataroot, '')
                                         url = self.getURL(relpath)
                                         urls.append(url)
@@ -133,7 +140,7 @@ class db_datacollect_v2_viewer(renderer_class):
                         xlink = item.get('{http://www.w3.org/1999/xlink}href')
                         if xlink:
                             path = os.path.realpath(fname)
-                            if path.startswith(self._web_support.dataroot) and os.access(path, os.R_OK) and os.path.exists(path):
+                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                 relpath = path.replace(self._web_support.dataroot, '')
                                 url = self.getURL(relpath)
                                 item.set('url', url)
@@ -259,9 +266,12 @@ class db_datacollect_v2_viewer(renderer_class):
                     pass
                 else:
                     size = os.path.getsize(self._fullpath)
-                    magicstore = magic.open(magic.MAGIC_MIME)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    if platform.system() is "Windows":
+                        contenttype = magic.from_file(self._fullpath, mime=True)
+                    else:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(self._fullpath)
                     f = open(self._fullpath, "rb")
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)
@@ -414,7 +424,7 @@ class db_datacollect_v2_viewer(renderer_class):
 
         #print "Stylesheet Loaded Successfully:"
         #print stylestring
-        stylestring = stylestring.replace('/usr/local/QAutils/checklist/datacollect2.xsl', os.path.join(self._web_support.qautils, "checklist/datacollect2.xsl"))
+        stylestring = stylestring.replace('/usr/local/QAutils/checklist/datacollect2.xsl', "/".join([self._web_support.qautils, "checklist/datacollect2.xsl"]))
 
         # If we set the flag earlier, we need to change the namespace
         if override is True:

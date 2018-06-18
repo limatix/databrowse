@@ -10,7 +10,7 @@
 	<!-- Scripts Declared Inline at top of Head Section -->
 	<db:inlinescript>
 		<script type="text/javascript" src="/dbres/uncryptmailto.js" defer="true"/>
-		<script type="text/javascript" src="/dbres/jquery-1.9.1.min.js"/>
+		<script type="text/javascript" src="/dbres/jquery-3.3.1.min.js"/>
 	</db:inlinescript>
 
 	<!-- Suffix Appended to Page Title in Title Tag -->

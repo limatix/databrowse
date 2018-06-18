@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -33,13 +33,45 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
-""" test_db_default.py - Unit Tests for db_default """
+""" requirements.py - Script that determines current system and the required dependencies """
 
-import unittest2
-from lxml import etree
-from databrowse.lib import db_lib as dbl
+import sys
+import os
 
-class db_default_simpletest(unittest2.TestCase):
-    def runTest(self):
-        self.assertIsInstance(dbl.GetXML('.', handler='db_default'), etree._Element)
+
+def select_requirements_file():
+    """
+    Return the path to a requirements file based on some os/arch condition.
+    """
+
+    # operating system
+    sys_platform = str(sys.platform).lower()
+    linux = 'linux' in sys_platform
+    windows = 'win32' in sys_platform
+    cygwin = 'cygwin' in sys_platform
+    solaris = 'sunos' in sys_platform
+    macosx = 'darwin' in sys_platform
+    posix = 'posix' in os.name.lower()
+
+    if windows:
+        return 'requirements/windows.txt'
+    elif macosx:
+        return 'requirements/mac.txt'
+    elif linux:
+        return 'requirements/linux.txt'
+    elif cygwin:
+        return 'requirements/cygwin.txt'
+    elif solaris:
+        return 'requirements/solaris.txt'
+    elif posix:
+        return 'requirements/posix.txt'
+    else:
+        raise Exception('Unsupported OS/platform')

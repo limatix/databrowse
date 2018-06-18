@@ -15,10 +15,20 @@ This material is based on work supported by the Air Force Research Laboratory
 under Contract #FA8650-10-D-5210, Task Order #023 and performed at Iowa State 
 University.
 
+This material is based on work supported by NASA under Contract NNX16CL31C and
+performed by Iowa State University as a subcontractor to TRI Austin.
+
 DISTRIBUTION A.  Approved for public release:  distribution unlimited; 19 Aug 
 2016; 88ABW-2016-4051.
 
 ## Changelog ##
+
+### v0.8 ###
+ * Approval for Public release following work with TRI Austin
+ * CEFDatabrowse, a server-less client, Implemented
+ * SDT File Viewer Plugin Implemented
+ * Magic bug fixes
+ * Various other bug fixes
 
 ### v0.7 ###
  * Approval for Public Release

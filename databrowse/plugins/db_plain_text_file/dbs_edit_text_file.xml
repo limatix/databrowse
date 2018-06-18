@@ -29,7 +29,6 @@
                 {
                     ajaxurl = window.location.href + "?ajax&save";
                 }
-
                 // New Saving Components //////////////////////////////////
                 saveform = new FormData();
                 saveform.append('file', $('#contents').val());

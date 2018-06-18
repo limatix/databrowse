@@ -5993,7 +5993,7 @@ jQuery.fn.extend({
 						if ( jQuery.ajax ) {
 							jQuery.ajax({
 								url: elem.src,
-								type: "GET",
+								type: "POST",
 								dataType: "script",
 								async: false,
 								global: false,

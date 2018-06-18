@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -33,21 +33,38 @@
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
 ## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ support/dummy_web_support.py - Classes to encapsulate Web/WSGI functionality """
 
 import os
 import os.path
 import cgi
+import urllib
 from lxml import etree
 import databrowse.support
+
+
+class CefHttp:
+    def __init__(self):
+        pass
 
 
 class wsgi_req:
     """ A simple wrapper for the wsgi request """
 
-    environ = None              # environment dictionary
-    start_response = None       # start_response function to call before finalization
+    def start_response(self, status, headers):
+        for header in headers:
+            self.response_headers[header[0]] = header[1]
+        pass       # start_response function to call before finalization
+
+    environ = {}              # environment dictionary
     filename = None             # name of script that was called
     dirname = None              # name of directory containing script that was called
     unparsed_uri = None         # request URI
@@ -73,10 +90,22 @@ class wsgi_req:
         #else:
         #    self.form = fs
         #    pass
-        fs = None
+        fs = {}
         params['path'] = filename
-        os.environ['QUERY_STRING'] = str('&'.join(['%s=%s' % (key, params[key]) for key in params]))
-        fs = cgi.FieldStorage(keep_blank_values=1)
+        resultset = [key for key, value in params.items() if key not in ['files[]']]
+        os.environ['QUERY_STRING'] = str('&'.join(['%s=%s' % (key, params[key]) for key in resultset]))
+
+        if "files[]" in params:
+            for var in params:
+                fp = CefHttp()
+                if var == "files[]":
+                    for fvar in params[var]:
+                        setattr(fp, fvar, params[var][fvar])
+                else:
+                    setattr(fp, "value", params[var])
+                fs[var] = fp
+        else:
+            fs = cgi.FieldStorage(keep_blank_values=1)
         self.form = fs
 
         self.status = '200 OK'
@@ -234,34 +263,53 @@ class web_support:
 
     def __init__(self, filename, params):
         self.req = wsgi_req(filename, params)
+        self.webdir = os.path.join(params["install"], "databrowse_wsgi")
         #self.reqfilename = self.req.filename
-        #self.webdir = os.path.dirname(self.reqfilename)
         #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
+        scheme = params.get("scheme")
 
         # Try to Load Optional Configuration File
-        #try:
-            #conffile = file(os.path.join(os.path.dirname(self.reqfilename), "web.conf"))
-            #self.confstr = conffile.read()
-            #conffile.close()
-            #exec self.confstr
-        #except:
-        #    pass
+        try:
+            conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
+            self.confstr = conffile.read()
+            conffile.close()
+            exec self.confstr
+        except Exception:
+            pass
 
         # Set Default Configuration Options
+        if self.dataroot is None:
+            self.dataroot = os.path.normpath(params.get("dataroot"))
+            if self.dataroot is None:
+                self.dataroot = '/'
+            pass
 
-        self.dataroot = '/'
+        if self.checklistpath is None:
+            self.checklistpath = "/SOPs"
 
         if self.siteurl is None:
-            self.siteurl = "http://localhost/databrowse"
+            if scheme is not None:
+                self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot)[3:]])
+            else:
+                self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             pass
 
         if self.resurl is None:
-            self.resurl = "http://localhost/dbres"
+            if scheme is not None:
+                self.resurl = "/".join([scheme[:-1], urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
+                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")))[3:]])
+            else:
+                self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
+                    os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
+                    "databrowse_wsgi/resources")))[3:]])
             pass
 
         if self.logouturl is None:
-            self.logouturl = "http://localhost/logout"
+            if scheme is not None:
+                self.logouturl = "/".join([scheme[:-1], "logout"])
+            else:
+                self.logouturl = "http://0.0.0.0/logout"
             pass
 
         #if not environ["REMOTE_USER"]:
@@ -298,11 +346,15 @@ class web_support:
             pass
 
         if self.limatix_qautils is None:
-            self.limatix_qautils = '/usr/local/limatix-qautils'
+            self.limatix_qautils = params.get("limatix-qautils")
+            if self.limatix_qautils is None:
+                self.limatix_qautils = '/usr/local/limatix-qautils'
             pass
 
         if self.qautils is None:
-            self.qautils = '/usr/local/QAutils'
+            self.qautils = params.get("qautils")
+            if self.qautils is None:
+                self.qautils = '/usr/local/QAutils'
             pass
 
         if self.administrators is None:

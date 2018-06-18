@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,7 +32,7 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
 """ plugins/renderers/db_data_table - Plugin for Data Table Display """
 

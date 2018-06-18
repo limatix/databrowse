@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+	<xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+	
+	<!-- Title Variable - Obtains Title for Page from one of several sources -->
+	<xsl:variable name="title">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:pagetitle">
+				<xsl:value-of select="html:html/html:body/@db:pagetitle"/>
+			</xsl:when>
+			<xsl:when test="html:html/html:head/html:title">
+				<xsl:value-of select="html:html/html:head/html:title"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="html:html/html:body/html:h1"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Resdir Variable - Full URL to Resource Directory -->
+	<xsl:variable name="resdir">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:resdir"><xsl:value-of select="html:html/html:body/@db:resdir"/>/</xsl:when>
+			<xsl:otherwise>databrowse_wsgi/resources/</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<xsl:variable name="proctime">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:proctime"><xsl:value-of select="html:html/html:body/@db:proctime"/></xsl:when>
+			<xsl:otherwise/>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Begin Page Templates -->
+	<xsl:template match="/">
+		<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us">
+			<head>
+				<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
+				<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+				<title><xsl:if test="not($title='')"><xsl:value-of select="$title"/> - </xsl:if><xsl:value-of select="document('../databrowse_style.xml')/db:dbstyle/db:titlesuffix"/></title>
+				<xsl:element name="link">
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>base.css</xsl:attribute>
+				  	<xsl:attribute name="media">all</xsl:attribute>
+				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+			    </xsl:element>
+				<xsl:element name="link">
+			        <xsl:attribute name="href"><xsl:value-of select="$resdir"/>sample.css</xsl:attribute>
+				  	<xsl:attribute name="media">all</xsl:attribute>
+				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
+			    </xsl:element>
+			    <script type="text/javascript" src="{$resdir}jquery-3.3.1.min.js"/>
+			    <script type="text/javascript">
+			    	<![CDATA[
+			    		var fullwidth = false;
+			    		function togglefullwidth() {
+			    			if (fullwidth == true) {
+			    				setnormalwidth();
+			    			}
+			    			else {
+			    				setfullwidth();
+			    			}
+			    		}
+			    		function setfullwidth() {
+			    			$('.wrapper').css('margin-left', '10px');
+			    			$('.wrapper').css('margin-right', '10px');
+			    			$('.wrapper').css('width', 'auto');
+			    			$('#content').css('width', String($("#container").width() - $("#sidebar").width() - 40) + 'px');
+			    			$('.pathbar').css('width', String($("#container").width() - $("#sidebar").width()) + 'px');
+			    			fullwidth = true;
+			    			img = $("#toggleexpand a img");
+			    			img.attr('src', img.attr('src').replace('fullscreen', 'leave-fullscreen'));
+			    		}
+			    		function setnormalwidth() {
+			    			$('.wrapper').css('margin-left', 'auto');
+			    			$('.wrapper').css('margin-right', 'auto');
+			    			$('.wrapper').css('width', '960px');
+			    			$('#content').css('width', '');
+			    			$('.pathbar').css('width', String($("#container").width() - $("#sidebar").width()) + 'px');
+			    			fullwidth = false;
+			    			img = $("#toggleexpand a img");
+			    			img.attr('src', img.attr('src').replace('leave-fullscreen', 'fullscreen'));
+			    		}
+			    		$(function() {
+			    			$(window).resize(function() {
+			    				if (fullwidth == true)	{
+			    					$('#content').css('width', String($("#container").width() - $("#sidebar").width() - 40) + 'px');
+			    					$('.pathbar').css('width', String($("#container").width() - $("#sidebar").width()) + 'px');
+			    				}
+			    			});
+
+			    		});
+
+			    	]]>
+			    </script>
+				<xsl:apply-templates select="html:html/html:head/*" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:meta" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:link" mode="head"/>				
+				<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:inlinestyle" mode="head"/>
+				<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:inlinescript" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:style" mode="head"/>
+				<xsl:apply-templates select="html:html/html:body/html:script" mode="head"/>
+			</head>
+			<body>
+				<div class="pwrapper">
+					<div class="skip"><a accesskey="2" href="#container">Skip Navigation</a></div>
+					<div class="fwrapper wrapper" id="header">
+						<div class="isu-red-ribbon" id="ribbon" role="banner">
+							<div class="clearfix wrapper">
+								<div class="grids-fluid clearfix">
+									<div class="grid-right" style="margin-right:10px;margin-top:15px;">
+										<div class="sub-title site-tagline"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetagline/*"/></div>
+									</div>
+									<div class="grid-left" style="margin-left:10px;margin-top:15px;">
+										<div class="site-title sub-title"><xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:sitetitle/*"/></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix cwrapper wrapper" id="container">
+						<div class="isu-sidebar" id="sidebar">
+							<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:navigation" mode="vert"/>
+							<xsl:apply-templates select="html:html/db:navigation" mode="vert"/>
+	 						<ul class="navigation footer">
+	 							<xsl:apply-templates select="document('../databrowse_style.xml')/db:dbstyle/db:navbarfoot/*" mode="html"/>
+							</ul>
+						</div>
+						<div class="grids isu-content" id="content" role="main">
+							<xsl:apply-templates mode="html"/>
+						</div>
+					</div>
+					<div class="fwrapper wrapper">
+						<div class="clearfix isu-footer" id="footer" role="contentinfo">
+							<div class="pull-left first">
+							</div>
+							<div class="pull-left last">
+						        <xsl:copy-of select="document('../databrowse_style.xml')/db:dbstyle/db:footer/*"/>
+							</div>
+						</div>
+					</div>
+					<xsl:if test="$proctime"><div style="text-align:center; font-size:xx-small">Rendering Time: <xsl:value-of select="$proctime"/> s</div></xsl:if>
+					<div id="loading" style="display:none">Loading...</div>
+				</div>
+			</body>
+		</html>
+	</xsl:template>
+
+	<!-- BEGIN NAVIGATION BAR -->
+
+	<!-- Catch Navigation Tags -->
+	<xsl:template match="db:navigation" mode="vert">
+		<xsl:apply-templates mode="vert"/>
+	</xsl:template>
+
+	<!-- Catch all to Apply Nav Bar Templates -->
+	<xsl:template match="db:navbar" mode="vert">
+		<ul class="navigation">
+			<xsl:apply-templates mode="vert"/>
+		</ul>
+	</xsl:template>
+
+	<!-- Root Level Navelem Tag -->
+	<xsl:template match="db:navelem" mode="vert">
+		<xsl:element name="li">
+			<xsl:choose>
+				<xsl:when test="@selected='true'"> 
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="db:navdir/@alwaysopen='true'">
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
+			<xsl:apply-templates mode="subtree"/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Navdir Tag -->
+	<xsl:template match="db:navdir" mode="subtree">
+		<ul class="vertbarsubtree">
+			<xsl:apply-templates mode="subtree"/>
+		</ul>
+	</xsl:template>
+
+	<!-- Navelem in a Navdir -->
+	<xsl:template match="db:navelem" mode="subtree">
+		<xsl:element name="li">
+			<xsl:choose>
+				<xsl:when test="@selected='true'"> 
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="db:navdir/@alwaysopen='true'">
+					<xsl:attribute name="class">selected</xsl:attribute>
+				</xsl:when>
+			</xsl:choose>
+			<xsl:apply-templates mode="subtree"/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Apply Class to Anchors -->
+	<xsl:template match="html:a" mode="subtree">
+		<xsl:element name="{name()}" namespace="http://www.w3.org/1999/xhtml">
+			<xsl:attribute name="class">navbaranchor</xsl:attribute>
+			<xsl:for-each select="@*">
+				<xsl:attribute name="{name()}"><xsl:value-of select="."/></xsl:attribute>
+			</xsl:for-each>
+			<xsl:value-of select="."/>
+		</xsl:element>
+	</xsl:template>
+
+	<!-- Filter out Navbar -->
+	<xsl:template match="db:navbar" mode="html">
+	</xsl:template>
+
+	<!-- END NAVIGATION BAR -->
+
+
+	<!-- Apply Templates to Body -->
+	<xsl:template match="html:html" mode="html" priority="1">
+		<xsl:apply-templates mode="html"/>
+	</xsl:template>
+	<xsl:template match="html:head" priority="1" mode="html">
+	</xsl:template>
+	<xsl:template match="html:body" priority="1" mode="html">
+		<xsl:apply-templates mode="html"/>
+	</xsl:template>
+
+	<!-- Copy Meta Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:meta">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Link Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:link">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Script Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:script">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- Copy Style Tags to Head -->
+	<xsl:template mode="head" priority="1" match="html:style">
+		<!-- keep contents -->
+		<xsl:copy-of select="."/>
+	</xsl:template>
+
+	<!-- replacement for the broken &nbsp; -->
+	<xsl:template match="nbsp" mode="html">
+		<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+	</xsl:template>
+
+	<!-- replacement for the broken &emsp; -->
+	<xsl:template match="emsp" mode="html">
+		<!-- IE6 doesn't support &emsp; ... use this <span> as an alternative -->
+		<!-- <xsl:text disable-output-escaping="yes">&amp;emsp;</xsl:text> -->
+		<span style="margin-left: 1em"> </span>
+	</xsl:template>
+
+	<!-- filter out META elements -->
+	<xsl:template match="html:meta" mode="html">
+	</xsl:template>
+
+	<!-- filter out LINK elements -->
+	<xsl:template match="html:link" mode="html">
+	</xsl:template>
+
+	<!-- filter out STYLE elements -->
+	<xsl:template match="html:style" mode="html">
+	</xsl:template>
+
+	<!-- filter out SCRIPT elements -->
+	<xsl:template match="html:script" mode="html">
+	</xsl:template>
+
+	<!-- filter out TITLE elements -->
+	<xsl:template match="html:title" mode="html">
+	</xsl:template>
+
+	<!-- fallthrough for unadjusted elements -->
+	<xsl:template match="@*|*|text()|processing-instruction()|comment()" priority="0" mode="html"><xsl:copy><xsl:apply-templates select="@*|*|text()|processing-instruction()|comment()" mode="html"/></xsl:copy></xsl:template>
+
+</xsl:stylesheet>

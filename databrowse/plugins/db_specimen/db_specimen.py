@@ -32,7 +32,7 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
 """ plugins/renderers/db_specimen.py - Default Text Renderer """
 
