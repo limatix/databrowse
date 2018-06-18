@@ -58,6 +58,7 @@ import ctypes
 import os
 import platform
 import sys
+import argparse
 from re import search
 import ConfigParser
 from urlparse import urlparse
@@ -88,9 +89,9 @@ def save_settings():
 def update_dataroot(newdataroot):
     global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"))
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
-    with open(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"), 'wb') as configfile:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
         config.write(configfile)
     configdict['dataroot'] = newdataroot
 
@@ -101,44 +102,47 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 load_settings()
 
 # Handle command line variables
-usr_path = ""
-try:
-    if sys.argv[1] is not None:
-        if sys.argv[1] == "-s":
-            try:
-                if sys.argv[2] is not None:
-                    if os.path.exists(sys.argv[2]):
-                        update_dataroot(sys.argv[2])
-                        print("Updated dataroot to: %s" % configdict['dataroot'])
-                        sys.exit(0)
-            except IndexError:
-                print("Dataroot is currently: %s" % configdict['dataroot'])
-                sys.exit(0)
-        elif sys.argv[1] == "-e":
-            if platform.system() == "Linux":
-                status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
-                if status != 0:
-                    if status == 32512:
-                        raise Exception("%s: EDITOR not set" % status)
-                    else:
-                        raise Exception("%s: Could not open config file." % status)
-            elif platform.system() == "Windows":
-                status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
-                if status != 0:
-                    raise Exception("%s: Could not open config file." % status)
-            else:
-                print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
-            sys.exit(0)
-        else:
-            if os.path.exists(sys.argv[1]):
-                usr_path = os.path.splitdrive(sys.argv[1])[1]
-            else:
-                usr_path = configdict['dataroot']
-except IndexError:
-    pass
+parser = argparse.ArgumentParser(description='Databrowse: An Extensible Data Management Platform')
+parser.add_argument('-s', '--setdataroot', metavar='path', help='path to set new dataroot')
+parser.add_argument('-e', '--openconfig', action='store_true', help='open cefdatabrowse config file')
+parser.add_argument('-g', '--go', metavar='path', const="here", nargs="?", help='open cefdatabrowse in a directory')
+args = parser.parse_args()
 
-if usr_path == "":
-    usr_path = os.path.splitdrive(os.getcwd())[1]
+usr_path = ""
+if args.setdataroot:
+    try:
+        if os.path.exists(args.setdataroot):
+            update_dataroot(args.setdataroot)
+            print("Updated dataroot to: %s" % configdict['dataroot'])
+            sys.exit(0)
+    except IndexError:
+        print("Dataroot is currently: %s" % configdict['dataroot'])
+        sys.exit(0)
+elif args.openconfig:
+    if platform.system() == "Linux":
+        status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
+        if status != 0:
+            if status == 32512:
+                raise Exception("%s: EDITOR not set" % status)
+            else:
+                raise Exception("%s: Could not open config file." % status)
+    elif platform.system() == "Windows":
+        status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
+        if status != 0:
+            raise Exception("%s: Could not open config file." % status)
+    else:
+        print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
+    sys.exit(0)
+elif args.go:
+    if args.go != "here":
+        if os.path.exists(args.go):
+            usr_path = args.go
+        else:
+            raise argparse.ArgumentTypeError('Path does not exist.')
+    else:
+        usr_path = os.getcwd()
+else:
+    usr_path = configdict['dataroot']
 
 # GLOBALS
 PYQT4 = False

@@ -21,6 +21,23 @@ performed by Iowa State University as a subcontractor to TRI Austin.
 DISTRIBUTION A.  Approved for public release:  distribution unlimited; 19 Aug 
 2016; 88ABW-2016-4051.
 
+## CEFDatabrowse Install Instructions ##
+From PIP:
+    > pip install databrowse
+From source:
+    > cd databrowse_source_dir
+    > python setup.py install
+
+Usage: cefdatabrowse.py [-h] [-s path] [-e] [-g [path]]
+
+    Databrowse: An Extensible Data Management Platform
+
+    optional arguments:
+      -h, --help                    show this help message and exit
+      -s path, --setdataroot path   path to set new dataroot
+      -e, --openconfig              open cefdatabrowse config file
+      -g [path], --go [path]        open cefdatabrowse in a directory
+
 ## Changelog ##
 
 ### v0.8 ###
