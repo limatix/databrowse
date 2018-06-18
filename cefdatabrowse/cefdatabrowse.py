@@ -74,22 +74,23 @@ def load_settings():
 
 
 def save_settings():
+    global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    config.read(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"))
     config.set("databrowse", "WIDTH", configdict['width'])
     config.set("databrowse", "HEIGHT", configdict['height'])
     config.set("databrowse", "X", POS_X)
     config.set("databrowse", "Y", POS_Y)
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
+    with open(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"), 'wb') as configfile:
         config.write(configfile)
 
 
 def update_dataroot(newdataroot):
     global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+    config.read(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
+    with open(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"), 'wb') as configfile:
         config.write(configfile)
     configdict['dataroot'] = newdataroot
 
@@ -193,8 +194,8 @@ scheme = "http://0.0.0.0/"
 
 # OS differences
 CefWidgetParent = QWidget
-install = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-sys.path.insert(0, install)
+configdict['install'] = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+sys.path.insert(0, configdict['install'])
 if LINUX and (PYQT4 or PYSIDE):
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
@@ -308,7 +309,7 @@ class ClientHandler:
 
         # Call the databrowse library and return the generated html
         if handler is "cefdatabrowse":
-            databrowsepaths = {'install': install, 'path': fullpath, 'scheme': scheme}
+            databrowsepaths = {'install': configdict['install'], 'path': fullpath, 'scheme': scheme}
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
             params.update(urlparams)
@@ -819,7 +820,7 @@ class CefApplication(QApplication):
         self.timer.stop()
 
     def setupIcon(self):
-        icon_file = os.path.join(install + "/cefdatabrowse/resources/", "{0}.png".format("icon256"))
+        icon_file = os.path.join(configdict['install'] + "/cefdatabrowse/resources/", "{0}.png".format("icon256"))
         if os.path.exists(icon_file):
             self.setWindowIcon(QIcon(icon_file))
 
@@ -932,7 +933,7 @@ class NavigationBar(QFrame):
         self.url.setText(unquote(browser.GetUrl().replace(scheme, "")))
 
     def createButton(self, name):
-        resources = install + "/cefdatabrowse/resources"
+        resources = configdict['install'] + "/cefdatabrowse/resources"
         pixmap = QPixmap(os.path.join(resources, "{0}.png".format(name)))
         icon = QIcon(pixmap)
         button = QPushButton()
