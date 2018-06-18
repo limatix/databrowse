@@ -233,7 +233,6 @@ class ClientHandler:
                     urlparams[paramone] = paramone
 
         fs = request.GetPostData()
-        # TODO: Handle POST data here
         # Especially uploaded files because of this:
         # [0608/110311.456:ERROR:request_impl.cc(785)] NOT IMPLEMENTED multi-part form data is not supported
         if len(fs) > 0:
