@@ -37,18 +37,15 @@
 """ Main script for the standalone CEFPython based Databrowse Application"""
 
 '''
-Usage:
-databrowse [None/argument/path]
-    None -> Opens CEFDatabrowse in current directory
-    path -> a path to a file/directory that if exists CEFDatabrowse will be launched there 
+Usage: cefdatabrowse.py [-h] [-s path] [-e] [-g [path]]
 
-Arguments:
-databrowse -s [None/path]
-    None -> returns current dataroot path
-    path -> a path that if exists sets the dataroot to path
+    Databrowse: An Extensible Data Management Platform
 
-databrowse -e
-    None -> opens the configuration file in the default text editor
+    optional arguments:
+      -h, --help                    show this help message and exit
+      -s path, --setdataroot path   path to set new dataroot
+      -e, --openconfig              open cefdatabrowse config file
+      -g [path], --go [path]        open cefdatabrowse in a directory
 '''
 
 configdict = {}

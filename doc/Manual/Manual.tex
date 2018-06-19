@@ -28,14 +28,16 @@
 \title{Databrowse: An extensible data management platform}
 \author{
         Tyler J. Lesthaeghe \\
+        tylerl@iastate.edu \\[1em]
+        Nathan D. Scheirer \\
+        scheirer@iastate.edu \\[1em]
                 Department of Aerospace Engineering and\\
                 Center for Nondestructive Evaluation\\
         Iowa State University of Science and Technology\\
         Ames, Iowa 50011\\
-        tylerl@iastate.edu
 }
 \date{\today \\
-	Version 0.7}
+	Version 0.8}
 
 \newcommand{\confitem}[5]{ 
 	\textbf{#1} \texttt{self.#2} (\textit{#3}) \\
@@ -69,6 +71,15 @@ This material is based on work supported by the Air Force Research Laboratory un
 \hfill\break
 \hfill\break
 DISTRIBUTION A.  Approved for public release:  distribution unlimited; 19 Aug 2016; 88ABW-2016-4051.
+\hfill\break
+\hfill\break
+This material is based on work supported by NASA under Contract
+NNX16CL31C and performed by Iowa State University as a subcontractor
+to TRI Austin.
+\hfill\break
+\hfill\break
+Approved for public release by TRI Austin: distribution unlimited;
+01 June 2018; by Carl W. Magnuson (NDE Division Director).
 \clearpage
 \tableofcontents
 
@@ -126,7 +137,12 @@ Since every file can be represented as XML, Databrowse provides an interface for
 \clearpage
 \section{Installing Databrowse}
 
-\subsection{Software Requirements and Dependencies}
+\subsection{Databrowse Platforms}
+
+Databrowse comes in two flavors, both of which contain the same functionality and provide nearly identical feature sets. Databrowse Server utilizes a WSGI compliant web server which is hosted the end users data storage system. The server version of Databrowse allows the end user to access their file system remotely from any other device connected to the internet following a onetime installation process. Alternatively, CEFDatabrowse has been implemented which utilizes CEFpython (Chromium Embedded Framework - Python) to provide the entirety of the Databrowse library on a single client. This self contained client can be installed directly through PIP and will seclude the Databrowse session to the host machine. This version of Databrowse can be especially effective in environments where data cannot be accessed via the internet or be even exposed to a network.
+
+\subsection{Databrowse Server}
+\subsubsection{Software Requirements and Dependencies}
 
 Databrowse requires the use of a WSGI compliant web server.  Databrowse has been tested extensively with mod\_wsgi on Apache 2.2.15 on Red Hat Enterprise Linux 6.6 and Apache 2.4.10 on Ubuntu 15.04.  The usage of mod\_wsgi, Apache, and a Unix-based operating system are strongly recommended.  Using Apache on Windows has been preliminarily tested; however, its use is strongly discouraged at this time due to file path issues that will be resolved in a later version of Databrowse.
 
@@ -136,7 +152,7 @@ Databrowse is dependent upon Python 2 (2.6 or later, Python 3 is not supported a
 
 \begin{itemize}
 	\item python-lxml version 3.2 or greater
-	\item python-magic version 0.2 or greater
+	\item python-magic version 0.2 or greater  (python-magic-bin if platform is Windows)
 	\item python-numpy version 1.8 or greater
 	\item python-pillow version 2.3 or greater
 	
@@ -152,19 +168,22 @@ Several Databrowse plugins packaged with the distribution also require the use o
 
 Databrowse also requires the use of mod\_rewrite for URL rewriting.  Databrowse can be ran without this support enabled; however, its use has not been tested extensively.
 
-\subsubsection{Experimental Windows Use}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+\paragraph{Experimental Windows Use}
 
 A set of binary packages providing the necessary prerequisites have been compiled and are available upon request for usage with Apache on Windows.  These packages require the usage of Apache compiled against the Microsoft Visual C++ 9 Runtime.  This is a limitation imposed by Python 2.  WampServer 2.2d is one such binary distribution of Apache that meets these requirements.  Please contact the author for additional information. 
 
-\subsection{Installation on Unix-based Platforms}
+\subsubsection{Installation on Unix-based Platforms}
 
 The necessary minimum prerequisites can be installed using the following commands on Debian-based platforms:
 
 \begin{verbatim}
-sudo apt-get install python2.7 python-lxml python-magic python-numpy python-pip libjpeg \
-   libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev apache2 libapache2-mod-wsgi     \
-   libapache2-mod-rewrite python-dev python-setuptools libtiff5-dev libjpeg8-dev        \
-   zlib1g-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+sudo apt-get install python2.7 python-lxml python-magic  (python-magic-bin if platform  \
+   is Windows) python-numpy python-pip libjpeg libjpeg-dev libfreetype6                 \
+   libfreetype6-dev zlib1g-dev apache2 libapache2-mod-wsgi libapache2-mod-rewrite	      \
+   python-dev python-setuptools libtiff5-dev libjpeg8-dev zlib1g-dev liblcms2-dev       \
+   libwebp-dev tcl8.5-dev tk8.5-dev python-tk                                           \
 sudo pip install pillow
 \end{verbatim}
 
@@ -282,6 +301,72 @@ sudo service httpd restart
 \end{verbatim}
 
 You should now be able to access Databrowse by visiting \url{http://localhost/databrowse} in your web browser.
+
+\subsection{CEFDatabrowse}
+CEFDatabrowse is a standalone client that operates nearly identically to the server version of Databrowse, however this version does not require a connection to a network and allows local usage of Databrowe's feature set.
+
+\subsubsection{Software Requirements and Dependencies}
+CEFDatabrowse utilizes the same dependenices as the server version with a few additions. The Databrowse core architecture as been extensively tested on Linux, however the CEFDatabrowse client is being used on both Linux and Windows platforms at this time. Your experience may be different if you are using an untested platform.
+CEFDatabrowse requires Python 2.7 and will not function with any other version of Python at this time. The following Python modules are also required, these should be automatically installed when the PIP package or setup.py file is ran but if a package does not install correctly these are what are required:
+
+\begin{itemize}
+\item python-lxml version 3.2 or greater
+\item python-magic version 0.2 or greater (python-magic-bin if platform is Windows)
+\item python-numpy version 1.8 or greater
+\item python-pillow version 2.3 or greater
+\item cefpython3 version 57.0 or greater
+\end{itemize}
+\subsubsection{Installation}
+On either Linux or Windows the installation process should be almost identical with the exception that the python-magic library should be used on Linux and the python-magic-bin library should be used on Windows. To install CEFDatabrowse verify that Python 2.7 is installed on your system. If not, run:
+
+\begin{verbatim}
+Linux:
+sudo apt-get install python2.7
+Windows:
+Install Anaconda package manager or a Python 2.7 binary
+\end{verbatim}
+
+CEFDatabrowse can be installed via PIP or from source. The PIP binaries are verified to work in both Linux and Windows environments, therefore to install via PIP execute the following command in your command prompt:
+
+\begin{verbatim}
+pip install databrowse
+\end{verbatim}
+
+This will install CEFDatabrowse along with the components that would be required to run the server version to your sites-packages directory within your Python installation directory. Following a successful installation CEFDatabrowse can be utilized in the following manner:
+
+\begin{verbatim}
+Usage: databrowse [-h] [-s path] [-e] [-g [path]]
+
+    Databrowse: An Extensible Data Management Platform
+
+    optional arguments:
+      -h, --help                    show this help message and exit
+      -s path, --setdataroot path   path to set new dataroot
+      -e, --openconfig              open cefdatabrowse config file
+      -g [path], --go [path]        open cefdatabrowse in a directory
+\end{verbatim}
+
+On a fresh install a few configuration values will need to be changed. These include the dataroot directory and any third party software packages that need to be added to the Python path during operation. The CEFDatabrowse configuration file can be accessed using the command:
+
+\begin{verbatim}
+databrowse -e
+\end{verbatim}
+
+This will open the configuration file in your default editor. From here the file will contain a default configuration like this:
+
+\begin{verbatim}
+[databrowse]
+width = 800
+height = 600
+x = 0
+y = 0
+dataroot = C:/databrowse
+limatix-qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils
+qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/QAutils
+dataguzzlerlib = C:/Users/nscheirer/Documents/dev/dataguzzler-lib/python
+\end{verbatim}
+
+From here you can set which directory you would like CEFDatabrowse to have access to. Keep in mind that CEFDatabrowse cannot access any files outside of this directory, therefore if you would like access to all files setting the dataroot to C:/ is acceptable. When a new dataroot is set it will be required that a directory called SOPs be created in the dataroot directory location. CEFDatabrowse will throw an error reminding you of this if you do not have a SOPs folder. The values following dataroot correspond to required third party packages that different plugins utilize. If you need that functionality replace these paths with the correct path to your installed copies. From this point CEFDatabrowse can be used via the defined usage above.
 
 \clearpage
 \section{Getting Started}\label{GettingStarted}
