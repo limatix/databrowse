@@ -320,7 +320,6 @@ class ClientHandler:
                 html = open(unquote(fullpath), "rb")
             except IOError:
                 if not os.path.exists(unquote(fullpath)):
-                    # C:/databrowse/specimens?handler=db_specimen_database&style_mode=add_specimen_group
                     raise IOError("Install location needs to be updated")
                 else:
                     if os.path.isdir(unquote(fullpath)):
