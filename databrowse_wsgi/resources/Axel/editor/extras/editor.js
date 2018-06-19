@@ -50,7 +50,7 @@ var Utility = {
 	// Simply escapes url characters if the caller has been started from a local file, otherwise 
 	// appends the proxy string so that the url is accessed through a proxy.
 	makeURLForFile : function (url, proxy) {
-		if ((Utility.isLocalSession()) || (url.indexOf('file://') == 0) || (url.indexOf('http://') == -1) || (url.indexOf('http://0.0.0.0') == 0)) {
+		if ((Utility.isLocalSession()) || (url.indexOf('file://') == 0) || (url.indexOf('http://') == -1)) {
 			return url;
 		} else {
 			return proxy + escape(url);
@@ -105,7 +105,10 @@ Utility.FileListAction.prototype = {
 	   		xhr.open( "GET", url,  false); 
 				// false:synchronous thus we don't need to define xhr.onreadystatechange 
 				// see http://developer.mozilla.org/en/XMLHttpRequest
-	   		xhr.send(null);
+			var host = window.location.hostname;
+			if (host != "0.0.0.0") {
+			    xhr.send(null);
+			}
 	      	if((xhr.status  == 200) || (xhr.status  == 0)) { // second test is for local usage -no Web server (from XHR MozDev doc)
 				listing = xhr.responseText;
 				this.status = 1;
@@ -136,7 +139,7 @@ Utility.FileListAction.prototype = {
 		}
 	},
 	loadxTigerTmplFrom : function (url) { 
-		if (Utility.isLocalSession()) {		
+		if (Utility.isLocalSession()) {
 			this.load(url, this.localxTigerTmplDetector, this.xTigerTmplFilter) 
 		} else {
 			this.load(url, this.proxyxTigerTmplDetector, this.xTigerTmplFilter) 		
