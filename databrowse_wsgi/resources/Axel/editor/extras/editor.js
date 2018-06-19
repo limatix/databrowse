@@ -50,7 +50,7 @@ var Utility = {
 	// Simply escapes url characters if the caller has been started from a local file, otherwise 
 	// appends the proxy string so that the url is accessed through a proxy.
 	makeURLForFile : function (url, proxy) {
-		if ((Utility.isLocalSession()) || (url.indexOf('file://') == 0) || (url.indexOf('http://') == -1)) {
+		if ((Utility.isLocalSession()) || (url.indexOf('file://') == 0) || (url.indexOf('http://') == -1) || (url.indexOf('http://0.0.0.0') == 0)) {
 			return url;
 		} else {
 			return proxy + escape(url);
@@ -650,7 +650,7 @@ viewerApp.prototype = {
 	
 	// Load list of templates in predefined container and add them as options in the appropriate selector
 	initializeTemplateList : function (path) {
-		var list = new Utility.FileListAction ();		
+		var list = new Utility.FileListAction ();
 		list.loadxTigerTmplFrom(Utility.makeURLForFile(path, this.PROXY));
 		if (list.isInError()) { // in error, set template path and template list to default
 			this.log(list.error, 1);

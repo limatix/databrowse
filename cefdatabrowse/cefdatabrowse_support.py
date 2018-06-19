@@ -359,7 +359,7 @@ def application(filename, params):
             elif "styleonly" in db_web_support.req.form:
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 parser = etree.XMLParser()
                 parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
                 styletree = etree.ElementTree(etree.XML(style, parser))

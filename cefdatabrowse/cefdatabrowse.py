@@ -219,7 +219,6 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        relpath = os.path.relpath(parsedurl.path[1:])
         fullpath = parsedurl.path[1:]
 
         urlparams = {}
@@ -275,7 +274,6 @@ class ClientHandler:
             resHandler._frame = frame
             resHandler._request = request
             resHandler._fullpath = fullpath
-            resHandler._relpath = relpath
             resHandler._params = urlparams
             self._AddStrongReference(resHandler)
             return resHandler
@@ -286,7 +284,6 @@ class ClientHandler:
             resHandler._frame = frame
             resHandler._request = request
             resHandler._fullpath = fullpath
-            resHandler._relpath = relpath
             self._AddStrongReference(resHandler)
             return resHandler
 
@@ -323,9 +320,13 @@ class ClientHandler:
                 html = open(unquote(fullpath), "rb")
             except IOError:
                 if not os.path.exists(unquote(fullpath)):
+                    # C:/databrowse/specimens?handler=db_specimen_database&style_mode=add_specimen_group
                     raise IOError("Install location needs to be updated")
                 else:
-                    raise IOError("Unknown problem")
+                    if os.path.isdir(unquote(fullpath)):
+                        html = ""
+                    else:
+                        raise IOError("Unknown problem")
             mime = response.GetMimeType()
             urlparams.update({'headers': {'Content-Type': mime}})
             data = "".join(html)
@@ -369,7 +370,6 @@ class ResourceHandler:
     _webRequestClient = None
     _params = {}
     _fullpath = None
-    _relpath = None
     _offsetRead = 0
 
     def ProcessRequest(self, request, callback):
@@ -474,7 +474,6 @@ class DatabrowseHandler:
     _webRequestClient = None
     _params = None
     _fullpath = None
-    _relpath = None
     _offsetRead = 0
 
     def ProcessRequest(self, request, callback):
