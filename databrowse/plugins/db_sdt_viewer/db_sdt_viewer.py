@@ -52,12 +52,14 @@ if platform.system() == "Linux":
     import grp
 from stat import *
 from lxml import etree
-from databrowse.support.renderer_support import renderer_class
 import magic
 import numpy as np
+from numpy.lib.recfunctions import repack_fields
 import collections
-from PIL import Image
-import matplotlib.pyplot as plt
+import subprocess
+
+from data_types import SdtDataTypes
+from databrowse.support.renderer_support import renderer_class
 
 
 class db_sdt_viewer(renderer_class):
@@ -74,7 +76,9 @@ class db_sdt_viewer(renderer_class):
     dtype_lookup = {'INTEGER 12': np.int16,
                     'INTEGER 16': np.int16,
                     'FLOAT 32': np.float32,
-                    'CHAR 8': np.int8}
+                    'CHAR 8': np.int8,
+                    'UNKNOWN 264': np.dtype({'names': ['f', 'x', 'y', 'z', 't'],
+                                             'formats': [np.bool_, np.float64, np.float64, np.float64, np.float64]})}
 
     def check_units(self, param):
         # Check whether the provided string is an integer, float, or a value with units
@@ -197,7 +201,7 @@ class db_sdt_viewer(renderer_class):
                     print "Reshaping and scaling data to match header information"
 
                 scaled_data = self.scale_data(data, value['Element Representation'], data_range, undef_value)
-                datasets.update({value['Subset Label']: {'y': x, 'x': y, 't':t, 'v': scaled_data}})
+                datasets.update({value['Subset Label']: {'y': x, 'x': y, 't': t, 'v': scaled_data}})
 
         return datasets
 
@@ -226,6 +230,14 @@ class db_sdt_viewer(renderer_class):
             undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**32)))*undef_value
             scaled_data[scaled_data == undef_value] = np.nan
             return scaled_data
+
+        elif dtype == 'UNKNOWN 264':
+            data = data[['x', 'y', 'z', 't']]
+            data = repack_fields(data).view(np.float64).reshape(data.shape + (-1,))
+            # scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**33)))*data
+            # undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**33)))*undef_value
+            # scaled_data[scaled_data == undef_value] = np.nan
+            return data
 
         else:
             raise Exception('Data type {t} not recognized'.format(t=dtype))
@@ -295,8 +307,15 @@ class db_sdt_viewer(renderer_class):
                         contenttype = "text/plain"
                     extension = os.path.splitext(self._fullpath)[1][1:]
                     icon = self._handler_support.GetIcon(contenttype, extension)
-
                     downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+
+                    try:
+                        __import__('imp').find_module('NDI_app')
+                        nditoolboxlink = self.getURL(self._relpath, content_mode="nditoolbox")
+                    except ImportError:
+                        nditoolboxlink = ""
+                        pass
+
                     imagelink = self.getURL(self._relpath, content_mode="raw", image="true")
 
                     xmlroot = etree.Element('{%s}sdtfile' %
@@ -304,6 +323,7 @@ class db_sdt_viewer(renderer_class):
                                             nsmap=self.nsmap,
                                             name=os.path.basename(self._relpath),
                                             resurl=self._web_support.resurl,
+                                            nditoolboxlink=nditoolboxlink,
                                             downlink=downlink, icon=icon,
                                             imagelink=imagelink)
 
@@ -391,183 +411,24 @@ class db_sdt_viewer(renderer_class):
                     return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                 else:
                     return iter(lambda: f.read(1024), '')
+            elif self._content_mode == "nditoolbox" and "ajax" in self._web_support.req.form:
+                import NDI_app
+                subprocess.Popen(['python', NDI_app.__file__, self._fullpath], cwd=os.path.dirname(NDI_app.__file__))
+
+                self._web_support.req.output = "NDITOOlBOX Called Successfully"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
             elif self._content_mode == "raw" and "image" in self._web_support.req.form:
                 if "dataset" not in self._web_support.req.form:
                     raise self.RendererException("Dataset Must Be Selected")
 
-                f = None
+                plot_types = SdtDataTypes(self)
 
-                if "frame" in self._web_support.req.form:
-                    fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)+"_Frame"+str(self._web_support.req.form['frame'].value)
-                    if self.CacheFileExists(fprefix,'png'):
-                        f = self.getCacheFileHandler('rb', fprefix, 'png')
-                        contenttype='image/png'
-                        size = os.path.getsize(self.getCacheFileName(fprefix,'png'))
-                        pass
-                    pass
-                else:
-                    fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
-                    if self.CacheFileExists(fprefix, 'png'):
-                        f = self.getCacheFileHandler('rb', fprefix, 'png')
-                        contenttype='image/png'
-                        size = os.path.getsize(self.getCacheFileName(fprefix,'png'))
-                        pass
-                    pass
-                if f is None:
-                    g = open(self._fullpath)
-                    paramdict, datasets, xmltree = self.parse_sdt(g)
-                    g.close()
-
-                    dsetname = self._web_support.req.form['dataset'].value
-
-                    if dsetname not in datasets:
-                        raise self.RendererException("Dataset '%s' Not Found" % dsetname)
-
-                    ds = datasets[dsetname]
-
-                    shp = ds['v'].shape
-
-                    pd = None
-
-                    for i in paramdict:
-                        if i.startswith('-- Data Subset'):
-                            if paramdict[i]['Subset Label'] == dsetname:
-                                pd = paramdict[i]
-                                pass
-                            pass
-                        pass
-
-                    if pd is None:
-                        raise self.RendererException("Unable to locate '%s' in Parameter List" % dsetname)
-
-                    vmin = float(pd['Measurement Range'].split()[0])
-                    vmax = float(pd['Measurement Range'].split()[1])+vmin
-                    try:
-                        vunits = pd['Measurement Range'].split()[2]
-                    except:
-                        vunits = "unitless"
-
-                    # Ascan
-                    if shp[0] == 1 and shp[1] == 1 and shp[2] > 1:
-                        plt.plot(ds['t'], ds['v'][0,0,:])
-                        plt.xlabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        plt.ylabel('Amplitude (%s)' % (vunits))
-                        #pylab.ylim([vmin, vmax])
-                        fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
-                    # Bscan
-                    elif shp[0] > 1 and shp[1] == 1 and shp[2] > 1:
-                        # Beware - this one probably doesn't work
-                        # Also, this situation probably doesn't actually happen
-                        plt.imshow(ds['v'][:,0,:], cmap='jet',
-                                     origin='lower', extent=[ds['x'][0],
-                                                             ds['x'][-1],
-                                                             ds['t'][0],
-                                                             ds['t'][-1]])#vmin=vmin, vmax=vmax)
-                        axis = 'Axis 1'
-                        aunits = 'None'
-                        for i in paramdict:
-                            if i.startswith('--- First Axis ---'):
-                                axis = i[i.find('(')+1:i.find(')')]
-                                aunits = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            pass
-                        plt.xlabel('Position, %s (%s)' % (axis, aunits))
-                        plt.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        cb = plt.colorbar()
-                        cb.set_label('Amplitude (%s)' % vunits)
-                        fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
-                    # Bscan
-                    elif shp[1] > 1 and shp[0] == 1 and shp[2] > 1:
-                        plt.imshow(ds['v'][0,:,:], cmap='jet',
-                                     origin='lower', extent=[ds['y'][0],
-                                                             ds['y'][-1],
-                                                             ds['t'][0],
-                                                             ds['t'][-1]])#vmin=vmin, vmax=vmax)
-                        axis = 'Axis 2'
-                        aunits = 'None'
-                        for i in paramdict:
-                            if i.startswith('--- Second Axis ---'):
-                                axis = i[i.find('(')+1:i.find(')')]
-                                aunits = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            pass
-                        plt.xlabel('Position, %s (%s)' % (axis, aunits))
-                        plt.ylabel('Time, t (%s)' % (self.check_units(pd['Sample Resolution'])[1]))
-                        cb = plt.colorbar()
-                        cb.set_label('Amplitude (%s)' % vunits)
-                        fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
-                    # Gated CScan Output - i.e. Both Positions And No Time
-                    elif shp[0] > 1 and shp[1] > 1 and shp[2] == 1:
-                        plt.imshow(ds['v'][:,:,0], cmap='jet',
-                                     origin='lower', extent=[ds['x'][0],
-                                                             ds['x'][-1],
-                                                             ds['y'][0],
-                                                             ds['y'][-1]],
-                                    vmin=ds['v'].min(), vmax=ds['v'].max())
-                        axis1 = 'Axis 1'
-                        a1units = 'None'
-                        axis2 = 'Axis 2'
-                        a2units = 'None'
-                        for i in paramdict:
-                            if i.startswith('--- First Axis ---'):
-                                axis1 = i[i.find('(')+1:i.find(')')]
-                                a1units = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            elif i.startswith('--- Second Axis ---'):
-                                axis2 = i[i.find('(')+1:i.find(')')]
-                                a2units = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            pass
-                        plt.xlabel('Position, %s (%s)' % (axis1, a1units))
-                        plt.ylabel('Position, %s (%s)' % (axis2, a2units))
-                        cb = plt.colorbar()
-                        cb.set_label('Amplitude, (%s)' % vunits)
-                        fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value)
-                    # CScan
-                    elif shp[0] > 1 and shp[1] > 1 and shp[2] > 1:
-                        if "frame" not in self._web_support.req.form:
-                            frame = ds['v'].max(0).max(0).argmax()
-                        else:
-                            frame = int(self._web_support.req.form['frame'].value)
-                        plt.imshow(ds['v'][:,:,frame], cmap='jet',
-                                     origin='lower', extent=[ds['x'][0],
-                                                             ds['x'][-1],
-                                                             ds['y'][0],
-                                                             ds['y'][-1]],
-                                     vmin=ds['v'].min(), vmax=ds['v'].max())
-                        axis1 = 'Axis 1'
-                        a1units = 'None'
-                        axis2 = 'Axis 2'
-                        a2units = 'None'
-                        for i in paramdict:
-                            if i.startswith('--- First Axis ---'):
-                                axis1 = i[i.find('(')+1:i.find(')')]
-                                a1units = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            elif i.startswith('--- Second Axis ---'):
-                                axis2 = i[i.find('(')+1:i.find(')')]
-                                a2units = self.check_units(paramdict[i]['Sample Resolution'])[1]
-                                pass
-                            pass
-                        plt.xlabel('Position, %s (%s)' % (axis1, a1units))
-                        plt.ylabel('Position, %s (%s)' % (axis2, a2units))
-                        cb = plt.colorbar()
-                        cb.set_label('Amplitude (%s)' % vunits)
-                        plt.title('Time, t=%0.2f %s' % (ds['t'][frame],
-                                                              self.check_units(pd['Sample Resolution'])[1]))
-                        fprefix = "Dataset_"+str(self._web_support.req.form['dataset'].value+"_Frame%d"%frame)
-
-                    f = self.getCacheFileHandler('wb', fprefix, 'png')
-                    plt.savefig(f)
-                    f.close()
-                    plt.clf()
-                    size = os.path.getsize(self.getCacheFileName(fprefix, 'png'))
-                    contenttype='image/png'
-                    f = self.getCacheFileHandler('rb', fprefix, 'png')
+                f = self.getCacheFileHandler('rb', plot_types.fprefix, plot_types.ext)
 
                 self._web_support.req.response_headers['Content-Disposition'] = "filename=" + os.path.basename(f.name)
-                self._web_support.req.response_headers['Content-Type'] = contenttype
-                self._web_support.req.response_headers['Content-Length'] = str(size)
+                self._web_support.req.response_headers['Content-Type'] = plot_types.contenttype
+                self._web_support.req.response_headers['Content-Length'] = str(plot_types.size)
                 self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                 self._web_support.req.output_done = True
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:

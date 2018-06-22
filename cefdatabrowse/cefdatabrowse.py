@@ -49,6 +49,7 @@ Usage: cefdatabrowse.py [-h] [-s path] [-e] [-g [path]]
 '''
 
 configdict = {}
+partydict = {}
 
 from cefpython3 import cefpython as cef
 import ctypes
@@ -65,10 +66,11 @@ import cefdatabrowse_support as dbp
 
 # Load saved cef application settings
 def load_settings():
-    global configdict
+    global configdict, partydict
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     configdict.update(dict(config.items('databrowse')))
+    partydict.update(dict(config.items('3rdparty')))
 
 
 def save_settings():
@@ -202,7 +204,8 @@ if LINUX and (PYQT4 or PYSIDE):
     CefWidgetParent = QX11EmbedContainer
 
 # Append external libraries to path
-sys.path.insert(0, configdict['dataguzzlerlib'])
+for item in partydict.keys():
+    sys.path.insert(0, partydict[item])
 
 
 # Modified client handler from cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
