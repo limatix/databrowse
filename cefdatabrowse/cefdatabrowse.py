@@ -729,7 +729,7 @@ class MainWindow(QMainWindow):
 
     def openfile(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", configdict['dataroot'],
                                                   "All Files (*);;Python Files (*.py)", options=options)
         if fileName:
             self.cef_widget.browser.LoadUrl(scheme + fileName)
