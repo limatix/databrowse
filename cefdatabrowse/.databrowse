@@ -3,7 +3,7 @@ width = 1040
 height = 702
 x = 0
 y = 0
-dataroot = C:\
+dataroot = C:\databrowse
 limatix-qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils
 qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/QAutils
 

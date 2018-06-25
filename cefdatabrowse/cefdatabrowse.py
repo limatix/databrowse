@@ -118,7 +118,7 @@ elif args.openconfig:
         status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
         if status != 0:
             if status == 32512:
-                raise Exception("%s: EDITOR not set" % status)
+                raise Exception("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
             else:
                 raise Exception("%s: Could not open config file." % status)
     elif platform.system() == "Windows":
@@ -677,7 +677,7 @@ class MainWindow(QMainWindow):
 
         closeAction = QAction("&Close", self)
         closeAction.setStatusTip('Close Databrowse')
-        closeAction.triggered.connect(self.closeEvent)
+        closeAction.triggered.connect(self.closeapp)
 
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu('&File')
@@ -716,6 +716,13 @@ class MainWindow(QMainWindow):
             # noinspection PyArgumentList
             layout.addWidget(self.container, 1, 0)
 
+    def closeapp(self):
+        # Close browser (force=True) and free CEF reference
+        if self.cef_widget.browser:
+            self.cef_widget.browser.CloseBrowser(True)
+            self.clear_browser_references()
+            self.close()
+
     def closeEvent(self, event):
         # Close browser (force=True) and free CEF reference
         if self.cef_widget.browser:
@@ -741,7 +748,7 @@ class MainWindow(QMainWindow):
                 os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
             if status != 0:
                 if status == 32512:
-                    print("%s: EDITOR not set" % status)
+                    print("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
                 else:
                     print("%s: Could not open config file." % status)
         elif platform.system() == "Windows":
@@ -888,8 +895,9 @@ class LoadHandler(object):
             self.navigation_bar.cef_widget.setFocus()
             # Temporary fix no. 2 for focus issue on Linux (Issue #284)
             if LINUX:
-                print("[qt.py] LoadHandler.OnLoadStart:"
-                      " keyboard focus fix no. 2 (Issue #284)")
+                pass
+                # print("[qt.py] LoadHandler.OnLoadStart:"
+                #       " keyboard focus fix no. 2 (Issue #284)")
                 # browser.SetFocus(True)        -- Seems like this isn't necessary
             self.initial_app_loading = False
 
@@ -904,8 +912,8 @@ class FocusHandler(object):
     def OnGotFocus(self, browser, **_):
         # Temporary fix no. 1 for focus issues on Linux (Issue #284)
         if LINUX:
-            print("[qt.py] FocusHandler.OnGotFocus:"
-                  " keyboard focus fix no. 1 (Issue #284)")
+            # print("[qt.py] FocusHandler.OnGotFocus:"
+            #       " keyboard focus fix no. 1 (Issue #284)")
             browser.SetFocus(True)
 
 
