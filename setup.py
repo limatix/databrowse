@@ -108,4 +108,4 @@ setup(
 )
 
 print("Updating config permissions.")
-os.chmod(os.path.join(__file__, "cefdatabrowse/.databrowse"), 0o777)
+os.chmod(os.path.join(os.path.abspath(__file__), "cefdatabrowse/.databrowse"), 0o770)
