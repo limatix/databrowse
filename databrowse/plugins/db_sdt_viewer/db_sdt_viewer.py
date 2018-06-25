@@ -54,7 +54,8 @@ from stat import *
 from lxml import etree
 import magic
 import numpy as np
-from numpy.lib.recfunctions import repack_fields
+# Change to be made in numpy 15
+# from numpy.lib.recfunctions import repack_fields
 import collections
 import subprocess
 
@@ -233,7 +234,9 @@ class db_sdt_viewer(renderer_class):
 
         elif dtype == 'UNKNOWN 264':
             data = data[['x', 'y', 'z', 't']]
-            data = repack_fields(data).view(np.float64).reshape(data.shape + (-1,))
+            # Change to be made in numpy 15
+            # data = repack_fields(data).view(np.float64).reshape(data.shape + (-1,))
+            data = data.view(np.float64).reshape(data.shape + (-1,))
             # scaled_data = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**33)))*data
             # undef_value = (((2*drange[0]+drange[1])/2.0) + (float(drange[1])/(2.0**33)))*undef_value
             # scaled_data[scaled_data == undef_value] = np.nan

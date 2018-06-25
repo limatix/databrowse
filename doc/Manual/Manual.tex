@@ -306,7 +306,7 @@ You should now be able to access Databrowse by visiting \url{http://localhost/da
 CEFDatabrowse is a standalone client that operates nearly identically to the server version of Databrowse, however this version does not require a connection to a network and allows local usage of Databrowe's feature set.
 
 \subsubsection{Software Requirements and Dependencies}
-CEFDatabrowse utilizes the same dependenices as the server version with a few additions. The Databrowse core architecture as been extensively tested on Linux, however the CEFDatabrowse client is being used on both Linux and Windows platforms at this time. Your experience may be different if you are using an untested platform.
+CEFDatabrowse utilizes the same dependencies as the server version with a few additions. The Databrowse core architecture as been extensively tested on Linux, however the CEFDatabrowse client is being used on both Linux and Windows platforms at this time. Your experience may be different if you are using an untested platform.
 CEFDatabrowse requires Python 2.7 and will not function with any other version of Python at this time. The following Python modules are also required, these should be automatically installed when the PIP package or setup.py file is ran but if a package does not install correctly these are what are required:
 
 \begin{itemize}
@@ -1231,6 +1231,17 @@ The web page viewer plugin will display the contents of an HTML file within the 
 
 \endgroup
 
+
+\begingroup
+\setlength\intextsep{0pt}
+\subsection{SDT File Viewer}
+\begin{wrapfigure}[20]{R}{0.45\textwidth}
+		\includegraphics[width=0.45\textwidth]{SDT_Viewer.png}
+\end{wrapfigure}
+The SDT file viewer operates on .sdt files generated from third party data collection software, i.e. Inspectionware. With the ability to generate images and gifs of the included data sets as well as collecting the header information all of the experimental data is located in one easy to find location. Integration with the NDIToolBox is also available if that software is available.
+
+\endgroup
+
 \clearpage
 \section{License and Third-Party Components}
 Databrowse is distributed under the terms of the BSD-3 clause license. \\
@@ -1272,6 +1283,12 @@ License: BSD-3 \\
 \noindent Portions of this software are adapted from exif-py-1.2.0: \\
 Copyright \copyright\ 2002-2007 Gene Cash \\
 Copyright \copyright\ 2007-2013 Ianaré Sévi and contributors \\
+License: BSD-3 \\
+
+\noindent Portions of this software are adapted from cefpython: \\
+Copyright \copyright\ 2012 The CEF Python authors - see the Authors file in cefpython repository. \\
+All rights reserved. Licensed under the BSD 3-clause license. \\
+See project website: https://github.com/cztomczak/cefpython \\
 License: BSD-3 \\
 
 
