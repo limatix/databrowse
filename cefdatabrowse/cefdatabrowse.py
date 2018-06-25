@@ -675,10 +675,15 @@ class MainWindow(QMainWindow):
         openAction.setStatusTip('Open file')
         openAction.triggered.connect(self.openfile)
 
+        closeAction = QAction("&Close", self)
+        closeAction.setStatusTip('Close Databrowse')
+        closeAction.triggered.connect(self.closeEvent)
+
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu('&File')
         fileMenu.addAction(settingsAction)
         fileMenu.addAction(openAction)
+        fileMenu.addAction(closeAction)
 
         layout.addWidget(self.navigation_bar, 0, 0)
         layout.addWidget(self.cef_widget, 1, 0)
