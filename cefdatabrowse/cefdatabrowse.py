@@ -666,6 +666,20 @@ class MainWindow(QMainWindow):
         self.cef_widget = CefWidget(self)
         self.navigation_bar = NavigationBar(self.cef_widget)
         layout = QGridLayout()
+
+        settingsAction = QAction("&Settings", self)
+        settingsAction.setStatusTip('Open settings file')
+        settingsAction.triggered.connect(self.settings)
+
+        openAction = QAction("&Open", self)
+        openAction.setStatusTip('Open file')
+        openAction.triggered.connect(self.openfile)
+
+        mainMenu = self.menuBar()
+        fileMenu = mainMenu.addMenu('&File')
+        fileMenu.addAction(settingsAction)
+        fileMenu.addAction(openAction)
+
         layout.addWidget(self.navigation_bar, 0, 0)
         layout.addWidget(self.cef_widget, 1, 0)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -707,6 +721,35 @@ class MainWindow(QMainWindow):
         # Clear browser references that you keep anywhere in your
         # code. All references must be cleared for CEF to shutdown cleanly.
         self.cef_widget.browser = None
+
+    def openfile(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "All Files (*);;Python Files (*.py)", options=options)
+        if fileName:
+            self.cef_widget.browser.LoadUrl(scheme + fileName)
+
+    def settings(self):
+        status = -1
+        if platform.system() == "Linux":
+            status = os.system('%s %s' % (
+                os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
+            if status != 0:
+                if status == 32512:
+                    print("%s: EDITOR not set" % status)
+                else:
+                    print("%s: Could not open config file." % status)
+        elif platform.system() == "Windows":
+            status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+            if status != 0:
+                print("%s: Could not open config file." % status)
+        else:
+            print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
+        if status == 0:
+            load_settings()
+            for item in partydict.keys():
+                sys.path.insert(0, partydict[item])
+            self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
 
 
 class CefWidget(CefWidgetParent):
