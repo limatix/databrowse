@@ -58,7 +58,7 @@ from numpy.lib.recfunctions import repack_fields
 import collections
 import subprocess
 
-from data_types import SdtDataTypes
+from data_sets import SDTDataSets
 from databrowse.support.renderer_support import renderer_class
 
 
@@ -422,7 +422,7 @@ class db_sdt_viewer(renderer_class):
                 if "dataset" not in self._web_support.req.form:
                     raise self.RendererException("Dataset Must Be Selected")
 
-                plot_types = SdtDataTypes(self)
+                plot_types = SDTDataSets(self)
 
                 f = self.getCacheFileHandler('rb', plot_types.fprefix, plot_types.ext)
 

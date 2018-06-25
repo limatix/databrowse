@@ -26,7 +26,7 @@ def save_animation(filepath, shp, ds):
     return 0
 
 
-class SdtDataTypes:
+class SDTDataSets:
 
     def __init__(self, parent):
         self.parent = parent
@@ -65,7 +65,6 @@ class SdtDataTypes:
                 size = os.path.getsize(self.parent.getCacheFileName(fprefix, 'png'))
                 ext = 'png'
             else:
-                f = None
                 contenttype = None
                 size = None
                 ext = None
