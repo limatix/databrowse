@@ -94,10 +94,6 @@ def update_dataroot(newdataroot):
         config.write(configfile)
     configdict['dataroot'] = newdataroot
 
-
-myappid = u'limatix.org.databrowse'
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
 load_settings()
 
 # Handle command line variables
@@ -202,6 +198,10 @@ sys.path.insert(0, configdict['install'])
 if LINUX and (PYQT4 or PYSIDE):
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
+
+if WINDOWS:
+    myappid = u'limatix.org.databrowse'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 # Append external libraries to path
 for item in partydict.keys():
