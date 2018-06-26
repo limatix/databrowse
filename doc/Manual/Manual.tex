@@ -307,7 +307,8 @@ CEFDatabrowse is a standalone client that operates nearly identically to the ser
 
 \subsubsection{Software Requirements and Dependencies}
 CEFDatabrowse utilizes the same dependencies as the server version with a few additions. The Databrowse core architecture as been extensively tested on Linux, however the CEFDatabrowse client is being used on both Linux and Windows platforms at this time. Your experience may be different if you are using an untested platform.
-CEFDatabrowse requires Python 2.7 and will not function with any other version of Python at this time. The following Python modules are also required, these should be automatically installed when the PIP package or setup.py file is ran but if a package does not install correctly these are what are required:
+
+CEFDatabrowse requires Python 2.7 and will not function with any other version of Python at this time. The following Python modules are also required, these should be automatically installed when the PIP package or setup.py file is ran but if a package does not install correctly, then these are the packages that are required:
 
 \begin{itemize}
 \item python-lxml version 3.2 or greater
@@ -332,7 +333,7 @@ CEFDatabrowse can be installed via PIP or from source. The PIP binaries are veri
 pip install databrowse
 \end{verbatim}
 
-This will install CEFDatabrowse along with the components that would be required to run the server version to your sites-packages directory within your Python installation directory. Following a successful installation CEFDatabrowse can be utilized in the following manner:
+This will install CEFDatabrowse along with the components that would be required to run the server version to your sites-packages directory within your Python installation directory. Following a successful installation, CEFDatabrowse can be utilized in the following manner:
 
 \begin{verbatim}
 Usage: databrowse [-h] [-s path] [-e] [-g [path]]
@@ -352,7 +353,7 @@ On a fresh install a few configuration values will need to be changed. These inc
 databrowse -e
 \end{verbatim}
 
-This will open the configuration file in your default editor. If the EDITOR envrionment variable is not set then you will have to set it to your prefered editor program inorder for these features to work. The configuration file will contain default variables like this:
+This will open the configuration file in your default editor. If the EDITOR envrionment variable is not set then you will have to set it to your prefered editor program in order for these features to work. The configuration file will contain default variables like this:
 
 \begin{verbatim}
 [databrowse]
