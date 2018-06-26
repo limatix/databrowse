@@ -151,7 +151,7 @@ try:
     from PyQt4.QtCore import *
 
     PYQT4 = True
-except Exception:
+except ImportError:
     try:
         # noinspection PyUnresolvedReferences
         import PySide
@@ -163,7 +163,7 @@ except Exception:
         from PySide.QtCore import *
 
         PYSIDE = True
-    except Exception:
+    except ImportError:
         try:
             # noinspection PyUnresolvedReferences
             from PyQt5.QtGui import *
@@ -173,7 +173,7 @@ except Exception:
             from PyQt5.QtWidgets import *
 
             PYQT5 = True
-        except Exception:
+        except ImportError:
             print("You need to install one of the following:")
             print("pyqt4")
             print("pyside")
@@ -188,9 +188,6 @@ WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
-# Configuration
-scheme = "http://0.0.0.0/"
-
 # OS differences
 CefWidgetParent = QWidget
 configdict['install'] = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
@@ -202,6 +199,9 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     myappid = u'limatix.org.databrowse'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    scheme = "http://0.0.0.0/"
+elif LINUX:
+    scheme = "http://databrowse/"
 
 # Append external libraries to path
 for item in partydict.keys():
@@ -320,7 +320,7 @@ class ClientHandler:
                     else:
                         raise IOError("Unknown problem")
             mime = response.GetMimeType()
-            urlparams.update({'headers': {'Content-Type': mime}, 'status': 200})
+            urlparams.update({'headers': {'Content-Type': mime}, "status": 200})
             data = "".join(html)
 
         return data
