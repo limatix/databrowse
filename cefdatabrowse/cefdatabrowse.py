@@ -270,25 +270,25 @@ class ClientHandler:
                 urlparams.update(fs)
 
         # Any resource files must be located in the databrowse_wsgi directory in the databrowse root source directory
-        if "databrowse_wsgi" not in fullpath:
-            resHandler = DatabrowseHandler()
-            resHandler._clientHandler = self
-            resHandler._browser = browser
-            resHandler._frame = frame
-            resHandler._request = request
-            resHandler._fullpath = fullpath
-            resHandler._params = urlparams
-            self._AddStrongReference(resHandler)
-            return resHandler
-        else:
-            resHandler = ResourceHandler()
-            resHandler._clientHandler = self
-            resHandler._browser = browser
-            resHandler._frame = frame
-            resHandler._request = request
-            resHandler._fullpath = fullpath
-            self._AddStrongReference(resHandler)
-            return resHandler
+        # if "databrowse_wsgi" not in fullpath:
+        resHandler = DatabrowseHandler()
+        resHandler._clientHandler = self
+        resHandler._browser = browser
+        resHandler._frame = frame
+        resHandler._request = request
+        resHandler._fullpath = fullpath
+        resHandler._params = urlparams
+        self._AddStrongReference(resHandler)
+        return resHandler
+        # else:
+        #     resHandler = ResourceHandler()
+        #     resHandler._clientHandler = self
+        #     resHandler._browser = browser
+        #     resHandler._frame = frame
+        #     resHandler._request = request
+        #     resHandler._fullpath = fullpath
+        #     self._AddStrongReference(resHandler)
+        #     return resHandler
 
     def _OnResourceResponse(self, handler, browser, fullpath, frame, request, requestStatus,
             requestError, response, urlparams, data):
@@ -308,7 +308,7 @@ class ClientHandler:
         # Return the new data - you can modify it.
 
         # Call the databrowse library and return the generated html
-        if handler is "cefdatabrowse":
+        if "databrowse_wsgi" not in fullpath:
             databrowsepaths = {'install': configdict['install'], 'path': fullpath, 'scheme': scheme}
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
