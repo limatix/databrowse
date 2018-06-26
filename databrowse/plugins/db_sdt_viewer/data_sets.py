@@ -291,14 +291,17 @@ class SDTDataSets:
         self.size = os.path.getsize(self.parent.getCacheFileName(self.fprefix, self.ext))
 
         # Experimental gif support
-        if subprocess.call(["magick"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT) == 0:
-            fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
-            ext = "gif"
-            if not self.parent.CacheFileExists(fprefix, ext) or os.path.getsize(self.parent.getCacheFileName(fprefix, ext)) == 0:
-                ft = self.parent.getCacheFileHandler('wb', fprefix, ext)
-                ft.close()
-                p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds))
-                p.daemon = False
-                p.start()
-        else:
+        try:
+            if subprocess.call(["magick"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT) == 0:
+                fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+                ext = "gif"
+                if not self.parent.CacheFileExists(fprefix, ext) or os.path.getsize(self.parent.getCacheFileName(fprefix, ext)) == 0:
+                    ft = self.parent.getCacheFileHandler('wb', fprefix, ext)
+                    ft.close()
+                    p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds))
+                    p.daemon = False
+                    p.start()
+            else:
+                raise OSError
+        except OSError:
             print("Warning: Imagemagick is not install or improperly configured. Gif support not available.")
