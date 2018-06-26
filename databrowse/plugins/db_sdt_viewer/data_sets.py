@@ -3,8 +3,8 @@ import subprocess
 from multiprocessing import Process
 import matplotlib
 from matplotlib import animation
-import matplotlib.pyplot as plt
 matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 def save_animation(filepath, shp, ds):
