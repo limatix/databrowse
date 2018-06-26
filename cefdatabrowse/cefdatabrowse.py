@@ -270,7 +270,6 @@ class ClientHandler:
                 urlparams.update(fs)
 
         # Any resource files must be located in the databrowse_wsgi directory in the databrowse root source directory
-        # if "databrowse_wsgi" not in fullpath:
         resHandler = DatabrowseHandler()
         resHandler._clientHandler = self
         resHandler._browser = browser
@@ -280,17 +279,8 @@ class ClientHandler:
         resHandler._params = urlparams
         self._AddStrongReference(resHandler)
         return resHandler
-        # else:
-        #     resHandler = ResourceHandler()
-        #     resHandler._clientHandler = self
-        #     resHandler._browser = browser
-        #     resHandler._frame = frame
-        #     resHandler._request = request
-        #     resHandler._fullpath = fullpath
-        #     self._AddStrongReference(resHandler)
-        #     return resHandler
 
-    def _OnResourceResponse(self, handler, browser, fullpath, frame, request, requestStatus,
+    def _OnResourceResponse(self, browser, fullpath, frame, request, requestStatus,
             requestError, response, urlparams, data):
         # This callback is emulated through ResourceHandler
         # and WebRequest. Real "OnResourceResponse" is not yet
@@ -356,109 +346,6 @@ class ClientHandler:
             print("_ReleaseStrongReference() FAILED: resource handler not found, id = %s" % (resHandler._resourceHandlerId))
 
 
-# Typical resource handler provided by cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
-class ResourceHandler:
-
-    # The methods of this class will always be called
-    # on the IO thread.
-
-    _resourceHandlerId = None
-    _clientHandler = None
-    _browser = None
-    _frame = None
-    _request = None
-    _responseHeadersReadyCallback = None
-    _web_request = None
-    _webRequestClient = None
-    _params = {}
-    _fullpath = None
-    _offsetRead = 0
-
-    def ProcessRequest(self, request, callback):
-        # print("Resource called")
-        # print("ProcessRequest()")
-        # 1. Start the request using WebRequest
-        # 2. Return True to handle the request
-        # 3. Once response headers are ready call
-        #    callback.Continue()
-        self._responseHeadersReadyCallback = callback
-        self._webRequestClient = WebRequestClient()
-        self._webRequestClient._resourceHandler = self
-        self._webRequestClient._filetype = "resource"
-        # Need to set AllowCacheCredentials and AllowCookies for
-        # the cookies to work during POST requests (Issue 127).
-        # To skip cache set the SkipCache request flag.
-        request.SetFlags(cef.Request.Flags["AllowCachedCredentials"]\
-                | cef.Request.Flags["AllowCookies"])
-        # A strong reference to the WebRequest object must kept.
-        self._web_request = cef.WebRequest.Create(
-                request, self._webRequestClient)
-        return True
-
-    def GetResponseHeaders(self, response, responseLengthOut, redirectUrlOut):
-        # print("GetResponseHeaders()")
-        # 1. If the response length is not known set
-        #    responseLengthOut[0] to -1 and ReadResponse()
-        #    will be called until it returns False.
-        # 2. If the response length is known set
-        #    responseLengthOut[0] to a positive value
-        #    and ReadResponse() will be called until it
-        #    returns False or the specified number of bytes
-        #    have been read.
-        # 3. Use the |response| object to set the mime type,
-        #    http status code and other optional header values.
-        # 4. To redirect the request to a new URL set
-        #    redirectUrlOut[0] to the new url.
-        assert self._webRequestClient._response, "Response object empty"
-        wrcResponse = self._webRequestClient._response
-        response.SetStatus(wrcResponse.GetStatus())
-        response.SetStatusText(wrcResponse.GetStatusText())
-        response.SetHeaderMap(self._params["headers"])
-        if wrcResponse.GetHeaderMultimap():
-            response.SetHeaderMultimap(wrcResponse.GetHeaderMultimap())
-        responseLengthOut[0] = self._webRequestClient._dataLength
-        if not responseLengthOut[0]:
-            # Probably a cached page? Or a redirect?
-            pass
-
-    def ReadResponse(self, data_out, bytes_to_read, bytes_read_out, callback):
-        # print("ReadResponse()")
-        # 1. If data is available immediately copy up to
-        #    bytes_to_read bytes into data_out[0], set
-        #    bytes_read_out[0] to the number of bytes copied,
-        #    and return true.
-        # 2. To read the data at a later time set
-        #    bytes_read_out[0] to 0, return true and call
-        #    callback.Continue() when the data is available.
-        # 3. To indicate response completion return false.
-        if self._offsetRead < self._webRequestClient._dataLength:
-            dataChunk = self._webRequestClient._data[\
-                    self._offsetRead:(self._offsetRead + bytes_to_read)]
-            self._offsetRead += len(dataChunk)
-            data_out[0] = dataChunk
-            bytes_read_out[0] = len(dataChunk)
-            return True
-        self._clientHandler._ReleaseStrongReference(self)
-        print("no more data, return False")
-        return False
-
-    def CanGetCookie(self, cookie):
-        # Return true if the specified cookie can be sent
-        # with the request or false otherwise. If false
-        # is returned for any cookie then no cookies will
-        # be sent with the request.
-        return True
-
-    def CanSetCookie(self, cookie):
-        # Return true if the specified cookie returned
-        # with the response can be set or false otherwise.
-        return True
-
-    def Cancel(self):
-        # Request processing has been canceled.
-        pass
-
-
 # Adapted resource handler to deal with the returned start resposne variables from databrowse
 # Based on the resource handler in cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class DatabrowseHandler:
@@ -488,7 +375,6 @@ class DatabrowseHandler:
         self._responseHeadersReadyCallback = callback
         self._webRequestClient = WebRequestClient()
         self._webRequestClient._resourceHandler = self
-        self._webRequestClient._filetype = "cefdatabrowse"
         # Need to set AllowCacheCredentials and AllowCookies for
         # the cookies to work during POST requests (Issue 127).
         # To skip cache set the SkipCache request flag.
@@ -568,7 +454,6 @@ class DatabrowseHandler:
 class WebRequestClient:
 
     _resourceHandler = None
-    _filetype = None
     _data = ""
     _dataLength = -1
     _response = None
@@ -597,7 +482,6 @@ class WebRequestClient:
         # there was a redirect, what will GetUrl() return
         # for both of them?
         self._data = self._resourceHandler._clientHandler._OnResourceResponse(
-                self._filetype,
                 self._resourceHandler._browser,
                 self._resourceHandler._fullpath,
                 self._resourceHandler._frame,
