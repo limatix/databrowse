@@ -346,13 +346,13 @@ Usage: databrowse [-h] [-s path] [-e] [-g [path]]
       -g [path], --go [path]        open cefdatabrowse in a directory
 \end{verbatim}
 
-On a fresh install a few configuration values will need to be changed. These include the dataroot directory and any third party software packages that need to be added to the Python path during operation. The CEFDatabrowse configuration file can be accessed using the command:
+On a fresh install a few configuration values will need to be changed. These include the dataroot directory and any third party software packages that need to be added to the Python path during operation. The CEFDatabrowse configuration file can be accessed through the settings in the GUI or by using the command:
 
 \begin{verbatim}
 databrowse -e
 \end{verbatim}
 
-This will open the configuration file in your default editor. From here the file will contain a default configuration like this:
+This will open the configuration file in your default editor. If the EDITOR envrionment variable is not set then you will have to set it to your prefered editor program inorder for these features to work. The configuration file will contain default variables like this:
 
 \begin{verbatim}
 [databrowse]
@@ -363,10 +363,15 @@ y = 0
 dataroot = C:/databrowse
 limatix-qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils
 qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/QAutils
+
+[3rdparty]
 dataguzzlerlib = C:/Users/nscheirer/Documents/dev/dataguzzler-lib/python
+nditoolbox = C:/Users/nscheirer/Documents/nditoolnew/NDITool
 \end{verbatim}
 
-From here you can set which directory you would like CEFDatabrowse to have access to. Keep in mind that CEFDatabrowse cannot access any files outside of this directory, therefore if you would like access to all files setting the dataroot to C:/ is acceptable. When a new dataroot is set it will be required that a directory called SOPs be created in the dataroot directory location. CEFDatabrowse will throw an error reminding you of this if you do not have a SOPs folder. The values following dataroot correspond to required third party packages that different plugins utilize. If you need that functionality replace these paths with the correct path to your installed copies. From this point CEFDatabrowse can be used via the defined usage above.
+\noindent Note: If installing on a Linux platform, the configuration file's permissions might need to be changed to allow write access. \\
+
+From here you can set which directory you would like CEFDatabrowse to have access to (dataroot). Keep in mind that CEFDatabrowse cannot access any files outside of this directory, therefore if you would like access to all files, setting the dataroot to C:/ is an acceptable approach. When a new dataroot is set it will be required that a directory called SOPs be created in the dataroot directory location therefore, CEFDatabrowse will throw an error reminding you of this if you do not have a SOPs folder. The values following dataroot correspond to required third party packages that different plugins utilize. If you need that functionality, replace these paths with the correct path to your installed copies. From this point CEFDatabrowse can be used via the defined usage above.
 
 \clearpage
 \section{Getting Started}\label{GettingStarted}
