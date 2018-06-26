@@ -44,7 +44,6 @@
 """ setup.py - Main Install Script """
 
 import os
-import pkgutil
 import requirements as r
 from setuptools import setup, find_packages
 
@@ -107,7 +106,3 @@ setup(
         ]
     }
 )
-
-print("Updating config permissions.")
-package = pkgutil.get_loader("databrowse")
-os.chmod(os.path.join(os.path.dirname(package.filename), "cefdatabrowse/.databrowse"), 0o770)
