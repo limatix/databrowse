@@ -330,7 +330,7 @@ class ClientHandler:
                     else:
                         raise IOError("Unknown problem")
             mime = response.GetMimeType()
-            urlparams.update({'headers': {'Content-Type': mime}})
+            urlparams.update({'headers': {'Content-Type': mime}, 'status': 200})
             data = "".join(html)
 
         return data
