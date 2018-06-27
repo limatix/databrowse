@@ -26,6 +26,8 @@ Approved for public release by TRI Austin: distribution unlimited;
 01 June 2018; by Carl W. Magnuson (NDE Division Director).
 
 ## CEFDatabrowse Install Instructions ##
+Dependencies are platform specific and can be found in [requirements](https://github.com/limatix/databrowse/blob/master/requirements).
+
 From PIP:<br>
     `> pip install databrowse`<br>
 From source:<br>

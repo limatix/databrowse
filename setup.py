@@ -48,7 +48,8 @@ import os
 import requirements as r
 import platform
 from shutil import copyfile
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Distribution
+from setuptools.command.install import install
 
 # Collect all databrowse static files required for CEFDatabrowse
 search_dirs = [('databrowse_wsgi', []), ('cefdatabrowse', [])]
@@ -110,12 +111,28 @@ setup(
     }
 )
 
-if platform.system() == "Windows":
-    db_base = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as OPATH:
-        OPATH.writelines(['@echo off \r\n',
-                          '{} {} -W ignore %* \r\n'.format(sys.executable,
-                                                           os.path.join(db_base, 'cefdatabrowse/cefdatabrowse.py'))])
 
-    execdir = raw_input("Enter execution directory: ")
-    copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))
+class OnlyGetScriptPath(install):
+    def run(self):
+        self.distribution.install_scripts = self.install_scripts
+        db_base = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as bat:
+            bat.writelines(['@echo off \r\n',
+                            '{} %* \r\n'.format(os.path.join(self.distribution.install_scripts, "databrowse.exe"))])
+
+        execdir = raw_input("Enter execution directory: ")
+        copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))
+
+
+def get_setuptools_script_dir():
+    dist = Distribution({'cmdclass': {'install': OnlyGetScriptPath}})
+    dist.dry_run = True  # not sure if necessary, but to be safe
+    dist.parse_config_files()
+    command = dist.get_command_obj('install')
+    command.ensure_finalized()
+    command.run()
+    return dist.install_scripts
+
+
+if platform.system() == "Windows":
+    get_setuptools_script_dir()
