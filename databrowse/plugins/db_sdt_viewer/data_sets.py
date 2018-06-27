@@ -12,17 +12,17 @@ def save_animation(filepath, shp, ds):
     fig = plt.figure()
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
     ims = []
-    print("Generating images")
+    print("Generating images.")
     for i in range(0, shp[2]):
         ttl = plt.text(0.5, 1.01, "Depth: %s" % i, horizontalalignment='center', verticalalignment='bottom', transform=ax.transAxes)
         im = plt.imshow(ds['v'][:, :, i], animated=True, cmap="binary")
         plt.xlabel("x")
         plt.ylabel("y")
         ims.append([im, ttl])
-    print("Generating animation")
+    print("Generating animation.")
     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True)
 
-    print("Saving animation")
+    print("Saving animation. Please wait to close this window until saving is completed.")
     ani.save(filepath, writer='imagemagick')
     print("%s is done being generated. Please refresh." % filepath)
     return 0
@@ -160,7 +160,6 @@ class SDTDataSets:
         plt.plot(self.ds['t'], self.ds['v'][0, 0, :])
         plt.xlabel('Time, t (%s)' % (self.parent.check_units(self.pd['Sample Resolution'])[1]))
         plt.ylabel('Amplitude (%s)' % (self.vunits))
-        # pylab.ylim([vmin, vmax])
 
         self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
         self.ext = "png"
@@ -171,11 +170,11 @@ class SDTDataSets:
     def bscan_1(self):
         # Beware - this one probably doesn't work
         # Also, this situation probably doesn't actually happen
-        plt.imshow(self.ds['v'][:, 0, :], cmap='jet',
+        plt.imshow(self.ds['v'][:, 0, :], cmap='binary',
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['t'][0],
-                                           self.ds['t'][-1]])  # vmin=vmin, vmax=vmax)
+                                           self.ds['t'][-1]])
         axis = 'Axis 1'
         aunits = 'None'
         for i in self.paramdict:
@@ -196,11 +195,11 @@ class SDTDataSets:
         self.size = os.path.getsize(self.parent.getCacheFileName(self.fprefix, self.ext))
 
     def bscan_2(self):
-        plt.imshow(self.ds['v'][0, :, :], cmap='jet',
+        plt.imshow(self.ds['v'][0, :, :], cmap='binary',
                    origin='lower', extent=[self.ds['y'][0],
                                            self.ds['y'][-1],
                                            self.ds['t'][0],
-                                           self.ds['t'][-1]])  # vmin=vmin, vmax=vmax)
+                                           self.ds['t'][-1]])
         axis = 'Axis 2'
         aunits = 'None'
         for i in self.paramdict:
@@ -225,8 +224,7 @@ class SDTDataSets:
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['y'][0],
-                                           self.ds['y'][-1]],
-                   vmin=self.ds['v'].min(), vmax=self.ds['v'].max())
+                                           self.ds['y'][-1]])
         axis1 = 'Axis 1'
         a1units = 'None'
         axis2 = 'Axis 2'
@@ -262,8 +260,7 @@ class SDTDataSets:
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['y'][0],
-                                           self.ds['y'][-1]],
-                   vmin=self.ds['v'].min(), vmax=self.ds['v'].max())
+                                           self.ds['y'][-1]])
         axis1 = 'Axis 1'
         a1units = 'None'
         axis2 = 'Axis 2'

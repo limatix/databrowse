@@ -43,8 +43,11 @@
 ###############################################################################
 """ setup.py - Main Install Script """
 
+import sys
 import os
 import requirements as r
+import platform
+from shutil import copyfile
 from setuptools import setup, find_packages
 
 # Collect all databrowse static files required for CEFDatabrowse
@@ -106,3 +109,13 @@ setup(
         ]
     }
 )
+
+if platform.system() == "Windows":
+    db_base = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as OPATH:
+        OPATH.writelines(['@echo off \r\n',
+                          '{} {} -W ignore %* \r\n'.format(sys.executable,
+                                                           os.path.join(db_base, 'cefdatabrowse/cefdatabrowse.py'))])
+
+    execdir = raw_input("Enter execution directory: ")
+    copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))

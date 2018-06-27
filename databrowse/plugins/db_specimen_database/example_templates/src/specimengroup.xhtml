@@ -1,0 +1,994 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:xt="http://ns.inria.org/xtiger" xml:lang="en">
+<head>                  
+  <!-- Use UTF-8 and avoid the xml protocol declaration at the top for Internet Explorer -->
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=8;" />   
+  <meta name="description" content="XTiger XML document template" />
+  <meta name="keywords" content="template, XTiger" />
+
+  <title>specimengroup</title>
+
+  <xt:head version="1.1" templateVersion="1.0" label="specimengroup">
+
+		
+
+		<!--________________________________-->
+
+		<!-- Group Details -->
+		<!--________________________________-->
+
+		<!-- ID -->
+		<xt:component name="groupid">
+			<tr>
+				<th width="25%">Group ID</th><td><xt:use types="text">01</xt:use></td>
+			</tr>
+		</xt:component>
+
+		<xt:component name="groupdesc">
+			<tr>
+				<th width="25%">Group Description</th><td><xt:use types="text" option="unset"/></td>
+			</tr>
+		</xt:component>
+
+		<!-- Identifier tag -->
+		<xt:component name="identifiertags">
+			<tr>
+				<th>Group Tags</th>
+				<td>
+					<ul style="list-style-type:none; padding:0; margin:0">
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel='tag'>
+							<li><xt:menu-marker size="15"/><xt:use types="text" label="tag">same material</xt:use></li>
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+		</xt:component>
+		
+
+		<!--________________________________-->
+
+		<!-- Geometric properties of the specimen -->
+		<!--________________________________-->
+
+		<xt:component name="getdimension">
+			 <td><xt:attribute types="select" name="direction" default="length" values="length width thickness height radius inner_radius outer_radius"/></td><td><xt:use types="string"/></td><td><xt:attribute types="string" default="mm" name="units"/></td>
+		</xt:component>
+
+		<xt:component name="dimensions">
+			<xt:use types="getdimension"/>
+		</xt:component>
+
+		<!-- Geometric dimensions -->
+		<xt:component name="geomdefinitions">
+			<tr>
+				<th width="25%">Component Name:</th>
+				<td><xt:attribute type="string" name="component" default="component name"/></td>
+			</tr>
+			<tr>
+				<th width="25%">Component Shape:</th>
+				<td><xt:use types="string" label="shape" option="unset">rectangular prism</xt:use></td>
+			</tr>
+			<tr>
+				<th width="25%">CAD File:</th>
+				<td><xt:use types="text" label="cadfile" option="unset">cadfile.stl</xt:use></td>
+			</tr>
+			<tr>
+				<th width="25%">Dimension Type</th>
+				<td><xt:attribute type="select" name="dimensiontype" option="unset" values="measured nominal"/></td>
+			</tr>
+			<tr>
+				<th width="25%">Coordinate System</th>
+				<td><xt:attribute types="select" name="coordinatesystem" option="unset" values="cartesian cylindrical spherical"/></td>
+			</tr>
+			<tr>
+				<th width="25%">Dimensions</th>
+				<td>
+					<table class="cream full-width" style="padding: 0px; margin: -3px -6px -3px 0px">
+						<thead>
+							<tr>
+								<th>Direction</th><th>Size</th><th>Units</th><th></th>
+							</tr>
+						</thead>
+						<tbody>
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="dimension">
+							<tr><xt:use types="dimensions" label="dimension"/><td><xt:menu-marker size="15"/></td></tr>
+						</xt:repeat>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Coordinate system definitions -->
+		<!--________________________________-->
+
+		<!-- Local coordinate system. Depending on the choice, you get the local coordinate axes definitions -->
+
+		<xt:union name="cartesianaxes" include="x y z"/>
+
+		<xt:component name="x">
+			 <xt:use types="directionalong" label="direction"/> 
+		</xt:component>
+
+		<xt:component name="y">
+			 <xt:use types="directionalong" label="direction"/> 
+		</xt:component>
+
+		<xt:component name="z">
+			<xt:use types="directionalong" label="direction"/> 
+		</xt:component>
+
+		<xt:component name="directionalong">
+			<xt:attribute type="select" name="name" values="length width thickness height" default="length"/> 
+		</xt:component>
+
+		<xt:component name="cartesian">
+			<br/><div style="width:25%; float:left">Axis and Direction</div>
+		 	<ul style="list-style-type:none; padding: 5px 0px 0px 133px; margin-bottom:0px">
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="x y z">
+				<li><xt:menu-marker size="15"/> <xt:use types="cartesianaxes"/></li>
+			</xt:repeat></ul>
+		</xt:component>
+
+		<xt:component name="cylindricalaxes">
+			<xt:attribute type="select" name="name" values="radius theta height" default="radius"/>
+		</xt:component>
+
+		<xt:component name="cylindrical">
+		</xt:component>
+
+		<xt:union name="coordinatesystemtypes" include="cartesian cylindrical"/>
+
+		<xt:component name="coordinatedefs">
+			<tr>
+				<th width="25%">Axes Definition</th>
+				<td><div style="width:25%; float:left">Coordinate System</div>
+				<xt:use types="coordinatesystemtypes" /></td>
+			</tr>
+		</xt:component>
+
+		<!--________________________________ -->
+
+		<!-- Origin definition -->
+		<!--________________________________ -->
+
+		<xt:component name="intersectionplanes">
+			<xt:attribute type="select" name="face" values="front back right left top bottom" default="front"/>
+		</xt:component>
+
+		<xt:component name="frontplaneloc">
+			<xt:use types="string"> define location</xt:use>
+		</xt:component>
+
+		<xt:component name="backplaneloc">
+			<xt:use types="string"> define location</xt:use>
+		</xt:component>
+
+		<xt:component name="rightplaneloc">
+			<xt:use types="string"> define location</xt:use>
+		</xt:component>
+		
+		<xt:component name="locationplanes">
+				<xt:attribute name="face" type="select" values="front back right top left bottom" default="front"/> <xt:use types="string"/>
+		</xt:component>
+
+		<xt:component name="location">
+			<br/><div style="width:25%; float:left">Loation Planes</div>
+			<ul style="list-style-type:none; padding: 5px 0px 0px 133px;  margin-bottom:0px">
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="plane">
+				<li><xt:menu-marker size="15"/><xt:use types="locationplanes" label="plane"/></li>
+			</xt:repeat></ul>
+		</xt:component>
+
+		<xt:component name="intersection">
+			<br/><div style="width:25%; float:left">Intersection Planes</div>
+			<ul style="list-style-type:none; padding: 5px 0px 0px 133px;  margin-bottom:0px">
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="plane">
+				<li><xt:menu-marker size="15"/>
+				<xt:use types="intersectionplanes" label="plane"/></li>
+			</xt:repeat>
+			</ul>
+		</xt:component>
+
+		<xt:union name="origintypes" include="intersection location"/>
+
+		<xt:component name="origindef">
+			<tr>
+				<th width="25%">Origin Location</th>
+				<td>
+					<div style="width:25%; float:left">Definition</div>
+					<xt:use types="origintypes"/>
+				</td>
+		  	</tr>
+		</xt:component>
+
+		 <xt:component name="coordinatesystem">
+			<xt:use types="coordinatedefs" label="axesdefinition"/>
+			<xt:use types="origindef" label="origin"/>
+		</xt:component>
+
+		<!--________________________________ -->
+
+		<!-- specimen Orientation definition -->
+		<!--________________________________ -->
+
+		<xt:component name="directiondef">
+			<th width="25%"><xt:menu-marker size="15"/><xt:attribute type="select" name="name" values="length width thickness height radius inner_radius outer_radius" default="length"/></th><td> <xt:use types="text">None </xt:use></td>
+		</xt:component>
+
+		<xt:component name="direction">
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="direction">
+				<tr>
+				<xt:use types="directiondef" label="direction"/>
+				</tr>
+			</xt:repeat>
+		</xt:component>
+
+		<xt:component name="referencedef">
+			<th width="25%"><xt:menu-marker size="15"/><xt:attribute type="select" name="face" values="top bottom front back right left" default="front"/></th><td><xt:use types="text">None</xt:use></td>
+		</xt:component>
+
+		<xt:component name="reference">
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="reference">
+				<tr><xt:use types="referencedef" label="reference"/></tr>
+			</xt:repeat>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Physical properties -->
+		<!--________________________________-->
+
+		<xt:union name="propertylist" include="Hardness YoungsModulus ShearModulus YieldStrength TensileStrength PoissonsRatio Density ThermalConductivity ThermalDiffusivity VolumetricHeatCapacity SpecificHeatCapacity FractureToughness CijMat"/> 
+
+		<xt:component name="YoungsModulus">
+			<p>
+			<div style="width:25%; float:left; padding-left:50px">Value</div>
+			<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="GPa"/>
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Source</div>
+			<xt:attribute types="string" name="source" default="website" option="unset"/>
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+			<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+			<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="Hardness">
+			<p>
+			<div style="width:25%; float:left; padding-left:50px">Value</div>
+			<xt:use types="string">0</xt:use> <xt:attribute types="string" name="units" default="HRC"/>
+			<br/>
+                        <div style="width:25%; float:left; padding-left:50px">Source</div>
+                        <xt:attribute types="string" name="source" default="website" option="unset"/>
+                        <br/>
+                        <div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+                        <xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/>
+                        <br/>
+                        <div style="width:25%; float:left; padding-left:50px">Measured By</div>
+                        <xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>
+
+		<xt:component name="ShearModulus">
+			<p>
+			<div style="width:25%; float:left; padding-left:50px">Value</div>
+			<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="GPa"/>
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Source</div>
+			<xt:attribute types="string" name="source" default="website" option="unset"/>
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+			<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+			<br/>
+			<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+			<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="YieldStrength">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="MPa"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+
+		<xt:component name="TensileStrength">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="MPa"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="PoissonsRatio">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="Density">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="kg/m^3"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="ThermalConductivity">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="W/m/K"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="ThermalDiffusivity">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="m^2/s"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="VolumetricHeatCapacity">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="J/m^2/K"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="SpecificHeatCapacity">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="J/Kg/K"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="FractureToughness">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="MPa*sqrt(m)"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="CijMat">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Value</div>
+				<xt:use types="string"> 0 </xt:use> <xt:attribute types="string" name="units" default="GPa"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Source</div>
+				<xt:attribute types="string" name="source" default="website" option="unset"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Meas Condition</div>
+				<xt:attribute types="string" name="meascondition" default="adiabatic" option="unset"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured By</div>
+				<xt:attribute types="string" name="measuredby" option="unset"/>
+			</p>
+		</xt:component>   
+
+		<xt:component name="propertydefs">
+			<xt:use types="propertylist"/>
+		</xt:component>
+
+		<!-- physical properties -->
+		<xt:component name="physicalproperties">
+			<!-- optional component name -->
+			<tr>
+				<th width="25%">Component Name</th>
+				<td><xt:attribute type="string" name="component" default="component name"/><xt:menu-marker size="15"/></td>
+			</tr>
+			<tr>
+				<th>Material</th>
+				<td><xt:use types="string" label="material" option="unset"/></td>
+			</tr>
+			<!-- Enter property values-->
+			<tr>
+				<th>Propteries</th>
+				<td>
+
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="YoungsModulus ShearModulus YieldStrength PoissonsRatio Density ThermalConductivity ThermalDiffusivity VolumetricHeatCapacity CijMat">
+				 <xt:menu-marker size="15"/><xt:use types="propertydefs"/>
+			</xt:repeat>
+				</td>
+			</tr>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Fatigue process -->
+		<!--________________________________-->
+
+		<xt:component name="fatiguetesttype">
+			<tr>
+				<th width="25%">Load Type</th>
+				<td><xt:attribute name="fixture" type="select" default="3ptbending" values="3ptbending 4ptbending tension compression"/></td>
+			</tr>
+			<tr>
+				<th>Load Span</th>
+				<td><xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="mm"/></td>
+			</tr>
+		</xt:component>
+
+		<xt:component name="fatiguefrequency">
+			<tr>
+				<th>Fatigue Frequency</th>
+				<td><xt:use types="string">1</xt:use> <xt:attribute name="units" type="string" default="Hz"/></td>
+			</tr>
+		</xt:component>
+
+		<xt:union name="LoadAndCrackMonitoring" include="cracklength loadmeasurement"/> 
+	
+		<xt:component name="minloadmeasured">
+			<div style="width:25%; float:left; padding-left:50px">Minimum Load</div>
+			<xt:use types="string"> 0 </xt:use> <xt:attribute name="units" type="string" default="MPa"/>
+			<br/>
+		</xt:component>
+
+		<xt:component name="maxloadmeasured">
+			<div style="width:25%; float:left; padding-left:50px">Maximum Load</div>
+			<xt:use types="string"> 0 </xt:use> <xt:attribute name="units" type="string" default="MPa"/>
+		</xt:component>
+
+		<xt:component name="cracklength">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Flaw Index</div>
+				<xt:attribute name="flawid" type="string" default="A"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Measured With</div>
+				<xt:attribute name="meastype" type="string" default="microscopy"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Number of Cycles</div>
+				<xt:attribute name="numcycles" type="string" default="0"/>
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Crack Length</div>
+				<xt:use types="string">0</xt:use> <xt:attribute name="units" type="string" default="mm"/>
+			</p>
+		</xt:component>
+
+		<xt:component name="loadmeasurement">
+			<p>
+				<div style="width:25%; float:left; padding-left:50px">Measurement Date</div>
+				<xt:attribute name="date" type="text" default="date"/> 
+				<br/>
+				<div style="width:25%; float:left; padding-left:50px">Number of Cycles</div>
+				<xt:attribute name="numcycles" type="string" default="0"/>
+				<br/>
+				<xt:use types="minloadmeasured" label="minload"/>
+				<xt:use types="maxloadmeasured" label="maxload"/>
+			</p>
+		</xt:component>
+
+		<xt:component name="crackmonitoring">
+			<xt:use types="LoadAndCrackMonitoring"/>
+		</xt:component>
+
+		<xt:component name="fatigueprocess">
+			<xt:use types="fatiguetesttype" label="gagelength">0</xt:use> 
+			<xt:use types="fatiguefrequency" label="fatiguefrequency">0</xt:use> 
+			<tr>
+				<th>Measurements</th>
+				<td>
+					<ul style="padding:0; margin:0; list-style-type:none;">
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="cracklength loadmeasurement" label="measurements">
+							<xt:menu-marker/><xt:use types="crackmonitoring" />
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Flaw parameters -->
+		<!--________________________________-->
+
+		<xt:union name="axeslist" include="xcoordinate ycoordinate zcoordinate rcoordinate thetacoordinate phicoordinate"/>
+
+		<xt:component name="xcoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="mm"/>
+		</xt:component>
+
+		<xt:component name="ycoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="mm"/>
+		</xt:component>
+
+		<xt:component name="zcoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="mm"/>
+		</xt:component>
+
+		<xt:component name="rcoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="mm"/>
+		</xt:component>
+	
+		<xt:component name="thetacoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="degrees"/>
+		</xt:component>
+
+		<xt:component name="phicoordinate">
+			<xt:use types="text">0 </xt:use> <xt:attribute name="units" type="string" default="degrees"/>
+		</xt:component>
+
+		<xt:component name="flawlocation">
+			<xt:use types="axeslist"/>	
+		</xt:component>
+
+		<xt:component name="flawloccoords">
+			<tr>
+				<th>Coordinate System</th>
+				<td><xt:attribute name="coordinate-frame" types="select" values="cartesian cylindrical spherical" default="cartesian"/></td>
+			</tr>
+			<tr>
+				<th>Coordinates</th>
+				<td>
+					<ul style="padding:0; margin:0; list-style-type:none">
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="xcoordinate ycoordinate zcoordinate rcoordinate thetacoordinate phicoordinate">
+							<li><xt:menu-marker size="15"/><xt:use types="axeslist"/></li>
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+		</xt:component>
+
+
+		<!--________________________________-->
+
+		<!-- Stress riser parameters -->
+		<!--________________________________-->
+	
+		<xt:component name="stressriserlength">
+			<tr>
+				<th>Stress Riser Length</th>
+				<td><xt:use types="text" option="unset">0</xt:use> <xt:attribute name="units" types="string" default="mil" option="unset" /></td>
+			</tr>
+		</xt:component>
+	
+		<xt:component name="stressriserwidth">
+			<tr>
+				<th>Stress Riser Width</th>
+				<td><xt:use types="text" option="unset">0</xt:use> <xt:attribute name="units" types="string" default="mil" option="unset" /></td>
+			</tr>
+		</xt:component>
+		
+		<xt:component name="stressriserdepth">
+			<tr>
+				<th>Stress Riser Depth</th>
+				<td><xt:use types="text" option="unset">0</xt:use> <xt:attribute name="units" types="string" default="mil" option="unset" /></td>
+			</tr>
+		</xt:component>
+	
+		
+		<xt:component name="stressriserparams">
+			<tr>
+				<th>Stress Riser Type</th>
+				<td><xt:attribute name="type" types="text" default="EDM notch" option="unset"/></td>
+			</tr>
+			<xt:use types="stressriserlength" label="length"/>
+			<xt:use types="stressriserwidth" label="width"/>
+			<xt:use types="stressriserdepth" label="depth"/>			
+		</xt:component>
+		
+		<xt:component name="flawsize">
+			<xt:use types="text">0</xt:use> <xt:attribute name="units" types="string" default="mm"/>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Flaw and Stress riser parameters -->
+		<!--________________________________-->
+
+		<xt:component name="flawandstressriser">
+			<tr>
+				<th width="25%">Flaw Index</th>
+				<td><xt:attribute types="text" name="index" default="A"/></td>
+			</tr>
+			<tr>
+				<th>Flaw Type</th>
+				<td><xt:attribute types="text" name="flawtype" default="fatigue crack"/></td>
+			</tr>
+			<tr>
+				<th>Flaw Shape</th>
+				<td><xt:attribute types="text" name="shape" default="half-penny"/></td>
+			</tr>
+			<tr>
+				<th>Flaw Size</th>
+				<td><xt:use types="flawsize" label="flawsize"/></td>
+			</tr>
+			<xt:use types="flawloccoords" label="location"/>
+		    <xt:use types="stressriserparams" label="stressriser" option="unset"/>
+		</xt:component>
+		<!--________________________________-->
+
+		<!-- Provenance -->
+		<!--________________________________-->
+
+		<xt:component name="provenance">
+			<tr><th width="25%">Manufactured By</th><td><xt:use types="text" label="manufacturedby" option="unset"></xt:use></td></tr>
+			<tr><th>Source</th><td><xt:use types="text" label="source" option="unset"></xt:use></td></tr>
+			<tr><th>In Charge</th><td><xt:use types="text" label="incharge" option="unset"></xt:use></td></tr>
+			<tr><th>Export Control</th><td><xt:use types="text" label="exportcontrolled" option="unset"/> </td></tr>
+		</xt:component>
+
+		<!--________________________________-->
+
+		<!-- Markings -->
+		<!--________________________________-->
+
+		<xt:component name="identifier">
+			<li><xt:menu-marker size="15"/><xt:use types="text" label="identifier">None</xt:use></li>
+		</xt:component>
+
+		<xt:component name="fiducialmarks">
+			<li><xt:use types="fiducialmark" label="fiducialmark"/></li>
+		</xt:component>
+
+		<xt:component name="fiducialmark">
+			<table class="cream full-width" style="padding: 0px; ">
+				<tbody>
+					<tr>
+						<th width="30%">Mark Name</th><td><xt:attribute types="text" name="name"/><div style="float:right"><xt:menu-marker/></div></td>
+					</tr>
+					<tr>
+						<th width="30%">Description</th><td><xt:use types="text" name="description" label="description" option="unset"/></td>
+					</tr>
+				<xt:use types="fiducialcoords" label="location"/>
+				</tbody>
+			</table>
+		</xt:component>
+
+		<xt:component name="fiducialcoords">
+			<tr>
+				<th>Coordinate System</th>
+				<td><xt:attribute name="coordinate-frame" types="select" values="cartesian cylindrical spherical" default="cartesian" option="unset"/></td>
+			</tr>
+			<tr>
+				<th>Coordinates</th>
+				<td>
+					<ul style="padding:0; margin:0; list-style-type:none">
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="xcoordinate ycoordinate zcoordinate rcoordinate thetacoordinate phicoordinate">
+							<li><xt:menu-marker size="15"/><xt:use types="axeslist"/></li>
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+		</xt:component>
+
+		<xt:component name="markings">
+			<tr>
+				<th width="25%">
+					Fiducial Marks
+				</th>
+				<td>
+					<ul style="list-style-type:none; padding-left:0px; margin-bottom: 0px;">
+						<xt:repeat minOccurs="0" maxOccurs="*" label="fiducialmarks">
+							<xt:use types="fiducialmarks"/>
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<th width="25%">
+					Identifier Markings
+				</th>
+				<td>
+					<ul style="list-style-type:none; padding-left:0px; margin-bottom: 0px;">
+						<xt:repeat minOccurs="0" maxOccurs="*" label="identifiers">
+							<xt:use types="identifier" />
+						</xt:repeat>
+					</ul>
+				</td>
+			</tr>
+		</xt:component>
+
+		<xt:component name="externalinfoloc">
+			<tr>
+				<th>Support Files Path</th>
+				<td>
+					<ul style="list-style-type:none; padding:0; margin:0">
+						<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="reldest">
+							<li><xt:menu-marker size="15"/><!--<xt:use types="string" label="reldest" />--><xt:use types="reldest" label="reldest" /></li>
+						</xt:repeat>
+					</ul>
+					
+				</td>
+			</tr>
+		</xt:component>
+
+                <xt:component name="reldest">
+                    <xt:attribute types="string" name="xlink:href"/>
+                </xt:component>
+
+		<xt:component name="notes">
+			<table class="cream full-width">
+				<thead>
+					<tr>
+						<th>Notes</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><xt:use types="text" option="unset"/></td>
+					</tr>
+				</tbody>
+			</table>
+		</xt:component>
+
+		<xt:component name="actionevent">
+			<td><xt:use types="text" label="date" /></td>
+			<td><xt:use types="text" label="perfby"/></td>
+			<td><xt:use types="text" label="action" /></td>
+			<td><xt:use types="text" label="notes" option="unset"/></td>
+		</xt:component>
+
+		<xt:component name="actionlog">
+			<table class="cream full-width">
+				<thead>
+					<tr>
+						<th colspan="5">Action Log</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th width="9%"/><th width="10%">Date</th><th width="15%">Performed By</th><th width="30%">Action</th><th>Notes</th>
+					</tr>
+					<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="actionevent">
+						<tr>
+							<td><xt:menu-marker/></td><xt:use types="actionevent" label="actionevent" option="unset"/>
+						</tr>
+					</xt:repeat>
+				</tbody>
+			</table>			
+		</xt:component>	
+
+
+
+  </xt:head>
+  
+  <link rel="stylesheet" type="text/css" href="Preview.css" />  
+  <!-- Place here optional AXEL code for making the template auto-editable -->
+		<style type="text/css">
+			p {
+				padding: 10px 0 0 0;
+				margin: 10;      
+				}
+
+			p > span {
+				color: green;
+				font-style:italic;
+				}
+ 
+		</style>
+</head>
+
+<body>  
+			<table class="cream full-width">
+				<thead>
+					<tr>
+						<th colspan="2">
+							Basic Group Details
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<xt:use types="groupid" label="groupid"/>
+					<xt:use types="groupdesc" label="groupdesc"/>
+					<xt:use types="identifiertags" label="identifiertags"/>
+					<xt:use types="externalinfoloc" label="reldests"/>
+				</tbody>
+			</table>
+			<table class="cream full-width">
+				<thead>
+					<tr>
+						<th colspan="2">
+							Provenance
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<xt:use types="provenance" label="provenance"/>	
+				</tbody>
+			</table>
+			<xt:repeat minOccurs="0" maxOccurs="1" pseudoLabel="markings">
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Specimen Markings<xt:menu-marker size="15"/>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="markings" label="markings"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+			<xt:repeat minOccurs="0" maxOccurs="1" pseudoLabel="reference direction">
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Specimen Orientation<xt:menu-marker size="15"/>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th colspan="2">Face Definitions</th>
+						</tr>
+							<xt:use types="reference"/>
+						<tr>
+							<th colspan="2">Direction Definitions</th>
+						</tr>
+							<xt:use types="direction"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+
+			<xt:repeat minOccurs="0" maxOccurs="1" pseudoLabel="coordinatesystem"> 
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Coordinate System<xt:menu-marker size="15"/>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="coordinatesystem" label="coordinatesystem"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+			
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="geometry">
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Geometric Properties<xt:menu-marker size="15"/> 
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="geomdefinitions" label="geometry"/> 
+					</tbody>
+				</table>
+			</xt:repeat>
+
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="physicalproperties">
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Physical Properties<xt:menu-marker size="15"/> 
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="physicalproperties" label="physicalproperties"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+			
+			<xt:repeat minOccurs="0" maxOccurs="*" pseudoLabel="flawparameters"> 
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Flaw Parameters<xt:menu-marker size="15"/> 
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="flawandstressriser" label="flawparameters"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+
+			<xt:repeat minOccurs="0" maxOccurs="1" pseudoLabel="fatigueprocess"> 
+				<table class="cream full-width">
+					<thead>
+						<tr>
+							<th colspan="2">
+								Fatigue Process<xt:menu-marker size="15"/> 
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xt:use types="fatigueprocess" label="fatigueprocess"/>
+					</tbody>
+				</table>
+			</xt:repeat>
+
+			<xt:use types="actionlog" label="actionlog"/>
+			<xt:use types="notes" label="notes"/>
+			
+</body>
+</html>
