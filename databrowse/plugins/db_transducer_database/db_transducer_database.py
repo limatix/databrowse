@@ -107,7 +107,7 @@ class db_transducer_database(db_directory_module.db_directory):
                             self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                             return [self._web_support.req.return_page()]
                         else:
-                            f = open(fullfilename, "w")
+                            f = open(fullfilename, "wb")
                             f.write(filestring)
                             f.close
                             os.makedirs(os.path.join(self._fullpath, transducerid + "_files"))

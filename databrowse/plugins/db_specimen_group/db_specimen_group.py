@@ -108,7 +108,7 @@ class db_specimen_group(renderer_class):
                         os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -171,7 +171,7 @@ class db_specimen_group(renderer_class):
                         os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                         pass
 
-                f = open(fullfilename, "w")
+                f = open(fullfilename, "wb")
                 f.write(etree.tostring(xmltree))
                 f.close
 

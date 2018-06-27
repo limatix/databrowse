@@ -126,7 +126,7 @@ class db_specimen_database(db_directory_module.db_directory):
                                     self._web_support.req.output = "Error Creating Files Directory: " + str(err)
                                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                                     return [self._web_support.req.return_page()]
-                            f = open(fullfilename, "w")
+                            f = open(fullfilename, "wb")
                             f.write(filestring)
                             f.close
                             self._web_support.req.output = "File Saved Successfully"
@@ -160,7 +160,7 @@ class db_specimen_database(db_directory_module.db_directory):
                                     self._web_support.req.output = "Error Creating Files Directory: " + str(err)
                                     self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                                     return [self._web_support.req.return_page()]
-                            f = open(fullfilename, "w")
+                            f = open(fullfilename, "wb")
                             f.write(filestring)
                             f.close
                             self._web_support.req.output = "File Saved Successfully"
