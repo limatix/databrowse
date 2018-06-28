@@ -71,16 +71,16 @@ def select_requirements_file():
         prefix = ''
 
     if windows:
-        return 'requirements/windows/windows{}.txt'.format(prefix)
+        return 'requirements/windows/windows%s.txt' % prefix
     elif macosx:
-        return 'requirements/mac/mac{}.txt'.format(prefix)
+        return 'requirements/mac/mac%s.txt' % prefix
     elif linux:
-        return 'requirements/linux/linux{}.txt'.format(prefix)
+        return 'requirements/linux/linux%s.txt' % prefix
     elif cygwin:
-        return 'requirements/cygwin/cygwin{}.txt'.format(prefix)
+        return 'requirements/cygwin/cygwin%s.txt' % prefix
     elif solaris:
-        return 'requirements/solaris/solaris{}.txt'.format(prefix)
+        return 'requirements/solaris/solaris%s.txt' % prefix
     elif posix:
-        return 'requirements/posix/posix{}.txt'.format(prefix)
+        return 'requirements/posix/posix%s.txt' % prefix
     else:
         raise Exception('Unsupported OS/platform')
