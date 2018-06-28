@@ -1,6 +1,7 @@
 import os
 import subprocess
 from multiprocessing import Process
+from packaging import version
 import matplotlib
 from matplotlib import animation
 matplotlib.use('Agg')
@@ -290,14 +291,17 @@ class SDTDataSets:
         # Experimental gif support
         try:
             if subprocess.call(["magick"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT) == 0:
-                fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
-                ext = "gif"
-                if not self.parent.CacheFileExists(fprefix, ext) or os.path.getsize(self.parent.getCacheFileName(fprefix, ext)) == 0:
-                    ft = self.parent.getCacheFileHandler('wb', fprefix, ext)
-                    ft.close()
-                    p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds))
-                    p.daemon = False
-                    p.start()
+                if version.parse(matplotlib.__version__) > version.parse("2.0.0"):
+                    fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+                    ext = "gif"
+                    if not self.parent.CacheFileExists(fprefix, ext) or os.path.getsize(self.parent.getCacheFileName(fprefix, ext)) == 0:
+                        ft = self.parent.getCacheFileHandler('wb', fprefix, ext)
+                        ft.close()
+                        p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds))
+                        p.daemon = False
+                        p.start()
+                else:
+                    print("Warning: Matplotlib %s does not support gif functionality." % matplotlib.__version__)
             else:
                 raise OSError
         except OSError:

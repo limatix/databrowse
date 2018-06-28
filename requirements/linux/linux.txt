@@ -1,8 +1,8 @@
 lxml>=3.2.0
-numpy>=1.10.0
-pillow>=2.3.0,<4
+numpy>=1.14.0
+pillow>=2.3.0
 qrcode>=4.0
 #unittest2>=0.5.1
 cefpython3>=57.0
 file-magic>=0.1
-matplotlib>=1.2.0
+matplotlib>=2.2.0
