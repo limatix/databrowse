@@ -74,8 +74,8 @@ with open(r.select_requirements_file(), 'r') as f:
 
 setup(
     name="databrowse",
-    author="Tyler Lesthaeghe",
-    author_email="tylerl@iastate.edu",
+    author="Tyler Lesthaeghe/Nathan Scheirer",
+    author_email="tylerl@iastate.edu/scheirer@iastate.edu",
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",

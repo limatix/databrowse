@@ -72,7 +72,6 @@ class db_sdt_viewer(renderer_class):
     _default_style_mode = "examine_datasets"
     _default_recursion_depth = 2
 
-
     # Used to read in data
     dtype_lookup = {'INTEGER 12': np.int16,
                     'INTEGER 16': np.int16,
@@ -144,7 +143,7 @@ class db_sdt_viewer(renderer_class):
                 maxval = minval+nx*resval
 
                 x = np.arange(minval, maxval, resval)
-                if len(x)>nx:
+                if len(x) > nx:
                     x = x[0:nx]
 
             if key.find('Second Axis') > 0:
@@ -158,7 +157,7 @@ class db_sdt_viewer(renderer_class):
                 maxval = minval+ny*resval
 
                 y = np.arange(minval, maxval, resval)
-                if len(y)>ny:
+                if len(y) > ny:
                     y = y[0:ny]
 
         for key, value in paramdict.items():
@@ -177,7 +176,7 @@ class db_sdt_viewer(renderer_class):
                 maxval = minval+nt*resval
 
                 t = np.arange(minval, maxval, resval)
-                if len(t)>nt:
+                if len(t) > nt:
                     t = t[0:nt]
 
                 data_type = self.dtype_lookup[value['Element Representation']]
@@ -187,8 +186,8 @@ class db_sdt_viewer(renderer_class):
                 if verbose:
                     print "Data type found to be {d}".format(d=data_type)
 
-                #data = np.fromfile(fstream, dtype=data_type, count=nx*ny*nt)
-                #data = np.reshape(data,(len(y),len(x),len(t)), order='C') # [index axis, scan axis, time axis]]
+                # data = np.fromfile(fstream, dtype=data_type, count=nx*ny*nt)
+                # data = np.reshape(data,(len(y),len(x),len(t)), order='C') # [index axis, scan axis, time axis]]
                 curpos = fstream.tell()
                 data = np.memmap(fstream, data_type, 'r', curpos, (len(y), len(x), len(t)), 'C')
                 fstream.seek(curpos + (len(y)*len(x)*len(t)*np.dtype(data_type).itemsize))
