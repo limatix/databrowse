@@ -116,7 +116,7 @@ class db_limatix_qautils_editor(renderer_class):
                         os.rename(fullfilename, "%s.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -158,7 +158,7 @@ class db_limatix_qautils_editor(renderer_class):
                             shutil.copy(imagepath, tempsavedir)
                         except:
                             pass
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close()
                     try:
@@ -213,7 +213,7 @@ class db_limatix_qautils_editor(renderer_class):
                             os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                             pass
 
-                        f = open(fullfilename, "w")
+                        f = open(fullfilename, "wb")
                         f.write(filestring)
                         f.close
                         self._web_support.req.output = "File Saved Successfully"
@@ -244,7 +244,7 @@ class db_limatix_qautils_editor(renderer_class):
                 xml = etree.parse(f)
                 f.close()
                 xmlroot = xml.getroot()
-                templatefile = "/".join(os.path.abspath(self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")).split("\\"))
+                templatefile = self.getURL("/SOPs/.src/checklist.xhtml", handler="db_default", content_mode="raw", ContentType="application/xml")
                 xmlroot.set("templatefile", templatefile)
                 return xmlroot
             else:

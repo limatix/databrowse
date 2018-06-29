@@ -290,7 +290,7 @@ class web_support:
 
         if self.siteurl is None:
             if scheme is not None:
-                self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot)[3:]])
+                self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot).replace("///", "")])
             else:
                 self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             pass
@@ -298,11 +298,11 @@ class web_support:
         if self.resurl is None:
             if scheme is not None:
                 self.resurl = "/".join([scheme[:-1], urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
-                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources")))[3:]])
+                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources"))).replace("///", "")])
             else:
                 self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
                     os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
-                    "databrowse_wsgi/resources")))[3:]])
+                    "databrowse_wsgi/resources"))).replace("///", "")])
             pass
 
         if self.logouturl is None:

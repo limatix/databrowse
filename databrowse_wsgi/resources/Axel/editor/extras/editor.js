@@ -105,7 +105,10 @@ Utility.FileListAction.prototype = {
 	   		xhr.open( "GET", url,  false); 
 				// false:synchronous thus we don't need to define xhr.onreadystatechange 
 				// see http://developer.mozilla.org/en/XMLHttpRequest
-	   		xhr.send(null);
+			var host = window.location.hostname;
+			if (host != "0.0.0.0") {
+			    xhr.send(null);
+			}
 	      	if((xhr.status  == 200) || (xhr.status  == 0)) { // second test is for local usage -no Web server (from XHR MozDev doc)
 				listing = xhr.responseText;
 				this.status = 1;
@@ -136,7 +139,7 @@ Utility.FileListAction.prototype = {
 		}
 	},
 	loadxTigerTmplFrom : function (url) { 
-		if (Utility.isLocalSession()) {		
+		if (Utility.isLocalSession()) {
 			this.load(url, this.localxTigerTmplDetector, this.xTigerTmplFilter) 
 		} else {
 			this.load(url, this.proxyxTigerTmplDetector, this.xTigerTmplFilter) 		
@@ -650,7 +653,7 @@ viewerApp.prototype = {
 	
 	// Load list of templates in predefined container and add them as options in the appropriate selector
 	initializeTemplateList : function (path) {
-		var list = new Utility.FileListAction ();		
+		var list = new Utility.FileListAction ();
 		list.loadxTigerTmplFrom(Utility.makeURLForFile(path, this.PROXY));
 		if (list.isInError()) { // in error, set template path and template list to default
 			this.log(list.error, 1);

@@ -101,7 +101,7 @@ class db_transducer(renderer_class):
                         os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -126,7 +126,7 @@ class db_transducer(renderer_class):
                     else:
                         return iter(lambda: f.read(1024), '')
                 else:
-                    tf = open(self._fullpath, "r")
+                    tf = open(self._fullpath, "rb")
                     tdbfile = etree.parse(tf)
                     tf.close()
                     tdbroot = tdbfile.getroot()
@@ -144,7 +144,7 @@ class db_transducer(renderer_class):
                     return [output.getvalue()]
             if "printbarcode" in self._web_support.req.form:
                 try:
-                    tf = open(self._fullpath, "r")
+                    tf = open(self._fullpath, "rb")
                     tdbfile = etree.parse(tf)
                     tf.close()
                     tdbroot = tdbfile.getroot()

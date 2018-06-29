@@ -417,7 +417,7 @@ class renderer_class(object):
         if os.access(filename, os.R_OK) and os.path.exists(filename):
             basestat = os.stat(self._fullpath)
             cachestat = os.stat(filename)
-            if basestat[ST_MTIME] != cachestat[ST_MTIME]:
+            if basestat[ST_MTIME] > cachestat[ST_MTIME]:
                 return False
             else:
                 return True

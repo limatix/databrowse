@@ -61,17 +61,26 @@ def select_requirements_file():
     macosx = 'darwin' in sys_platform
     posix = 'posix' in os.name.lower()
 
+    # python version
+    python_major = sys.version_info[0]
+    python_minor = sys.version_info[1]
+
+    if python_major == 2 and python_minor < 7:
+        prefix = '26'
+    else:
+        prefix = ''
+
     if windows:
-        return 'requirements/windows.txt'
+        return 'requirements/windows/windows%s.txt' % prefix
     elif macosx:
-        return 'requirements/mac.txt'
+        return 'requirements/mac/mac%s.txt' % prefix
     elif linux:
-        return 'requirements/linux.txt'
+        return 'requirements/linux/linux%s.txt' % prefix
     elif cygwin:
-        return 'requirements/cygwin.txt'
+        return 'requirements/cygwin/cygwin%s.txt' % prefix
     elif solaris:
-        return 'requirements/solaris.txt'
+        return 'requirements/solaris/solaris%s.txt' % prefix
     elif posix:
-        return 'requirements/posix.txt'
+        return 'requirements/posix/posix%s.txt' % prefix
     else:
         raise Exception('Unsupported OS/platform')

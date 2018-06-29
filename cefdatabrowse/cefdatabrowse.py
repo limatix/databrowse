@@ -37,27 +37,27 @@
 """ Main script for the standalone CEFPython based Databrowse Application"""
 
 '''
-Usage:
-databrowse [None/argument/path]
-    None -> Opens CEFDatabrowse in current directory
-    path -> a path to a file/directory that if exists CEFDatabrowse will be launched there 
+Usage: cefdatabrowse.py [-h] [-s path] [-e] [-g [path]]
 
-Arguments:
-databrowse -s [None/path]
-    None -> returns current dataroot path
-    path -> a path that if exists sets the dataroot to path
+    Databrowse: An Extensible Data Management Platform
 
-databrowse -e
-    None -> opens the configuration file in the default text editor
+    optional arguments:
+      -h, --help                    show this help message and exit
+      -s path, --setdataroot path   path to set new dataroot
+      -e, --openconfig              open cefdatabrowse config file
+      -g [path], --go [path]        open cefdatabrowse in a directory
 '''
 
 configdict = {}
+partydict = {}
 
 from cefpython3 import cefpython as cef
 import ctypes
 import os
 import platform
 import sys
+import argparse
+import subprocess
 from re import search
 import ConfigParser
 from urlparse import urlparse
@@ -67,10 +67,11 @@ import cefdatabrowse_support as dbp
 
 # Load saved cef application settings
 def load_settings():
-    global configdict
+    global configdict, partydict
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     configdict.update(dict(config.items('databrowse')))
+    partydict.update(dict(config.items('3rdparty')))
 
 
 def save_settings():
@@ -88,57 +89,56 @@ def save_settings():
 def update_dataroot(newdataroot):
     global configdict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"))
+    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
     config.set("databrowse", "dataroot", newdataroot)
-    with open(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"), 'wb') as configfile:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
         config.write(configfile)
     configdict['dataroot'] = newdataroot
-
-
-myappid = u'limatix.org.databrowse'
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 load_settings()
 
 # Handle command line variables
-usr_path = ""
-try:
-    if sys.argv[1] is not None:
-        if sys.argv[1] == "-s":
-            try:
-                if sys.argv[2] is not None:
-                    if os.path.exists(sys.argv[2]):
-                        update_dataroot(sys.argv[2])
-                        print("Updated dataroot to: %s" % configdict['dataroot'])
-                        sys.exit(0)
-            except IndexError:
-                print("Dataroot is currently: %s" % configdict['dataroot'])
-                sys.exit(0)
-        elif sys.argv[1] == "-e":
-            if platform.system() == "Linux":
-                status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
-                if status != 0:
-                    if status == 32512:
-                        raise Exception("%s: EDITOR not set" % status)
-                    else:
-                        raise Exception("%s: Could not open config file." % status)
-            elif platform.system() == "Windows":
-                status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
-                if status != 0:
-                    raise Exception("%s: Could not open config file." % status)
-            else:
-                print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
-            sys.exit(0)
-        else:
-            if os.path.exists(sys.argv[1]):
-                usr_path = os.path.splitdrive(sys.argv[1])[1]
-            else:
-                usr_path = configdict['dataroot']
-except IndexError:
-    pass
+parser = argparse.ArgumentParser(description='Databrowse: An Extensible Data Management Platform')
+parser.add_argument('-s', '--setdataroot', metavar='path', help='path to set new dataroot')
+parser.add_argument('-e', '--openconfig', action='store_true', help='open cefdatabrowse config file')
+parser.add_argument('-g', '--go', metavar='path', const="here", nargs="?", help='open cefdatabrowse in a directory')
+args = parser.parse_args()
 
-if usr_path == "":
-    usr_path = os.path.splitdrive(os.getcwd())[1]
+usr_path = ""
+if args.setdataroot:
+    try:
+        if os.path.exists(args.setdataroot):
+            update_dataroot(args.setdataroot)
+            print("Updated dataroot to: %s" % configdict['dataroot'])
+            sys.exit(0)
+    except IndexError:
+        print("Dataroot is currently: %s" % configdict['dataroot'])
+        sys.exit(0)
+elif args.openconfig:
+    if platform.system() == "Linux":
+        status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
+        if status != 0:
+            if status == 32512:
+                raise Exception("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
+            else:
+                raise Exception("%s: Could not open config file." % status)
+    elif platform.system() == "Windows":
+        status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
+        if status != 0:
+            raise Exception("%s: Could not open config file." % status)
+    else:
+        print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
+    sys.exit(0)
+elif args.go:
+    if args.go != "here":
+        if os.path.exists(args.go):
+            usr_path = args.go
+        else:
+            raise argparse.ArgumentTypeError('Path does not exist.')
+    else:
+        usr_path = os.getcwd()
+else:
+    usr_path = configdict['dataroot']
 
 # GLOBALS
 PYQT4 = False
@@ -152,7 +152,7 @@ try:
     from PyQt4.QtCore import *
 
     PYQT4 = True
-except Exception:
+except ImportError:
     try:
         # noinspection PyUnresolvedReferences
         import PySide
@@ -164,7 +164,7 @@ except Exception:
         from PySide.QtCore import *
 
         PYSIDE = True
-    except Exception:
+    except ImportError:
         try:
             # noinspection PyUnresolvedReferences
             from PyQt5.QtGui import *
@@ -174,7 +174,7 @@ except Exception:
             from PyQt5.QtWidgets import *
 
             PYQT5 = True
-        except Exception:
+        except ImportError:
             print("You need to install one of the following:")
             print("pyqt4")
             print("pyside")
@@ -189,9 +189,6 @@ WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
 
-# Configuration
-scheme = "http://0.0.0.0/"
-
 # OS differences
 CefWidgetParent = QWidget
 configdict['install'] = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
@@ -200,8 +197,16 @@ if LINUX and (PYQT4 or PYSIDE):
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
 
+if WINDOWS:
+    myappid = u'limatix.org.databrowse'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    scheme = "http://0.0.0.0/"
+elif LINUX:
+    scheme = "http://databrowse/"
+
 # Append external libraries to path
-sys.path.insert(0, configdict['dataguzzlerlib'])
+for item in partydict.keys():
+    sys.path.insert(0, partydict[item])
 
 
 # Modified client handler from cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
@@ -218,7 +223,6 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        relpath = os.path.relpath(parsedurl.path[1:])
         fullpath = parsedurl.path[1:]
 
         urlparams = {}
@@ -267,29 +271,17 @@ class ClientHandler:
                 urlparams.update(fs)
 
         # Any resource files must be located in the databrowse_wsgi directory in the databrowse root source directory
-        if "databrowse_wsgi" not in fullpath:
-            resHandler = DatabrowseHandler()
-            resHandler._clientHandler = self
-            resHandler._browser = browser
-            resHandler._frame = frame
-            resHandler._request = request
-            resHandler._fullpath = fullpath
-            resHandler._relpath = relpath
-            resHandler._params = urlparams
-            self._AddStrongReference(resHandler)
-            return resHandler
-        else:
-            resHandler = ResourceHandler()
-            resHandler._clientHandler = self
-            resHandler._browser = browser
-            resHandler._frame = frame
-            resHandler._request = request
-            resHandler._fullpath = fullpath
-            resHandler._relpath = relpath
-            self._AddStrongReference(resHandler)
-            return resHandler
+        resHandler = DatabrowseHandler()
+        resHandler._clientHandler = self
+        resHandler._browser = browser
+        resHandler._frame = frame
+        resHandler._request = request
+        resHandler._fullpath = fullpath
+        resHandler._params = urlparams
+        self._AddStrongReference(resHandler)
+        return resHandler
 
-    def _OnResourceResponse(self, handler, browser, fullpath, frame, request, requestStatus,
+    def _OnResourceResponse(self, browser, fullpath, frame, request, requestStatus,
             requestError, response, urlparams, data):
         # This callback is emulated through ResourceHandler
         # and WebRequest. Real "OnResourceResponse" is not yet
@@ -307,7 +299,7 @@ class ClientHandler:
         # Return the new data - you can modify it.
 
         # Call the databrowse library and return the generated html
-        if handler is "cefdatabrowse":
+        if "databrowse_wsgi" not in fullpath:
             databrowsepaths = {'install': configdict['install'], 'path': fullpath, 'scheme': scheme}
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
@@ -324,9 +316,12 @@ class ClientHandler:
                 if not os.path.exists(unquote(fullpath)):
                     raise IOError("Install location needs to be updated")
                 else:
-                    raise IOError("Unknown problem")
+                    if os.path.isdir(unquote(fullpath)):
+                        html = ""
+                    else:
+                        raise IOError("Unknown problem")
             mime = response.GetMimeType()
-            urlparams.update({'headers': {'Content-Type': mime}})
+            urlparams.update({'headers': {'Content-Type': mime}, "status": 200})
             data = "".join(html)
 
         return data
@@ -352,110 +347,6 @@ class ClientHandler:
             print("_ReleaseStrongReference() FAILED: resource handler not found, id = %s" % (resHandler._resourceHandlerId))
 
 
-# Typical resource handler provided by cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
-class ResourceHandler:
-
-    # The methods of this class will always be called
-    # on the IO thread.
-
-    _resourceHandlerId = None
-    _clientHandler = None
-    _browser = None
-    _frame = None
-    _request = None
-    _responseHeadersReadyCallback = None
-    _web_request = None
-    _webRequestClient = None
-    _params = {}
-    _fullpath = None
-    _relpath = None
-    _offsetRead = 0
-
-    def ProcessRequest(self, request, callback):
-        # print("Resource called")
-        # print("ProcessRequest()")
-        # 1. Start the request using WebRequest
-        # 2. Return True to handle the request
-        # 3. Once response headers are ready call
-        #    callback.Continue()
-        self._responseHeadersReadyCallback = callback
-        self._webRequestClient = WebRequestClient()
-        self._webRequestClient._resourceHandler = self
-        self._webRequestClient._filetype = "resource"
-        # Need to set AllowCacheCredentials and AllowCookies for
-        # the cookies to work during POST requests (Issue 127).
-        # To skip cache set the SkipCache request flag.
-        request.SetFlags(cef.Request.Flags["AllowCachedCredentials"]\
-                | cef.Request.Flags["AllowCookies"])
-        # A strong reference to the WebRequest object must kept.
-        self._web_request = cef.WebRequest.Create(
-                request, self._webRequestClient)
-        return True
-
-    def GetResponseHeaders(self, response, responseLengthOut, redirectUrlOut):
-        # print("GetResponseHeaders()")
-        # 1. If the response length is not known set
-        #    responseLengthOut[0] to -1 and ReadResponse()
-        #    will be called until it returns False.
-        # 2. If the response length is known set
-        #    responseLengthOut[0] to a positive value
-        #    and ReadResponse() will be called until it
-        #    returns False or the specified number of bytes
-        #    have been read.
-        # 3. Use the |response| object to set the mime type,
-        #    http status code and other optional header values.
-        # 4. To redirect the request to a new URL set
-        #    redirectUrlOut[0] to the new url.
-        assert self._webRequestClient._response, "Response object empty"
-        wrcResponse = self._webRequestClient._response
-        response.SetStatus(wrcResponse.GetStatus())
-        response.SetStatusText(wrcResponse.GetStatusText())
-        response.SetHeaderMap(self._params["headers"])
-        if wrcResponse.GetHeaderMultimap():
-            response.SetHeaderMultimap(wrcResponse.GetHeaderMultimap())
-        responseLengthOut[0] = self._webRequestClient._dataLength
-        if not responseLengthOut[0]:
-            # Probably a cached page? Or a redirect?
-            pass
-
-    def ReadResponse(self, data_out, bytes_to_read, bytes_read_out, callback):
-        # print("ReadResponse()")
-        # 1. If data is available immediately copy up to
-        #    bytes_to_read bytes into data_out[0], set
-        #    bytes_read_out[0] to the number of bytes copied,
-        #    and return true.
-        # 2. To read the data at a later time set
-        #    bytes_read_out[0] to 0, return true and call
-        #    callback.Continue() when the data is available.
-        # 3. To indicate response completion return false.
-        if self._offsetRead < self._webRequestClient._dataLength:
-            dataChunk = self._webRequestClient._data[\
-                    self._offsetRead:(self._offsetRead + bytes_to_read)]
-            self._offsetRead += len(dataChunk)
-            data_out[0] = dataChunk
-            bytes_read_out[0] = len(dataChunk)
-            return True
-        self._clientHandler._ReleaseStrongReference(self)
-        print("no more data, return False")
-        return False
-
-    def CanGetCookie(self, cookie):
-        # Return true if the specified cookie can be sent
-        # with the request or false otherwise. If false
-        # is returned for any cookie then no cookies will
-        # be sent with the request.
-        return True
-
-    def CanSetCookie(self, cookie):
-        # Return true if the specified cookie returned
-        # with the response can be set or false otherwise.
-        return True
-
-    def Cancel(self):
-        # Request processing has been canceled.
-        pass
-
-
 # Adapted resource handler to deal with the returned start resposne variables from databrowse
 # Based on the resource handler in cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class DatabrowseHandler:
@@ -473,7 +364,6 @@ class DatabrowseHandler:
     _webRequestClient = None
     _params = None
     _fullpath = None
-    _relpath = None
     _offsetRead = 0
 
     def ProcessRequest(self, request, callback):
@@ -486,7 +376,6 @@ class DatabrowseHandler:
         self._responseHeadersReadyCallback = callback
         self._webRequestClient = WebRequestClient()
         self._webRequestClient._resourceHandler = self
-        self._webRequestClient._filetype = "cefdatabrowse"
         # Need to set AllowCacheCredentials and AllowCookies for
         # the cookies to work during POST requests (Issue 127).
         # To skip cache set the SkipCache request flag.
@@ -566,7 +455,6 @@ class DatabrowseHandler:
 class WebRequestClient:
 
     _resourceHandler = None
-    _filetype = None
     _data = ""
     _dataLength = -1
     _response = None
@@ -595,7 +483,6 @@ class WebRequestClient:
         # there was a redirect, what will GetUrl() return
         # for both of them?
         self._data = self._resourceHandler._clientHandler._OnResourceResponse(
-                self._filetype,
                 self._resourceHandler._browser,
                 self._resourceHandler._fullpath,
                 self._resourceHandler._frame,
@@ -664,6 +551,30 @@ class MainWindow(QMainWindow):
         self.cef_widget = CefWidget(self)
         self.navigation_bar = NavigationBar(self.cef_widget)
         layout = QGridLayout()
+
+        openAction = QAction("&Open", self)
+        openAction.setStatusTip('Open file')
+        openAction.triggered.connect(self.openfile)
+
+        settingsAction = QAction("&Settings", self)
+        settingsAction.setStatusTip('Open settings file')
+        settingsAction.triggered.connect(self.settings)
+
+        helpAction = QAction("&Help", self)
+        helpAction.setStatusTip('Open Manual')
+        helpAction.triggered.connect(self.opendoc)
+
+        closeAction = QAction("&Close", self)
+        closeAction.setStatusTip('Close Databrowse')
+        closeAction.triggered.connect(self.closeapp)
+
+        mainMenu = self.menuBar()
+        fileMenu = mainMenu.addMenu('&File')
+        fileMenu.addAction(openAction)
+        fileMenu.addAction(settingsAction)
+        fileMenu.addAction(helpAction)
+        fileMenu.addAction(closeAction)
+
         layout.addWidget(self.navigation_bar, 0, 0)
         layout.addWidget(self.cef_widget, 1, 0)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -695,6 +606,13 @@ class MainWindow(QMainWindow):
             # noinspection PyArgumentList
             layout.addWidget(self.container, 1, 0)
 
+    def closeapp(self):
+        # Close browser (force=True) and free CEF reference
+        if self.cef_widget.browser:
+            self.cef_widget.browser.CloseBrowser(True)
+            self.clear_browser_references()
+            self.close()
+
     def closeEvent(self, event):
         # Close browser (force=True) and free CEF reference
         if self.cef_widget.browser:
@@ -705,6 +623,38 @@ class MainWindow(QMainWindow):
         # Clear browser references that you keep anywhere in your
         # code. All references must be cleared for CEF to shutdown cleanly.
         self.cef_widget.browser = None
+
+    def opendoc(self):
+        subprocess.Popen(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir).replace("\\", "/") + '/doc/Manual.pdf', shell=True)
+
+    def openfile(self):
+        options = QFileDialog.Options()
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", configdict['dataroot'],
+                                                  "All Files (*)", options=options)
+        if fileName:
+            self.cef_widget.browser.LoadUrl(scheme + fileName)
+
+    def settings(self):
+        status = -1
+        if platform.system() == "Linux":
+            status = os.system('%s %s' % (
+                os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
+            if status != 0:
+                if status == 32512:
+                    print("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
+                else:
+                    print("%s: Could not open config file." % status)
+        elif platform.system() == "Windows":
+            status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+            if status != 0:
+                print("%s: Could not open config file." % status)
+        else:
+            print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
+        if status == 0:
+            load_settings()
+            for item in partydict.keys():
+                sys.path.insert(0, partydict[item])
+            self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
 
 
 class CefWidget(CefWidgetParent):
@@ -838,8 +788,9 @@ class LoadHandler(object):
             self.navigation_bar.cef_widget.setFocus()
             # Temporary fix no. 2 for focus issue on Linux (Issue #284)
             if LINUX:
-                print("[qt.py] LoadHandler.OnLoadStart:"
-                      " keyboard focus fix no. 2 (Issue #284)")
+                pass
+                # print("[qt.py] LoadHandler.OnLoadStart:"
+                #       " keyboard focus fix no. 2 (Issue #284)")
                 # browser.SetFocus(True)        -- Seems like this isn't necessary
             self.initial_app_loading = False
 
@@ -854,8 +805,8 @@ class FocusHandler(object):
     def OnGotFocus(self, browser, **_):
         # Temporary fix no. 1 for focus issues on Linux (Issue #284)
         if LINUX:
-            print("[qt.py] FocusHandler.OnGotFocus:"
-                  " keyboard focus fix no. 1 (Issue #284)")
+            # print("[qt.py] FocusHandler.OnGotFocus:"
+            #       " keyboard focus fix no. 1 (Issue #284)")
             browser.SetFocus(True)
 
 

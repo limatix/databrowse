@@ -141,6 +141,10 @@
     </style>
     <script type="text/javascript" defer="true">
         <![CDATA[
+            function nditoolErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Opening NDIToolbox: " + errorThrown)
+            }
+
             $(document).ready(function() {
                 prettyPrint();
                 $('#blackout').mouseup(function() {
@@ -158,6 +162,29 @@
                 $("#popupframe").html($(divid).html());
                 $('#popuptitle').html('Viewing Waveform ' + waveform);
                 $('#popupframe img.lazy').attr('src', $('#popupframe img.lazy').attr('data-original'));
+            }
+
+            function nditoolbox(url){
+                ajaxurl = url + "&ajax&nditool";
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    dataType: "text",
+                    error: nditoolErrorCallback,
+                    processData: false,
+                    type: 'POST',
+                    url: ajaxurl
+                });
+            }
+
+            function changecolormap(selectObject) {
+                var value = selectObject.value;
+                var url = $('#popupframe img.lazy').attr('data-original')
+                console.log(value);
+                console.log(url);
+
+                $('#popupframe img.lazy').attr('src', url + "&color=" + value);
             }
         ]]>
     </script>
@@ -180,8 +207,14 @@
             <th style="width:8px">
                 <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
             </th>
-            <th colspan="2" style="word-wrap: break-word">
+            <th colspan="3" style="word-wrap: break-word">
                 <span style="width:665px;display:inline-block"><xsl:value-of select="@name"/></span>
+                <xsl:if test="@nditoolboxlink != ''">
+                    <button style="float:right">
+                        <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                        NDITOOLBOX
+                    </button>
+                </xsl:if>
                 <a>
                     <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
                     <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
@@ -232,11 +265,15 @@
             <tbody>
                 <tr>
                     <th>Dataset Preview:</th>
-                    <td style="text-align:center">
-                        <img class="lazy" width="500px">
+                    <td style="text-align:center;position:relative" width="500px">
+                        <img id="previewimg" class="lazy">
                             <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/loading.gif</xsl:attribute>
                             <xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;dataset=<xsl:value-of select="@name"/></xsl:attribute>
                         </img>
+                        <select style="position:absolute;margin-left:-30px" onchange="changecolormap(this)">
+                          <option value="binary">Binary</option>
+                          <option value="jet">Jet</option>
+                        </select>
                     </td>
                 </tr>
                 <xsl:variable name="localname"><xsl:value-of select="@name"/></xsl:variable>
