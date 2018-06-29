@@ -223,7 +223,7 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        fullpath = parsedurl.path[1:]
+        fullpath = unquote(parsedurl.path[1:])
 
         urlparams = {}
         if parsedurl.query != "":
@@ -625,7 +625,7 @@ class MainWindow(QMainWindow):
         self.cef_widget.browser = None
 
     def opendoc(self):
-        subprocess.Popen(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir).replace("\\", "/") + '/doc/Manual.pdf', shell=True)
+        subprocess.Popen(os.path.dirname(os.path.abspath(__file__)).replace("\\", "/") + '/resources/Manual.pdf', shell=True)
 
     def openfile(self):
         options = QFileDialog.Options()
