@@ -109,7 +109,7 @@ class db_checklist_editor(renderer_class):
                         os.rename(fullfilename, "%s.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -153,7 +153,7 @@ class db_checklist_editor(renderer_class):
                             shutil.copy(imagepath, tempsavedir)
                         except:
                             pass
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close()
                     try:
@@ -208,7 +208,7 @@ class db_checklist_editor(renderer_class):
                             os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                             pass
 
-                        f = open(fullfilename, "w")
+                        f = open(fullfilename, "wb")
                         f.write(filestring)
                         f.close
                         self._web_support.req.output = "File Saved Successfully"

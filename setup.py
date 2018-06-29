@@ -45,7 +45,10 @@
 
 import os
 import requirements as r
-from setuptools import setup, find_packages
+import platform
+from shutil import copyfile
+from setuptools import setup, find_packages, Distribution
+from setuptools.command.install import install
 
 # Collect all databrowse static files required for CEFDatabrowse
 search_dirs = [('databrowse_wsgi', []), ('cefdatabrowse', [])]
@@ -56,6 +59,7 @@ for search_dir in range(0, len(search_dirs)):
                 search_dirs.append((dir, []))
             idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
             search_dirs[idx][1].append(os.path.join(dir, file))
+search_dirs.append(('doc', ['doc/Manual/Manual.pdf']))
 
 
 def readfile(filename):
@@ -70,8 +74,8 @@ with open(r.select_requirements_file(), 'r') as f:
 
 setup(
     name="databrowse",
-    author="Tyler Lesthaeghe",
-    author_email="tylerl@iastate.edu",
+    author="Tyler Lesthaeghe/Nathan Scheirer",
+    author_email="tylerl@iastate.edu/scheirer@iastate.edu",
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
@@ -106,3 +110,29 @@ setup(
         ]
     }
 )
+
+
+class OnlyGetScriptPath(install):
+    def run(self):
+        self.distribution.install_scripts = self.install_scripts
+        db_base = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as bat:
+            bat.writelines(['@echo off \r\n',
+                            '{} %* \r\n'.format(os.path.join(self.distribution.install_scripts, "databrowse.exe"))])
+
+        execdir = raw_input("Enter execution directory: ")
+        copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))
+
+
+def get_setuptools_script_dir():
+    dist = Distribution({'cmdclass': {'install': OnlyGetScriptPath}})
+    dist.dry_run = True  # not sure if necessary, but to be safe
+    dist.parse_config_files()
+    command = dist.get_command_obj('install')
+    command.ensure_finalized()
+    command.run()
+    return dist.install_scripts
+
+
+if platform.system() == "Windows":
+    get_setuptools_script_dir()

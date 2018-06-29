@@ -95,7 +95,7 @@ class db_file_ops(renderer_class):
                         pass
                     os.rename(fullfilename, "%s.%.2d%s" % (os.path.splitext(fullfilename)[0], filenum, os.path.splitext(fullfilename)[1]))
                     pass
-                f = open(fullfilename, "w")
+                f = open(fullfilename, "wb")
                 f.write(fieldStorage.value)
                 f.close
             results = []

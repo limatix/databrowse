@@ -215,7 +215,7 @@ class db_specimen(renderer_class):
                     else:
                         return iter(lambda: f.read(1024), '')
                 else:
-                    sf = open(self._fullpath, "r")
+                    sf = open(self._fullpath, "rb")
                     sdbfile = etree.parse(sf)
                     sf.close()
                     sdbroot = sdbfile.getroot()
@@ -233,7 +233,7 @@ class db_specimen(renderer_class):
                     return [output.getvalue()]
             if "printbarcode" in self._web_support.req.form:
                 try:
-                    sf = open(self._fullpath, "r")
+                    sf = open(self._fullpath, "rb")
                     sdbfile = etree.parse(sf)
                     sf.close()
                     sdbroot = sdbfile.getroot()

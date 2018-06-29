@@ -105,11 +105,8 @@ class db_directory(renderer_class):
             caller = self.__class__.__name__
             dirlist = self.getDirectoryList(self._fullpath)
             for item in dirlist:
-                if self._relpath != "/":
-                    itemrelpath = "/".join([self._relpath, item])
-                else:
-                    itemrelpath = self._relpath + item
-                itemfullpath = "/".join([self._fullpath, item])
+                itemrelpath = os.path.join(self._relpath, item).replace("\\", "/")
+                itemfullpath = os.path.join(self._fullpath, item).replace("\\", "/")
                 (handlers, icon) = self._handler_support.GetHandlerAndIcon(itemfullpath)
                 handler = handlers[-1]
                 if handler in self._handler_support.directoryplugins:

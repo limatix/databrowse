@@ -87,7 +87,7 @@ class db_plain_text_file(renderer_class):
                             pass
                         os.rename(self._fullpath, "%s.bak.%.2d" % (self._fullpath, filenum))
                         pass
-                    f = open(self._fullpath, "w")
+                    f = open(self._fullpath, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
