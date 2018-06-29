@@ -177,6 +177,15 @@
                     url: ajaxurl
                 });
             }
+
+            function changecolormap(selectObject) {
+                var value = selectObject.value;
+                var url = $('#popupframe img.lazy').attr('data-original')
+                console.log(value);
+                console.log(url);
+
+                $('#popupframe img.lazy').attr('src', url + "&color=" + value);
+            }
         ]]>
     </script>
     <div id="blackout"/>
@@ -256,11 +265,15 @@
             <tbody>
                 <tr>
                     <th>Dataset Preview:</th>
-                    <td style="text-align:center" width="500px">
+                    <td style="text-align:center;position:relative" width="500px">
                         <img id="previewimg" class="lazy">
                             <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/loading.gif</xsl:attribute>
                             <xsl:attribute name="data-original"><xsl:value-of select="//@imagelink"/>&amp;dataset=<xsl:value-of select="@name"/></xsl:attribute>
                         </img>
+                        <select style="position:absolute;margin-left:-30px" onchange="changecolormap(this)">
+                          <option value="binary">Binary</option>
+                          <option value="jet">Jet</option>
+                        </select>
                     </td>
                 </tr>
                 <xsl:variable name="localname"><xsl:value-of select="@name"/></xsl:variable>

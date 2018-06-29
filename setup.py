@@ -43,7 +43,6 @@
 ###############################################################################
 """ setup.py - Main Install Script """
 
-import sys
 import os
 import requirements as r
 import platform
@@ -60,6 +59,7 @@ for search_dir in range(0, len(search_dirs)):
                 search_dirs.append((dir, []))
             idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
             search_dirs[idx][1].append(os.path.join(dir, file))
+search_dirs.append(('doc', ['doc/Manual/Manual.pdf']))
 
 
 def readfile(filename):

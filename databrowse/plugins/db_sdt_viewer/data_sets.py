@@ -8,7 +8,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-def save_animation(filepath, shp, ds):
+def save_animation(filepath, shp, ds, color):
     print("Starting to generate %s" % filepath)
     fig = plt.figure()
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -16,7 +16,7 @@ def save_animation(filepath, shp, ds):
     print("Generating images.")
     for i in range(0, shp[2]):
         ttl = plt.text(0.5, 1.01, "Depth: %s" % i, horizontalalignment='center', verticalalignment='bottom', transform=ax.transAxes)
-        im = plt.imshow(ds['v'][:, :, i], animated=True, cmap="binary")
+        im = plt.imshow(ds['v'][:, :, i], animated=True, cmap=color)
         plt.xlabel("x")
         plt.ylabel("y")
         ims.append([im, ttl])
@@ -42,6 +42,7 @@ class SDTDataSets:
         self.vunits = None
         self.fprefix = None
         self.paramdict = None
+        self.color = None
 
         self.check_preexisting()
         if self.size is None:
@@ -60,9 +61,14 @@ class SDTDataSets:
         plt.clf()
 
     def check_preexisting(self):
+        if 'color' not in self.parent._web_support.req.form:
+            self.color = 'binary'
+        else:
+            self.color = self.parent._web_support.req.form['color'].value
+
         if "frame" in self.parent._web_support.req.form:
             fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_Frame" + str(
-                self.parent._web_support.req.form['frame'].value)
+                self.parent._web_support.req.form['frame'].value) + "_" + self.color
             if self.parent.CacheFileExists(fprefix, 'png'):
                 contenttype = 'image/png'
                 size = os.path.getsize(self.parent.getCacheFileName(fprefix, 'png'))
@@ -72,7 +78,7 @@ class SDTDataSets:
                 size = None
                 ext = None
         else:
-            fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+            fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_" + self.color
             if self.parent.CacheFileExists(fprefix, 'png'):
                 contenttype = 'image/png'
                 size = os.path.getsize(self.parent.getCacheFileName(fprefix, 'png'))
@@ -162,7 +168,7 @@ class SDTDataSets:
         plt.xlabel('Time, t (%s)' % (self.parent.check_units(self.pd['Sample Resolution'])[1]))
         plt.ylabel('Amplitude (%s)' % (self.vunits))
 
-        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_" + self.color
         self.ext = "png"
         self.contenttype = 'image/png'
         self.save()
@@ -171,7 +177,7 @@ class SDTDataSets:
     def bscan_1(self):
         # Beware - this one probably doesn't work
         # Also, this situation probably doesn't actually happen
-        plt.imshow(self.ds['v'][:, 0, :], cmap='binary',
+        plt.imshow(self.ds['v'][:, 0, :], cmap=self.color,
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['t'][0],
@@ -189,14 +195,14 @@ class SDTDataSets:
         cb = plt.colorbar()
         cb.set_label('Amplitude (%s)' % self.vunits)
 
-        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_" + self.color
         self.ext = "png"
         self.contenttype = 'image/png'
         self.save()
         self.size = os.path.getsize(self.parent.getCacheFileName(self.fprefix, self.ext))
 
     def bscan_2(self):
-        plt.imshow(self.ds['v'][0, :, :], cmap='binary',
+        plt.imshow(self.ds['v'][0, :, :], cmap=self.color,
                    origin='lower', extent=[self.ds['y'][0],
                                            self.ds['y'][-1],
                                            self.ds['t'][0],
@@ -214,14 +220,14 @@ class SDTDataSets:
         cb = plt.colorbar()
         cb.set_label('Amplitude (%s)' % self.vunits)
 
-        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_" + self.color
         self.ext = "png"
         self.contenttype = 'image/png'
         self.save()
         self.size = os.path.getsize(self.parent.getCacheFileName(self.fprefix, self.ext))
 
     def gated_cscan(self):
-        plt.imshow(self.ds['v'][:, :, 0], cmap='binary',
+        plt.imshow(self.ds['v'][:, :, 0], cmap=self.color,
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['y'][0],
@@ -245,7 +251,7 @@ class SDTDataSets:
         cb = plt.colorbar()
         cb.set_label('Amplitude, (%s)' % self.vunits)
 
-        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) + "_" + self.color
         self.ext = "png"
         self.contenttype = 'image/png'
         self.save()
@@ -257,7 +263,7 @@ class SDTDataSets:
         else:
             frame = int(self.parent._web_support.req.form['frame'].value)
 
-        plt.imshow(self.ds['v'][:, :, frame], cmap='binary',
+        plt.imshow(self.ds['v'][:, :, frame], cmap=self.color,
                    origin='lower', extent=[self.ds['x'][0],
                                            self.ds['x'][-1],
                                            self.ds['y'][0],
@@ -282,7 +288,8 @@ class SDTDataSets:
         cb.set_label('Amplitude (%s)' % self.vunits)
         plt.title('Time, t=%0.2f %s' % (self.ds['t'][frame],
                                         self.parent.check_units(self.pd['Sample Resolution'])[1]))
-        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value + "_Frame%d" % frame)
+        self.fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value + "_Frame%d" % frame) +\
+                       "_" + self.color
         self.ext = "png"
         self.contenttype = 'image/png'
         self.save()
@@ -292,12 +299,13 @@ class SDTDataSets:
         try:
             if subprocess.call(["magick"], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT) == 0:
                 if version.parse(matplotlib.__version__) > version.parse("2.0.0"):
-                    fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value)
+                    fprefix = "Dataset_" + str(self.parent._web_support.req.form['dataset'].value) +\
+                              "_" + self.color
                     ext = "gif"
                     if not self.parent.CacheFileExists(fprefix, ext) or os.path.getsize(self.parent.getCacheFileName(fprefix, ext)) == 0:
                         ft = self.parent.getCacheFileHandler('wb', fprefix, ext)
                         ft.close()
-                        p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds))
+                        p = Process(target=save_animation, args=(self.parent.getCacheFileName(fprefix, ext), self.shp, self.ds, self.color))
                         p.daemon = False
                         p.start()
                 else:

@@ -57,6 +57,7 @@ import os
 import platform
 import sys
 import argparse
+import subprocess
 from re import search
 import ConfigParser
 from urlparse import urlparse
@@ -551,13 +552,17 @@ class MainWindow(QMainWindow):
         self.navigation_bar = NavigationBar(self.cef_widget)
         layout = QGridLayout()
 
+        openAction = QAction("&Open", self)
+        openAction.setStatusTip('Open file')
+        openAction.triggered.connect(self.openfile)
+
         settingsAction = QAction("&Settings", self)
         settingsAction.setStatusTip('Open settings file')
         settingsAction.triggered.connect(self.settings)
 
-        openAction = QAction("&Open", self)
-        openAction.setStatusTip('Open file')
-        openAction.triggered.connect(self.openfile)
+        helpAction = QAction("&Help", self)
+        helpAction.setStatusTip('Open Manual')
+        helpAction.triggered.connect(self.opendoc)
 
         closeAction = QAction("&Close", self)
         closeAction.setStatusTip('Close Databrowse')
@@ -565,8 +570,9 @@ class MainWindow(QMainWindow):
 
         mainMenu = self.menuBar()
         fileMenu = mainMenu.addMenu('&File')
-        fileMenu.addAction(settingsAction)
         fileMenu.addAction(openAction)
+        fileMenu.addAction(settingsAction)
+        fileMenu.addAction(helpAction)
         fileMenu.addAction(closeAction)
 
         layout.addWidget(self.navigation_bar, 0, 0)
@@ -618,10 +624,13 @@ class MainWindow(QMainWindow):
         # code. All references must be cleared for CEF to shutdown cleanly.
         self.cef_widget.browser = None
 
+    def opendoc(self):
+        subprocess.Popen(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir).replace("\\", "/") + '/doc/Manual.pdf', shell=True)
+
     def openfile(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", configdict['dataroot'],
-                                                  "All Files (*);;Python Files (*.py)", options=options)
+                                                  "All Files (*)", options=options)
         if fileName:
             self.cef_widget.browser.LoadUrl(scheme + fileName)
 
