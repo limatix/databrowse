@@ -63,8 +63,8 @@ with open(r.select_requirements_file(), 'r') as f:
 
 setup(
     name="databrowse",
-    author="Tyler Lesthaeghe/Nathan Scheirer",
-    author_email="tylerl@iastate.edu/scheirer@iastate.edu",
+    author="Tyler Lesthaeghe, Nathan Scheirer",
+    author_email="tylerl@iastate.edu, scheirer@iastate.edu",
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
@@ -80,7 +80,6 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
-        "Environment :: CEF Client",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Natural Language :: English",
