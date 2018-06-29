@@ -50,17 +50,6 @@ from shutil import copyfile
 from setuptools import setup, find_packages, Distribution
 from setuptools.command.install import install
 
-# Collect all databrowse static files required for CEFDatabrowse
-search_dirs = [('databrowse_wsgi', []), ('cefdatabrowse', [])]
-for search_dir in range(0, len(search_dirs)):
-    for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
-        for file in files:
-            if dir not in dict(search_dirs):
-                search_dirs.append((dir, []))
-            idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
-            search_dirs[idx][1].append(os.path.join(dir, file))
-search_dirs.append(('doc', ['doc/Manual/Manual.pdf']))
-
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
@@ -79,10 +68,10 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.8.0',
-    packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data={'': ['*.conf', '*.xml', '.databrowse']},
-    data_files=search_dirs,
+    version='0.8.1',
+    packages=find_packages(exclude=['tests', 'test_*']),
+    package_data={'': ['*.conf', '*.xml']},
+    include_package_data=True,
     license="BSD-3",
     long_description=readfile('README.md'),
     test_suite='nose.collector',
@@ -110,29 +99,3 @@ setup(
         ]
     }
 )
-
-
-class OnlyGetScriptPath(install):
-    def run(self):
-        self.distribution.install_scripts = self.install_scripts
-        db_base = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as bat:
-            bat.writelines(['@echo off \r\n',
-                            '{} %* \r\n'.format(os.path.join(self.distribution.install_scripts, "databrowse.exe"))])
-
-        execdir = raw_input("Enter execution directory: ")
-        copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))
-
-
-def get_setuptools_script_dir():
-    dist = Distribution({'cmdclass': {'install': OnlyGetScriptPath}})
-    dist.dry_run = True  # not sure if necessary, but to be safe
-    dist.parse_config_files()
-    command = dist.get_command_obj('install')
-    command.ensure_finalized()
-    command.run()
-    return dist.install_scripts
-
-
-if platform.system() == "Windows":
-    get_setuptools_script_dir()
