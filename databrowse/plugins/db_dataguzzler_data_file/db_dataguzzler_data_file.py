@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,12 +32,20 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_dataguzzler.py - Default Renderer - Basic Output for Any Dataguzzler File """
 
 import os
 import os.path
+import platform
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 import magic
@@ -50,9 +58,7 @@ import numpy
 import tempfile
 import subprocess
 from PIL import Image
-import matplotlib as mpl
-mpl.use('Agg')
-import pylab
+import matplotlib.pyplot as plt
 
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
 dgf_nestedchunks = set(["DATAGUZZ", "GUZZNWFM", "GUZZWFMD", "METADATA", "METDATUM", "SNAPSHOT", "SNAPSHTS", "VIBRDATA", "VIBFCETS", "VIBFACET"])
@@ -247,7 +253,7 @@ class db_dataguzzler_data_file(renderer_class):
         dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'dgz'))
-        return (self.getCacheFileHandler('r', filename, 'dgz'), size)
+        return (self.getCacheFileHandler('rb', filename, 'dgz'), size)
 
     def GetDataguzzlerWaveformCsvFile(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -348,13 +354,13 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
 
         # Finish and Save
-        f = self.getCacheFileHandler('w', filename, 'csv')
+        f = self.getCacheFileHandler('wb', filename, 'csv')
         numpy.savetxt(f, waveform.data, delimiter=",")
         f.close()
         dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'csv'))
-        return (self.getCacheFileHandler('r', filename, 'csv'), size)
+        return (self.getCacheFileHandler('rb', filename, 'csv'), size)
 
     def GetDataguzzlerWaveformMatFile(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -455,13 +461,13 @@ class db_dataguzzler_data_file(renderer_class):
             raise self.RendererException("Unexpected " + chunk.Name + " Chunk Found")
 
         # Finish and Save
-        f = self.getCacheFileHandler('w', filename, 'mat')
+        f = self.getCacheFileHandler('wb', filename, 'mat')
         sio.savemat(f, {'waveform': waveform})
         f.close()
         dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'mat'))
-        return (self.getCacheFileHandler('r', filename, 'mat'), size)
+        return (self.getCacheFileHandler('rb', filename, 'mat'), size)
 
     def GetDataguzzlerWaveformVideo(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -611,8 +617,8 @@ class db_dataguzzler_data_file(renderer_class):
                     title = waveformname + " (" + coord[2] + ": " + str(t[framenumber]) + " " + units[2] + ")"
                 else:
                     title = waveformname + " (Frame " + str(framenumber) + ")"
-                pylab.imshow(waveform.data[:, :, framenumber].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
-                cb = pylab.colorbar()
+                plt.imshow(waveform.data[:, :, framenumber].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
+                cb = plt.colorbar()
                 cb.set_label(coord[-1] + " (" + units[-1] + ")")
                 if rgbawaveform is not None:
                     RGBAdat = rgbawaveform.data[:, :, framenumber].transpose().tostring()
@@ -623,13 +629,13 @@ class db_dataguzzler_data_file(renderer_class):
                     RGBAmat2[:, 1] = RGBAmat[:, 2]
                     RGBAmat2[:, 2] = RGBAmat[:, 1]
                     RGBAmat2[:, 3] = RGBAmat[:, 0]
-                    pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
-                pylab.title(title)
-                pylab.xlabel(coord[0] + " (" + units[0] + ")")
-                pylab.ylabel(coord[1] + " (" + units[1] + ")")
-                pylab.savefig(os.path.join(tmpdir, imagefilename + '.png'))
+                    plt.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+                plt.title(title)
+                plt.xlabel(coord[0] + " (" + units[0] + ")")
+                plt.ylabel(coord[1] + " (" + units[1] + ")")
+                plt.savefig(os.path.join(tmpdir, imagefilename + '.png'))
                 filelist.append(os.path.join(tmpdir, imagefilename + '.png'))
-                pylab.clf()
+                plt.clf()
         else:
             raise self.RendererException("Only Three Dimensional Waveforms May Be Converted To Video")
 
@@ -651,7 +657,7 @@ class db_dataguzzler_data_file(renderer_class):
             os.remove(name)
         os.rmdir(tmpdir)
         size = os.path.getsize(self.getCacheFileName(filename, 'avi'))
-        return (self.getCacheFileHandler('r', filename, 'avi'), size)
+        return (self.getCacheFileHandler('rb', filename, 'avi'), size)
 
     def GetDataguzzlerWaveformImage(self):
         # Get Handle to Dataguzzler File and Open First Chunk
@@ -833,8 +839,8 @@ class db_dataguzzler_data_file(renderer_class):
                 title = waveformname + " (" + coord[2] + ": " + str(t[framenumber]) + " " + units[2] + ")"
             else:
                 title = waveformname + " (Frame " + str(framenumber) + ")"
-            pylab.imshow(waveform.data[:, :, framenumber].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
-            cb = pylab.colorbar()
+            plt.imshow(waveform.data[:, :, framenumber].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
+            cb = plt.colorbar()
             cb.set_label(coord[-1] + " (" + units[-1] + ")")
             if rgbawaveform is not None:
                 RGBAdat = rgbawaveform.data[:, :, framenumber].transpose().tostring()
@@ -845,11 +851,11 @@ class db_dataguzzler_data_file(renderer_class):
                 RGBAmat2[:, 1] = RGBAmat[:, 2]
                 RGBAmat2[:, 2] = RGBAmat[:, 1]
                 RGBAmat2[:, 3] = RGBAmat[:, 0]
-                pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+                plt.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
             self.plotroi(waveform)
-            pylab.title(title)
-            pylab.xlabel(coord[0] + " (" + units[0] + ")")
-            pylab.ylabel(coord[1] + " (" + units[1] + ")")
+            plt.title(title)
+            plt.xlabel(coord[0] + " (" + units[0] + ")")
+            plt.ylabel(coord[1] + " (" + units[1] + ")")
         elif len(waveform.data.shape) == 2:     # 2D Waveforms
             extent = [inival[0], waveform.data.shape[0] * step[0] + inival[0], inival[1], waveform.data.shape[1] * step[1] + inival[1]]
             if ROICOORDX1 is not None and ROICOORDX2 is not None and ROICOORDY1 is not None and ROICOORDY2 is not None:
@@ -858,8 +864,8 @@ class db_dataguzzler_data_file(renderer_class):
             else:
                 vmin = waveform.data.min()
                 vmax = waveform.data.max()
-            pylab.imshow(waveform.data[:, :].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
-            cb = pylab.colorbar()
+            plt.imshow(waveform.data[:, :].T, cmap=cmap, origin='lower', extent=extent, vmin=vmin, vmax=vmax)
+            cb = plt.colorbar()
             cb.set_label(coord[-1] + " (" + units[-1] + ")")
             if rgbawaveform is not None:
                 RGBAdat = rgbawaveform.data[:, :].transpose().tostring()
@@ -870,14 +876,14 @@ class db_dataguzzler_data_file(renderer_class):
                 RGBAmat2[:, 1] = RGBAmat[:, 2]
                 RGBAmat2[:, 2] = RGBAmat[:, 1]
                 RGBAmat2[:, 3] = RGBAmat[:, 0]
-                pylab.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
+                plt.imshow(Image.fromstring("RGBA", (rgbawaveform.data.shape[0], rgbawaveform.data.shape[1]), RGBAmat2.tostring()), origin='lower', extent=extent)
             self.plotroi(waveform)
-            pylab.title(waveformname)
-            pylab.xlabel(coord[0] + " (" + units[0] + ")")
-            pylab.ylabel(coord[1] + " (" + units[1] + ")")
+            plt.title(waveformname)
+            plt.xlabel(coord[0] + " (" + units[0] + ")")
+            plt.ylabel(coord[1] + " (" + units[1] + ")")
         elif len(waveform.data.shape) == 1 and waveform.data.shape[0] != 1:  # 1D Waveforms
             n = waveform.data.shape[0]
-            x = pylab.arange(0, n, dtype='d') * step[0] + inival[0]
+            x = numpy.arange(0, n, dtype='d') * step[0] + inival[0]
             y = waveform.data
             if n > 10000:
                 chunksize = 1000
@@ -888,39 +894,39 @@ class db_dataguzzler_data_file(renderer_class):
                 min_env = ychunks.min(axis=1)
                 ycenters = ychunks.mean(axis=1)
                 xcenters = xchunks.mean(axis=1)
-                pylab.fill_between(xcenters, min_env, max_env, edgecolor='none')
+                plt.fill_between(xcenters, min_env, max_env, edgecolor='none')
                 #color='gray', edgecolor='none', alpha=0.5
-                pylab.plot(xcenters, ycenters)
+                plt.plot(xcenters, ycenters)
             else:
-                pylab.plot(x, y)
-            pylab.title(waveformname)
-            pylab.xlabel(coord[0] + " (" + units[0] + ")")
-            pylab.ylabel(coord[-1] + " (" + units[-1] + ")")
-            pylab.grid(True)
+                plt.plot(x, y)
+            plt.title(waveformname)
+            plt.xlabel(coord[0] + " (" + units[0] + ")")
+            plt.ylabel(coord[-1] + " (" + units[-1] + ")")
+            plt.grid(True)
             pass
         elif len(waveform.data.shape) != 0 and waveform.data.shape[0] == 1:   # 1D 1 Point Scalar Waveform
-            pylab.plot(waveform.data, marker='o', color='b')
-            pylab.title(waveformname)
+            plt.plot(waveform.data, marker='o', color='b')
+            plt.title(waveformname)
             if "Coord1" in waveform.MetaData:
-                pylab.xlabel(coord[0] + " (" + units[0] + ")")
-            pylab.ylabel(coord[-1] + " (" + units[-1] + ")")
-            pylab.grid(True)
+                plt.xlabel(coord[0] + " (" + units[0] + ")")
+            plt.ylabel(coord[-1] + " (" + units[-1] + ")")
+            plt.grid(True)
             pass
         else:
-            pylab.xlabel('NaN')
-            pylab.ylabel('NaN')
-            pylab.grid(True)
-            pylab.title('No Figure')
+            plt.xlabel('NaN')
+            plt.ylabel('NaN')
+            plt.grid(True)
+            plt.title('No Figure')
 
         # Finish and Save
-        f = self.getCacheFileHandler('w', filename, 'png')
-        pylab.savefig(f)
+        f = self.getCacheFileHandler('wb', filename, 'png')
+        plt.savefig(f)
         f.close()
-        pylab.clf()
+        plt.clf()
         dgf.rewind(dgfh)
         dgf.close(dgfh)
         size = os.path.getsize(self.getCacheFileName(filename, 'png'))
-        return (self.getCacheFileHandler('r', filename, 'png'), size, 'image/png')
+        return (self.getCacheFileHandler('rb', filename, 'png'), size, 'image/png')
 
     def plotroi(self, waveform):
         ROIX1=dgm.GetMetaDatumWIDbl(waveform,"ROIX1",-1e12)
@@ -928,14 +934,14 @@ class db_dataguzzler_data_file(renderer_class):
         ROIY1=dgm.GetMetaDatumWIDbl(waveform,"ROIY1",-1e12)
         ROIY2=dgm.GetMetaDatumWIDbl(waveform,"ROIY2",1e12)
         if ROIX1 != -1e12 and ROIX2 != 1e12 and ROIY1 != -1e12 and ROIY2 != 1e12:
-            xlim = pylab.xlim()
-            ylim = pylab.ylim()
-            pylab.plot([ROIX1, ROIX2], [ROIY1, ROIY1], 'b-')
-            pylab.plot([ROIX1, ROIX2], [ROIY2, ROIY2], 'b-')
-            pylab.plot([ROIX1, ROIX1], [ROIY1, ROIY2], 'b-')
-            pylab.plot([ROIX2, ROIX2], [ROIY1, ROIY2], 'b-')
-            pylab.xlim(xlim)
-            pylab.ylim(ylim)
+            xlim = plt.xlim()
+            ylim = plt.ylim()
+            plt.plot([ROIX1, ROIX2], [ROIY1, ROIY1], 'b-')
+            plt.plot([ROIX1, ROIX2], [ROIY2, ROIY2], 'b-')
+            plt.plot([ROIX1, ROIX1], [ROIY1, ROIY2], 'b-')
+            plt.plot([ROIX2, ROIX2], [ROIY1, ROIY2], 'b-')
+            plt.xlim(xlim)
+            plt.ylim(ylim)
         pass
 
     def getContent(self):
@@ -989,19 +995,19 @@ class db_dataguzzler_data_file(renderer_class):
                     if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form and "frame" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'png'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'png'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'png')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value+"_"+self._web_support.req.form["frame"].value, 'png')
                             contenttype = 'image/png'
                         pass
                     elif "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'png'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'png'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'png')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'png')
                             contenttype = 'image/png'
                         pass
                     elif "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'png'):
                             size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'png'))
-                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'png')
+                            f = self.getCacheFileHandler('rb', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'png')
                             contenttype = 'image/png'
                         pass
 
@@ -1016,19 +1022,19 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "matfile" in self._web_support.req.form:
                     f = None
                     if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'mat')
                         pass
                     elif "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'mat'):
                             size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'mat'))
-                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'mat')
+                            f = self.getCacheFileHandler('rb', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'mat')
                         pass
 
                     if f is None:
@@ -1042,19 +1048,19 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "csvfile" in self._web_support.req.form:
                     f = None
                     if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'csv')
                         pass
                     elif "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'csv'):
                             size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'csv'))
-                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'csv')
+                            f = self.getCacheFileHandler('rb', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'csv')
                         pass
 
                     if f is None:
@@ -1068,19 +1074,19 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "dgzfile" in self._web_support.req.form:
                     f = None
                     if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'dgz')
                         pass
                     elif "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz'):
                             size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz'))
-                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz')
+                            f = self.getCacheFileHandler('rb', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'dgz')
                         pass
 
                     if f is None:
@@ -1094,19 +1100,19 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 elif "avifile" in self._web_support.req.form:
                     f = None
                     if "snapshot" in self._web_support.req.form and "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi'):
                             size = os.path.getsize(self.getCacheFileName("SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi'))
-                            f = self.getCacheFileHandler('r', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi')
+                            f = self.getCacheFileHandler('rb', "SNAPSHOT"+str(self._web_support.req.form['snapshot'].value)+"_"+self._web_support.req.form["waveform"].value, 'avi')
                         pass
                     elif "waveform" in self._web_support.req.form:
                         if self.CacheFileExists("WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi'):
                             size = os.path.getsize(self.getCacheFileName("WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi'))
-                            f = self.getCacheFileHandler('r', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi')
+                            f = self.getCacheFileHandler('rb', "WAVEFORM"+self._web_support.req.form["waveform"].value, 'avi')
                         pass
 
                     if f is None:
@@ -1120,13 +1126,16 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
 
                 else:
                     size = os.path.getsize(self._fullpath)
-                    magicstore = magic.open(magic.MAGIC_NONE)
-                    magicstore.load()
-                    contenttype = magicstore.file(self._fullpath)
+                    if platform.system() is "Windows":
+                        contenttype = magic.from_file(self._fullpath, mime=True)
+                    else:
+                        magicstore = magic.open(magic.MAGIC_MIME)
+                        magicstore.load()
+                        contenttype = magicstore.file(self._fullpath)
                     f = open(self._fullpath, "rb")
                     self._web_support.req.response_headers['Content-Type'] = contenttype
                     self._web_support.req.response_headers['Content-Length'] = str(size)
@@ -1136,7 +1145,7 @@ class db_dataguzzler_data_file(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
             else:
                 raise self.RendererException("Invalid Content Mode")
             pass

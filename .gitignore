@@ -21,3 +21,4 @@ databrowse_wsgi/databrowse_wsgi.conf
 *.out
 *.toc
 install
+.idea/

@@ -4,6 +4,7 @@ graft doc
 include COPYING
 include DEPENDENCIES
 include README.md
+include requirements.txt
 include setup.py
 include TODO
 exclude doc/Manual/*.aux
@@ -12,3 +13,4 @@ exclude doc/Manual/*.fls
 exclude doc/Manual/*.out
 exclude doc/Manual/*.toc
 exclude install
+global-exclude test*

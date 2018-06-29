@@ -32,35 +32,66 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ setup.py - Main Install Script """
 
 import os
-from setuptools import setup, find_packages
+import requirements as r
+import platform
+from shutil import copyfile
+from setuptools import setup, find_packages, Distribution
+from setuptools.command.install import install
+
+# Collect all databrowse static files required for CEFDatabrowse
+search_dirs = [('databrowse_wsgi', []), ('cefdatabrowse', [])]
+for search_dir in range(0, len(search_dirs)):
+    for dir, subdir, files in os.walk(search_dirs[search_dir][0]):
+        for file in files:
+            if dir not in dict(search_dirs):
+                search_dirs.append((dir, []))
+            idx = [search_dirs.index(tupl) for tupl in search_dirs if tupl[0] == dir][0]
+            search_dirs[idx][1].append(os.path.join(dir, file))
+search_dirs.append(('doc', ['doc/Manual/Manual.pdf']))
 
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
+
+# Determine platform specific requirements
+with open(r.select_requirements_file(), 'r') as f:
+    reqs = f.read().splitlines()
+
+
 setup(
     name="databrowse",
-    author="Tyler Lesthaeghe",
-    author_email="tylerl@iastate.edu",
+    author="Tyler Lesthaeghe/Nathan Scheirer",
+    author_email="tylerl@iastate.edu/scheirer@iastate.edu",
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.7.5',
+    version='0.8.0',
     packages=find_packages(exclude=['databrowse_wsgi', 'tests', 'test_*']),
-    package_data = {'':['*.conf', '*.xml']},
+    package_data={'': ['*.conf', '*.xml', '.databrowse']},
+    data_files=search_dirs,
     license="BSD-3",
     long_description=readfile('README.md'),
     test_suite='nose.collector',
     zip_safe=False,
+    install_requires=reqs,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
+        "Environment :: CEF Client",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Natural Language :: English",
@@ -72,5 +103,36 @@ setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities"
-    ]
+    ],
+    entry_points={
+        'console_scripts': [
+            'databrowse = cefdatabrowse.cefdatabrowse:main'
+        ]
+    }
 )
+
+
+class OnlyGetScriptPath(install):
+    def run(self):
+        self.distribution.install_scripts = self.install_scripts
+        db_base = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(db_base, 'databrowse.bat'), 'wb') as bat:
+            bat.writelines(['@echo off \r\n',
+                            '{} %* \r\n'.format(os.path.join(self.distribution.install_scripts, "databrowse.exe"))])
+
+        execdir = raw_input("Enter execution directory: ")
+        copyfile(os.path.join(db_base, 'databrowse.bat'), os.path.join(execdir, 'databrowse.bat'))
+
+
+def get_setuptools_script_dir():
+    dist = Distribution({'cmdclass': {'install': OnlyGetScriptPath}})
+    dist.dry_run = True  # not sure if necessary, but to be safe
+    dist.parse_config_files()
+    command = dist.get_command_obj('install')
+    command.ensure_finalized()
+    command.run()
+    return dist.install_scripts
+
+
+if platform.system() == "Windows":
+    get_setuptools_script_dir()

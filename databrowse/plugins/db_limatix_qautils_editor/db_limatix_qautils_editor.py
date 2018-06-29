@@ -32,7 +32,14 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_checklist_chx.py - Generic Checklist Files """
 
@@ -78,7 +85,7 @@ class db_limatix_qautils_editor(renderer_class):
                         self._web_support.req.output = "Error Saving File:  Full Path '%s' is an Existing Directory" % fullfilename
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
-                    if not fullpath.startswith(self._web_support.dataroot):
+                    if not fullpath.startswith(os.path.normpath(self._web_support.dataroot)):
                         self._web_support.req.output = "Error Saving File:  Attempt to Save File Outside of Dataroot"
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                         return [self._web_support.req.return_page()]
@@ -109,7 +116,7 @@ class db_limatix_qautils_editor(renderer_class):
                         os.rename(fullfilename, "%s.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -151,7 +158,7 @@ class db_limatix_qautils_editor(renderer_class):
                             shutil.copy(imagepath, tempsavedir)
                         except:
                             pass
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close()
                     try:
@@ -173,7 +180,7 @@ class db_limatix_qautils_editor(renderer_class):
                         if 'wsgi.file_wrapper' in self._web_support.req.environ:
                             return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                         else:
-                            return iter(lambda: f.read(1024))
+                            return iter(lambda: f.read(1024), '')
                     except Exception as err:
                         self._web_support.req.output = "Error Generating PDF:  " + err
                         self._web_support.req.response_headers['Content-Type'] = 'text/plain'
@@ -206,7 +213,7 @@ class db_limatix_qautils_editor(renderer_class):
                             os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                             pass
 
-                        f = open(fullfilename, "w")
+                        f = open(fullfilename, "wb")
                         f.write(filestring)
                         f.close
                         self._web_support.req.output = "File Saved Successfully"

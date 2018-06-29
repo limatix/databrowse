@@ -18,7 +18,42 @@ University.
 DISTRIBUTION A.  Approved for public release:  distribution unlimited; 19 Aug 
 2016; 88ABW-2016-4051.
 
+This material is based on work supported by NASA under Contract
+NNX16CL31C and performed by Iowa State University as a subcontractor
+to TRI Austin.
+
+Approved for public release by TRI Austin: distribution unlimited;
+01 June 2018; by Carl W. Magnuson (NDE Division Director).
+
+## CEFDatabrowse Install Instructions ##
+Dependencies are platform specific and can be found in [requirements](https://github.com/limatix/databrowse/blob/master/requirements).
+
+From PIP:<br>
+    `> pip install databrowse`<br>
+From source:<br>
+    `> cd databrowse_source_dir`<br>
+    `> python setup.py install`<br>
+
+
+```
+Usage: databrowse [-h] [-s path] [-e] [-g [path]]
+
+    Databrowse: An Extensible Data Management Platform
+
+    optional arguments:
+      -h, --help                    show this help message and exit
+      -s path, --setdataroot path   path to set new dataroot
+      -e, --openconfig              open cefdatabrowse config file
+      -g [path], --go [path]        open cefdatabrowse in a directory
+```
 ## Changelog ##
+
+### v0.8 ###
+ * Approval for Public release following work with TRI Austin
+ * CEFDatabrowse, a server-less client, Implemented
+ * SDT File Viewer Plugin Implemented
+ * Magic bug fixes
+ * Various other bug fixes
 
 ### v0.7 ###
  * Approval for Public Release

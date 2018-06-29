@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,13 +32,13 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
 """ plugins/renderers/db_xml_generic.py - Default Text Renderer """
 
 import os
 import qrcode
-import Image
+from PIL import Image
 import StringIO
 import subprocess
 from lxml import etree
@@ -101,7 +101,7 @@ class db_transducer(renderer_class):
                         os.rename(fullfilename, "%s.bak.%.2d" % (fullfilename, filenum))
                         pass
 
-                    f = open(fullfilename, "w")
+                    f = open(fullfilename, "wb")
                     f.write(filestring)
                     f.close
                     self._web_support.req.output = "File Saved Successfully"
@@ -124,9 +124,9 @@ class db_transducer(renderer_class):
                     if 'wsgi.file_wrapper' in self._web_support.req.environ:
                         return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
                     else:
-                        return iter(lambda: f.read(1024))
+                        return iter(lambda: f.read(1024), '')
                 else:
-                    tf = open(self._fullpath, "r")
+                    tf = open(self._fullpath, "rb")
                     tdbfile = etree.parse(tf)
                     tf.close()
                     tdbroot = tdbfile.getroot()
@@ -144,7 +144,7 @@ class db_transducer(renderer_class):
                     return [output.getvalue()]
             if "printbarcode" in self._web_support.req.form:
                 try:
-                    tf = open(self._fullpath, "r")
+                    tf = open(self._fullpath, "rb")
                     tdbfile = etree.parse(tf)
                     tf.close()
                     tdbroot = tdbfile.getroot()

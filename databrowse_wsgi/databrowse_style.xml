@@ -1,0 +1,54 @@
+<db:dbstyle xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+	<!-- CSS Declared Inline at top of Head Section -->
+	<db:inlinestyle>
+		<style type="test/css">
+
+		</style>
+	</db:inlinestyle>
+
+	<xsl:stylesheet version="1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
+	<!-- Resdir Variable - Full URL to Resource Directory -->
+	<xsl:variable name="resdir">
+		<xsl:choose>
+			<xsl:when test="html:html/html:body/@db:resdir"><xsl:value-of select="html:html/html:body/@db:resdir"/>/</xsl:when>
+			<xsl:otherwise>databrowse_wsgi/resources/</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Scripts Declared Inline at top of Head Section -->
+	<db:inlinescript>
+		<script type="text/javascript" src="{$resdir}uncryptmailto.js" defer="true"/>
+		<script type="text/javascript" src="{$resdir}jquery-3.3.1.min.js"/>
+	</db:inlinescript>
+
+	</xsl:stylesheet>
+
+	<!-- Suffix Appended to Page Title in Title Tag -->
+	<db:titlesuffix>Databrowse</db:titlesuffix>
+
+	<!-- Site Title Displayed in the Ribbon -->
+	<db:sitetitle><a href="/">Databrowse</a></db:sitetitle>
+
+	<!-- Site Tagline -->
+	<db:sitetagline><div id="sitetagline"></div><script type="text/javascript">$('#sitetagline').html("");</script></db:sitetagline>  <!-- Replace "" with location.hostname -->
+
+	<!-- NavBar Top -->
+	<!--<db:navbar>
+		<db:navelem><a href="/databrowse">Databrowse Home</a></db:navelem>
+	</db:navbar>-->
+
+	<!-- Quick Link Top Bar - Left Side -->
+	<db:topbarleft>
+	</db:topbarleft>
+
+	<!-- Quick Link Top Bar - Right Side -->
+	<db:topbarright>
+	</db:topbarright>
+
+	<!-- Footer Text -->
+	<db:footer>
+		<p>Copyright &#169; 2012-2016 Iowa State University Research Foundation, Inc. All rights reserved.</p>
+	</db:footer>
+
+</db:dbstyle>

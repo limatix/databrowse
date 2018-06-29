@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -32,7 +32,14 @@
 ## performed at Iowa State University.                                       ##
 ##                                                                           ##
 ## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.											 ##
+## 19 Aug 2016; 88ABW-2016-4051.                                             ##
+##                                                                           ##
+## This material is based on work supported by NASA under Contract           ##
+## NNX16CL31C and performed by Iowa State University as a subcontractor      ##
+## to TRI Austin.                                                            ##
+##                                                                           ##
+## Approved for public release by TRI Austin: distribution unlimited;        ##
+## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ plugins/renderers/db_file_ops.py - File Operations Utility Plugin """
 
@@ -69,11 +76,11 @@ class db_file_ops(renderer_class):
         if operation == "upload":
             if not os.path.isdir(self._fullpath):
                 raise self.RendererException("Uploads Must Be in Folder")
-            elif not "files[]" in self._web_support.req.form:
+            elif "files[]" not in self._web_support.req.form:
                 raise self.RendererException("No Uploads Found")
             fieldStorage = self._web_support.req.form["files[]"]
             fullfilename = os.path.abspath(self._fullpath + "/" + fieldStorage.filename)
-            if not fullfilename.startswith(self._web_support.dataroot):
+            if not fullfilename.startswith(os.path.normpath(self._web_support.dataroot)):
                 raise self.RendererException("Attempt to Save File Outside of Dataroot")
             # Let's check on the directory and make sure its writable and it exists
             if not os.access(self._fullpath, os.W_OK) and os.path.exists(self._fullpath):
@@ -88,7 +95,7 @@ class db_file_ops(renderer_class):
                         pass
                     os.rename(fullfilename, "%s.%.2d%s" % (os.path.splitext(fullfilename)[0], filenum, os.path.splitext(fullfilename)[1]))
                     pass
-                f = open(fullfilename, "w")
+                f = open(fullfilename, "wb")
                 f.write(fieldStorage.value)
                 f.close
             results = []
@@ -141,7 +148,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newdirpath = os.path.abspath(os.path.join(self._fullpath, self._web_support.req.form["dirname"].value))
-                if not newdirpath.startswith(self._web_support.dataroot):
+                if not newdirpath.startswith(os.path.normpath(self._web_support.dataroot)):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newdirpath):
                     outputmsg = "ERROR: Directory Already Exists"
@@ -169,7 +176,7 @@ class db_file_ops(renderer_class):
                 outputmsg = "ERROR: Directory '" + self._fullpath + "' Not Writable"
             else:
                 newpath = os.path.abspath(os.path.join(os.path.dirname(self._fullpath), self._web_support.req.form["newname"].value))
-                if not newpath.startswith(self._web_support.dataroot):
+                if not newpath.startswith(os.path.normpath(self._web_support.dataroot)):
                     outputmsg = "ERROR: Cannot Write Outside Of Dataroot"
                 elif os.path.exists(newpath):
                     outputmsg = "ERROR: File or Directory Already Exists"

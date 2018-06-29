@@ -23,7 +23,7 @@
 ## EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       ##
 ## PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        ##
 ## PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    ##
-## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ## 
+## LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      ##
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
@@ -38,6 +38,7 @@
 
 import os
 from lxml import etree
+import crc_algorithms
 
 _specimendb = '/databrowse/specimens'
 NS = {"specimen": "http://thermal.cnde.iastate.edu/specimen"}
@@ -46,7 +47,7 @@ OUTPUT_STRING = 0
 OUTPUT_ELEMENT = 1
 OUTPUT_ETREE = 2
 norecursion = []
-attributekeys = { 
+attributekeys = {
                   NSSTR + 'dimension': 'direction',
                   NSSTR + 'direction': 'name',
                   NSSTR + 'reference': 'face',
@@ -124,7 +125,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
         else:
             raise SpecimenException('Invalid Return Type')
         pass
-        
+
     elif len(groupidelem) == 1:
         groupid = groupidelem[0].text
 
@@ -228,7 +229,7 @@ def _combine_element(one, other, group):
                         if not el.get('fromgroup'):
                             child.set('fromgroup', group)
                         mapping[tagname(el)].append(child)
-            else:   
+            else:
                 try:
                     # Recursively process the element, and update it in the same way
                     _combine_element(mapping[tagname(el)], el, group)
@@ -240,3 +241,13 @@ def _combine_element(one, other, group):
                     # Just add it
                     one.append(el)
     pass
+
+def GenerateCheckdigit(basename):
+   alg = crc_algorithms.Crc(width = 4, poly = 64+2+1, reflect_in=False,
+                            xor_in=0, reflect_out=False, xor_out=0)
+   crc = alg.bit_by_bit(basename) & ((1<<4)-1) # Calc CRC and limit to 15
+   letters="ACEFGHJKLMPRTWXN"
+   crcletter=letters[crc]
+   return crcletter
+
+
