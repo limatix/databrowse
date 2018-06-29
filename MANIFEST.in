@@ -1,3 +1,4 @@
+graft cefdatabrowse
 graft databrowse
 graft databrowse_wsgi
 graft doc
