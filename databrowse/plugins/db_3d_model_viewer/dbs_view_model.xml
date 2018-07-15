@@ -1,4 +1,99 @@
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:3dmodel="http://thermal.cnde.iastate.edu/databrowse/3dmodel" xmlns:model="http://thermal.cnde.iastate.edu/3dmodel" match="3dmodel:modelfile" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbmodel="http://thermal.cnde.iastate.edu/databrowse/dbmodel" xmlns:model="http://thermal.cnde.iastate.edu/dbmodel" match="dbmodel:modelfile" mode="full">
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/three.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/STLLoader.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/controls/OrbitControls.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        var model = "<xsl:value-of select="@model"/>";
+        <![CDATA[
+        var container, camera, cameraTarget, scene, renderer, controls;
+
+        $(document).ready(function() {
+            init();
+            animate();
+        });
+
+        function init() {
+
+            container = document.createElement( 'div' );
+            document.getElementById("model").appendChild( container );
+
+            camera = new THREE.PerspectiveCamera( 35, 419 / 419, 1, 100 );
+            camera.position.set( 3, 0.15, 3 );
+            cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+            controls = new THREE.OrbitControls( camera );
+
+            camera.lookAt( cameraTarget );
+            controls.update();
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0x72645b );
+            scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
+
+            var loader = new THREE.STLLoader();
+            loader.load( model, function ( geometry ) {
+                var material = new THREE.MeshNormalMaterial();
+                var mesh = new THREE.Mesh( geometry, material );
+                mesh.position.set( 0, 0, 0 );
+                mesh.rotation.set( 0, - Math.PI / 2, 0 );
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                scene.add( mesh );
+            } );
+
+            // Lights
+            scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+            addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+            addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+
+            // renderer
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( 419, 419 );
+            renderer.gammaInput = true;
+            renderer.gammaOutput = true;
+            renderer.shadowMap.enabled = true;
+
+            container.appendChild( renderer.domElement );
+
+        }
+
+        function animate() {
+            requestAnimationFrame( animate );
+            controls.update();
+            render();
+        }
+
+        function addShadowedLight( x, y, z, color, intensity ) {
+            var directionalLight = new THREE.DirectionalLight( color, intensity );
+			directionalLight.position.set( x, y, z );
+			scene.add( directionalLight );
+			directionalLight.castShadow = true;
+			var d = 1;
+			directionalLight.shadow.camera.left = -d;
+			directionalLight.shadow.camera.right = d;
+			directionalLight.shadow.camera.top = d;
+			directionalLight.shadow.camera.bottom = -d;
+			directionalLight.shadow.camera.near = 1;
+			directionalLight.shadow.camera.far = 4;
+			directionalLight.shadow.mapSize.width = 1024;
+			directionalLight.shadow.mapSize.height = 1024;
+			directionalLight.shadow.bias = -0.002;
+        }
+
+        function render() {
+			renderer.render( scene, camera );
+        }
+        ]]>
+    </script>
     <table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
     	<thead>
         	<th style="width:8px">
@@ -12,15 +107,12 @@
 				</a>
 			</th>
     	</thead>
-    	<tbody>
-	        <tr><td></td><td>Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
-	        <tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
-	        <tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
-	        <tr><td></td><td>Size: </td><td><xsl:value-of select="size"/></td></tr>
-	        <tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
-	        <tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
-	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
-	    </tbody>
+		<tbody>
+            <tr style="height:10px">
+            </tr>
+            <tr id="model">
+            </tr>
+        </tbody>
     </table>
 </xsl:template>
 <xsl:template match="*" mode="escape">

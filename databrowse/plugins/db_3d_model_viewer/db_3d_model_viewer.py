@@ -46,8 +46,8 @@ from databrowse.support.renderer_support import renderer_class
 class db_3d_model_viewer(renderer_class):
     """ Generic 3D Model Files """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/modelfile"
-    _namespace_local = "3dmodel"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dbmodel"
+    _namespace_local = "dbmodel"
     _default_content_mode = "full"
     _default_style_mode = "view_model"
     _default_recursion_depth = 2
@@ -84,7 +84,9 @@ class db_3d_model_viewer(renderer_class):
                                             nsmap=self.nsmap,
                                             name=os.path.basename(self._relpath),
                                             resurl=self._web_support.resurl,
-                                            downlink=downlink, icon=icon)
+                                            downlink=downlink,
+                                            icon=icon,
+                                            model=self.getURL(self._relpath, content_mode="raw"))
 
                     xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                     xmlchild.text = os.path.basename(self._fullpath)
@@ -92,34 +94,16 @@ class db_3d_model_viewer(renderer_class):
                     xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                     xmlchild.text = os.path.dirname(self._fullpath)
 
-                    xmlchild = etree.SubElement(xmlroot, "size", nsmap=self.nsmap)
-                    xmlchild.text = self.ConvertUserFriendlySize(file_size)
-
-                    xmlchild = etree.SubElement(xmlroot, "mtime", nsmap=self.nsmap)
-                    xmlchild.text = file_mtime
-
-                    xmlchild = etree.SubElement(xmlroot, "ctime", nsmap=self.nsmap)
-                    xmlchild.text = file_ctime
-
-                    xmlchild = etree.SubElement(xmlroot, "atime", nsmap=self.nsmap)
-                    xmlchild.text = file_atime
-
-                    # Content Type
-                    xmlchild = etree.SubElement(xmlroot, "contenttype", nsmap=self.nsmap)
-                    xmlchild.text = contenttype
-
-                    # File Permissions
-                    xmlchild = etree.SubElement(xmlroot, "permissions", nsmap=self.nsmap)
-                    xmlchild.text = self.ConvertUserFriendlyPermissions(st[ST_MODE])
-
-                    # User and Group
-                    if platform.system() == "Linux":
-                        username = pwd.getpwuid(st[ST_UID])[0]
-                        groupname = grp.getgrgid(st[ST_GID])[0]
-                        xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
-                        xmlchild.text = "%s:%s" % (username, groupname)
-                    import pdb
-                    pdb.set_trace()
                     return xmlroot
+            elif self._content_mode == "raw":
+                f = open(self._fullpath, "rb")
+                self._web_support.req.response_headers['Content-Disposition'] = "filename=" + os.path.basename(f.name)
+                self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
+                self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                self._web_support.req.output_done = True
+                if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                    return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                else:
+                    return iter(lambda: f.read(1024), '')
             else:
                 raise self.RendererException("Invalid Content Mode")
