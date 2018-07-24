@@ -28,10 +28,11 @@
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
 ###############################################################################
-""" plugins/handlers/db_3d_model_viewer.py - Generic 3D Model Viewer Handler """
+""" plugins/handlers/db_serial_viewer.py - Viewer for Arduino output logs """
 
 import os
 import os.path
+import numpy as np
 import time
 import magic
 import platform
@@ -40,17 +41,45 @@ if platform.system() == "Linux":
     import grp
 from stat import *
 from lxml import etree
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from databrowse.support.renderer_support import renderer_class
 
 
-class db_3d_model_viewer(renderer_class):
-    """ Generic 3D Model Files """
+class db_serial_viewer(renderer_class):
+    """ Generic Arduino Output Files """
 
-    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/dbmodel"
-    _namespace_local = "dbmodel"
+    _namespace_uri = "http://thermal.cnde.iastate.edu/databrowse/serial"
+    _namespace_local = "serial"
     _default_content_mode = "full"
-    _default_style_mode = "view_model"
+    _default_style_mode = "view_plots"
     _default_recursion_depth = 2
+
+    def parse_log(self, fullpath):
+        data = None
+        headers = None
+        timecalc = None
+        with open(fullpath, "rb") as input_data:
+            # Skips text before the beginning of the interesting block:
+            for line in input_data:
+                if line.strip().__contains__("START"):
+                    headers = line.strip()[:-1].split("are ")[1].split(", ")
+                    timecalc = line.strip().split(" ")
+                    timecalc = timecalc[1][2:] + timecalc[2]
+
+                    data = np.empty((0, len(headers)))
+                    break
+            # Reads text until the end of the block:
+            for line in input_data:  # This keeps reading the file
+                if line.strip().__contains__("END"):
+                    break
+                line_array = np.asarray(line.split(" "), dtype=np.float64)
+                data = np.vstack((data, line_array))
+        data_dict = {}
+        for i in range(0, len(headers)):
+            data_dict[headers[i]] = data[:, i]
+        return timecalc, data_dict
 
     def getContent(self):
         if self._caller != "databrowse":
@@ -79,14 +108,13 @@ class db_3d_model_viewer(renderer_class):
                     icon = self._handler_support.GetIcon(contenttype, extension)
                     downlink = self.getURL(self._relpath, content_mode="raw", download="true")
 
-                    xmlroot = etree.Element('{%s}modelfile' %
+                    xmlroot = etree.Element('{%s}logfile' %
                                             self._namespace_uri,
                                             nsmap=self.nsmap,
                                             name=os.path.basename(self._relpath),
                                             resurl=self._web_support.resurl,
                                             downlink=downlink,
-                                            icon=icon,
-                                            model=self.getURL(self._relpath, content_mode="raw"))
+                                            icon=icon)
 
                     xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                     xmlchild.text = os.path.basename(self._fullpath)
@@ -94,12 +122,38 @@ class db_3d_model_viewer(renderer_class):
                     xmlchild = etree.SubElement(xmlroot, "path", nsmap=self.nsmap)
                     xmlchild.text = os.path.dirname(self._fullpath)
 
+                    # Datasets
+                    dsetcontent = etree.SubElement(xmlroot, "dataset", nsmap=self.nsmap)
+                    dsetcontent.set("url", self.getURL(self._relpath, content_mode="raw") + "&image")
                     return xmlroot
-            elif self._content_mode == "raw":
-                f = open(self._fullpath, "rb")
+            elif self._content_mode == "raw" and "image" in self._web_support.req.form:
+                timecalc, data = self.parse_log(self._fullpath)
+                fprefix = os.path.splitext(os.path.basename(self._fullpath))[0]
+                if not self.CacheFileExists(fprefix, 'png'):
+                    plt.figure()
+                    for header in data:
+                        if header != "time":
+                            x = data['time']
+                            y = data[header]
+                            plt.plot(x, y, label=header)
+                    plt.xlabel('Time (s)')
+                    plt.ylabel('Temperature (C)')
+                    plt.title('Break Time: %s' % timecalc)
+                    plt.legend(loc=4)
+                    f = self.getCacheFileHandler('wb', fprefix, 'png')
+                    plt.savefig(f)
+                    pass
+
+                f = self.getCacheFileHandler('rb', fprefix, 'png')
+
+                contenttype = 'image/png'
+                size = os.path.getsize(self.getCacheFileName(fprefix, 'png'))
+
                 self._web_support.req.response_headers['Content-Disposition'] = "filename=" + os.path.basename(f.name)
-                self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
-                self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                self._web_support.req.response_headers['Content-Type'] = contenttype
+                self._web_support.req.response_headers['Content-Length'] = str(size)
+                self._web_support.req.start_response(self._web_support.req.status,
+                                                     self._web_support.req.response_headers.items())
                 self._web_support.req.output_done = True
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:
                     return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)

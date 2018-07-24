@@ -28,12 +28,12 @@
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
 ###############################################################################
-""" plugins/handlers/dbh_3dmodel_viewer.py - Generic 3D Model Viewer Handler """
+""" plugins/handlers/dbh_serial_viewer.py - Viewer for Arduino output logs """
 
 
-def dbh_3d_model_viewer(path, contenttype, extension, roottag, nsurl):
-    """ Generic Checklist Handler - Returns checlist for Checklist Files """
-    if extension.lower() == "stl":
-        return "db_3d_model_viewer"
+def dbh_serial_viewer(path, contenttype, extension, roottag, nsurl):
+    """ Generic Serial Handler - Returns serial handler for Arduino output logs """
+    if extension.lower() == "serial":
+        return "db_serial_viewer"
     else:
         return False
