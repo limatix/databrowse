@@ -33,7 +33,7 @@
 
 def dbh_cad_model_viewer(path, contenttype, extension, roottag, nsurl):
     """ Generic Checklist Handler - Returns checlist for Checklist Files """
-    if extension.lower() == "stl":
+    if extension.lower() in ["stl", "obj", "x3d"]:
         return "db_cad_model_viewer"
     else:
         return False

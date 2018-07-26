@@ -3,9 +3,22 @@
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
     	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/three.min.js</xsl:attribute>
     </xsl:element>
+	<xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x3dom.js</xsl:attribute>
+    </xsl:element>
+	<xsl:element name="link">
+		<xsl:attribute name="rel">stylesheet</xsl:attribute>
+    	<xsl:attribute name="type">text/css</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x3dom.css</xsl:attribute>
+    </xsl:element>
     <xsl:element name="script">
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
     	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/STLLoader.js</xsl:attribute>
+    </xsl:element>
+	<xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/OBJLoader.js</xsl:attribute>
     </xsl:element>
     <xsl:element name="script">
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -16,11 +29,13 @@
         var modeltype = "<xsl:value-of select="@extension"/>";
         var loadinggif = "<xsl:value-of select="@resurl"/>/icons/loading.gif";
 		<![CDATA[
-        var camera, cameraTarget, scene, renderer, controls;
+        var loader, camera, cameraTarget, scene, renderer, controls;
 
         $(document).ready(function() {
-            init();
-            animate();
+			init();
+			if (loader != null) {
+			    animate();
+			}
         });
 
         function init() {
@@ -38,13 +53,13 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(  0xD6D6D6 );
 
-            var loadingdiv = document.createElement("tr");
+            var loadingtr = document.createElement("tr");
 
             var img = new Image();
             img.src = loadinggif;
 
-            loadingdiv.appendChild(img);
-            content.parentElement.appendChild(loadingdiv);
+            loadingtr.appendChild(img);
+            content.parentElement.appendChild(loadingtr);
 
             var manager = new THREE.LoadingManager();
             manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
@@ -52,44 +67,62 @@
             };
             manager.onLoad = function ( ) {
                 content.hidden = false;
-                loadingdiv.hidden = true;
+                loadingtr.hidden = true;
             };
 
-            var loader = null;
+            loader = null;
             if (modeltype == "stl") {
                 loader = new THREE.STLLoader(manager);
+				loader.load( model, function ( geometry ) {
+					var material = new THREE.MeshPhongMaterial({color: 0x6E6E6E});
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( 0, 0, 0 );
+					mesh.rotation.set( 0, - Math.PI / 2, 0 );
+
+					var bbox = new THREE.Box3().setFromObject(mesh);
+					var scale = 1 / (bbox.max.x - bbox.min.x);
+
+					mesh.scale.set( scale, scale, scale );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					scene.add( mesh );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
             } else if (modeltype == "obj") {
-                // OBJ loader here
-                loader = null;
+                loader = new THREE.OBJLoader(manager);
+				loader.load( model, function ( object ) {
+					scene.add( object );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
+			} else if (modeltype == "x3d") {
+				loader = null;
             } else {
                 loader = null;
             }
 
             if (loader == null) {
-                alert("Invalid 3D model type. Support types: stl");
+                if (modeltype != "x3d") {
+                    alert("Invalid 3D model type. Support types: stl, obj, x3d");
+                } else {
+                    $("<x3d width='500px' height='400px'>" +
+                      	"<scene>" +
+							"<inline url='" + escape(model) + "'></inline>" +
+					    "</scene>" +
+					  "</x3d>").appendTo( content );
+                    return;
+                }
             }
-
-            loader.load( model, function ( geometry ) {
-                var material = new THREE.MeshPhongMaterial({color: 0x6E6E6E});
-                var mesh = new THREE.Mesh( geometry, material );
-                mesh.position.set( 0, 0, 0 );
-                mesh.rotation.set( 0, - Math.PI / 2, 0 );
-
-                var bbox = new THREE.Box3().setFromObject(mesh);
-      			var scale = 1 / (bbox.max.x - bbox.min.x);
-
-      			mesh.scale.set( scale, scale, scale );
-
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                scene.add( mesh );
-            },
-            // called when loading is in progresses
-            null,
-            // called when loading has errors
-           	function ( error ) {
-		        alert( 'Error loading model. ' + error );
-        	});
 
             // Lights
             scene.add( new THREE.HemisphereLight( 0xffffff, 0x111122 ) );
