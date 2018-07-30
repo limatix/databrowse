@@ -35,6 +35,8 @@
 			init();
 			if (loader != null) {
 			    animate();
+			} else {
+			    alert("Only obj and stl files are supported at this moment.");
 			}
         });
 
@@ -105,37 +107,24 @@
 				function ( error ) {
 					alert( 'Error loading model. ' + error );
 				});
-			} else if (modeltype == "x3d") {
-				loader = null;
             } else {
                 loader = null;
             }
 
-            if (loader == null) {
-                if (modeltype != "x3d") {
-                    alert("Invalid 3D model type. Support types: stl, obj, x3d");
-                } else {
-                    $("<x3d width='500px' height='400px'>" +
-                      	"<scene>" +
-							"<inline url='" + escape(model) + "'></inline>" +
-					    "</scene>" +
-					  "</x3d>").appendTo( content );
-                    return;
-                }
+            if (loader != null){
+				// Lights
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x111122 ) );
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( content.offsetWidth, content.offsetWidth );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+
+				content.appendChild( renderer.domElement );
             }
-
-            // Lights
-            scene.add( new THREE.HemisphereLight( 0xffffff, 0x111122 ) );
-
-            // renderer
-            renderer = new THREE.WebGLRenderer( { antialias: true } );
-            renderer.setPixelRatio( window.devicePixelRatio );
-            renderer.setSize( content.offsetWidth, content.offsetWidth );
-            renderer.gammaInput = true;
-            renderer.gammaOutput = true;
-            renderer.shadowMap.enabled = true;
-
-            content.appendChild( renderer.domElement );
         }
 
 		function Resize(){
