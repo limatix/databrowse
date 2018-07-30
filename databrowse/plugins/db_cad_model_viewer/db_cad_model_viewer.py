@@ -34,6 +34,7 @@ import os
 import os.path
 import time
 import magic
+import subprocess
 import platform
 if platform.system() == "Linux":
     import pwd
@@ -79,6 +80,13 @@ class db_cad_model_viewer(renderer_class):
                     icon = self._handler_support.GetIcon(contenttype, extension)
                     downlink = self.getURL(self._relpath, content_mode="raw", download="true")
 
+                    try:
+                        __import__('imp').find_module('NDI_app')
+                        nditoolboxlink = self.getURL(self._relpath, content_mode="nditoolbox")
+                    except ImportError:
+                        nditoolboxlink = ""
+                        pass
+
                     xmlroot = etree.Element('{%s}modelfile' %
                                             self._namespace_uri,
                                             nsmap=self.nsmap,
@@ -87,7 +95,8 @@ class db_cad_model_viewer(renderer_class):
                                             downlink=downlink,
                                             icon=icon,
                                             model=self.getURL(self._relpath, content_mode="raw", model="true"),
-                                            extension=extension)
+                                            extension=extension,
+                                            nditoolboxlink=nditoolboxlink)
 
                     xmlchild = etree.SubElement(xmlroot, "filename", nsmap=self.nsmap)
                     xmlchild.text = os.path.basename(self._fullpath)
@@ -96,6 +105,13 @@ class db_cad_model_viewer(renderer_class):
                     xmlchild.text = os.path.dirname(self._fullpath)
 
                     return xmlroot
+            elif self._content_mode == "nditoolbox" and "ajax" in self._web_support.req.form:
+                import NDI_app
+                subprocess.Popen(['python', NDI_app.__file__, self._fullpath], cwd=os.path.dirname(NDI_app.__file__))
+
+                self._web_support.req.output = "NDITOOlBOX Called Successfully"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
             elif self._content_mode == "raw" and "download" in self._web_support.req.form:
                 size = os.path.getsize(self._fullpath)
                 try:

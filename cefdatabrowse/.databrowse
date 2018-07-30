@@ -1,13 +1,13 @@
 [databrowse]
-width = 1040
-height = 702
+width = 1434
+height = 843
 x = 0
 y = 0
-dataroot = C:\databrowse
-limatix-qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/limatix-qautils
-qautils = C:/Users/nscheirer/Documents/dev/databrowse-utils/QAutils
+dataroot = C:\databrowsedemos
+limatix-qautils = C:\opt\limatix-qautils
+qautils = C:\opt\QAutils
 
 [3rdparty]
-dataguzzlerlib = C:/Users/nscheirer/Documents/dev/dataguzzler-lib/python
-nditoolbox = C:\Users\nscheirer\Documents\nditoolnew\NDITool
+dataguzzlerlib = C:\opt\dataguzzler-lib\python
+nditoolbox = C:\opt\NDITool
 
