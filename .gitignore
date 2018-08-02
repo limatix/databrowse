@@ -22,3 +22,4 @@ databrowse_wsgi/databrowse_wsgi.conf
 *.toc
 install
 .idea/
+cefdatabrowse/.databrowse
