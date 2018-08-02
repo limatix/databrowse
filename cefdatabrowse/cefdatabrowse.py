@@ -53,6 +53,7 @@ partydict = {}
 
 from cefpython3 import cefpython as cef
 from shutil import copyfile
+import pkg_resources
 import ctypes
 import os
 import platform

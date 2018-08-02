@@ -5,6 +5,15 @@
     </xsl:element>
     <xsl:element name="script">
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x3dom.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+    	<xsl:attribute name="type">text/css</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x3dom.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
     	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/STLLoader.js</xsl:attribute>
     </xsl:element>
 	<xsl:element name="script">
@@ -27,7 +36,9 @@
 			if (loader != null) {
 			    animate();
 			} else {
-			    alert("Only obj and stl files are supported at this moment.");
+			    if (modeltype != "x3d") {
+			        alert("Only obj, stl, and x3d files are supported at this moment.");
+			    }
 			}
         });
 
@@ -98,6 +109,21 @@
 				function ( error ) {
 					alert( 'Error loading model. ' + error );
 				});
+            } else if (modeltype = "x3d") {
+                loader = null;
+                $(content).append("<p class='case'>" +
+                "<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='inline' showStat='true' x='0px' y='0px' width='" + content.offsetWidth + "px' height='" + content.offsetWidth + "px'>" +
+                  "<Scene>" +
+                    "<Viewpoint position='0 0 1' orientation='0 0 0 1' />" +
+                    "<Background skyColor='1 1 1' />" +
+                    "<Transform translation='0 0 0' >" +
+                        "<Inline url='" + model.replace(/&/g, '&amp;amp;') + "'></Inline>" +
+                    "</Transform>" +
+                  "</Scene>" +
+                "</X3D>" +
+                "</p>");
+                loadingtr.hidden = true;
+                return;
             } else {
                 loader = null;
             }
