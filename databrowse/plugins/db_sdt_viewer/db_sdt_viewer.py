@@ -101,15 +101,15 @@ class db_sdt_viewer(renderer_class):
         # Contents are read by streaming so it must be done in this order
 
         if verbose:
-            print "Reading in header information"
+            print("Reading in header information")
         paramdict = self.read_params(fstream, verbose)
 
         if verbose:
-            print "Reading in data chunk"
+            print("Reading in data chunk")
         datasets = self.read_data(fstream, paramdict, verbose)
 
         if verbose:
-            print "Extracting XML formatted chunk"
+            print("Extracting XML formatted chunk")
         xmltree = self.read_xml(fstream, verbose)
 
         return paramdict, datasets, xmltree
@@ -134,7 +134,7 @@ class db_sdt_viewer(renderer_class):
         for key, value in paramdict.items():
             if key.find('First Axis') > 0:
                 if verbose:
-                    print "Found first axis header information"
+                    print("Found first axis header information")
 
                 nx = int(value['Number of Sample Points'])
 
