@@ -52,6 +52,8 @@ Usage: databrowse [-h] [-s path] [-e] [-g [path]]
  * Approval for Public release following work with TRI Austin
  * CEFDatabrowse, a server-less client, Implemented
  * SDT File Viewer Plugin Implemented
+ * 3D Model Viewer Plugin Implemented
+ * Serial log viewer Plugin for LIMATIX thermoconductivity demo
  * Magic bug fixes
  * Various other bug fixes
 

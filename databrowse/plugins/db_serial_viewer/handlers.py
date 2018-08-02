@@ -27,19 +27,13 @@
 ## NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        ##
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              ##
 ##                                                                           ##
-## This material is based on work supported by the Air Force Research        ##
-## Laboratory under Contract #FA8650-10-D-5210, Task Order #023 and          ##
-## performed at Iowa State University.                                       ##
-##                                                                           ##
-## DISTRIBUTION A.  Approved for public release:  distribution unlimited;    ##
-## 19 Aug 2016; 88ABW-2016-4051.                                             ##
 ###############################################################################
-""" plugins/handlers/dbh__xml.py - Generic XML Handler """
+""" plugins/handlers/dbh_serial_viewer.py - Viewer for Arduino output logs """
 
 
-def dbh__xml(path, contenttype, extension, roottag, nsurl):
-    """ Generic XML Handler - Returns xml_generic for all XML files """
-    if contenttype.startswith('application/xml') or contenttype.startswith("text/xml") or extension == "xlg" or extension == "xml" or extension == "x3d":
-        return "db_generic_XML_file"
+def dbh_serial_viewer(path, contenttype, extension, roottag, nsurl):
+    """ Generic Serial Handler - Returns serial handler for Arduino output logs """
+    if extension.lower() == "serial":
+        return "db_serial_viewer"
     else:
         return False

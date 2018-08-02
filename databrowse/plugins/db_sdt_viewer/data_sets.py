@@ -312,5 +312,6 @@ class SDTDataSets:
                     print("Warning: Matplotlib %s does not support gif functionality." % matplotlib.__version__)
             else:
                 raise OSError
-        except OSError:
+        except Exception as e:
             print("Warning: Imagemagick is not install or improperly configured. Gif support not available.")
+            print(e)
