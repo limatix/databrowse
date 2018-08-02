@@ -1,0 +1,185 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbmodel="http://thermal.cnde.iastate.edu/databrowse/dbmodel" xmlns:model="http://thermal.cnde.iastate.edu/dbmodel" match="dbmodel:modelfile" mode="full">
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/three.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/STLLoader.js</xsl:attribute>
+    </xsl:element>
+	<xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/OBJLoader.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/controls/OrbitControls.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        var model = "<xsl:value-of select="@model"/>";
+        var modeltype = "<xsl:value-of select="@extension"/>";
+        var loadinggif = "<xsl:value-of select="@resurl"/>/icons/loading.gif";
+		<![CDATA[
+        var loader, camera, cameraTarget, scene, renderer, controls;
+
+        $(document).ready(function() {
+			init();
+			if (loader != null) {
+			    animate();
+			} else {
+			    alert("Only obj and stl files are supported at this moment.");
+			}
+        });
+
+        function init() {
+
+            content = document.getElementById("model");
+
+            camera = new THREE.PerspectiveCamera( 35, content.offsetWidth / content.offsetWidth, 1, 100 );
+            camera.position.set( 3, 0.15, 3 );
+            cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+            controls = new THREE.OrbitControls( camera, content );
+
+            camera.lookAt( cameraTarget );
+            controls.update();
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(  0xD6D6D6 );
+
+            var loadingtr = document.createElement("tr");
+
+            var img = new Image();
+            img.src = loadinggif;
+
+            loadingtr.appendChild(img);
+            content.parentElement.appendChild(loadingtr);
+
+            var manager = new THREE.LoadingManager();
+            manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+                content.hidden = true;
+            };
+            manager.onLoad = function ( ) {
+                content.hidden = false;
+                loadingtr.hidden = true;
+            };
+
+            loader = null;
+            if (modeltype == "stl") {
+                loader = new THREE.STLLoader(manager);
+				loader.load( model, function ( geometry ) {
+					var material = new THREE.MeshPhongMaterial({color: 0x6E6E6E});
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( 0, 0, 0 );
+					mesh.rotation.set( 0, - Math.PI / 2, 0 );
+
+					var bbox = new THREE.Box3().setFromObject(mesh);
+					var scale = 1 / (bbox.max.x - bbox.min.x);
+
+					mesh.scale.set( scale, scale, scale );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					scene.add( mesh );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
+            } else if (modeltype == "obj") {
+                loader = new THREE.OBJLoader(manager);
+				loader.load( model, function ( object ) {
+					scene.add( object );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
+            } else {
+                loader = null;
+            }
+
+            if (loader != null){
+				// Lights
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x111122 ) );
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( content.offsetWidth, content.offsetWidth );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+
+				content.appendChild( renderer.domElement );
+            }
+        }
+
+		function Resize(){
+			camera.aspect = content.offsetWidth / content.offsetWidth;
+			camera.updateProjectionMatrix();
+			renderer.setSize( content.offsetWidth, content.offsetWidth );
+		}
+
+        function animate() {
+			Resize();
+            requestAnimationFrame( animate );
+            controls.update();
+            render();
+        }
+
+        function render() {
+			renderer.render( scene, camera );
+        }
+
+		function nditoolErrorCallback (jqXHR, textStatus, errorThrown) {
+			alert("Error Opening NDIToolbox: " + errorThrown)
+		}
+		function nditoolbox(url){
+			ajaxurl = url + "&ajax&nditool";
+			$.ajax({
+				async: 'false',
+				cache: 'false',
+				contentType: false,
+				dataType: "text",
+				error: nditoolErrorCallback,
+				processData: false,
+				type: 'POST',
+				url: ajaxurl
+			});
+		}
+        ]]>
+    </script>
+    <table class="cream" style="table-layout:fixed; width:100%; word-break: break-all;">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<xsl:if test="@nditoolboxlink != ''">
+                    <button style="float:right">
+                        <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                        NDITOOLBOX
+                    </button>
+                </xsl:if>
+				<a style="float:right">
+					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+				</a>
+			</th>
+    	</thead>
+		<tbody>
+            <tr style="height:10px">
+            </tr>
+            <tr id="model">
+            </tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template match="*" mode="escape">
+    <xsl:copy-of select="."/>
+</xsl:template>

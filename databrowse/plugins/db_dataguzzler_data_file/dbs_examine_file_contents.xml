@@ -141,6 +141,9 @@
     </style>
     <script type="text/javascript" defer="true">
         <![CDATA[
+            function nditoolErrorCallback (jqXHR, textStatus, errorThrown) {
+                alert("Error Opening NDIToolbox: " + errorThrown)
+            }
             $(document).ready(function() {
                 prettyPrint();
                 $('#blackout').mouseup(function() {
@@ -158,6 +161,19 @@
                 $("#popupframe").html($(divid).html());
                 $('#popuptitle').html('Viewing Waveform ' + waveform);
                 $('#popupframe img.lazy').attr('src', $('#popupframe img.lazy').attr('data-original'));
+            }
+            function nditoolbox(url){
+                ajaxurl = url + "&ajax&nditool";
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    dataType: "text",
+                    error: nditoolErrorCallback,
+                    processData: false,
+                    type: 'POST',
+                    url: ajaxurl
+                });
             }
         ]]>
     </script>
@@ -182,6 +198,12 @@
             </th>
             <th colspan="2" style="word-wrap: break-word">
                 <span style="width:665px;display:inline-block"><xsl:value-of select="@name"/></span>
+                <xsl:if test="@nditoolboxlink != ''">
+                    <button style="float:right">
+                        <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                        NDITOOLBOX
+                    </button>
+                </xsl:if>
                 <a>
                     <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
                     <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>

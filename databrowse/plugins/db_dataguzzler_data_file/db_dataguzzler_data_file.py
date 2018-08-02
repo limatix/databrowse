@@ -982,12 +982,27 @@ class db_dataguzzler_data_file(renderer_class):
                 dgzlink = self.getURL(self._relpath, content_mode="raw", dgzfile="true")
                 avilink = self.getURL(self._relpath, content_mode="raw", avifile="true")
 
+                try:
+                    __import__('imp').find_module('NDI_app')
+                    nditoolboxlink = self.getURL(self._relpath, content_mode="nditoolbox")
+                except ImportError:
+                    nditoolboxlink = ""
+                    pass
+
                 self.nsmap['dbdg'] = "http://thermal.cnde.iastate.edu/databrowse/dataguzzler"
 
-                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink, dgzlink=dgzlink, avilink=avilink)
+                xmlroot = etree.Element('{%s}dbdg' % "http://thermal.cnde.iastate.edu/databrowse/dataguzzler", nsmap=self.nsmap, name=os.path.basename(self._relpath), resurl=self._web_support.resurl, downlink=downlink, icon=icon, imagelink=imagelink, matlink=matlink, csvlink=csvlink, dgzlink=dgzlink, avilink=avilink, nditoolboxlink=nditoolboxlink)
                 xmlroot.append(xmlcontent)
 
                 return xmlroot
+
+            elif self._content_mode == "nditoolbox" and "ajax" in self._web_support.req.form:
+                import NDI_app
+                subprocess.Popen(['python', NDI_app.__file__, self._fullpath], cwd=os.path.dirname(NDI_app.__file__))
+
+                self._web_support.req.output = "NDITOOlBOX Called Successfully"
+                self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+                return [self._web_support.req.return_page()]
 
             elif self._content_mode == "raw":
                 if "image" in self._web_support.req.form:
