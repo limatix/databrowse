@@ -1,0 +1,24 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:serial="http://thermal.cnde.iastate.edu/databrowse/serial" match="serial:logfile" mode="full">
+    <table class="cream" style="table-layout:fixed; width:100%; word-break: break-all;">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<a style="float:right">
+					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+				</a>
+			</th>
+    	</thead>
+		<tbody>
+            <tr><img>
+                <xsl:attribute name="src"><xsl:value-of select="dataset/@url"/></xsl:attribute>
+            </img></tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template match="*" mode="escape">
+    <xsl:copy-of select="."/>
+</xsl:template>

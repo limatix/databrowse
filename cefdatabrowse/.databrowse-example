@@ -1,0 +1,13 @@
+[databrowse]
+width = 1434
+height = 843
+x = 0
+y = 0
+dataroot = C:\databrowsedemos
+limatix-qautils = C:\opt\limatix-qautils
+qautils = C:\opt\QAutils
+
+[3rdparty]
+dataguzzlerlib = C:\opt\dataguzzler-lib\python
+nditoolbox = C:\opt\NDITool
+

@@ -52,6 +52,8 @@ configdict = {}
 partydict = {}
 
 from cefpython3 import cefpython as cef
+from shutil import copyfile
+import pkg_resources
 import ctypes
 import os
 import platform
@@ -69,9 +71,18 @@ import cefdatabrowse_support as dbp
 def load_settings():
     global configdict, partydict
     config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-    configdict.update(dict(config.items('databrowse')))
-    partydict.update(dict(config.items('3rdparty')))
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")):
+        config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+        configdict.update(dict(config.items('databrowse')))
+        partydict.update(dict(config.items('3rdparty')))
+    else:
+        print("### Alert ###")
+        print("### Settings need to be set ###")
+        print("### %s ###" % os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+        copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse-example"),
+                 os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
+        subprocess.call(["databrowse", "-e"])
+        load_settings()
 
 
 def save_settings():
@@ -94,6 +105,7 @@ def update_dataroot(newdataroot):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
         config.write(configfile)
     configdict['dataroot'] = newdataroot
+
 
 load_settings()
 
@@ -522,6 +534,7 @@ def main():
 
 # Check graphical framework version and CEFPython version
 def check_versions():
+    print("[qt.py] Databrowse {ver}".format(ver=pkg_resources.require("databrowse")[0].version))
     print("[qt.py] CEF Python {ver}".format(ver=cef.__version__))
     print("[qt.py] Python {ver} {arch}".format(
             ver=platform.python_version(), arch=platform.architecture()[0]))

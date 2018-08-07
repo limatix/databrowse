@@ -23,7 +23,7 @@ NNX16CL31C and performed by Iowa State University as a subcontractor
 to TRI Austin.
 
 Approved for public release by TRI Austin: distribution unlimited;
-01 June 2018; by Carl W. Magnuson (NDE Division Director).
+02 August 2018; by Carl W. Magnuson (NDE Division Director).
 
 ## CEFDatabrowse Install Instructions ##
 Dependencies are platform specific and can be found in [requirements](https://github.com/limatix/databrowse/blob/master/requirements).
@@ -52,6 +52,8 @@ Usage: databrowse [-h] [-s path] [-e] [-g [path]]
  * Approval for Public release following work with TRI Austin
  * CEFDatabrowse, a server-less client, Implemented
  * SDT File Viewer Plugin Implemented
+ * 3D Model Viewer Plugin Implemented
+ * Serial log viewer Plugin for LIMATIX thermoconductivity demo
  * Magic bug fixes
  * Various other bug fixes
 
