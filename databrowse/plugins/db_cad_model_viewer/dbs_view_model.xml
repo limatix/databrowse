@@ -29,7 +29,7 @@
         var modeltype = "<xsl:value-of select="@extension"/>";
         var loadinggif = "<xsl:value-of select="@resurl"/>/icons/loading.gif";
 		<![CDATA[
-        var loader, camera, cameraTarget, scene, renderer, controls;
+        var loader, camera, cameraTarget, scene, renderer, controls, geometryobj;
 
         $(document).ready(function() {
 			init();
@@ -43,10 +43,12 @@
         });
 
         function init() {
-
             content = document.getElementById("model");
 
-            camera = new THREE.PerspectiveCamera( 35, content.offsetWidth / content.offsetWidth, 1, 100 );
+            var stats = document.createElement("div");
+            stats.setAttribute("id", "info");
+
+            camera = new THREE.PerspectiveCamera( 35, content.offsetWidth / window.innerHeight, 1, 100 );
             camera.position.set( 3, 0.15, 3 );
             cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
             controls = new THREE.OrbitControls( camera, content );
@@ -90,6 +92,10 @@
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
+
+					geometryobj = new THREE.Geometry().fromBufferGeometry( mesh.geometry );
+					stats.innerHTML = "# Faces: " + geometryobj.faces.length + "<br></br># Vertices: " + geometryobj.vertices.length;
+
 					scene.add( mesh );
 				},
 				// called when loading is in progresses
@@ -101,6 +107,14 @@
             } else if (modeltype == "obj") {
                 loader = new THREE.OBJLoader(manager);
 				loader.load( model, function ( object ) {
+				    var faces = 0;
+				    var vertices = 0;
+				    for (i = 0; i < object.children.length; i++) {
+				        geometryobj = new THREE.Geometry().fromBufferGeometry( object.children[i].geometry );
+				        faces += geometryobj.faces.length;
+				        vertices += geometryobj.vertices.length;
+				    }
+                    stats.innerHTML = "# Faces: " + faces + "<br></br># Vertices: " + vertices;
 					scene.add( object );
 				},
 				// called when loading is in progresses
@@ -140,14 +154,15 @@
 				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
 
+				content.appendChild(stats);
 				content.appendChild( renderer.domElement );
             }
         }
 
 		function Resize(){
-			camera.aspect = content.offsetWidth / content.offsetWidth;
+			camera.aspect = content.offsetWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
-			renderer.setSize( content.offsetWidth, content.offsetWidth );
+			renderer.setSize( content.offsetWidth, window.innerHeight );
 		}
 
         function animate() {
@@ -179,6 +194,14 @@
 		}
         ]]>
     </script>
+    <style>
+        #info {
+            background-color: rgba(128, 128, 128, 0.5);
+            position: absolute;
+            padding: 8px;
+            border-bottom-right-radius: 8px;
+        }
+    </style>
     <table class="cream" style="table-layout:fixed; width:100%; word-break: break-all;">
     	<thead>
         	<th style="width:8px">
