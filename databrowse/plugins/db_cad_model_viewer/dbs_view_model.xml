@@ -1,0 +1,285 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbmodel="http://thermal.cnde.iastate.edu/databrowse/dbmodel" xmlns:model="http://thermal.cnde.iastate.edu/dbmodel" match="dbmodel:modelfile" mode="full">
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/three.min.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x3dom.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="link">
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+    	<xsl:attribute name="type">text/css</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x3dom.css</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/STLLoader.js</xsl:attribute>
+    </xsl:element>
+	<xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/loaders/OBJLoader.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+    	<xsl:attribute name="type">text/javascript</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/controls/OrbitControls.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        var model = "<xsl:value-of select="@model"/>";
+        var modeltype = "<xsl:value-of select="@extension"/>";
+        var loadinggif = "<xsl:value-of select="@resurl"/>/icons/loading.gif";
+		<![CDATA[
+        var loader, camera, cameraTarget, scene, renderer, controls, geometryobj;
+
+        $(document).ready(function() {
+			init();
+			if (loader != null) {
+			    animate();
+			} else {
+			    if (modeltype != "x3d") {
+			        alert("Only obj, stl, and x3d files are supported at this moment.");
+			    }
+			}
+        });
+
+        function init() {
+            content = document.getElementById("model");
+
+            var stats = document.createElement("div");
+            stats.setAttribute("id", "info");
+
+            camera = new THREE.PerspectiveCamera( 35, content.offsetWidth / window.innerHeight, 1, 100 );
+            camera.position.set( 3, 0.15, 3 );
+            cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+            controls = new THREE.OrbitControls( camera, content );
+
+            camera.lookAt( cameraTarget );
+            controls.update();
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(  0xD6D6D6 );
+
+            var loadingtr = document.createElement("tr");
+
+            var img = new Image();
+            img.src = loadinggif;
+
+            loadingtr.appendChild(img);
+            content.parentElement.appendChild(loadingtr);
+
+            var manager = new THREE.LoadingManager();
+            manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+                content.hidden = true;
+            };
+            manager.onLoad = function ( ) {
+                content.hidden = false;
+                loadingtr.hidden = true;
+            };
+
+            loader = null;
+            if (modeltype == "stl") {
+                loader = new THREE.STLLoader(manager);
+				loader.load( model, function ( geometry ) {
+					var material = new THREE.MeshPhongMaterial({color: 0x6E6E6E});
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( 0, 0, 0 );
+					mesh.rotation.set( 0, - Math.PI / 2, 0 );
+
+                    fitCameraToObject(camera, mesh, 1.25, controls);
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					geometryobj = new THREE.Geometry().fromBufferGeometry( mesh.geometry );
+					stats.innerHTML = "# Faces: " + geometryobj.faces.length + "<br></br># Vertices: " + geometryobj.vertices.length;
+
+					scene.add( mesh );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
+            } else if (modeltype == "obj") {
+                loader = new THREE.OBJLoader(manager);
+				loader.load( model, function ( object ) {
+				    fitCameraToObject(camera, object, 1.25, controls);
+				    var faces = 0;
+				    var vertices = 0;
+				    for (i = 0; i < object.children.length; i++) {
+				        geometryobj = new THREE.Geometry().fromBufferGeometry( object.children[i].geometry );
+				        faces += geometryobj.faces.length;
+				        vertices += geometryobj.vertices.length;
+				    }
+                    stats.innerHTML = "# Faces: " + faces + "<br></br># Vertices: " + vertices;
+					scene.add( object );
+				},
+				// called when loading is in progresses
+				null,
+				// called when loading has errors
+				function ( error ) {
+					alert( 'Error loading model. ' + error );
+				});
+            } else if (modeltype = "x3d") {
+                loader = null;
+                $(content).append("<p class='case'>" +
+                "<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='inline' showStat='true' x='0px' y='0px' width='" + content.offsetWidth + "px' height='" + content.offsetWidth + "px'>" +
+                  "<Scene>" +
+                    "<Viewpoint position='0 0 1' orientation='0 0 0 1' />" +
+                    "<Background skyColor='1 1 1' />" +
+                    "<Transform translation='0 0 0' >" +
+                        "<Inline url='" + model.replace(/&/g, '&amp;amp;') + "'></Inline>" +
+                    "</Transform>" +
+                  "</Scene>" +
+                "</X3D>" +
+                "</p>");
+                loadingtr.hidden = true;
+                return;
+            } else {
+                loader = null;
+            }
+
+            if (loader != null){
+				// Lights
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x111122 ) );
+
+				// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( content.offsetWidth, content.offsetWidth );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMap.enabled = true;
+
+				content.appendChild(stats);
+				content.appendChild( renderer.domElement );
+            }
+        }
+
+        // https://discourse.threejs.org/t/camera-zoom-to-fit-object/936/2
+        // @looeee
+        const fitCameraToObject = function ( camera, object, offset, controls ) {
+
+            offset = offset || 1.25;
+
+            const boundingBox = new THREE.Box3();
+
+            // get bounding box of object - this will be used to setup controls and camera
+            boundingBox.setFromObject( object );
+
+            const center = boundingBox.getCenter();
+
+            const size = boundingBox.getSize();
+
+            // get the max side of the bounding box (fits to width OR height as needed )
+            const maxDim = Math.max( size.x, size.y, size.z );
+            const fov = camera.fov * ( Math.PI / 180 );
+            let cameraZ = Math.abs( maxDim / 4 * Math.tan( fov * 2 ) );
+
+            cameraZ *= offset; // zoom out a little so that objects don't fill the screen
+
+            camera.position.z = cameraZ;
+
+            const minZ = boundingBox.min.z;
+            const cameraToFarEdge = ( minZ < 0 ) ? -minZ + cameraZ : cameraZ - minZ;
+
+            camera.far = cameraToFarEdge * 3;
+            camera.updateProjectionMatrix();
+
+            if ( controls ) {
+
+              // set camera to rotate around center of loaded object
+              controls.target = center;
+
+              // prevent camera from zooming out far enough to create far plane cutoff
+              controls.maxDistance = cameraToFarEdge * 2;
+
+              controls.saveState();
+
+            } else {
+
+                camera.lookAt( center )
+
+           }
+        };
+
+		function Resize(){
+			camera.aspect = content.offsetWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( content.offsetWidth, window.innerHeight );
+		}
+
+        function animate() {
+			Resize();
+            requestAnimationFrame( animate );
+            controls.update();
+            render();
+        }
+
+        function render() {
+			renderer.render( scene, camera );
+        }
+
+		function nditoolErrorCallback (jqXHR, textStatus, errorThrown) {
+			alert("Error Opening NDIToolbox: " + errorThrown)
+		}
+		function nditoolbox(url){
+			ajaxurl = url + "&ajax&nditool";
+			$.ajax({
+				async: 'false',
+				cache: 'false',
+				contentType: false,
+				dataType: "text",
+				error: nditoolErrorCallback,
+				processData: false,
+				type: 'POST',
+				url: ajaxurl
+			});
+		}
+        ]]>
+    </script>
+    <style>
+        #info {
+            background-color: rgba(128, 128, 128, 0.5);
+            position: absolute;
+            padding: 8px;
+            border-bottom-right-radius: 8px;
+        }
+    </style>
+    <table class="cream full-width" style="table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:8px">
+                    <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+                </th>
+                <th colspan="2" style="word-wrap: break-word">
+                   <span><xsl:value-of select="@name"/></span>
+                   <a style="float:right">
+                        <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+                        <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+                   </a>
+               </th>
+            </tr>
+            <tr>
+                <th colspan="3">
+                   <xsl:if test="@nditoolboxlink != ''">
+                        <button style="float:right;">
+                            <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                            NDITOOLBOX
+                        </button>
+                   </xsl:if>
+                </th>
+            </tr>
+        </thead>
+		<tbody>
+            <tr style="height:10px">
+            </tr>
+            <tr id="model">
+            </tr>
+        </tbody>
+    </table>
+</xsl:template>
+<xsl:template match="*" mode="escape">
+    <xsl:copy-of select="."/>
+</xsl:template>

@@ -49,6 +49,14 @@ All rights reserved. Licensed under the BSD 3-clause license.
 See project website: https://github.com/cztomczak/cefpython
 License: BSD-3
 
+Portions of this software are adapted from three.js:
+Copyright (c) 2010-2018 three.js authors
+License: MIT
+
+Portions of this software are adapted from x3dom:
+Copyright (c) 2009-2018 X3DOM authors
+License: MIT and GPL
+
 === GNU PUBLIC LICENSE v3 =====================================================
 
                     GNU GENERAL PUBLIC LICENSE

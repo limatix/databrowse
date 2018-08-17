@@ -12,7 +12,6 @@ build/*
 dist/*
 *.egg-info*
 *.egg*
-databrowse_wsgi/databrowse_style.xml
 databrowse_wsgi/databrowse_wsgi.conf
 *.aux
 *.fdb_latexmk
@@ -22,3 +21,4 @@ databrowse_wsgi/databrowse_wsgi.conf
 *.toc
 install
 .idea/
+cefdatabrowse/.databrowse

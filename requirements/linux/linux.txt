@@ -6,3 +6,4 @@ qrcode>=4.0
 cefpython3>=57.0
 file-magic>=0.1
 matplotlib>=2.2.0
+packaging>=17.1

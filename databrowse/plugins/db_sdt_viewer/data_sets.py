@@ -4,7 +4,9 @@ from multiprocessing import Process
 from packaging import version
 import matplotlib
 from matplotlib import animation
-matplotlib.use('Agg')
+BACKEND = 'Agg'
+if matplotlib.get_backend().lower() != BACKEND.lower():
+    matplotlib.use(BACKEND)
 import matplotlib.pyplot as plt
 
 
@@ -312,5 +314,6 @@ class SDTDataSets:
                     print("Warning: Matplotlib %s does not support gif functionality." % matplotlib.__version__)
             else:
                 raise OSError
-        except OSError:
+        except Exception as e:
             print("Warning: Imagemagick is not install or improperly configured. Gif support not available.")
+            print(e)
