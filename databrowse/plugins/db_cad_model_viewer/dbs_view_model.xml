@@ -247,25 +247,31 @@
             border-bottom-right-radius: 8px;
         }
     </style>
-    <table class="cream" style="table-layout:fixed; width:100%; word-break: break-all;">
-    	<thead>
-        	<th style="width:8px">
-				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
-			</th>
-			<th colspan="2" style="word-wrap: break-word">
-				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
-				<xsl:if test="@nditoolboxlink != ''">
-                    <button style="float:right">
-                        <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
-                        NDITOOLBOX
-                    </button>
-                </xsl:if>
-				<a style="float:right">
-					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
-					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
-				</a>
-			</th>
-    	</thead>
+    <table class="cream full-width" style="table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:8px">
+                    <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+                </th>
+                <th colspan="2" style="word-wrap: break-word">
+                   <span><xsl:value-of select="@name"/></span>
+                   <a style="float:right">
+                        <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+                        <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+                   </a>
+               </th>
+            </tr>
+            <tr>
+                <th colspan="3">
+                   <xsl:if test="@nditoolboxlink != ''">
+                        <button style="float:right;">
+                            <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                            NDITOOLBOX
+                        </button>
+                   </xsl:if>
+                </th>
+            </tr>
+        </thead>
 		<tbody>
             <tr style="height:10px">
             </tr>

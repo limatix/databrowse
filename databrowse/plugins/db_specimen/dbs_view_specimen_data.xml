@@ -13,6 +13,23 @@
                     $("#loading").fadeOut(500);
                 }); 
             }
+
+            function nditoolErrorCallback (jqXHR, textStatus, errorThrown) {
+			    alert("Error Opening NDIToolbox: " + errorThrown)
+            }
+            function nditoolbox(url){
+                ajaxurl = url + "&ajax&nditool";
+                $.ajax({
+                    async: 'false',
+                    cache: 'false',
+                    contentType: false,
+                    dataType: "text",
+                    error: nditoolErrorCallback,
+                    processData: false,
+                    type: 'POST',
+                    url: ajaxurl
+                });
+            }
         ]]>
     </script>
     <style>
@@ -40,6 +57,17 @@
     </xsl:if>
     <div style="float:right; width:300px; margin-left: 15px;">
         <table class="cream" style="width:278px;">
+            <xsl:if test="@nditoolboxlink != ''">
+                <thead>
+                    <tr style="text-align: center">
+                        <button>
+                            <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                            NDITOOLBOX
+                        </button>
+                    </tr>
+                </thead>
+                <tr style="height:10px"/>
+            </xsl:if>
             <thead>
                 <tr><th>Specimen Barcode</th></tr>
             </thead>

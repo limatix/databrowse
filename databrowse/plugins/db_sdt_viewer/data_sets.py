@@ -4,7 +4,9 @@ from multiprocessing import Process
 from packaging import version
 import matplotlib
 from matplotlib import animation
-matplotlib.use('Agg')
+BACKEND = 'Agg'
+if matplotlib.get_backend().lower() != BACKEND.lower():
+    matplotlib.use(BACKEND)
 import matplotlib.pyplot as plt
 
 

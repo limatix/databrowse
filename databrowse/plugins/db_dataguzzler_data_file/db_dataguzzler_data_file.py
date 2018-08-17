@@ -58,6 +58,10 @@ import numpy
 import tempfile
 import subprocess
 from PIL import Image
+import matplotlib
+BACKEND = 'Agg'
+if matplotlib.get_backend().lower() != BACKEND.lower():
+    matplotlib.use(BACKEND)
 import matplotlib.pyplot as plt
 
 # These definitions should be synchronized with dg_dumpfile within dataguzzler
