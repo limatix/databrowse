@@ -7,3 +7,4 @@ cefpython3>=57.0
 python-magic-bin>=0.4.14
 matplotlib>=2.2.0
 packaging>=17.1
+gitpython>=2.1.11

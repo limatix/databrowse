@@ -1,0 +1,27 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:git="http://thermal.cnde.iastate.edu/databrowse/git" match="git:git" mode="full">
+    <h2>Directory Structure</h2>
+    <xsl:apply-templates select="repo_contents"/>
+</xsl:template>
+
+<xsl:template match="*[*]">
+    <xsl:value-of select="@name"/>
+    <ul>
+        <xsl:apply-templates/>
+    </ul>
+</xsl:template>
+
+<xsl:template match="*">
+    <p>
+        <xsl:if test="@untracked='True'">
+            <xsl:attribute name="style">
+                <xsl:value-of select="'color:red;'"/>
+            </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@changed='True'">
+            <xsl:attribute name="style">
+                <xsl:value-of select="'color:green;'"/>
+            </xsl:attribute>
+        </xsl:if>
+        <xsl:value-of select="name()"/>
+    </p>
+</xsl:template>
