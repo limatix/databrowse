@@ -47,6 +47,8 @@ import pdb
 import os
 import os.path
 import git
+import magic
+import datetime
 import urllib
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -68,14 +70,31 @@ class db_git(renderer_class):
             if os.path.isdir(itemfullpath):
                 xmldir = etree.SubElement(xmlcontents, "dir", nsmap=self.nsmap)
                 xmldir.attrib["name"] = os.path.basename(itemfullpath)
-
                 self.recursive_search(xmldir, itemfullpath, root=os.path.join(root, os.path.basename(itemfullpath)).replace("\\", "/"))
             else:
                 xmlitem = etree.SubElement(xmlcontents, "item", nsmap=self.nsmap)
                 xmlitem.text = item
-                if item in self.changedfiles:
+
+                itemsubpath = os.path.join(root, item).replace("\\", "/")
+
+                try:
+                    magicstore = magic.open(magic.MAGIC_MIME)
+                    magicstore.load()
+                    contenttype = magicstore.file(
+                        os.path.realpath(itemfullpath))  # real path to resolve symbolic links outside of dataroot
+                except AttributeError:
+                    contenttype = magic.from_file(os.path.realpath(itemfullpath), mime=True)
+                if contenttype is None:
+                    contenttype = "text/plain"
+
+                extension = os.path.splitext(itemfullpath)[1][1:]
+                icon = self._handler_support.GetIcon(contenttype, extension)
+
+                xmlitem.attrib['icon'] = icon
+
+                if itemsubpath in self.changedfiles:
                     xmlitem.attrib['changed'] = "True"
-                if os.path.join(root, item).replace("\\", "/") in self.untracked:
+                if itemsubpath in self.untracked:
                     xmlitem.attrib['untracked'] = "True"
 
     def getContent(self):
@@ -88,7 +107,9 @@ class db_git(renderer_class):
                 else:
                     requested_branch = "master"
 
-                downlink = self.getURL(self._relpath, content_mode="raw", download="true")
+                repo = git.Repo(self._fullpath)
+
+                downlink = self.getURL(self._relpath, content_mode="raw", download="true", branch=repo.active_branch)
 
                 xmlroot = etree.Element('{%s}git' %
                                         self._namespace_uri,
@@ -96,8 +117,6 @@ class db_git(renderer_class):
                                         name=os.path.basename(self._relpath),
                                         resurl=self._web_support.resurl,
                                         downlink=downlink)
-
-                repo = git.Repo(self._fullpath)
 
                 xmlchild = etree.SubElement(xmlroot, "giturl", self.nsmap)
                 xmlchild.text = self.getURL(self._relpath, content_mode="clone")
@@ -142,21 +161,28 @@ class db_git(renderer_class):
 
                 self.recursive_search(xmldir, self._fullpath)
 
-                with open("test2.xml", "wb") as f:
-                    f.write(etree.tostring(xmlroot, pretty_print=True))
-
                 return xmlroot
             elif self._content_mode == "raw" and "download" in self._web_support.req.form:
+                if "branch" in self._web_support.req.form:
+                    requested_branch = self._web_support.req.form["branch"].value
+                else:
+                    requested_branch = "master"
+
                 repo = git.Repo(self._fullpath)
 
-                f = self.getCacheFileHandler('wb', "tar")
+                repo.git.checkout(requested_branch)
+
+                timestamp = datetime.datetime.now()
+                timestamp = timestamp.strftime("%b-%d-%Y-%I-%M%p")
+
+                f = self.getCacheFileHandler('wb', timestamp + "_" + requested_branch, "tar")
                 repo.archive(f)
                 f.close()
 
-                f = self.getCacheFileHandler('rb', "tar")
+                f = self.getCacheFileHandler('rb', timestamp + "_" + requested_branch, "tar")
                 self._web_support.req.response_headers['Content-Type'] = "application/gzip"
                 self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
-                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + f.name
+                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(f.name)
                 self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
                 self._web_support.req.output_done = True
                 if 'wsgi.file_wrapper' in self._web_support.req.environ:

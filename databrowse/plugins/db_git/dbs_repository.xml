@@ -1,27 +1,146 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:git="http://thermal.cnde.iastate.edu/databrowse/git" match="git:git" mode="full">
-    <h2>Directory Structure</h2>
-    <xsl:apply-templates select="repo_contents"/>
+    <!--<xsl:variable name="resurl" select='@resurl' />-->
+    <style type="text/css">
+        .grid {
+            width: 100%;
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat( 2, minmax(250px, 1fr) );
+            background-color: #fff;
+        }
+        .repo-details {
+            grid-column: 1 / 2;
+            grid-row: 1;
+        }
+        .changed {
+            grid-column: 1 / 2;
+            grid-row: 2;
+        }
+        .untracked {
+            grid-column: 1 / 2;
+            grid-row: 3;
+        }
+        .logs {
+            grid-column: 1 / 2;
+            grid-row: 4;
+        }
+        .repo {
+            grid-column: 2;
+            grid-row: 1 / 4;
+        }
+        .tree {
+            margin-left:-30px;
+            margin-top: 8px;
+        }
+        .repoitem {
+            padding: 3px;
+            margin-top: 5px;
+            border-left: solid;
+        }
+    </style>
+    <div class="grid">
+        <div class="repo-details">
+            <h2>Repository Details/h2>
+            <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                <thead>
+                    <th colspan="4" style="word-wrap: break-word">
+                        <span style="display:inline-block">Active Branch: <xsl:value-of select="active_branch/text()"/></span>
+                        <xsl:if test="@downlink">
+                            <a style="float: right">
+                                <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+                                <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+                            </a>
+                        </xsl:if>
+                    </th>
+                </thead>
+                <tr>
+                    <td>Clone url:</td><td colspan="3"><xsl:value-of select="giturl/text()"/></td>
+                </tr>
+            </table>
+        </div>
+        <div class="changed">
+            <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                <thead>
+                    <th colspan="2" style="word-wrap: break-word">
+                        <span style="width:370px;display:inline-block">Modified Files:</span>
+                    </th>
+                </thead>
+                <xsl:for-each select="changed_files/file">
+                    <tr>
+                        <td colspan="2"><xsl:value-of select="text()"/></td>
+                    </tr>
+                </xsl:for-each>
+            </table>
+        </div>
+        <div class="untracked">
+            <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                <thead>
+                    <th colspan="2" style="word-wrap: break-word">
+                        <span style="width:370px;display:inline-block">Untracked Files:</span>
+                    </th>
+                </thead>
+                <xsl:for-each select="untracked_files/file">
+                    <tr>
+                        <td colspan="2"><xsl:value-of select="text()"/></td>
+                    </tr>
+                </xsl:for-each>
+            </table>
+        </div>
+        <div class="logs">
+            <h2>Commit History</h2>
+            <xsl:for-each select="branches/branch">
+                <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                    <thead>
+                        <th colspan="2" style="word-wrap: break-word">
+                            <span style="width:370px;display:inline-block">Branch: <xsl:value-of select="name/text()"/></span>
+                        </th>
+                    </thead>
+                    <xsl:for-each select="log/log_entry">
+                        <tr>
+                            <td colspan="2"><xsl:value-of select="text()"/></td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
+            </xsl:for-each>
+        </div>
+        <div class="repo">
+            <h2>Directory Structure</h2>
+            <div class="tree">
+                <xsl:apply-templates select="repo_contents"/>
+            </div>
+        </div>
+    </div>
 </xsl:template>
 
 <xsl:template match="*[*]">
-    <xsl:value-of select="@name"/>
+    <xsl:if test="@name != ''">
+        <div class="repoitem">
+            <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/folder.png</xsl:attribute></img>
+            <span style="padding-left: 8px">
+                <xsl:value-of select="@name"/>
+            </span>
+        </div>
+    </xsl:if>
     <ul>
         <xsl:apply-templates/>
     </ul>
 </xsl:template>
 
 <xsl:template match="*">
-    <p>
-        <xsl:if test="@untracked='True'">
-            <xsl:attribute name="style">
-                <xsl:value-of select="'color:red;'"/>
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@changed='True'">
-            <xsl:attribute name="style">
-                <xsl:value-of select="'color:green;'"/>
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:value-of select="name()"/>
-    </p>
+    <div class="repoitem">
+        <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+        <span style="padding-left: 8px">
+            <xsl:if test="@untracked='True'">
+                <xsl:attribute name="style">
+                    <xsl:value-of select="'color:red;'"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@changed='True'">
+                <xsl:attribute name="style">
+                    <xsl:value-of select="'color:green;'"/>
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="text()"/>
+        </span>
+    </div>
 </xsl:template>

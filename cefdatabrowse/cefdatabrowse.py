@@ -326,7 +326,7 @@ class ClientHandler:
                 html = open(unquote(fullpath), "rb")
             except IOError:
                 if not os.path.exists(unquote(fullpath)):
-                    raise IOError("Install location needs to be updated")
+                    raise IOError("Invalid path: %s" % unquote(fullpath))
                 else:
                     if os.path.isdir(unquote(fullpath)):
                         html = ""
