@@ -38,6 +38,7 @@
 
 import os
 import qrcode
+from urllib import quote, unquote
 from PIL import Image
 import StringIO
 import subprocess
@@ -57,6 +58,7 @@ class db_specimen(renderer_class):
 
     def getContent(self):
         if self._content_mode != "raw" and self._caller == "databrowse" and "ajax" not in self._web_support.req.form:
+            filerelpath = None
             specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
             if self._style_mode == "edit_specimen_data":
                 xml = etree.parse(self._fullpath)
@@ -88,6 +90,15 @@ class db_specimen(renderer_class):
             xmlroot.set("templatefile", templatefile)
             xmlroot.set("barcode", self.getURL(self._relpath, content_mode="raw", barcode="barcode"))
             xmlroot.set("printbarcode", self.getURL(self._relpath, content_mode="raw", printbarcode="printbarcode"))
+
+            if filerelpath:
+                try:
+                    __import__('imp').find_module('NDI_app')
+                    xmlroot.set("nditoolboxlink", self.getURL(self._relpath, content_mode="nditoolbox", dest=quote(filefullpath)))
+                except ImportError:
+                    xmlroot.set("nditoolboxlink", "")
+                    pass
+
             return xmlroot
         elif self._content_mode != "raw" and self._caller == "db_specimen_database" and self._style_mode == 'specimen_list':
             specimen = os.path.splitext(os.path.basename(self._fullpath))[0]
@@ -201,6 +212,13 @@ class db_specimen(renderer_class):
                 self._web_support.req.output = "Action Item Added Successfully"
                 self._web_support.req.response_headers['Content-Type'] = 'text/plain'
                 return [self._web_support.req.return_page()]
+        elif self._content_mode == "nditoolbox" and "ajax" in self._web_support.req.form:
+            import NDI_app
+            subprocess.Popen(['python', NDI_app.__file__, unquote(self._web_support.req.form['dest'].value)], cwd=os.path.dirname(NDI_app.__file__))
+
+            self._web_support.req.output = "NDITOOlBOX Called Successfully"
+            self._web_support.req.response_headers['Content-Type'] = 'text/plain'
+            return [self._web_support.req.return_page()]
         elif self._content_mode == "raw":
             if "barcode" in self._web_support.req.form:
                 if self.CacheFileExists("barcode", 'png'):
