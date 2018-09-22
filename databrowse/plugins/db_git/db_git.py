@@ -63,14 +63,18 @@ class db_git(renderer_class):
     _default_style_mode = "repository"
     _default_recursion_depth = 1
 
-    def recursive_search(self, xmlcontents, rootpath, root=""):
+    def recursive_search(self, xmlcontents, rootpath, root="", relroot=""):
         dirlist = self.getDirectoryList(rootpath)
         for item in dirlist:
             itemfullpath = os.path.join(rootpath, item).replace("\\", "/")
+            itemrelpath = os.path.join(relroot, item).replace("\\", "/")
             if os.path.isdir(itemfullpath):
                 xmldir = etree.SubElement(xmlcontents, "dir", nsmap=self.nsmap)
                 xmldir.attrib["name"] = os.path.basename(itemfullpath)
-                self.recursive_search(xmldir, itemfullpath, root=os.path.join(root, os.path.basename(itemfullpath)).replace("\\", "/"))
+                xmldir.attrib['url'] = self.getURL(itemrelpath)
+                self.recursive_search(xmldir, itemfullpath,
+                                      root=os.path.join(root, os.path.basename(itemfullpath)).replace("\\", "/"),
+                                      relroot=os.path.join(relroot, os.path.basename(itemrelpath)).replace("\\", "/"))
             else:
                 xmlitem = etree.SubElement(xmlcontents, "item", nsmap=self.nsmap)
                 xmlitem.text = item
@@ -91,6 +95,7 @@ class db_git(renderer_class):
                 icon = self._handler_support.GetIcon(contenttype, extension)
 
                 xmlitem.attrib['icon'] = icon
+                xmlitem.attrib['url'] = self.getURL(itemrelpath)
 
                 if itemsubpath in self.changedfiles:
                     xmlitem.attrib['changed'] = "True"
@@ -126,6 +131,7 @@ class db_git(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "branches", nsmap=self.nsmap)
                 for branch in repo.branches:
                     xmlbranch = etree.SubElement(xmlchild, "branch", nsmap=self.nsmap)
+                    xmlbranch.attrib['url'] = self.getURL(self._relpath, branch=branch.name)
 
                     xmlname = etree.SubElement(xmlbranch, "name", nsmap=self.nsmap)
                     xmlname.text = branch.name
@@ -135,7 +141,7 @@ class db_git(renderer_class):
                         xmlentry = etree.SubElement(xmllog, "log_entry", nsmap=self.nsmap)
                         xmlentry.text = log.format()
 
-                    if branch.name == requested_branch and not (repo.untracked_files and self.changedfiles):
+                    if branch.name == requested_branch and not self.changedfiles:
                         branch.checkout()
 
                 self.untracked = repo.untracked_files
@@ -159,7 +165,7 @@ class db_git(renderer_class):
                 xmldir = etree.SubElement(xmlcontents, "dir", nsmap=self.nsmap)
                 xmldir.attrib["name"] = os.path.basename(self._fullpath)
 
-                self.recursive_search(xmldir, self._fullpath)
+                self.recursive_search(xmldir, self._fullpath, relroot=self._relpath)
 
                 return xmlroot
             elif self._content_mode == "raw" and "download" in self._web_support.req.form:
