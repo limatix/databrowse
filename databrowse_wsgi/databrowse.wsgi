@@ -332,7 +332,7 @@ def application(environ, start_response):
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
 
-        if not renderer.isRaw():
+        if not renderer.isRaw() and not renderer.isGit():
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
             linkstring = db_web_support.siteurl

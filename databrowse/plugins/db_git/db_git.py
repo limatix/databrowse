@@ -49,7 +49,7 @@ import os.path
 import git
 import magic
 import datetime
-import urllib
+from shutil import copyfile
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 
@@ -106,7 +106,32 @@ class db_git(renderer_class):
         if self._caller != "databrowse":
             return None
         else:
-            if self._content_mode == "full":
+            if self.isGit():
+                repo_path = self._fullpath.split('.git')[0]
+
+                owd = os.getcwd()
+                os.chdir(repo_path)
+                g = git.Git()
+                g.execute(["git", "update-server-info"])
+                update_path = os.path.join(repo_path, ".git", "hooks", "post-update")
+                if not os.path.exists(update_path):
+                    copyfile(update_path+".sample", update_path)
+                os.chdir(owd)
+
+                repo = git.Repo(repo_path)
+                repo.git.checkout('master')
+
+                f = open(self._fullpath, "rb")
+                self._web_support.req.response_headers['Content-Type'] = "text/plain"
+                self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
+                self._web_support.req.response_headers['Content-Disposition'] = "attachment; filename=" + os.path.basename(f.name)
+                self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())
+                self._web_support.req.output_done = True
+                if 'wsgi.file_wrapper' in self._web_support.req.environ:
+                    return self._web_support.req.environ['wsgi.file_wrapper'](f, 1024)
+                else:
+                    return iter(lambda: f.read(1024), '')
+            elif self._content_mode == "full":
                 if "branch" in self._web_support.req.form:
                     requested_branch = self._web_support.req.form["branch"].value
                 else:
@@ -124,7 +149,7 @@ class db_git(renderer_class):
                                         downlink=downlink)
 
                 xmlchild = etree.SubElement(xmlroot, "giturl", self.nsmap)
-                xmlchild.text = self.getURL(self._relpath, content_mode="clone")
+                xmlchild.text = self.getURL(self._relpath) + "/.git"
 
                 self.changedfiles = [item.a_path for item in repo.index.diff(None)]
 

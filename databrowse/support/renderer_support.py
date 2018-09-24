@@ -276,6 +276,12 @@ class renderer_class(object):
         else:
             return False
 
+    def isGit(self):
+        if self._web_support.req.agent.startswith("git"):
+            return True
+        else:
+            return False
+
     def getStyleMode(self):
         #print "getStyleMode being called"
         return self._style_mode

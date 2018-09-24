@@ -36,15 +36,25 @@
 ###############################################################################
 """ plugins/handlers/dbh_directory.py - Generic Directory Handler """
 
-import os
+import git
+
+
+def is_git_repo(path):
+    try:
+        _ = git.Repo(path).git_dir
+        return True
+    except git.exc.InvalidGitRepositoryError:
+        return False
 
 
 def dbh_git(path, contenttype, extension, roottag, nsurl):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
-        if ".git" in os.listdir(path):
+        if is_git_repo(path):
             return "db_git"
         else:
             return False
+    elif ".git" in path:
+        return "db_git"
     else:
         return False

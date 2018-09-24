@@ -52,6 +52,7 @@ class wsgi_req:
     dirname = None              # name of directory containing script that was called
     unparsed_uri = None         # request URI
     form = None                 # form parameters
+    agent = None
     status = None               # Status string
     output = None               # Output string
     response_headers = None     # Dictionary of response headers
@@ -77,6 +78,8 @@ class wsgi_req:
         self.response_headers = {}
         self.response_headers['Content-Type'] = 'text/html'
         self.output_done = False
+
+        self.agent = environ['HTTP_USER_AGENT']
 
         if "debug" in self.form:
             self.response_headers["Content-Type"] = "text/plain"    # can switch to "text/plain" for debugging -- add ?debug to end of URL
