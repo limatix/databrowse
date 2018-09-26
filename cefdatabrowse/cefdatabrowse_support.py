@@ -269,10 +269,10 @@ def application(filename, params):
     starttime = time()
     import databrowse.support.dummy_web_support as db_web_support_module
 
-    try:
-        # Set up web_support class with environment information
-        db_web_support = db_web_support_module.web_support(filename, params)
+    # Set up web_support class with environment information
+    db_web_support = db_web_support_module.web_support(filename, params)
 
+    try:
         # Determine Requested File/Folder Absolute Path and Path Relative to Dataroot
         if "path" not in db_web_support.req.form:
             fullpath = db_web_support.dataroot

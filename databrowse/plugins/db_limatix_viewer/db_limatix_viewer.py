@@ -426,7 +426,7 @@ class db_limatix_viewer(renderer_class):
             pass
 
         #print "Stylesheet Loaded Successfully:"
-        #print stylestring
+        #print(stylestring)
         stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
 
         # If we set the flag earlier, we need to change the namespace

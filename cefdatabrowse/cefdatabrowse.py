@@ -212,9 +212,9 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     myappid = u'limatix.org.databrowse'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    scheme = "http://0.0.0.0/"
+    scheme = "http://0.0.0.0"
 elif LINUX:
-    scheme = "http://databrowse/"
+    scheme = "http://cefdatabrowse"
 
 # Append external libraries to path
 for item in partydict.keys():
@@ -235,7 +235,7 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        fullpath = unquote(parsedurl.path[1:])
+        fullpath = unquote(parsedurl.path.replace("\\", "/"))
 
         urlparams = {}
         if parsedurl.query != "":

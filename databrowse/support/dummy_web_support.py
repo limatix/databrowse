@@ -69,6 +69,7 @@ class wsgi_req:
     dirname = None              # name of directory containing script that was called
     unparsed_uri = None         # request URI
     form = None                 # form parameters
+    agent = "dummy"
     status = None               # Status string
     output = None               # Output string
     response_headers = None     # Dictionary of response headers
@@ -290,24 +291,24 @@ class web_support:
 
         if self.siteurl is None:
             if scheme is not None:
-                self.siteurl = "/".join([scheme[:-1], urllib.pathname2url(self.dataroot).replace("///", "")])
+                self.siteurl = "/".join([scheme, urllib.pathname2url(self.dataroot).replace("//", "")[1:]])
             else:
                 self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             pass
 
         if self.resurl is None:
             if scheme is not None:
-                self.resurl = "/".join([scheme[:-1], urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
-                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources"))).replace("///", "")])
+                self.resurl = "/".join([scheme, urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
+                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources"))).replace("//", "")[1:]])
             else:
                 self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
                     os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
-                    "databrowse_wsgi/resources"))).replace("///", "")])
+                    "databrowse_wsgi/resources"))).replace("//", "")[1:]])
             pass
 
         if self.logouturl is None:
             if scheme is not None:
-                self.logouturl = "/".join([scheme[:-1], "logout"])
+                self.logouturl = "/".join([scheme, "logout"])
             else:
                 self.logouturl = "http://0.0.0.0/logout"
             pass
