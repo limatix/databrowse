@@ -196,7 +196,7 @@ except ImportError:
 # Fix for PyCharm hints warnings when using static methods
 WindowUtils = cef.WindowUtils()
 
-# Platforms
+# Platforms-
 WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
@@ -213,6 +213,7 @@ if WINDOWS:
     myappid = u'limatix.org.databrowse'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     scheme = "http://0.0.0.0"
+    usr_path = "/" + usr_path
 elif LINUX:
     scheme = "http://cefdatabrowse"
 
@@ -235,7 +236,10 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        fullpath = unquote(parsedurl.path.replace("\\", "/"))
+        if WINDOWS:
+            fullpath = unquote(parsedurl.path[1:])
+        else:
+            fullpath = unquote(parsedurl.path)
 
         urlparams = {}
         if parsedurl.query != "":
