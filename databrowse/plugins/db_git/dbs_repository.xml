@@ -81,8 +81,8 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
-                            <td>Checkout Branch: </td>
-                            <td colspan="3" style="text-align: center">
+                            <td colspan="2">Checkout Branch: </td>
+                            <td colspan="2" style="text-align: center">
                                 <select id="branchoptions" style="padding: 5px">
                                     <xsl:for-each select="branches/branch">
                                         <xsl:if test="name/text()=//active_branch/text()">
