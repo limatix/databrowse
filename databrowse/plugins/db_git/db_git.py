@@ -129,9 +129,12 @@ class db_git(renderer_class):
                 else:
                     return iter(lambda: f.read(1024), '')
             elif self._content_mode == "full":
-                requested_branch = None
+                repo = git.Repo(self._fullpath)
+
+                self.changedfiles = [item.a_path for item in repo.index.diff(None)]
+
                 if "branch" in self._web_support.req.form:
-                    requested_branch = self._web_support.req.form["branch"].value
+                    repo.git.checkout(self._web_support.req.form["branch"].value)
 
                 repo = git.Repo(self._fullpath)
 
@@ -147,8 +150,6 @@ class db_git(renderer_class):
                 xmlchild = etree.SubElement(xmlroot, "giturl", self.nsmap)
                 xmlchild.text = self.getURL(self._relpath) + "/.git"
 
-                self.changedfiles = [item.a_path for item in repo.index.diff(None)]
-
                 xmlchild = etree.SubElement(xmlroot, "branches", nsmap=self.nsmap)
                 for branch in repo.branches:
                     xmlbranch = etree.SubElement(xmlchild, "branch", nsmap=self.nsmap)
@@ -161,9 +162,6 @@ class db_git(renderer_class):
                     for log in branch.log():
                         xmlentry = etree.SubElement(xmllog, "log_entry", nsmap=self.nsmap)
                         xmlentry.text = log.format()
-
-                    if branch.name == requested_branch and not self.changedfiles:
-                        branch.checkout()
 
                 self.untracked = repo.untracked_files
                 if repo.untracked_files:
@@ -190,14 +188,11 @@ class db_git(renderer_class):
 
                 return xmlroot
             elif self._content_mode == "raw" and "download" in self._web_support.req.form:
+                requested_branch = None
                 if "branch" in self._web_support.req.form:
                     requested_branch = self._web_support.req.form["branch"].value
-                else:
-                    requested_branch = "master"
 
                 repo = git.Repo(self._fullpath)
-
-                repo.git.checkout(requested_branch)
 
                 timestamp = datetime.datetime.now()
                 timestamp = timestamp.strftime("%b-%d-%Y-%I-%M%p")
