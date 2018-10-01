@@ -213,7 +213,8 @@ if WINDOWS:
     myappid = u'limatix.org.databrowse'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     scheme = "http://0.0.0.0"
-    usr_path = "/" + usr_path
+    if not usr_path.startswith("/"):
+        usr_path = "/" + usr_path
 elif LINUX:
     scheme = "http://cefdatabrowse"
 
@@ -671,7 +672,10 @@ class MainWindow(QMainWindow):
             load_settings()
             for item in partydict.keys():
                 sys.path.insert(0, partydict[item])
-            self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
+            if not configdict['dataroot'].startswith("/"):
+                self.cef_widget.browser.LoadUrl(scheme + "/" + configdict['dataroot'])
+            else:
+                self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
 
 
 class CefWidget(CefWidgetParent):

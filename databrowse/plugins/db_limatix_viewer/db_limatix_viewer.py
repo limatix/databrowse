@@ -126,6 +126,25 @@ class db_limatix_viewer(renderer_class):
                             url = self.getURL(relpath)
                             item.set('url', url)
                 return xmlroot
+            elif self._content_mode == "full" and self._style_mode in ['processed_specimen']:
+                import pdb
+                p = etree.XMLParser(huge_tree=True)
+                xmlroot = etree.parse(self._fullpath, parser=p).getroot()
+
+                fusionlist = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
+                for item in fusionlist:
+
+                    try:
+                        xlink = item.get('{http://www.w3.org/1999/xlink}href')
+                        pdb.set_trace()
+                        if xlink:
+                            path = os.path.realpath(fname)
+                            pdb.set_trace()
+                    except:
+                        pass
+
+                pdb.set_trace()
+                pass
             elif self._content_mode == "full" and self._style_mode != 'limatix_custom_view':
                 # Contents of File
                 #f = open(self._fullpath)
@@ -163,7 +182,7 @@ class db_limatix_viewer(renderer_class):
                         if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
                             url = self.getURL(relpath)
                             item.set('url', url)
-                return xmlroot            
+                return xmlroot
             elif self._content_mode == "full" and self._style_mode == "limatix_custom_view":
                 self._namespace_local = "dt"
                 self._namespace_uri = "http://limatix.org/databrowse/datatable"
