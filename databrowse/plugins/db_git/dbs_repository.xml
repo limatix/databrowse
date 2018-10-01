@@ -81,7 +81,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <tr>
-                            <td>Branches: </td>
+                            <td>Checkout Branch: </td>
                             <td colspan="3" style="text-align: center">
                                 <select id="branchoptions" style="padding: 5px">
                                     <xsl:for-each select="branches/branch">

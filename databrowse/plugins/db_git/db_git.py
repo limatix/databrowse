@@ -118,9 +118,6 @@ class db_git(renderer_class):
                     copyfile(update_path+".sample", update_path)
                 os.chdir(owd)
 
-                repo = git.Repo(repo_path)
-                repo.git.checkout('master')
-
                 f = open(self._fullpath, "rb")
                 self._web_support.req.response_headers['Content-Type'] = "text/plain"
                 self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
@@ -132,10 +129,9 @@ class db_git(renderer_class):
                 else:
                     return iter(lambda: f.read(1024), '')
             elif self._content_mode == "full":
+                requested_branch = None
                 if "branch" in self._web_support.req.form:
                     requested_branch = self._web_support.req.form["branch"].value
-                else:
-                    requested_branch = "master"
 
                 repo = git.Repo(self._fullpath)
 
