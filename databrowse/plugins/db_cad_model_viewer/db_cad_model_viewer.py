@@ -138,6 +138,7 @@ class db_cad_model_viewer(renderer_class):
                     return iter(lambda: f.read(1024), '')
             elif self._content_mode == "raw" and "model" in self._web_support.req.form:
                 f = open(self._fullpath, "rb")
+		self._web_support.req.response_headers['Content-Type'] = "model/x3d"
                 self._web_support.req.response_headers['Content-Disposition'] = "filename=" + os.path.basename(f.name)
                 self._web_support.req.response_headers['Content-Length'] = str(os.fstat(f.fileno()).st_size)
                 self._web_support.req.start_response(self._web_support.req.status, self._web_support.req.response_headers.items())

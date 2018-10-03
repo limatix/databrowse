@@ -126,25 +126,27 @@ class db_limatix_viewer(renderer_class):
                             url = self.getURL(relpath)
                             item.set('url', url)
                 return xmlroot
-            elif self._content_mode == "full" and self._style_mode in ['processed_specimen']:
-                import pdb
+            elif self._content_mode == "full" and self._style_mode in ['fusion']:
                 p = etree.XMLParser(huge_tree=True)
                 xmlroot = etree.parse(self._fullpath, parser=p).getroot()
 
-                fusionlist = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
-                for item in fusionlist:
-
-                    try:
-                        xlink = item.get('{http://www.w3.org/1999/xlink}href')
-                        pdb.set_trace()
-                        if xlink:
-                            path = os.path.realpath(fname)
-                            pdb.set_trace()
-                    except:
-                        pass
-
-                pdb.set_trace()
-                pass
+		xmlroot.attrib['resurl'] = self._web_support.resurl
+		
+		fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
+		for fusion in fusions:
+			fusionmodellist = fusion.xpath('dc:greensinversion_layer_3d', namespaces={'dc': 'http://limatix.org/datacollect'})
+			for model in fusionmodellist:
+				try:
+		                	xlink = model.get('{http://www.w3.org/1999/xlink}href')
+		                	if xlink:
+		                	    path = os.path.join(os.path.dirname(self._fullpath), xlink)
+		                	    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
+		                	        relpath = path.replace(self._web_support.dataroot, '')
+		                	        url = self.getURL(relpath, content_mode="raw", model="True")
+		                	        model.attrib['url'] = url
+		            	except:
+		                	pass
+                return xmlroot
             elif self._content_mode == "full" and self._style_mode != 'limatix_custom_view':
                 # Contents of File
                 #f = open(self._fullpath)
