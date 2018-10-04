@@ -146,7 +146,7 @@ class db_limatix_viewer(renderer_class):
                                     model.attrib['url'] = url
                         except Exception:
                             pass
-                        return xmlroot
+                return xmlroot
             elif self._content_mode == "full" and self._style_mode != 'limatix_custom_view':
                 # Contents of File
                 #f = open(self._fullpath)

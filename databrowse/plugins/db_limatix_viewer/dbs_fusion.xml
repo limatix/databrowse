@@ -96,12 +96,12 @@
 					<xsl:value-of select="dc:specimen/text()"/>
 				</xsl:attribute>
 				<xsl:for-each select="dc:greensinversion_layer_3d">
-					<texture>
+					<p>
 						<xsl:attribute name="id">
 							<xsl:value-of select="@layernum"/>
 						</xsl:attribute>
 						<xsl:value-of select="@url"/>
-					</texture>
+					</p>
 				</xsl:for-each>
 			</fusion>
 		</xsl:for-each>
