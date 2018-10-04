@@ -38,11 +38,11 @@
 			} else {
 			    if (modeltype != "x3d") {
 			        alert("Only obj, stl, and x3d files are supported at this moment.");
-			    } else {
-				element = document.getElementById('inline');
+			    } //else {
+				//element = document.getElementById('inline');
         			//center = element.runtime.getCenter();
-				console.log(element);
-			    }
+				    //console.log(element);
+			    //}
 			}
         });
 

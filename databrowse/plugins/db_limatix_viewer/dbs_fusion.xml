@@ -50,36 +50,36 @@
 		<h3>Select a Specimen</h3>
 		<xsl:for-each select="dc:fusion">
 			<a>
-				<xsl:attribute name="onclick">loadmodel('<xsl:value-of select="dc:specimen/text()"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@url"/>')</xsl:attribute>
+				<xsl:attribute name="onclick">loadmodel('<xsl:value-of select="dc:specimen/text()"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@url"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@layerdepth_meters"/>')</xsl:attribute>
 				<xsl:value-of select="dc:specimen"/>
 			</a>
 			<br/>
 		</xsl:for-each>
 	</div>
 	<div id="3dModel" style="text-align:center;">
-		<p>Change Depth:</p>
-		<a>
-			<xsl:attribute name="onclick">
-				decrementdepth();
-			</xsl:attribute>
-			<img>
-				<xsl:attribute name="src">
-					<xsl:value-of select="@resurl"/>/icons/go-previous.png
-				</xsl:attribute>
-			</img>
-		</a>
-		<a>
-			<xsl:attribute name="onclick">
-				incrementdepth();
-			</xsl:attribute>
-			<img>
-				<xsl:attribute name="src">
-					<xsl:value-of select="@resurl"/>/icons/go-next.png
-				</xsl:attribute>
-			</img>
-		</a>
-		<br/>
-		<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='x3dmodel' showStat='false' x='0px' y='0px'>
+		<!--<p>Change Depth:</p>-->
+		<!--<a>-->
+			<!--<xsl:attribute name="onclick">-->
+				<!--decrementdepth();-->
+			<!--</xsl:attribute>-->
+			<!--<img>-->
+				<!--<xsl:attribute name="src">-->
+					<!--<xsl:value-of select="@resurl"/>/icons/go-previous.png-->
+				<!--</xsl:attribute>-->
+			<!--</img>-->
+		<!--</a>-->
+		<!--<a>-->
+			<!--<xsl:attribute name="onclick">-->
+				<!--incrementdepth();-->
+			<!--</xsl:attribute>-->
+			<!--<img>-->
+				<!--<xsl:attribute name="src">-->
+					<!--<xsl:value-of select="@resurl"/>/icons/go-next.png-->
+				<!--</xsl:attribute>-->
+			<!--</img>-->
+		<!--</a>-->
+		<!--<br/>-->
+		<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='x3dmodel' nameSpaceName="x3dmodel" mapDEFToID="true" showStat='false' x='0px' y='0px'>
 			<Scene>
 				<Viewpoint position='0 0 1' orientation='0 0 0 1' />
 				<Background skyColor='1 1 1' />
@@ -96,7 +96,12 @@
 					<xsl:value-of select="dc:specimen/text()"/>
 				</xsl:attribute>
 				<xsl:for-each select="dc:greensinversion_layer_3d">
-					<p><xsl:value-of select="@url"/></p>
+					<texture>
+						<xsl:attribute name="id">
+							<xsl:value-of select="@layernum"/>
+						</xsl:attribute>
+						<xsl:value-of select="@url"/>
+					</texture>
 				</xsl:for-each>
 			</fusion>
 		</xsl:for-each>
