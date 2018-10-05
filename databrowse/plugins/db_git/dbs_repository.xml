@@ -57,6 +57,8 @@
 
             function expandrepo(el) {
                 var level = $(el).parent().parent().children("#repofile");
+                console.log(el);
+                console.log(level);
                 $.each(level, function( index, value ) {
                     value.style.display = "";
                 });
@@ -195,23 +197,23 @@
 </xsl:template>
 
 <xsl:template match="*[*]">
-    <xsl:if test="@name != ''">
-        <div id="repodir" class="repoitem">
-            <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/folder.png</xsl:attribute></img>
-            <span style="padding-left: 8px">
-                <a style="color: black;">
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="@url"/>
-                    </xsl:attribute>
-                    <xsl:value-of select="@name"/>
-                </a>
-            </span>
-            <img style="float: right" onclick="expandrepo(this)">
-                <xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/list-add.png</xsl:attribute>
-            </img>
-        </div>
-    </xsl:if>
     <ul>
+        <xsl:if test="@name != ''">
+            <div id="repodir" class="repoitem">
+                <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/folder.png</xsl:attribute></img>
+                <span style="padding-left: 8px">
+                    <a style="color: black;">
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="@url"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </span>
+                <img style="float: right" onclick="expandrepo(this)">
+                    <xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/list-add.png</xsl:attribute>
+                </img>
+            </div>
+        </xsl:if>
         <xsl:apply-templates/>
     </ul>
 </xsl:template>
