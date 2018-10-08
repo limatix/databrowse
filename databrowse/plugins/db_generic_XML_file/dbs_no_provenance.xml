@@ -1,0 +1,65 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" match="dbxml:dbxml" mode="full">
+    <table class="cream" style="table-layout:fixed; width:419px; word-break: break-all;">
+    	<thead>
+        	<th style="width:8px">
+				<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+			</th>
+			<th colspan="2" style="word-wrap: break-word">
+				<span style="width:370px;display:inline-block"><xsl:value-of select="@name"/></span>
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+					<img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+				</a>
+			</th>
+    	</thead>
+    	<tbody>
+	        <tr><td></td><td>Type: </td><td><xsl:value-of select="contenttype"/></td></tr>
+	        <tr><td></td><td>Owner: </td><td><xsl:value-of select="owner"/></td></tr>
+	        <tr><td></td><td>Permissions: </td><td><xsl:value-of select="permissions"/></td></tr>
+	        <tr><td></td><td>Size: </td><td><xsl:value-of select="size"/></td></tr>
+	        <tr><td></td><td>Modified: </td><td><xsl:value-of select="mtime"/></td></tr>
+	        <tr><td></td><td>Accessed: </td><td><xsl:value-of select="atime"/></td></tr>
+	        <tr><td></td><td>Updated: </td><td><xsl:value-of select="ctime"/></td></tr>
+	    </tbody>
+    </table>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/prettify/prettify.js</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="script">
+        <xsl:attribute name="type">text/javascript</xsl:attribute>
+        <xsl:attribute name="src"><xsl:value-of select="@resurl"/>/vkbeautify.0.99.00.beta.js</xsl:attribute>
+    </xsl:element>
+    <script type="text/javascript" defer="true">
+        <![CDATA[
+            $(document).ready(function() {
+                var htmlstring = $('#prettyprint').html();
+                var prettystring = vkbeautify.xml(htmlstring, 3);
+                $('#prettyprint').text(htmlstring).html();
+                if($('#prettyprint').text().length < 100000) {
+                    prettyPrint();
+                }
+            });
+        ]]>
+    </script>
+    <style>
+        #prettyprint {
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+    </style>
+    <xsl:element name="link">
+        <xsl:attribute name="type">text/css</xsl:attribute>
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="@resurl"/>/prettify/prettify.css</xsl:attribute>
+    </xsl:element>
+    <pre id="prettyprint" class="prettyprint">
+        <xsl:apply-templates select="contents/*" mode="escape"/>
+    </pre>
+</xsl:template>
+<xsl:template xmlns:dbxml="http://thermal.cnde.iastate.edu/databrowse/dbxml" match="*" mode="escape">
+    <xsl:copy-of select="."/>
+</xsl:template>

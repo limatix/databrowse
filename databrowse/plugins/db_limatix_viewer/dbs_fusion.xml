@@ -14,35 +14,52 @@
 			var inlineele;
 			var fusions;
 			var curfusion;
-			var depth = 1;
+			var depthele;
+			var depth = 0;
 
 			$(document).ready(function() {
 				element = document.getElementById('x3dmodel');
 				inlineele = element.querySelector('#inline');
-				fusions = document.getElementById("fusions");
+				fusions = document.getElementById('fusions');
+				depthele = document.getElementById('eledepth');
 			});
 
 			function incrementdepth() {
-				//depth += 1;
-				console.log(fusions.childNodes);
-				for(i = 0; i < fusions.childNodes.length; i++){
-					oChild = fusions.childNodes[i];
-					console.log(oChild);
+				fusion = fusions.content.querySelector('#' + curfusion);
+				fusion_children = fusion.children;
+				if (depth+1 < fusion_children.length) {
+					depth += 1;
+					new_fusion = fusion_children[depth].textContent;
+					new_depth = fusion_children[depth].getAttribute('layerdepth');
+					loadmodel(new_fusion, new_depth);
 				}
 			}
 
 			function decrementdepth() {
-				depth -= 1;
+				fusion = fusions.content.querySelector('#' + curfusion);
+				fusion_children = fusion.children;
+				if (depth-1 >= 0) {
+					depth -= 1;
+					new_fusion = fusion_children[depth].textContent;
+					new_depth = fusion_children[depth].getAttribute('layerdepth');
+					loadmodel(new_fusion, new_depth);
+				}
 			}
 
-			function loadmodel(id, url) {
+			function initmodel(id, url) {
 				curfusion = id;
 				inlineele.setAttribute("url", url);
 			
 				element.setAttribute("width", document.getElementById('content').offsetWidth + "px");
 				element.setAttribute("height", document.getElementById('content').offsetWidth + "px");
 
-				depth = 1;
+				depth = 0;
+				depthele.textContent = "Depth: 0.0";
+			}
+
+			function loadmodel(url, depth) {
+				inlineele.setAttribute("url", url);
+				depthele.textContent = "Depth: " + depth;
 			}
 		]]>
 	</script>
@@ -50,35 +67,35 @@
 		<h3>Select a Specimen</h3>
 		<xsl:for-each select="dc:fusion">
 			<a>
-				<xsl:attribute name="onclick">loadmodel('<xsl:value-of select="dc:specimen/text()"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@url"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@layerdepth_meters"/>')</xsl:attribute>
+				<xsl:attribute name="onclick">initmodel('<xsl:value-of select="dc:specimen/text()"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@url"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@layerdepth_meters"/>')</xsl:attribute>
 				<xsl:value-of select="dc:specimen"/>
 			</a>
 			<br/>
 		</xsl:for-each>
 	</div>
 	<div id="3dModel" style="text-align:center;">
-		<!--<p>Change Depth:</p>-->
-		<!--<a>-->
-			<!--<xsl:attribute name="onclick">-->
-				<!--decrementdepth();-->
-			<!--</xsl:attribute>-->
-			<!--<img>-->
-				<!--<xsl:attribute name="src">-->
-					<!--<xsl:value-of select="@resurl"/>/icons/go-previous.png-->
-				<!--</xsl:attribute>-->
-			<!--</img>-->
-		<!--</a>-->
-		<!--<a>-->
-			<!--<xsl:attribute name="onclick">-->
-				<!--incrementdepth();-->
-			<!--</xsl:attribute>-->
-			<!--<img>-->
-				<!--<xsl:attribute name="src">-->
-					<!--<xsl:value-of select="@resurl"/>/icons/go-next.png-->
-				<!--</xsl:attribute>-->
-			<!--</img>-->
-		<!--</a>-->
-		<!--<br/>-->
+		<p id="eledepth">Depth: 0.00</p>
+		<a>
+			<xsl:attribute name="onclick">
+				decrementdepth();
+			</xsl:attribute>
+			<img>
+				<xsl:attribute name="src">
+					<xsl:value-of select="@resurl"/>/icons/go-previous.png
+				</xsl:attribute>
+			</img>
+		</a>
+		<a>
+			<xsl:attribute name="onclick">
+				incrementdepth();
+			</xsl:attribute>
+			<img>
+				<xsl:attribute name="src">
+					<xsl:value-of select="@resurl"/>/icons/go-next.png
+				</xsl:attribute>
+			</img>
+		</a>
+		<br/>
 		<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='x3dmodel' nameSpaceName="x3dmodel" mapDEFToID="true" showStat='false' x='0px' y='0px'>
 			<Scene>
 				<Viewpoint position='0 0 1' orientation='0 0 0 1' />
@@ -97,9 +114,7 @@
 				</xsl:attribute>
 				<xsl:for-each select="dc:greensinversion_layer_3d">
 					<p>
-						<xsl:attribute name="id">
-							<xsl:value-of select="@layernum"/>
-						</xsl:attribute>
+						<xsl:attribute name="layerdepth"><xsl:value-of select="@layerdepth_meters"/> m</xsl:attribute>
 						<xsl:value-of select="@url"/>
 					</p>
 				</xsl:for-each>

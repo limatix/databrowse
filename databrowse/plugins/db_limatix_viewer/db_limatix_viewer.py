@@ -126,7 +126,7 @@ class db_limatix_viewer(renderer_class):
                             url = self.getURL(relpath)
                             item.set('url', url)
                 return xmlroot
-            elif self._content_mode == "full" and self._style_mode in ['fusion']:
+            elif self._content_mode == "full" and self._style_mode in ['fusion', 'processing_summary']:
                 p = etree.XMLParser(huge_tree=True)
                 xmlroot = etree.parse(self._fullpath, parser=p).getroot()
 
