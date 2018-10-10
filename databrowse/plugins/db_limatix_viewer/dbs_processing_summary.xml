@@ -6,8 +6,28 @@
 	td {
 		word-wrap:break-word;
 	}
-	</style>	
-	<h2>Processing Summary</h2>
+	</style>
+	<script type="text/javascript">
+	var resurl = "<xsl:value-of select="$resdir"/>";
+	<![CDATA[
+            function expandrepo(el) {
+                level = $(el).parent().parent().children("#procsteps")[0];
+                console.log(el);
+                console.log(level);
+				level.style.display = "";
+                el.src = resurl + "/icons/list-remove.png";
+                el.setAttribute( "onclick", "shrinkrepo(this);" );
+            }
+
+            function shrinkrepo(el) {
+                level = $(el).parent().parent().children("#procsteps")[0];
+                level.style.display = "none";
+                el.src = resurl + "/icons/list-add.png";
+                el.setAttribute( "onclick", "expandrepo(this);" );
+            }
+	]]>
+	</script>
+	<h2>Processing Steps</h2>
 	<xsl:apply-templates select="lip:process"/>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="lip:process">
@@ -28,20 +48,24 @@
 			</xsl:if>
 		</tbody>
 	</table>
-	<h3>Sub-Processes</h3>
-	<ul>
-		<xsl:for-each select="lip:process[lip:argv]">
-			<xsl:call-template name="subprocess"/>
-		</xsl:for-each>
-	</ul>
+	<div>
+		<h3>Process Breakup
+			<img style="float: right" onclick="expandrepo(this)">
+			    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+			</img>
+		</h3>
+		<ul id="procsteps" style="display:none;">
+			<xsl:for-each select="lip:process[lip:argv]">
+				<xsl:call-template name="subprocess"/>
+			</xsl:for-each>
+		</ul>
+	</div>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="process" name="subprocess">
 	<table class="cream full-width">
 		<tbody>
-			<tr><th colspan="1">Host</th><td colspan="4"><xsl:value-of select="lip:hostname/@username"/>@<xsl:value-of select="lip:hostname"/></td></tr>
 			<tr><th>Start Time</th><td colspan="4"><xsl:value-of select="lip:starttimestamp" /></td></tr>
 			<tr><th>Finish Time</th><td colspan="4"><xsl:value-of select="lip:finishtimestamp" /></td></tr>
-			<tr><th>Arguments</th><td colspan="4"><xsl:value-of select="lip:argv" /></td></tr>
 			<xsl:if test="lip:log">
 				<tr><th>Status</th><td colspan="4"><xsl:value-of select="lip:log/@status"/></td></tr>
 				<tr><th>Log</th><td colspan="4">

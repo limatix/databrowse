@@ -137,9 +137,9 @@ class db_generic_XML_file(renderer_class):
 					for bad in tree.xpath("//@lip:*", namespaces={'lip': 'http://limatix.org/provenance'}):
 						parent = bad.getparent()
 						for attribute in attributes:
-							val = parent.attrib.get(attribute)
+							val = parent.attrib.get('{http://limatix.org/provenance}' + attribute.split(":")[1])
 							if val:
-								parent.attrib.pop(attribute)
+								parent.attrib.pop('{http://limatix.org/provenance}' + attribute.split(":")[1])
 					xmlchild.append(tree)
 					xmlchild.text = etree.tostring(tree)
 					f.close()

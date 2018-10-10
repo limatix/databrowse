@@ -1,3 +1,5 @@
+<xi:include href="/usr/local/limatix-qautils/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xpointer(/xsl:stylesheet/node())" />
+
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
 	<xsl:element name="script">
 		<xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -46,34 +48,58 @@
 				}
 			}
 
-			function initmodel(id, url) {
+			function initmodel(id) {
+				hidedetails(curfusion);
 				curfusion = id;
-				inlineele.setAttribute("url", url);
-			
-				element.setAttribute("width", document.getElementById('content').offsetWidth + "px");
-				element.setAttribute("height", document.getElementById('content').offsetWidth + "px");
 
-				depth = 0;
-				depthele.textContent = "Depth: 0.0";
+				fusion = fusions.content.querySelector('#' + curfusion);
+				
+				if (fusion) {
+					url = fusion.children[0].textContent;
+					inlineele.setAttribute("url", url);
+			
+					element.setAttribute("width", document.getElementById('content').offsetWidth + "px");
+					element.setAttribute("height", document.getElementById('content').offsetWidth + "px");
+
+					depth = 0;
+					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
+				
+					container = document.getElementById('3dModel');
+					container.style.display = "";
+				}
+				loaddetails(curfusion);
 			}
 
 			function loadmodel(url, depth) {
 				inlineele.setAttribute("url", url);
 				depthele.textContent = "Depth: " + depth;
 			}
+
+			function loaddetails(id) {
+				spec_details = document.getElementsByName(id);
+                $.each(spec_details, function( index, value ) {
+                    value.style.display = "";
+                });
+			}
+			function hidedetails (id) {
+				spec_details = document.getElementsByName(id);
+                $.each(spec_details, function( index, value ) {
+                    value.style.display = "none";
+                });
+			}
 		]]>
 	</script>
 	<div id="specimenmenu">
 		<h3>Select a Specimen</h3>
-		<xsl:for-each select="dc:fusion">
+		<xsl:for-each select="//dc:specimen[not(preceding::dc:specimen/text() = text())]">
 			<a>
-				<xsl:attribute name="onclick">initmodel('<xsl:value-of select="dc:specimen/text()"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@url"/>', '<xsl:value-of select="dc:greensinversion_layer_3d[1]/@layerdepth_meters"/>')</xsl:attribute>
-				<xsl:value-of select="dc:specimen"/>
+				<xsl:attribute name="onclick">initmodel('<xsl:value-of select="text()"/>')</xsl:attribute>
+				<xsl:value-of select="text()"/>
 			</a>
 			<br/>
 		</xsl:for-each>
 	</div>
-	<div id="3dModel" style="text-align:center;">
+	<div id="3dModel" style="display:none;text-align:center;">
 		<p id="eledepth">Depth: 0.00</p>
 		<a>
 			<xsl:attribute name="onclick">
@@ -106,6 +132,12 @@
 			</Scene>
 		</X3D>
 	</div>
+		<xsl:for-each select="dc:measurement">
+			<div style="display:none;">
+				<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>
+				<xsl:call-template name="specimen"/>
+			</div>
+		</xsl:for-each>
 	<template id="fusions">
 		<xsl:for-each select="dc:fusion">
 			<fusion>
@@ -121,4 +153,15 @@
 			</fusion>
 		</xsl:for-each>
 	</template>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" name="specimen" mode="full">
+	<h3>Measurement Summary</h3>
+	<table class="cream full-width">
+	        <thead>
+	            <tr><th style="width:166px">Item</th><th>Value</th></tr>
+	        </thead>
+	        <tbody>
+	            <xsl:apply-templates select="dc:*" />
+	        </tbody>
+	    </table>
 </xsl:template>
