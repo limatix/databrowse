@@ -3,12 +3,12 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
 	<xsl:element name="script">
 		<xsl:attribute name="type">text/javascript</xsl:attribute>
-		<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x3dom.js</xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
 	</xsl:element>
 	<xsl:element name="link">
 		<xsl:attribute name="rel">stylesheet</xsl:attribute>
 		<xsl:attribute name="type">text/css</xsl:attribute>
-		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x3dom.css</xsl:attribute>
+		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
 	</xsl:element>
 	<script type="text/javascript">
 		<![CDATA[
