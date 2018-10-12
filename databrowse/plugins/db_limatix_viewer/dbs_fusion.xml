@@ -13,15 +13,13 @@
 	<script type="text/javascript">
 		<![CDATA[
 			var element;
-			var inlineele;
 			var fusions;
 			var curfusion;
 			var depthele;
 			var depth = 0;
 
 			$(document).ready(function() {
-				element = document.getElementById('x3dmodel');
-				inlineele = element.querySelector('#inline');
+				element = document.getElementById('x3dcanvas');
 				fusions = document.getElementById('fusions');
 				depthele = document.getElementById('eledepth');
 			});
@@ -56,10 +54,10 @@
 				
 				if (fusion) {
 					url = fusion.children[0].textContent;
-					inlineele.setAttribute("url", url);
+					element.setAttribute("src", url);
 			
-					element.setAttribute("width", document.getElementById('content').offsetWidth + "px");
-					element.setAttribute("height", document.getElementById('content').offsetWidth + "px");
+					element.style.width = document.getElementById('content').offsetWidth + "px";
+					element.style.height = document.getElementById('content').offsetWidth + "px";
 
 					depth = 0;
 					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
@@ -71,7 +69,7 @@
 			}
 
 			function loadmodel(url, depth) {
-				inlineele.setAttribute("url", url);
+				element.setAttribute("src", url);
 				depthele.textContent = "Depth: " + depth;
 			}
 
@@ -122,15 +120,9 @@
 			</img>
 		</a>
 		<br/>
-		<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='x3dmodel' nameSpaceName="x3dmodel" mapDEFToID="true" showStat='false' x='0px' y='0px'>
-			<Scene>
-				<Viewpoint position='0 0 1' orientation='0 0 0 1' />
-				<Background skyColor='1 1 1' />
-				<Transform translation='0 0 0' >
-					<Inline id="inline" url=''></Inline>
-				</Transform>
-			</Scene>
-		</X3D>
+		<X3DCanvas id="x3dcanvas" style="width: 700px; height: 432px;" src="">
+		  <p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
+		</X3DCanvas>
 	</div>
 		<xsl:for-each select="dc:measurement">
 			<div style="display:none;">
