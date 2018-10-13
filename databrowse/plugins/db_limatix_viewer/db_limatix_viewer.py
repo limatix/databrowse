@@ -142,7 +142,7 @@ class db_limatix_viewer(renderer_class):
                                 path = os.path.join(os.path.dirname(self._fullpath), xlink)
                                 if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                     relpath = path.replace(self._web_support.dataroot, '')
-                                    url = self.getURL(relpath, content_mode="raw", model="True")
+                                    url = self.getURL(relpath, content_mode="raw", model="true")
                                     model.attrib['url'] = url
                         except Exception:
                             pass

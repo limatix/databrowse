@@ -13,13 +13,24 @@
 	<script type="text/javascript">
 		<![CDATA[
 			var element;
+			var Browser;
 			var fusions;
 			var curfusion;
 			var depthele;
 			var depth = 0;
 
+			X3D (function () {
+				Browser = X3D.getBrowser("X3DCanvas"),
+				currentScene = Browser.currentScene;
+			},
+			function (error) {
+				// Error callback, no browser.
+				console.error(error);
+			});
+
 			$(document).ready(function() {
 				element = document.getElementById('x3dcanvas');
+				//Browser = X3D.getBrowser('X3DCanvas#browser');
 				fusions = document.getElementById('fusions');
 				depthele = document.getElementById('eledepth');
 			});
@@ -54,12 +65,15 @@
 				
 				if (fusion) {
 					url = fusion.children[0].textContent;
-					element.setAttribute("src", url);
-			
-					element.style.width = document.getElementById('content').offsetWidth + "px";
-					element.style.height = document.getElementById('content').offsetWidth + "px";
+
+					//element.setAttribute("src", url);
+					//element.style.width = document.getElementById('content').offsetWidth + "px";
+					//element.style.height = document.getElementById('content').offsetWidth + "px";
 
 					depth = 0;
+
+					loadmodel(url, depth);
+
 					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
 				
 					container = document.getElementById('3dModel');
@@ -69,7 +83,7 @@
 			}
 
 			function loadmodel(url, depth) {
-				element.setAttribute("src", url);
+				Browser.loadURL(new X3D.MFNode(url), new X3D.MFNode());
 				depthele.textContent = "Depth: " + depth;
 			}
 
@@ -121,7 +135,7 @@
 		</a>
 		<br/>
 		<X3DCanvas id="x3dcanvas" style="width: 700px; height: 432px;" src="">
-		  <p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
+			<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
 		</X3DCanvas>
 	</div>
 		<xsl:for-each select="dc:measurement">
