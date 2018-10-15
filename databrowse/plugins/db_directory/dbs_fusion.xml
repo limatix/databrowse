@@ -3,12 +3,12 @@
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
 	<xsl:element name="script">
 		<xsl:attribute name="type">text/javascript</xsl:attribute>
-		<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
 	</xsl:element>
 	<xsl:element name="link">
 		<xsl:attribute name="rel">stylesheet</xsl:attribute>
 		<xsl:attribute name="type">text/css</xsl:attribute>
-		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
+		<xsl:attribute name="href"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
 	</xsl:element>
 	<script type="text/javascript">
 		<![CDATA[
@@ -30,7 +30,6 @@
 
 			$(document).ready(function() {
 				element = document.getElementById('x3dcanvas');
-				//Browser = X3D.getBrowser('X3DCanvas#browser');
 				fusions = document.getElementById('fusions');
 				depthele = document.getElementById('eledepth');
 			});
@@ -77,13 +76,13 @@
 					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
 				
 					container = document.getElementById('3dModel');
-					container.style.display = "";
+					container.style.visibility = "";
 				}
 				loaddetails(curfusion);
 			}
 
 			function loadmodel(url, depth) {
-				Browser.loadURL(new X3D.MFNode(url), new X3D.MFNode());
+				Browser.loadURL(new X3D.MFString(url), new X3D.MFString());
 				depthele.textContent = "Depth: " + depth;
 			}
 
@@ -111,7 +110,7 @@
 			<br/>
 		</xsl:for-each>
 	</div>
-	<div id="3dModel" style="display:none;text-align:center;">
+	<div id="3dModel" style="visibility:hidden;text-align:center;">
 		<p id="eledepth">Depth: 0.00</p>
 		<a>
 			<xsl:attribute name="onclick">
