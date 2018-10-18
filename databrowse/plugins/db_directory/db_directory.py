@@ -60,64 +60,80 @@ class db_directory(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 1
 
-	def recursive_search(self, rootpath, relroot=""):
-		dirlist = self.getDirectoryList(rootpath)
-		for item in dirlist:
-			itemfullpath = os.path.join(rootpath, item).replace("\\", "/")
-			itemrelpath = os.path.join(relroot, item).replace("\\", "/")
-			if not os.path.isdir(itemfullpath):
-				try:
-					magicstore = magic.open(magic.MAGIC_MIME)
-					magicstore.load()
-					contenttype = magicstore.file(os.path.realpath(itemfullpath))  # real path to resolve symbolic links outside of dataroot
-				except AttributeError:
-					contenttype = magic.from_file(os.path.realpath(itemfullpath), mime=True)
-				if contenttype is None:
-					contenttype = "text/plain"
-
-				extension = os.path.splitext(itemfullpath)[1]
-				import pdb
-				pdb.set_trace()
-			else:
-				self.recursive_search(itemfullpath, relroot=os.path.join(relroot, os.path.basename(itemrelpath)).replace("\\", "/"))
+    def recursive_search(self, rootpath, relroot=""):
+        dirlist = self.getDirectoryList(rootpath)
+        for item in dirlist:
+            itemfullpath = os.path.join(rootpath, item).replace("\\", "/")
+            itemrelpath = os.path.join(relroot, item).replace("\\", "/")
+            if not os.path.isdir(itemfullpath):
+                extension = os.path.splitext(itemfullpath)[1]
+                import pdb
+                pdb.set_trace()
+            else:
+                self.recursive_search(itemfullpath,
+                                      relroot=os.path.join(relroot, os.path.basename(itemrelpath)).replace("\\", "/"))
 
     def recursiveloop(self, dirname, chxlist):
-        chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
+        chxdirlist = self.getDirectoryList(
+            os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
         for item in chxdirlist:
             if item.endswith(".chx"):
-                itemurl = self.getURL(os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item).replace("\\", "/"), handler=None)
+                itemurl = self.getURL(
+                    os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item).replace("\\", "/"),
+                    handler=None)
                 etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
                 pass
-            if os.path.isdir(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
-                if len([x for x in self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(dirname + '/' + item))) if (x.endswith('.chx') or os.path.isdir(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(dirname + '/' + item + '/' + x))))]) > 0:
-                    subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap, url=self.getURL(os.path.normpath(self._web_support.checklistpath + '/'  + dirname + '/' + item), handler=None), name=item)
+            if os.path.isdir(os.path.abspath(
+                    self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
+                if len([x for x in self.getDirectoryList(os.path.abspath(
+                        self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
+                                dirname + '/' + item))) if (x.endswith('.chx') or os.path.isdir(os.path.abspath(
+                        self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
+                                dirname + '/' + item + '/' + x))))]) > 0:
+                    subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap,
+                                                  url=self.getURL(os.path.normpath(
+                                                      self._web_support.checklistpath + '/' + dirname + '/' + item),
+                                                                  handler=None), name=item)
                     self.recursiveloop(os.path.normpath(dirname + '/' + item), subchxlist)
                 pass
 
-    def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers, content_mode=_default_content_mode, style_mode=_default_style_mode, recursion_depth=_default_recursion_depth):
+    def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers,
+                 content_mode=_default_content_mode, style_mode=_default_style_mode,
+                 recursion_depth=_default_recursion_depth):
         """ Load all of the values provided by initialization """
-        super(db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode, style_mode)
+        super(db_directory, self).__init__(relpath, fullpath, web_support, handler_support, caller, handlers, content_mode,
+                                           style_mode)
         if caller == "databrowse":
             uphref = self.getURLToParent(self._relpath)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref, resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
-            topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', nsmap=self.nsmap, xmlns="http://www.w3.org/1999/xhtml")
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, path=self._fullpath,
+                                    relpath=self._relpath, dataroot=self._web_support.dataroot, uphref=uphref,
+                                    resurl=self._web_support.resurl, siteurl=self._web_support.siteurl, root="True")
+            topmenu = etree.Element('{http://thermal.cnde.iastate.edu/databrowse}navbar', nsmap=self.nsmap,
+                                    xmlns="http://www.w3.org/1999/xhtml")
             navelem = etree.SubElement(topmenu, "{http://thermal.cnde.iastate.edu/databrowse}navelem", nsmap=self.nsmap)
             title = etree.SubElement(navelem, "{http://www.w3.org/1999/xhtml}a", nsmap=self.nsmap)
             title.text = "View Options"
-            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true", nsmap=self.nsmap)
+            navitems = etree.SubElement(navelem, "{http://thermal.cnde.iastate.edu/databrowse}navdir", alwaysopen="true",
+                                        nsmap=self.nsmap)
             if not "showhiddenfiles" in self._web_support.req.form:
-                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem', nsmap=self.nsmap)
-                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=""), nsmap=self.nsmap)
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem',
+                                            nsmap=self.nsmap)
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a',
+                                            href=self.getURL(self._relpath, showhiddenfiles=""), nsmap=self.nsmap)
                 menulink.text = "Show Hidden Files"
             else:
-                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem', nsmap=self.nsmap)
-                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a', href=self.getURL(self._relpath, showhiddenfiles=None), nsmap=self.nsmap)
+                menuitem = etree.SubElement(navitems, '{http://thermal.cnde.iastate.edu/databrowse}navelem',
+                                            nsmap=self.nsmap)
+                menulink = etree.SubElement(menuitem, '{http://www.w3.org/1999/xhtml}a',
+                                            href=self.getURL(self._relpath, showhiddenfiles=None), nsmap=self.nsmap)
                 menulink.text = "Hide Hidden Files"
             self._web_support.menu.AddMenu(topmenu)
             pass
         else:
             link = self.getURL(self._relpath, handler=None)
-            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath), path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot, href=link, resurl=self._web_support.resurl)
+            xmlroot = etree.Element('{%s}dir' % self._namespace_uri, nsmap=self.nsmap, name=os.path.basename(self._relpath),
+                                    path=self._fullpath, relpath=self._relpath, dataroot=self._web_support.dataroot,
+                                    href=link, resurl=self._web_support.resurl)
             pass
         if "ajax" in self._web_support.req.form:
             xmlroot.set("ajaxreq", "True")
@@ -133,10 +149,13 @@ class db_directory(renderer_class):
                 if handler in self._handler_support.directoryplugins:
                     icon = self._handler_support.directoryplugins[handler]
                 if handler in self._handler_support.directoryplugins:
-                    renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode=content_mode, style_mode=style_mode, recursion_depth=recursion_depth-1)
+                    renderer = self.__class__(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller,
+                                              handlers, content_mode=content_mode, style_mode=style_mode,
+                                              recursion_depth=recursion_depth - 1)
                 else:
                     exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-                    exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (handler, handler, content_mode, style_mode, recursion_depth - 1)
+                    exec "renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (
+                    handler, handler, content_mode, style_mode, recursion_depth - 1)
                 content = renderer.getContent()
                 if os.path.islink(itemfullpath):
                     overlay = "link"
@@ -151,26 +170,29 @@ class db_directory(renderer_class):
                     content.set('overlay', overlay)
                     xmlroot.append(content)
                 else:
-                    xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap, fullpath=itemfullpath, relpath=itemrelpath, basename=os.path.basename(itemfullpath), link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
+                    xmlchild = etree.SubElement(xmlroot, '{%s}file' % (self._namespace_uri), nsmap=self.nsmap,
+                                                fullpath=itemfullpath, relpath=itemrelpath,
+                                                basename=os.path.basename(itemfullpath),
+                                                link=self.getURL(itemrelpath, handler=None), icon=icon, overlay=overlay)
                     if content is not None:
                         xmlchild.append(content)
                         pass
                 pass
             pass
         else:
-            #ajax url and what not
+            # ajax url and what not
             xmlroot.set("ajax", "True")
-            xmlroot.set("ajaxurl", self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode, style_mode=self._style_mode))
+            xmlroot.set("ajaxurl",
+                        self.getURL(self._relpath, recursion_depth=1, nopagestyle=True, content_mode=self._content_mode,
+                                    style_mode=self._style_mode))
             pass
         if self._caller == "databrowse" and self._web_support.checklistpath is not None:
             chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri), nsmap=self.nsmap)
-            #chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
-
-            
+            # chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath))
 
             self.recursiveloop('/', chxlist)
 
-            #for item in [item for item in chxdirlist if item.endswith(".chx")]:
+            # for item in [item for item in chxdirlist if item.endswith(".chx")]:
             #    itemurl = self.getURL(os.path.join(self._web_support.checklistpath, item), handler=None)
             #    etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
             #    pass
@@ -179,33 +201,37 @@ class db_directory(renderer_class):
         pass
 
     def getContent(self):
-		if self._content_mode == "title" and self._style_mode in ['fusion']:
-			specimen_file_types = ['.xlg', '.xlp']
-			
-			self.recursive_search(self._fullpath, relroot=self._relpath)
+        if self._content_mode == "title" and self._style_mode in ['fusion']:
+            specimen_file_types = ['.xlg', '.xlp']
 
-			p = etree.XMLParser(huge_tree=True)
-			xmlroot = etree.parse(self._fullpath, parser=p).getroot()
+            self.recursive_search(self._fullpath, relroot=self._relpath)
 
-			fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
-			for fusion in fusions:
-				fusionmodellist = fusion.xpath('dc:greensinversion_layer_3d', namespaces={'dc': 'http://limatix.org/datacollect'})
-				for model in fusionmodellist:
-					try:
-						xlink = model.get('{http://www.w3.org/1999/xlink}href')
-						if xlink:
-						    path = os.path.join(os.path.dirname(self._fullpath), xlink)
-						    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
-						        relpath = path.replace(self._web_support.dataroot, '')
-						        url = self.getURL(relpath, content_mode="raw", model="true")
-						        model.attrib['url'] = url
-					except Exception:
-						pass
-			return xmlroot
-		elif self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
-			return self._xml
-		else:
-			raise self.RendererException("Invalid Content Mode")
-		pass
+            p = etree.XMLParser(huge_tree=True)
+            xmlroot = etree.parse(self._fullpath, parser=p).getroot()
 
-pass
+            fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
+            for fusion in fusions:
+                fusionmodellist = fusion.xpath('dc:greensinversion_layer_3d',
+                                               namespaces={'dc': 'http://limatix.org/datacollect'})
+                for model in fusionmodellist:
+                    try:
+                        xlink = model.get('{http://www.w3.org/1999/xlink}href')
+                        if xlink:
+                            path = os.path.join(os.path.dirname(self._fullpath), xlink)
+                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path,
+                                                                                                           os.R_OK) and os.path.exists(
+                                    path):
+                                relpath = path.replace(self._web_support.dataroot, '')
+                                url = self.getURL(relpath, content_mode="raw", model="true")
+                                model.attrib['url'] = url
+                    except Exception:
+                        pass
+            return xmlroot
+        elif self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
+            return self._xml
+        else:
+            raise self.RendererException("Invalid Content Mode")
+        pass
+
+
+    pass

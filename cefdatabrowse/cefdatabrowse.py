@@ -716,6 +716,7 @@ class CefWidget(CefWidgetParent):
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
+        self.browser.SetClientHandler(KeyboardHandler(self))
 
     def getHandle(self):
         if self.hidden_window:
@@ -832,6 +833,22 @@ class FocusHandler(object):
             # print("[qt.py] FocusHandler.OnGotFocus:"
             #       " keyboard focus fix no. 1 (Issue #284)")
             browser.SetFocus(True)
+
+
+class KeyboardHandler(object):
+    def __init__(self, cef_widget):
+        self.cef_widget = cef_widget
+        self.text = None
+
+    def OnPreKeyEvent(self, **event):
+        if event['event']['modifiers'] == 4L and event['event']['character'] == 70:
+            if self.text is None:
+                self.text, ok = QInputDialog.getText(self.cef_widget, 'Find', '')
+            self.cef_widget.browser.Find(0, str(self.text), True, False, False)
+            self.cef_widget.browser.SetFocus(True)
+        elif event['event']['character'] == 27:
+            self.cef_widget.browser.StopFinding(True)
+            self.text = None
 
 
 class NavigationBar(QFrame):
