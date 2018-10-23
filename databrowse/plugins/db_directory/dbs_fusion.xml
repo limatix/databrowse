@@ -1,0 +1,172 @@
+<xi:include href="/usr/local/limatix-qautils/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xpointer(/xsl:stylesheet/node())" />
+
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
+	<xsl:element name="script">
+		<xsl:attribute name="type">text/javascript</xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
+	</xsl:element>
+	<xsl:element name="link">
+		<xsl:attribute name="rel">stylesheet</xsl:attribute>
+		<xsl:attribute name="type">text/css</xsl:attribute>
+		<xsl:attribute name="href"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
+	</xsl:element>
+	<script type="text/javascript">
+		<![CDATA[
+			var element;
+			var Browser;
+			var fusions;
+			var curfusion;
+			var depthele;
+			var depth = 0;
+
+			X3D (function () {
+				Browser = X3D.getBrowser("X3DCanvas"),
+				currentScene = Browser.currentScene;
+			},
+			function (error) {
+				// Error callback, no browser.
+				console.error(error);
+			});
+
+			$(document).ready(function() {
+				element = document.getElementById('x3dcanvas');
+				fusions = document.getElementById('fusions');
+				depthele = document.getElementById('eledepth');
+			});
+
+			function incrementdepth() {
+				fusion = fusions.content.querySelector('#' + curfusion);
+				fusion_children = fusion.children;
+				if (depth+1 < fusion_children.length) {
+					depth += 1;
+					new_fusion = fusion_children[depth].textContent;
+					new_depth = fusion_children[depth].getAttribute('layerdepth');
+					loadmodel(new_fusion, new_depth);
+				}
+			}
+
+			function decrementdepth() {
+				fusion = fusions.content.querySelector('#' + curfusion);
+				fusion_children = fusion.children;
+				if (depth-1 >= 0) {
+					depth -= 1;
+					new_fusion = fusion_children[depth].textContent;
+					new_depth = fusion_children[depth].getAttribute('layerdepth');
+					loadmodel(new_fusion, new_depth);
+				}
+			}
+
+			function initmodel(id) {
+				hidedetails(curfusion);
+				curfusion = id;
+
+				fusion = fusions.content.querySelector('#' + curfusion);
+				
+				if (fusion) {
+					url = fusion.children[0].textContent;
+
+					//element.setAttribute("src", url);
+					//element.style.width = document.getElementById('content').offsetWidth + "px";
+					//element.style.height = document.getElementById('content').offsetWidth + "px";
+
+					depth = 0;
+
+					loadmodel(url, depth);
+
+					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
+				
+					container = document.getElementById('3dModel');
+					container.style.visibility = "";
+				}
+				loaddetails(curfusion);
+			}
+
+			function loadmodel(url, depth) {
+				Browser.loadURL(new X3D.MFString(url), new X3D.MFString());
+				depthele.textContent = "Depth: " + depth;
+			}
+
+			function loaddetails(id) {
+				spec_details = document.getElementsByName(id);
+                $.each(spec_details, function( index, value ) {
+                    value.style.display = "";
+                });
+			}
+			function hidedetails (id) {
+				spec_details = document.getElementsByName(id);
+                $.each(spec_details, function( index, value ) {
+                    value.style.display = "none";
+                });
+			}
+		]]>
+	</script>
+	<div id="specimenmenu">
+		<h3>Select a Specimen</h3>
+		<xsl:for-each select="//dc:specimen[not(preceding::dc:specimen/text() = text())]">
+			<a>
+				<xsl:attribute name="onclick">initmodel('<xsl:value-of select="text()"/>')</xsl:attribute>
+				<xsl:value-of select="text()"/>
+			</a>
+			<br/>
+		</xsl:for-each>
+	</div>
+	<div id="3dModel" style="visibility:hidden;text-align:center;">
+		<p id="eledepth">Depth: 0.00</p>
+		<a>
+			<xsl:attribute name="onclick">
+				decrementdepth();
+			</xsl:attribute>
+			<img>
+				<xsl:attribute name="src">
+					<xsl:value-of select="@resurl"/>/icons/go-previous.png
+				</xsl:attribute>
+			</img>
+		</a>
+		<a>
+			<xsl:attribute name="onclick">
+				incrementdepth();
+			</xsl:attribute>
+			<img>
+				<xsl:attribute name="src">
+					<xsl:value-of select="@resurl"/>/icons/go-next.png
+				</xsl:attribute>
+			</img>
+		</a>
+		<br/>
+		<X3DCanvas id="x3dcanvas" style="width: 700px; height: 432px;" src="">
+			<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
+		</X3DCanvas>
+	</div>
+		<xsl:for-each select="dc:measurement">
+			<div style="display:none;">
+				<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>
+				<xsl:call-template name="specimen"/>
+			</div>
+		</xsl:for-each>
+	<template id="fusions">
+		<xsl:for-each select="dc:fusion">
+			<fusion>
+				<xsl:attribute name="id">
+					<xsl:value-of select="dc:specimen/text()"/>
+				</xsl:attribute>
+				<xsl:for-each select="dc:greensinversion_layer_3d">
+					<p>
+						<xsl:attribute name="layerdepth"><xsl:value-of select="@layerdepth_meters"/> m</xsl:attribute>
+						<xsl:value-of select="@url"/>
+					</p>
+				</xsl:for-each>
+			</fusion>
+		</xsl:for-each>
+	</template>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" name="specimen" mode="full">
+	<h3>Measurement Summary</h3>
+	<table class="cream full-width">
+	        <thead>
+	            <tr><th style="width:166px">Item</th><th>Value</th></tr>
+	        </thead>
+	        <tbody>
+	            <xsl:apply-templates select="dc:*" />
+	        </tbody>
+	    </table>
+</xsl:template>

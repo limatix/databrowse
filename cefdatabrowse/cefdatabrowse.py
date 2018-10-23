@@ -321,6 +321,7 @@ class ClientHandler:
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
             params.update(urlparams)
+            params.update(request.GetHeaderMap())
             html = dbp.application(fullpath, params)
             data = "".join(html[0])
             urlparams.update({'headers': html[1], "status": html[2]})
@@ -340,6 +341,8 @@ class ClientHandler:
             mime = response.GetMimeType()
             urlparams.update({'headers': {'Content-Type': mime}, "status": 200})
             data = "".join(html)
+
+        del html
 
         return data
 

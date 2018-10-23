@@ -126,11 +126,9 @@ class db_limatix_viewer(renderer_class):
                             url = self.getURL(relpath)
                             item.set('url', url)
                 return xmlroot
-            elif self._content_mode == "full" and self._style_mode in ['fusion']:
+            elif self._content_mode == "full" and self._style_mode in ['processing_summary']:
                 p = etree.XMLParser(huge_tree=True)
                 xmlroot = etree.parse(self._fullpath, parser=p).getroot()
-
-                xmlroot.attrib['resurl'] = self._web_support.resurl
 
                 fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
                 for fusion in fusions:
@@ -142,7 +140,7 @@ class db_limatix_viewer(renderer_class):
                                 path = os.path.join(os.path.dirname(self._fullpath), xlink)
                                 if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                     relpath = path.replace(self._web_support.dataroot, '')
-                                    url = self.getURL(relpath, content_mode="raw", model="True")
+                                    url = self.getURL(relpath, content_mode="raw", model="true")
                                     model.attrib['url'] = url
                         except Exception:
                             pass

@@ -60,6 +60,27 @@ class db_directory(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 1
 
+	def recursive_search(self, rootpath, relroot=""):
+		dirlist = self.getDirectoryList(rootpath)
+		for item in dirlist:
+			itemfullpath = os.path.join(rootpath, item).replace("\\", "/")
+			itemrelpath = os.path.join(relroot, item).replace("\\", "/")
+			if not os.path.isdir(itemfullpath):
+				try:
+					magicstore = magic.open(magic.MAGIC_MIME)
+					magicstore.load()
+					contenttype = magicstore.file(os.path.realpath(itemfullpath))  # real path to resolve symbolic links outside of dataroot
+				except AttributeError:
+					contenttype = magic.from_file(os.path.realpath(itemfullpath), mime=True)
+				if contenttype is None:
+					contenttype = "text/plain"
+
+				extension = os.path.splitext(itemfullpath)[1]
+				import pdb
+				pdb.set_trace()
+			else:
+				self.recursive_search(itemfullpath, relroot=os.path.join(relroot, os.path.basename(itemrelpath)).replace("\\", "/"))
+
     def recursiveloop(self, dirname, chxlist):
         chxdirlist = self.getDirectoryList(os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
         for item in chxdirlist:
@@ -158,10 +179,33 @@ class db_directory(renderer_class):
         pass
 
     def getContent(self):
-        if self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
-            return self._xml
-        else:
-            raise self.RendererException("Invalid Content Mode")
-        pass
+		if self._content_mode == "title" and self._style_mode in ['fusion']:
+			specimen_file_types = ['.xlg', '.xlp']
+			
+			self.recursive_search(self._fullpath, relroot=self._relpath)
+
+			p = etree.XMLParser(huge_tree=True)
+			xmlroot = etree.parse(self._fullpath, parser=p).getroot()
+
+			fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
+			for fusion in fusions:
+				fusionmodellist = fusion.xpath('dc:greensinversion_layer_3d', namespaces={'dc': 'http://limatix.org/datacollect'})
+				for model in fusionmodellist:
+					try:
+						xlink = model.get('{http://www.w3.org/1999/xlink}href')
+						if xlink:
+						    path = os.path.join(os.path.dirname(self._fullpath), xlink)
+						    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
+						        relpath = path.replace(self._web_support.dataroot, '')
+						        url = self.getURL(relpath, content_mode="raw", model="true")
+						        model.attrib['url'] = url
+					except Exception:
+						pass
+			return xmlroot
+		elif self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
+			return self._xml
+		else:
+			raise self.RendererException("Invalid Content Mode")
+		pass
 
 pass

@@ -57,8 +57,6 @@
 
             function expandrepo(el) {
                 var level = $(el).parent().parent().children("#repofile");
-                console.log(el);
-                console.log(level);
                 $.each(level, function( index, value ) {
                     value.style.display = "";
                 });
