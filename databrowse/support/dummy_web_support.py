@@ -264,20 +264,22 @@ class web_support:
 
     def __init__(self, filename, params):
         self.req = wsgi_req(filename, params)
-        self.webdir = os.path.join(params["install"], "databrowse_wsgi")
+        if params.get("install"):
+            self.webdir = os.path.join(params["install"], "databrowse_wsgi")
         #self.reqfilename = self.req.filename
         #self.stderr = environ["wsgi.errors"]
         self.style = style_support()
         scheme = params.get("scheme")
 
         # Try to Load Optional Configuration File
-        try:
-            conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
-            self.confstr = conffile.read()
-            conffile.close()
-            exec self.confstr
-        except Exception:
-            pass
+        if params.get("install"):
+            try:
+                conffile = file(os.path.join(params["install"], "databrowse_wsgi/databrowse_wsgi.conf"))
+                self.confstr = conffile.read()
+                conffile.close()
+                exec self.confstr
+            except Exception:
+                pass
 
         # Set Default Configuration Options
         if self.dataroot is None:
@@ -290,27 +292,36 @@ class web_support:
             self.checklistpath = "/SOPs"
 
         if self.siteurl is None:
-            if scheme is not None:
-                self.siteurl = "/".join([scheme, urllib.pathname2url(self.dataroot).replace("//", "")[1:]])
+            if params.get("install"):
+                if scheme is not None:
+                    self.siteurl = "/".join([scheme, urllib.pathname2url(self.dataroot).replace("//", "")[1:]])
+                else:
+                    self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             else:
-                self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
+                self.siturl = "http://localhost/databrowse"
             pass
 
         if self.resurl is None:
-            if scheme is not None:
-                self.resurl = "/".join([scheme, urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
-                    os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources"))).replace("//", "")[1:]])
+            if params.get("install"):
+                if scheme is not None:
+                    self.resurl = "/".join([scheme, urllib.pathname2url(os.path.abspath(os.path.join(os.path.join(
+                        os.path.join(os.path.dirname(__file__), os.pardir), os.pardir), "databrowse_wsgi/resources"))).replace("//", "")[1:]])
+                else:
+                    self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
+                        os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
+                        "databrowse_wsgi/resources"))).replace("//", "")[1:]])
             else:
-                self.resurl = "/".join(["http://0.0.0.0", urllib.pathname2url(os.path.abspath(os.path.join(
-                    os.path.join(os.path.join(os.path.dirname(__file__), os.pardir), os.pardir),
-                    "databrowse_wsgi/resources"))).replace("//", "")[1:]])
+                self.resurl = "http://localhost/dbres"
             pass
 
         if self.logouturl is None:
-            if scheme is not None:
-                self.logouturl = "/".join([scheme, "logout"])
+            if params.get("install"):
+                if scheme is not None:
+                    self.logouturl = "/".join([scheme, "logout"])
+                else:
+                    self.logouturl = "http://0.0.0.0/logout"
             else:
-                self.logouturl = "http://0.0.0.0/logout"
+                self.logouturl = "http://localhost/logout"
             pass
 
         #if not environ["REMOTE_USER"]:
