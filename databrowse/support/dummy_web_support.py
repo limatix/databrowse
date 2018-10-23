@@ -299,7 +299,7 @@ class web_support:
                 else:
                     self.siteurl = "/".join(["http://0.0.0.0", self.dataroot])
             else:
-                self.siturl = "http://localhost/databrowse"
+                self.siteurl = "http://localhost/databrowse"
             pass
 
         if self.resurl is None:
