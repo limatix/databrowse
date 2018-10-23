@@ -283,7 +283,8 @@ class web_support:
 
         # Set Default Configuration Options
         if self.dataroot is None:
-            self.dataroot = os.path.normpath(params.get("dataroot"))
+            if params.get("dataroot"):
+                self.dataroot = os.path.normpath(params.get("dataroot"))
             if self.dataroot is None:
                 self.dataroot = '/'
             pass
