@@ -487,7 +487,10 @@ def application(filename, params):
             # Now we can get a list of request variables
             inputstring = ""
             for key in db_web_support.req.form.keys():
-                inputstring = inputstring + "%s:  %s \n" % (key, repr(db_web_support.req.form[key].value))
+                try:
+                    inputstring = inputstring + "%s:  %s \n" % (key, repr(db_web_support.req.form[key].value))
+                except AttributeError:
+                    pass
                 pass
             inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 

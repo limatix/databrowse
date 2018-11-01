@@ -40,6 +40,24 @@
 			<br/>
 		</xsl:for-each>
 	</div>
+	<!--<xsl:for-each select="//dc:config/dc:configfile">-->
+		<!--<div style="display:none;">-->
+			<!--<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>-->
+			<!--<xsl:call-template name="config"/>-->
+		<!--</div>-->
+	<!--</xsl:for-each>-->
+	<!--<xsl:for-each select="//dc:experiment">-->
+		<!--<div style="display:none;">-->
+			<!--<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>-->
+			<!--<xsl:call-template name="specimen"/>-->
+		<!--</div>-->
+	<!--</xsl:for-each>-->
+	<xsl:for-each select="//dc:fusion">
+		<div style="display:none;">
+			<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>
+			<xsl:call-template name="fusion"/>
+		</div>
+	</xsl:for-each>
 	<xsl:for-each select="//dc:measurement">
 		<div style="display:none;">
 			<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>
@@ -47,7 +65,14 @@
 		</div>
 	</xsl:for-each>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" name="specimen" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:fusion" name="fusion" mode="full">
+	<h3>Fusion</h3>
+	<X3DCanvas style="width: 700px; height: 432px;">
+		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d"/></xsl:attribute>
+		<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
+	</X3DCanvas>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" name="specimen" mode="full">
 	<h3>Measurement Summary</h3>
 	<table class="cream full-width">
 	        <thead>
@@ -57,4 +82,19 @@
 	            <xsl:apply-templates select="dc:*" />
 	        </tbody>
 	    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" name="config" mode="full">
+    <h3>Configuration</h3>
+            <xsl:choose>
+                <xsl:when test="@xlink:href and @url">
+                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                    <tt><xsl:value-of select="@xlink:href"/></tt></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tt><xsl:value-of select="@xlink:href"/></tt>
+                </xsl:otherwise>
+            </xsl:choose>
+        <pre class="prettyprint" style="height:300px">
+            <xsl:value-of select="."/>
+        </pre>
 </xsl:template>

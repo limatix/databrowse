@@ -505,7 +505,10 @@ def application(environ, start_response):
             # Now we can get a list of request variables
             inputstring = ""
             for key in form.keys():
-                inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
+                try:
+                    inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
+                except AttributeError:
+                    pass
                 pass
             inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 
