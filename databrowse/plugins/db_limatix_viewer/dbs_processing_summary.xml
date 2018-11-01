@@ -11,16 +11,14 @@
 	var resurl = "<xsl:value-of select="$resdir"/>";
 	<![CDATA[
             function expandrepo(el) {
-                level = $(el).parent().parent().children("#procsteps")[0];
-                console.log(el);
-                console.log(level);
+                level = $(el).parent().children("#procsteps")[0];
 				level.style.display = "";
                 el.src = resurl + "/icons/list-remove.png";
                 el.setAttribute( "onclick", "shrinkrepo(this);" );
             }
 
             function shrinkrepo(el) {
-                level = $(el).parent().parent().children("#procsteps")[0];
+                level = $(el).parent().children("#procsteps")[0];
                 level.style.display = "none";
                 el.src = resurl + "/icons/list-add.png";
                 el.setAttribute( "onclick", "expandrepo(this);" );
@@ -46,20 +44,20 @@
 			<xsl:if test="lip:log">
 				<tr><th>Log</th><td colspan="4"><xsl:value-of select="lip:log" /></td></tr>
 			</xsl:if>
+			<tr><th>Details</th><td colspan="4">
+				<div><span>Successes: <xsl:value-of select="count(.//lip:log[contains(@status, 'success')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span><span style="margin-left:30px">Exceptions: <xsl:value-of select="count(.//lip:log[contains(@status, 'exception')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span>
+					<img style="float: right" onclick="expandrepo(this)">
+				   		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+					</img>
+					<ul id="procsteps" style="display:none;">
+						<xsl:for-each select="lip:process[lip:argv]">
+							<xsl:call-template name="subprocess"/>
+						</xsl:for-each>
+					</ul>
+				</div>
+			</td></tr>
 		</tbody>
 	</table>
-	<div>
-		<h3>Process Breakup
-			<img style="float: right" onclick="expandrepo(this)">
-			    <xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
-			</img>
-		</h3>
-		<ul id="procsteps" style="display:none;">
-			<xsl:for-each select="lip:process[lip:argv]">
-				<xsl:call-template name="subprocess"/>
-			</xsl:for-each>
-		</ul>
-	</div>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="process" name="subprocess">
 	<table class="cream full-width">
