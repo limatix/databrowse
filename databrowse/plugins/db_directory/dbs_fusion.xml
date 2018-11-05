@@ -1,165 +1,74 @@
 <xi:include href="/usr/local/limatix-qautils/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xpointer(/xsl:stylesheet/node())" />
 
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:experiment" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dir:search" mode="title">
 	<xsl:element name="script">
 		<xsl:attribute name="type">text/javascript</xsl:attribute>
-		<xsl:attribute name="src"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
 	</xsl:element>
 	<xsl:element name="link">
 		<xsl:attribute name="rel">stylesheet</xsl:attribute>
 		<xsl:attribute name="type">text/css</xsl:attribute>
-		<xsl:attribute name="href"><xsl:value-of select="$resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
+		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
 	</xsl:element>
 	<script type="text/javascript">
+		var fullpath = "<xsl:value-of select="@path"/>";
 		<![CDATA[
-			var element;
-			var Browser;
-			var fusions;
-			var curfusion;
-			var depthele;
-			var depth = 0;
+			$( document ).ready(function() {
+				$("#searchterm").keyup(function(event) {
+					if (event.keyCode === 13) {
+						$("#searchbutton").click();
+					}
+				});
 
-			X3D (function () {
-				Browser = X3D.getBrowser("X3DCanvas"),
-				currentScene = Browser.currentScene;
-			},
-			function (error) {
-				// Error callback, no browser.
-				console.error(error);
+				$("#searchbutton").click(function() {
+					loadresults();
+				});
 			});
 
-			$(document).ready(function() {
-				element = document.getElementById('x3dcanvas');
-				fusions = document.getElementById('fusions');
-				depthele = document.getElementById('eledepth');
-			});
-
-			function incrementdepth() {
-				fusion = fusions.content.querySelector('#' + curfusion);
-				fusion_children = fusion.children;
-				if (depth+1 < fusion_children.length) {
-					depth += 1;
-					new_fusion = fusion_children[depth].textContent;
-					new_depth = fusion_children[depth].getAttribute('layerdepth');
-					loadmodel(new_fusion, new_depth);
-				}
-			}
-
-			function decrementdepth() {
-				fusion = fusions.content.querySelector('#' + curfusion);
-				fusion_children = fusion.children;
-				if (depth-1 >= 0) {
-					depth -= 1;
-					new_fusion = fusion_children[depth].textContent;
-					new_depth = fusion_children[depth].getAttribute('layerdepth');
-					loadmodel(new_fusion, new_depth);
-				}
-			}
-
-			function initmodel(id) {
-				hidedetails(curfusion);
-				curfusion = id;
-
-				fusion = fusions.content.querySelector('#' + curfusion);
-				
-				if (fusion) {
-					url = fusion.children[0].textContent;
-
-					//element.setAttribute("src", url);
-					//element.style.width = document.getElementById('content').offsetWidth + "px";
-					//element.style.height = document.getElementById('content').offsetWidth + "px";
-
-					depth = 0;
-
-					loadmodel(url, depth);
-
-					depthele.textContent = "Depth: " + fusion.children[0].getAttribute('layerdepth');
-				
-					container = document.getElementById('3dModel');
-					container.style.visibility = "";
-				}
-				loaddetails(curfusion);
-			}
-
-			function loadmodel(url, depth) {
-				Browser.loadURL(new X3D.MFString(url), new X3D.MFString());
-				depthele.textContent = "Depth: " + depth;
-			}
-
-			function loaddetails(id) {
-				spec_details = document.getElementsByName(id);
-                $.each(spec_details, function( index, value ) {
-                    value.style.display = "";
-                });
-			}
-			function hidedetails (id) {
-				spec_details = document.getElementsByName(id);
-                $.each(spec_details, function( index, value ) {
-                    value.style.display = "none";
-                });
+			function loadresults(term) {
+			    var text;
+		    	if (term) {
+		    	    text = term;
+		    	} else {
+		    	    text = document.getElementById("searchterm").value;
+		    	}
+			    if (text) {
+			        ajaxurl = fullpath + "&nopagestyle&search="+text;
+			        $.ajax({url: ajaxurl, success: function(result){
+						result = result.getElementById("searchcontent");
+						currentresult = document.getElementById("searchcontent");
+						currentresult.innerHTML = result.innerHTML;
+					}});
+			    }
 			}
 		]]>
 	</script>
-	<div id="specimenmenu">
-		<h3>Select a Specimen</h3>
-		<xsl:for-each select="//dc:specimen[not(preceding::dc:specimen/text() = text())]">
-			<a>
-				<xsl:attribute name="onclick">initmodel('<xsl:value-of select="text()"/>')</xsl:attribute>
-				<xsl:value-of select="text()"/>
-			</a>
-			<br/>
-		</xsl:for-each>
+	<div id="specimenwrapper">
+		<div style="float:right"><input type="text" id="searchterm"/><button id="searchbutton">Go</button></div>
+		<div id="searchcontent">
+			<xsl:apply-templates/>
+		</div>
 	</div>
-	<div id="3dModel" style="visibility:hidden;text-align:center;">
-		<p id="eledepth">Depth: 0.00</p>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:specimens">
+	<h3>Detected Specimens</h3>
+	<xsl:for-each select="dir:specimen">
 		<a>
-			<xsl:attribute name="onclick">
-				decrementdepth();
-			</xsl:attribute>
-			<img>
-				<xsl:attribute name="src">
-					<xsl:value-of select="@resurl"/>/icons/go-previous.png
-				</xsl:attribute>
-			</img>
-		</a>
-		<a>
-			<xsl:attribute name="onclick">
-				incrementdepth();
-			</xsl:attribute>
-			<img>
-				<xsl:attribute name="src">
-					<xsl:value-of select="@resurl"/>/icons/go-next.png
-				</xsl:attribute>
-			</img>
+			<xsl:attribute name="onclick">loadresults('<xsl:value-of select="text()"/>')</xsl:attribute>
+			<xsl:value-of select="text()"/>
 		</a>
 		<br/>
-		<X3DCanvas id="x3dcanvas" style="width: 700px; height: 432px;" src="">
-			<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
-		</X3DCanvas>
-	</div>
-		<xsl:for-each select="dc:measurement">
-			<div style="display:none;">
-				<xsl:attribute name="name"><xsl:value-of select="dc:specimen"/></xsl:attribute>
-				<xsl:call-template name="specimen"/>
-			</div>
-		</xsl:for-each>
-	<template id="fusions">
-		<xsl:for-each select="dc:fusion">
-			<fusion>
-				<xsl:attribute name="id">
-					<xsl:value-of select="dc:specimen/text()"/>
-				</xsl:attribute>
-				<xsl:for-each select="dc:greensinversion_layer_3d">
-					<p>
-						<xsl:attribute name="layerdepth"><xsl:value-of select="@layerdepth_meters"/> m</xsl:attribute>
-						<xsl:value-of select="@url"/>
-					</p>
-				</xsl:for-each>
-			</fusion>
-		</xsl:for-each>
-	</template>
+	</xsl:for-each>
+	<br/>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:measurement" name="specimen" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dir:content/dc:fusion">
+	<h3>3D Fusion</h3>
+	<X3DCanvas style="width: 700px; height: 432px;">
+		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d"/></xsl:attribute>
+		<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
+	</X3DCanvas>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dir:content/dc:measurement">
 	<h3>Measurement Summary</h3>
 	<table class="cream full-width">
 	        <thead>
@@ -169,4 +78,19 @@
 	            <xsl:apply-templates select="dc:*" />
 	        </tbody>
 	    </table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" name="config" mode="full">
+    <h3>Configuration</h3>
+            <xsl:choose>
+                <xsl:when test="@xlink:href and @url">
+                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+                    <tt><xsl:value-of select="@xlink:href"/></tt></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tt><xsl:value-of select="@xlink:href"/></tt>
+                </xsl:otherwise>
+            </xsl:choose>
+        <pre class="prettyprint" style="height:300px">
+            <xsl:value-of select="."/>
+        </pre>
 </xsl:template>

@@ -101,6 +101,7 @@ serverwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
+    <xsl:variable name="dataroot">%s</xsl:variable>
     <xsl:variable name="proctime">%s</xsl:variable>
     <xsl:template match="/">
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse">
@@ -170,6 +171,7 @@ localwrapper = '''<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://thermal.cnde.iastate.edu/databrowse" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xi="http://www.w3.org/2001/XInclude" version="1.0">
     <xsl:output method="xml" omit-xml-declaration="no" indent="no" version="1.0" media-type="application/xhtml+xml" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
     <xsl:variable name="resdir">%s</xsl:variable>
+    <xsl:variable name="dataroot">%s</xsl:variable>
     <xsl:variable name="proctime">%s</xsl:variable>
     <xsl:template match="/">
         <xsl:processing-instruction name="xml-stylesheet">type="text/xsl" href="/dbres/db_web.xml"</xsl:processing-instruction>
@@ -366,7 +368,7 @@ def application(environ, start_response):
             elif "styleonly" in db_web_support.req.form:
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 parser = etree.XMLParser()
                 parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
                 styletree = etree.ElementTree(etree.XML(style, parser))
@@ -395,7 +397,7 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 styletree = etree.ElementTree(etree.XML(style, parser))
                 styletree.xinclude()
                 content = xml.xslt(styletree.getroot())
@@ -406,7 +408,7 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
-                style = localwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = localwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 styletree = etree.ElementTree(etree.XML(style, parser))
                 styletree.xinclude()
                 content = xml.xslt(styletree.getroot())
@@ -420,7 +422,7 @@ def application(environ, start_response):
                 xml = etree.ElementTree(renderer.getContent())
                 endtime = time()
                 runtime = "%.6f" % (endtime-starttime)
-                style = serverwrapper % (db_web_support.resurl, runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
+                style = serverwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 styletree = etree.ElementTree(etree.XML(style, parser))
                 styletree.xinclude()
                 content = xml.xslt(styletree.getroot())
@@ -503,7 +505,10 @@ def application(environ, start_response):
             # Now we can get a list of request variables
             inputstring = ""
             for key in form.keys():
-                inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
+                try:
+                    inputstring = inputstring + "%s:  %s \n" % (key, repr(form[key].value))
+                except AttributeError:
+                    pass
                 pass
             inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 

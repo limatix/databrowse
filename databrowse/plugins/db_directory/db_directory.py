@@ -43,10 +43,13 @@
 ###############################################################################
 """ plugins/renderers/db_directory.py - Basic Output for Any Folder """
 
+import sys
 import os
 import os.path
-import urllib
+from difflib import get_close_matches
+from urllib import pathname2url
 from lxml import etree
+from lxml import objectify
 from databrowse.support.renderer_support import renderer_class
 
 
@@ -60,18 +63,16 @@ class db_directory(renderer_class):
     _default_style_mode = "list"
     _default_recursion_depth = 1
 
-    def recursive_search(self, rootpath, relroot=""):
+    def specimen_search(self, rootpath, fileexts):
+        filelist = []
         dirlist = self.getDirectoryList(rootpath)
         for item in dirlist:
             itemfullpath = os.path.join(rootpath, item).replace("\\", "/")
-            itemrelpath = os.path.join(relroot, item).replace("\\", "/")
             if not os.path.isdir(itemfullpath):
-                extension = os.path.splitext(itemfullpath)[1]
-                import pdb
-                pdb.set_trace()
-            else:
-                self.recursive_search(itemfullpath,
-                                      relroot=os.path.join(relroot, os.path.basename(itemrelpath)).replace("\\", "/"))
+                ext = os.path.splitext(itemfullpath)[1]
+                if ext in fileexts:
+                    filelist.append(itemfullpath)
+        return filelist
 
     def recursiveloop(self, dirname, chxlist):
         chxdirlist = self.getDirectoryList(
@@ -197,41 +198,173 @@ class db_directory(renderer_class):
             #    etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
             #    pass
             pass
+        if self._style_mode in ['fusion']:
+            if self._caller == "databrowse":
+                sens = 0.85
+                try:
+                    search_term = self._web_support.req.form['search'].value
+                except KeyError:
+                    search_term = "T17-F7611-6F"
+
+                p = etree.XMLParser(huge_tree=True, remove_blank_text=True)
+                specimen_file_types = ['.xlg', '.xlp']
+
+                filelist = self.specimen_search(self._fullpath, specimen_file_types)
+
+                xmllogs = etree.Element('{%s}logs' % self._namespace_uri, nsmap=self.nsmap)
+
+                for specfile in filelist:
+                    specxml = etree.parse(specfile, parser=p).getroot()
+                    self.nsmap.update(dict(set(specxml.xpath('//namespace::*'))))
+                    xmllogs.append(specxml)
+
+                specimens = xmllogs.xpath('//dc:specimen[not(preceding::dc:specimen/text() = text())]/text()',
+                                               namespaces=self.nsmap)
+
+                xmlsearch = etree.Element('{%s}search' % self._namespace_uri,
+                                          resurl=self._web_support.resurl,
+                                          path=self.getURL(self._relpath, style_mode="fusion"),
+                                          nsmap=self.nsmap)
+
+                xmlspecimens = etree.SubElement(xmlsearch, "{%s}specimens" % self._namespace_uri, nsmap=self.nsmap)
+                for specimen in specimens:
+                    xmlspecimen = etree.SubElement(xmlspecimens, '{%s}specimen' % self._namespace_uri, nsmap=self.nsmap)
+                    xmlspecimen.text = specimen
+
+                xmlcontent = etree.SubElement(xmlsearch, "{%s}content" % self._namespace_uri, nsmap=self.nsmap)
+                if search_term:
+                    all_elements = list(xmllogs.iter())[1:]
+
+                    for element in all_elements:
+                        res = []
+
+                        tag = element.tag
+
+                        attributes = element.attrib
+                        attrib_keys = attributes.keys()
+                        attrib_values = attributes.values()
+
+                        text = element.text
+
+                        if tag:
+                            res += get_close_matches(search_term, [tag.split("}")[1]], cutoff=sens, n=1)
+
+                        if attrib_keys:
+                            res += get_close_matches(search_term, attrib_keys, cutoff=sens, n=1)
+
+                        if attrib_values:
+                            res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
+
+                        if text:
+                            res += get_close_matches(search_term, [text], cutoff=sens, n=1)
+
+                        res = list(set(res))
+
+                        if res:
+                            parent = element
+                            while True:
+                                if parent.text and parent != xmllogs:
+                                    parent = parent.getparent()
+                                else:
+                                    break
+
+                            if parent not in xmlcontent:
+                                xmlcontent.append(parent)
+                    xmlroot = xmlsearch
         self._xml = xmlroot
         pass
 
     def getContent(self):
-        if self._content_mode == "title" and self._style_mode in ['fusion']:
-            specimen_file_types = ['.xlg', '.xlp']
-
-            self.recursive_search(self._fullpath, relroot=self._relpath)
-
-            p = etree.XMLParser(huge_tree=True)
-            xmlroot = etree.parse(self._fullpath, parser=p).getroot()
-
-            fusions = xmlroot.xpath('dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
-            for fusion in fusions:
-                fusionmodellist = fusion.xpath('dc:greensinversion_layer_3d',
-                                               namespaces={'dc': 'http://limatix.org/datacollect'})
-                for model in fusionmodellist:
-                    try:
-                        xlink = model.get('{http://www.w3.org/1999/xlink}href')
-                        if xlink:
-                            path = os.path.join(os.path.dirname(self._fullpath), xlink)
-                            if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path,
-                                                                                                           os.R_OK) and os.path.exists(
-                                    path):
-                                relpath = path.replace(self._web_support.dataroot, '')
-                                url = self.getURL(relpath, content_mode="raw", model="true")
-                                model.attrib['url'] = url
-                    except Exception:
-                        pass
-            return xmlroot
-        elif self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
+        if self._content_mode == "detailed" or self._content_mode == "summary" or self._content_mode == "title":
             return self._xml
         else:
             raise self.RendererException("Invalid Content Mode")
         pass
 
+    def loadStyleFunction(self):
+        """ Override Load Style Function to Replace URL """
 
-    pass
+        # Get Variables Containing Search Locations Ready
+        #print "In loadStyleFunction"
+        #print "Path = " + self._fullpath
+        #print "Plugin = " + self.__class__.__name__
+        custompath = os.path.abspath((self._fullpath if os.path.isdir(self._fullpath) else os.path.dirname(self._fullpath)) +
+                                     '/.databrowse/stylesheets/' + self.__class__.__name__ + '/dbs_' + self._style_mode + '.xml')
+        defaultpath = os.path.abspath(os.path.dirname(sys.modules['databrowse.plugins.' + self.__class__.__name__].__file__) + '/dbs_' + self._style_mode + '.xml')
+        #print "Custom Search Path = " + custompath
+        #print "Default Search Path = " + defaultpath
+
+        # Look for Custom Stylesheets in a .databrowse folder relative to the current path
+        filename = custompath if os.path.exists(custompath) else None
+        #print "Looking For Custom File === Filename is now " + repr(filename)
+
+        # If we find one, see if its overriding the standard stylesheet and set a flag to remind us later
+        override = False
+        if filename is not None:
+            override = True if (os.path.exists(defaultpath) or hasattr(self, '_style_' + self._style_mode)) else False
+            pass
+        #print "Checking for Default Stylesheets === Override is now " + repr(override)
+
+        # Let's first check if we have already loaded the standard stylesheets
+        if filename is None:
+            #print "Filename is still empty so let's see if we have loaded the default already"
+            if self._web_support.style.IsStyleLoaded(self._namespace_uri) and override != True:
+                #print "We have loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                return
+            else:
+                # If not, let's look for normal stylesheets
+                #print "Not loaded already === IsStyleLoaded is %s and override is %s" % (repr(self._web_support.style.IsStyleLoaded(self._namespace_uri)), repr(override))
+                filename = defaultpath if os.path.exists(defaultpath) else None
+                pass
+
+        # Let's check for a stylesheet in the current file
+        if filename is None:
+            #print "Filename is still none = looking for variable"
+            if hasattr(self, '_style_' + self._style_mode):
+                stylestring = getattr(self, '_style_' + self._style_mode)
+                pass
+            else:
+                # Unable to Find Stylesheet Anywhere - Return Error
+                #print "Unable to find stylesheet"
+                raise self.RendererException("Unable To Locate Stylesheet for Style Mode %s in %s" % (self._style_mode, self.__class__.__name__))
+        else:
+            # Lets load up whatever stylesheet we found
+            f = open(filename, 'r')
+            stylestring = f.read()
+            f.close()
+            pass
+
+        #print "Stylesheet Loaded Successfully:"
+        #print stylestring
+
+        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
+
+        # If we set the flag earlier, we need to change the namespace
+        if override is True:
+            #print "Override is True = Lets Modify Our Stylesheet"
+            randomid = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
+            #print "Random ID is " + randomid
+            newnamespace = self._namespace_uri + randomid
+            newlocalns = self._namespace_local + randomid
+            #print "New namespace is " + newnamespace
+            newnamedtemplates = self.__class__.__name__ + '-' + randomid + '-'
+            #print "Named templates are now prefixed " + newnamedtemplates
+            stylestring = stylestring.replace(self._namespace_uri, newnamespace)
+            stylestring = stylestring.replace(self._namespace_local + ":", newlocalns + ":")
+            stylestring = stylestring.replace("xmlns:" + self._namespace_local, "xmlns:" + newlocalns)
+            #print "Namespace Changed:"
+            #print stylestring
+            stylestring = stylestring.replace(self.__class__.__name__ + '-', newnamedtemplates)
+            #print "Named Templates Updated:"
+            #print stylestring
+            self._namespace_uri = newnamespace
+            self._namespace_local = newlocalns
+            pass
+
+        #print "Adding Style"
+        self._web_support.style.AddStyle(self._namespace_uri, stylestring)
+
+        pass
+
+
+pass
