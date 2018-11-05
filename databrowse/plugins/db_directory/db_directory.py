@@ -204,72 +204,72 @@ class db_directory(renderer_class):
                 try:
                     search_term = self._web_support.req.form['search'].value
                 except KeyError:
-                    search_term = "T17-F7611-6F"
+                    search_term = None
 
                 p = etree.XMLParser(huge_tree=True, remove_blank_text=True)
                 specimen_file_types = ['.xlg', '.xlp']
 
                 filelist = self.specimen_search(self._fullpath, specimen_file_types)
+                if len(filelist) > 0:
+                    xmllogs = etree.Element('{%s}logs' % self._namespace_uri, nsmap=self.nsmap)
 
-                xmllogs = etree.Element('{%s}logs' % self._namespace_uri, nsmap=self.nsmap)
+                    for specfile in filelist:
+                        specxml = etree.parse(specfile, parser=p).getroot()
+                        self.nsmap.update(dict(set(specxml.xpath('//namespace::*'))))
+                        xmllogs.append(specxml)
 
-                for specfile in filelist:
-                    specxml = etree.parse(specfile, parser=p).getroot()
-                    self.nsmap.update(dict(set(specxml.xpath('//namespace::*'))))
-                    xmllogs.append(specxml)
+                    specimens = xmllogs.xpath('//dc:specimen[not(preceding::dc:specimen/text() = text())]/text()',
+                                              namespaces=self.nsmap)
 
-                specimens = xmllogs.xpath('//dc:specimen[not(preceding::dc:specimen/text() = text())]/text()',
-                                               namespaces=self.nsmap)
+                    xmlsearch = etree.Element('{%s}search' % self._namespace_uri,
+                                              resurl=self._web_support.resurl,
+                                              path=self.getURL(self._relpath, style_mode="fusion"),
+                                              nsmap=self.nsmap)
 
-                xmlsearch = etree.Element('{%s}search' % self._namespace_uri,
-                                          resurl=self._web_support.resurl,
-                                          path=self.getURL(self._relpath, style_mode="fusion"),
-                                          nsmap=self.nsmap)
+                    xmlspecimens = etree.SubElement(xmlsearch, "{%s}specimens" % self._namespace_uri, nsmap=self.nsmap)
+                    for specimen in specimens:
+                        xmlspecimen = etree.SubElement(xmlspecimens, '{%s}specimen' % self._namespace_uri, nsmap=self.nsmap)
+                        xmlspecimen.text = specimen
 
-                xmlspecimens = etree.SubElement(xmlsearch, "{%s}specimens" % self._namespace_uri, nsmap=self.nsmap)
-                for specimen in specimens:
-                    xmlspecimen = etree.SubElement(xmlspecimens, '{%s}specimen' % self._namespace_uri, nsmap=self.nsmap)
-                    xmlspecimen.text = specimen
+                    xmlcontent = etree.SubElement(xmlsearch, "{%s}content" % self._namespace_uri, nsmap=self.nsmap)
+                    if search_term:
+                        all_elements = list(xmllogs.iter())[1:]
 
-                xmlcontent = etree.SubElement(xmlsearch, "{%s}content" % self._namespace_uri, nsmap=self.nsmap)
-                if search_term:
-                    all_elements = list(xmllogs.iter())[1:]
+                        for element in all_elements:
+                            res = []
 
-                    for element in all_elements:
-                        res = []
+                            tag = element.tag
 
-                        tag = element.tag
+                            attributes = element.attrib
+                            attrib_keys = attributes.keys()
+                            attrib_values = attributes.values()
 
-                        attributes = element.attrib
-                        attrib_keys = attributes.keys()
-                        attrib_values = attributes.values()
+                            text = element.text
 
-                        text = element.text
+                            if tag:
+                                res += get_close_matches(search_term, [tag.split("}")[1]], cutoff=sens, n=1)
 
-                        if tag:
-                            res += get_close_matches(search_term, [tag.split("}")[1]], cutoff=sens, n=1)
+                            if attrib_keys:
+                                res += get_close_matches(search_term, attrib_keys, cutoff=sens, n=1)
 
-                        if attrib_keys:
-                            res += get_close_matches(search_term, attrib_keys, cutoff=sens, n=1)
+                            if attrib_values:
+                                res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
 
-                        if attrib_values:
-                            res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
+                            if text:
+                                res += get_close_matches(search_term, [text], cutoff=sens, n=1)
 
-                        if text:
-                            res += get_close_matches(search_term, [text], cutoff=sens, n=1)
+                            res = list(set(res))
 
-                        res = list(set(res))
+                            if res:
+                                parent = element
+                                while True:
+                                    if parent.text and parent != xmllogs:
+                                        parent = parent.getparent()
+                                    else:
+                                        break
 
-                        if res:
-                            parent = element
-                            while True:
-                                if parent.text and parent != xmllogs:
-                                    parent = parent.getparent()
-                                else:
-                                    break
-
-                            if parent not in xmlcontent:
-                                xmlcontent.append(parent)
+                                if parent not in xmlcontent:
+                                    xmlcontent.append(parent)
                     xmlroot = xmlsearch
         self._xml = xmlroot
         pass
