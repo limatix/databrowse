@@ -46,6 +46,7 @@
 import sys
 import os
 import os.path
+from difflib import get_close_matches
 from urllib import pathname2url
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
@@ -197,26 +198,71 @@ class db_directory(renderer_class):
             #    pass
             pass
         if self._style_mode in ['fusion']:
-            if os.path.basename(self._fullpath) == os.path.basename(os.path.dirname(self._web_support.req.form['path'].value)):
+            if self._caller == "databrowse":
                 p = etree.XMLParser(huge_tree=True)
                 specimen_file_types = ['.xlg', '.xlp']
 
                 filelist = self.specimen_search(self._fullpath, specimen_file_types)
 
-                # xmlspecimens = etree.Element('{%s}specimenfiles' % self._namespace_uri, nsmap=self.nsmap)
+                xmlspecimens = etree.Element('{%s}specimenfiles' % self._namespace_uri, nsmap=self.nsmap)
 
                 for specfile in filelist:
                     specxml = etree.parse(specfile, parser=p).getroot()
-                    # self.nsmap.update(dict(set(specxml.xpath('//namespace::*'))))
-                    # xmlspecimens.append(specxml)
-                    xmlroot.append(specxml)
+                    self.nsmap.update(dict(set(specxml.xpath('//namespace::*'))))
+                    xmlspecimens.append(specxml)
+                    # xmlroot.append(specxml)
 
-                # specimens = xmlspecimens.xpath('//dc:specimen[not(preceding::dc:specimen/text() = text())]/text()',
-                #                                namespaces=self.nsmap)
+                specimens = xmlspecimens.xpath('//dc:specimen[not(preceding::dc:specimen/text() = text())]/text()',
+                                               namespaces=self.nsmap)
+
+                import pdb
+                all_elements = list(xmlspecimens.iter())
+
+                xmlspecs = etree.Element('{%s}specimens' % self._namespace_uri, nsmap=self.nsmap)
+
+                for element in all_elements:
+                    res = []
+
+                    tag = element.tag
+
+                    attributes = element.attrib
+                    attrib_keys = attributes.keys()
+                    attrib_values = attributes.values()
+
+                    text = element.text
+
+                    if tag:
+                        res += get_close_matches(tag, specimens)
+
+                    if attrib_keys:
+                        for attrib_key in attrib_keys:
+                            res += get_close_matches(attrib_key, specimens)
+
+                    if attrib_values:
+                        for attrib_value in attrib_values:
+                            res += get_close_matches(attrib_value, specimens)
+
+                    if text:
+                        res += get_close_matches(text, specimens)
+
+                    res = list(set(res))
+
+                    if res:
+                        parent = element.getparent()
+                        while True:
+                            if parent.text:
+                                parent = parent.getparent()
+                            else:
+                                break
+
+                        if parent not in xmlspecs:
+                            parent.attrib['specid'] = res[0]
+                            xmlspecs.append(element.getparent())
+
+                pdb.set_trace()
 
                 # chxlist = etree.SubElement(xmlroot, '{%s}chxlist' % (self._namespace_uri), nsmap=self.nsmap)
-                # import pdb
-                # pdb.set_trace()
+                pdb.set_trace()
         self._xml = xmlroot
         pass
 

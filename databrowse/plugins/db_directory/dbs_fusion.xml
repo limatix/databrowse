@@ -32,7 +32,7 @@
 	</script>
 	<div id="specimenmenu">
 		<h3>Select a Specimen</h3>
-		<xsl:for-each select="//dc:measurement/dc:specimen[not(preceding::dc:specimen/text() = text())]">
+		<xsl:for-each select="//dc:specimen[not(preceding::dc:specimen/text() = text())]">
 			<a>
 				<xsl:attribute name="onclick">loaddetails('<xsl:value-of select="text()"/>')</xsl:attribute>
 				<xsl:value-of select="text()"/>
