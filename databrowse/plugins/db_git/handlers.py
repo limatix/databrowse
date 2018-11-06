@@ -47,7 +47,7 @@ def is_git_repo(path):
         return False
 
 
-def dbh_git(path, contenttype, extension, roottag, nsurl):
+def dbh__git(path, contenttype, extension, roottag, nsurl):
     """ Generic Directory Handler - Returns directory_generic for all inode/directory """
     if contenttype.startswith("inode/directory") or contenttype.startswith("application/x-directory") or contenttype.startswith("directory"):
         if is_git_repo(path):
