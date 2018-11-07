@@ -256,7 +256,7 @@ class db_directory(renderer_class):
                                 res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
 
                             if text:
-                                res += get_close_matches(search_term, [text], cutoff=sens, n=1)
+                                res += get_close_matches(search_term, text.split(" "), cutoff=sens, n=1)
 
                             res = list(set(res))
 
