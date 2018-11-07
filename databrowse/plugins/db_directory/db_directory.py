@@ -286,6 +286,20 @@ class db_directory(renderer_class):
                                         grandparent.append(parent)
                             all_elements = list(xmlcontent.iter())[1:]
                     xmlroot = xmlsearch
+                    fusions = xmlroot.xpath('//dc:fusion', namespaces={'dc': 'http://limatix.org/datacollect'})
+                    for fusion in fusions:
+                        fusionmodellist = fusion.xpath('dc:greensinversion_3d', namespaces={'dc': 'http://limatix.org/datacollect'})
+                        for model in fusionmodellist:
+                            try:
+                                xlink = model.get('{http://www.w3.org/1999/xlink}href')
+                                if xlink:
+                                    path = os.path.join(self._fullpath, xlink)
+                                    if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
+                                        relpath = path.replace(self._web_support.dataroot, '')
+                                        url = self.getURL(relpath, content_mode="raw", model="true")
+                                        model.attrib['url'] = url
+                            except Exception:
+                                pass
                     print(etree.tostring(xmlroot, pretty_print=True))
         self._xml = xmlroot
         pass

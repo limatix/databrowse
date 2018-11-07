@@ -92,10 +92,10 @@
 		</div>
 	</div>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:fusion" mode="secondary">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:fusion" mode="secondary">
 	<h3>3D Fusion - <xsl:value-of select="dc:specimen"/> </h3>
 	<X3DCanvas style="width: 700px; height: 432px;">
-		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d"/></xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d/@url"/></xsl:attribute>
 		<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
 	</X3DCanvas>
 </xsl:template>
@@ -109,7 +109,7 @@
 			</tbody>
 	</table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:config/dc:configfile" mode="secondary">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" mode="secondary">
     <h3>Configuration</h3>
 	<xsl:choose>
 		<xsl:when test="@xlink:href and @url">
