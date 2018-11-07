@@ -47,10 +47,55 @@ import sys
 import os
 
 
+def sanitised_input(prompt, type_=None, min_=None, max_=None, range_=None):
+    """
+    Generic input prompt
+    https://stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response
+    :param prompt: Input question to ask user
+    :param type_: Variable type of the desired response
+    :param min_: Minimum value of a valid response
+    :param max_: Maximum value of a valid response
+    :param range_: Range of valid responses ie. ('a', 'b', 'c')
+    :return: User response
+    """
+    if min_ is not None and max_ is not None and max_ < min_:
+        raise ValueError("min_ must be less than or equal to max_.")
+    while True:
+        try:
+            ui = raw_input(prompt)
+        except SyntaxError:
+            print("Invalid input please try again.")
+            continue
+        if type_ is not None:
+            if type_ != type(ui):
+                print("Input type must be {0}.".format(type_.__name__))
+                continue
+        if max_ is not None and ui > max_:
+            print("Input must be less than or equal to {0}.".format(max_))
+        elif min_ is not None and ui < min_:
+            print("Input must be greater than or equal to {0}.".format(min_))
+        elif range_ is not None and ui not in range_:
+            if isinstance(range_, type(range)):
+                template = "Input must be between {0.start} and {0.stop}."
+                print(template.format(range_))
+            else:
+                template = "Input must be {0}."
+                if len(range_) == 1:
+                    print(template.format(*range_))
+                else:
+                    print(template.format(" or ".join((", ".join(map(str, range_[:-1])), str(range_[-1])))))
+        else:
+            return ui
+
+
 def select_requirements_file():
     """
     Return the path to a requirements file based on some os/arch condition.
     """
+
+    answer = sanitised_input("Auto install dependencies with PIP? [y/N]: ", str, range_=('y', 'Y', 'n', 'N'))
+    if answer not in ['y', 'Y']:
+        return 'requirements/null.txt'
 
     # operating system
     sys_platform = str(sys.platform).lower()
