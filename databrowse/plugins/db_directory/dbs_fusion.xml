@@ -11,6 +11,7 @@
 		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
 	</xsl:element>
 	<script type="text/javascript">
+		var resurl = "<xsl:value-of select="$resdir"/>";
 		var fullpath = "<xsl:value-of select="@path"/>";
 		<![CDATA[
 			$( document ).ready(function() {
@@ -41,16 +42,30 @@
 					}});
 			    }
 			}
+
+			function expand(el){
+			    content = $(el).parent().children('[name="_"]')[0];
+				content.style.display = "";
+                el.src = resurl + "/icons/list-remove.png";
+                el.setAttribute( "onclick", "shrink(this);" );
+			}
+
+			function shrink(el) {
+                content = $(el).parent().children('[name="_"]')[0];
+                content.style.display = "none";
+                el.src = resurl + "/icons/list-add.png";
+                el.setAttribute( "onclick", "expand(this);" );
+            }
 		]]>
 	</script>
 	<div id="specimenwrapper">
 		<div style="float:right"><input type="text" id="searchterm"/><button id="searchbutton">Go</button></div>
 		<div id="searchcontent">
-			<xsl:apply-templates/>
+			<xsl:apply-templates mode="initialize"/>
 		</div>
 	</div>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:specimens">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:specimens" mode="initialize">
 	<h3>Detected Specimens</h3>
 	<xsl:for-each select="dir:specimen">
 		<a>
@@ -60,37 +75,52 @@
 		<br/>
 	</xsl:for-each>
 	<br/>
+	<xsl:if test="dir:searchterm/text() != ''">
+		<h3>Search Keyword - <xsl:value-of select="dir:searchterm"/></h3>
+		<br/>
+	</xsl:if>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dir:content/dc:fusion">
-	<h3>3D Fusion</h3>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:_" mode="initialize">
+	<div>
+		<img style="float: right" onclick="expand(this)">
+			<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+		</img>
+		<h3><xsl:value-of select="@title"/></h3>
+		<div name="_" style="display:none">
+			<xsl:attribute name="id"><xsl:value-of select="@title"/></xsl:attribute>
+			<xsl:apply-templates mode="secondary"/>
+		</div>
+	</div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:fusion" mode="secondary">
+	<h3>3D Fusion - <xsl:value-of select="dc:specimen"/> </h3>
 	<X3DCanvas style="width: 700px; height: 432px;">
 		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d"/></xsl:attribute>
 		<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
 	</X3DCanvas>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dir:content/dc:measurement">
-	<h3>Measurement Summary</h3>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:measurement" mode="secondary">
 	<table class="cream full-width">
-	        <thead>
-	            <tr><th style="width:166px">Item</th><th>Value</th></tr>
-	        </thead>
-	        <tbody>
-	            <xsl:apply-templates select="dc:*" />
-	        </tbody>
-	    </table>
+			<thead>
+				<tr><th style="width:166px">Item</th><th>Value</th></tr>
+			</thead>
+			<tbody>
+				<xsl:apply-templates select="dc:*" />
+			</tbody>
+	</table>
 </xsl:template>
-<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://thermal.cnde.iastate.edu/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" name="config" mode="full">
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:config/dc:configfile" mode="secondary">
     <h3>Configuration</h3>
-            <xsl:choose>
-                <xsl:when test="@xlink:href and @url">
-                    <a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
-                    <tt><xsl:value-of select="@xlink:href"/></tt></a>
-                </xsl:when>
-                <xsl:otherwise>
-                    <tt><xsl:value-of select="@xlink:href"/></tt>
-                </xsl:otherwise>
-            </xsl:choose>
-        <pre class="prettyprint" style="height:300px">
-            <xsl:value-of select="."/>
-        </pre>
+	<xsl:choose>
+		<xsl:when test="@xlink:href and @url">
+			<a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+			<tt><xsl:value-of select="@xlink:href"/></tt></a>
+		</xsl:when>
+		<xsl:otherwise>
+			<tt><xsl:value-of select="@xlink:href"/></tt>
+		</xsl:otherwise>
+	</xsl:choose>
+	<pre class="prettyprint" style="height:300px">
+		<xsl:value-of select="."/>
+	</pre>
 </xsl:template>

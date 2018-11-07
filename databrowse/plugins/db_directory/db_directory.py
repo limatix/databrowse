@@ -202,9 +202,9 @@ class db_directory(renderer_class):
             if self._caller == "databrowse":
                 sens = 0.85
                 try:
-                    search_term = self._web_support.req.form['search'].value
+                    search_terms = self._web_support.req.form['search'].value
                 except KeyError:
-                    search_term = None
+                    search_terms = None
 
                 p = etree.XMLParser(huge_tree=True, remove_blank_text=True)
                 specimen_file_types = ['.xlg', '.xlp']
@@ -227,50 +227,66 @@ class db_directory(renderer_class):
                                               nsmap=self.nsmap)
 
                     xmlspecimens = etree.SubElement(xmlsearch, "{%s}specimens" % self._namespace_uri, nsmap=self.nsmap)
+
+                    xmlsearchterm = etree.SubElement(xmlspecimens, '{%s}searchterm' % self._namespace_uri, nsmap=self.nsmap)
+                    xmlsearchterm.text = search_terms
+
                     for specimen in specimens:
                         xmlspecimen = etree.SubElement(xmlspecimens, '{%s}specimen' % self._namespace_uri, nsmap=self.nsmap)
                         xmlspecimen.text = specimen
 
                     xmlcontent = etree.SubElement(xmlsearch, "{%s}content" % self._namespace_uri, nsmap=self.nsmap)
-                    if search_term:
+                    if search_terms:
                         all_elements = list(xmllogs.iter())[1:]
+                        for search_term in search_terms.split(" "):
+                            for child in xmlcontent:
+                                xmlcontent.remove(child)
 
-                        for element in all_elements:
-                            res = []
+                            for element in all_elements:
+                                res = []
 
-                            tag = element.tag
+                                tag = element.tag
 
-                            attributes = element.attrib
-                            attrib_keys = attributes.keys()
-                            attrib_values = attributes.values()
+                                attributes = element.attrib
+                                attrib_keys = attributes.keys()
+                                attrib_values = attributes.values()
 
-                            text = element.text
+                                text = element.text
 
-                            if tag:
-                                res += get_close_matches(search_term, [tag.split("}")[1]], cutoff=sens, n=1)
+                                if tag:
+                                    res += get_close_matches(search_term, [tag.split("}")[1]], cutoff=sens, n=1)
 
-                            if attrib_keys:
-                                res += get_close_matches(search_term, attrib_keys, cutoff=sens, n=1)
+                                if attrib_keys:
+                                    res += get_close_matches(search_term, attrib_keys, cutoff=sens, n=1)
 
-                            if attrib_values:
-                                res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
+                                if attrib_values:
+                                    res += get_close_matches(search_term, attrib_values, cutoff=sens, n=1)
 
-                            if text:
-                                res += get_close_matches(search_term, text.split(" "), cutoff=sens, n=1)
+                                if text:
+                                    res += get_close_matches(search_term, text.split(" "), cutoff=sens, n=1)
 
-                            res = list(set(res))
+                                res = list(set(res))
 
-                            if res:
-                                parent = element
-                                while True:
-                                    if parent.text and parent != xmllogs:
-                                        parent = parent.getparent()
-                                    else:
-                                        break
+                                if res:
+                                    parent = element
+                                    while True:
+                                        if parent.text and parent != xmllogs:
+                                            parent = parent.getparent()
+                                        else:
+                                            break
 
-                                if parent not in xmlcontent:
-                                    xmlcontent.append(parent)
+                                    if not xmlcontent.xpath("//dir:_[@title = '%s']" % parent.tag.split("}")[1],
+                                                            namespaces=self.nsmap):
+                                        grandparent = etree.SubElement(xmlcontent, "{%s}_" % self._namespace_uri, nsmap=self.nsmap)
+                                        grandparent.attrib['title'] = parent.tag.split("}")[1]
+
+                                    grandparent = xmlcontent.xpath("//dir:_[@title = '%s']" % parent.tag.split("}")[1],
+                                                                   namespaces=self.nsmap)[0]
+                                    if parent not in grandparent:
+                                        grandparent.append(parent)
+                            all_elements = list(xmlcontent.iter())[1:]
                     xmlroot = xmlsearch
+                    print(etree.tostring(xmlroot, pretty_print=True))
         self._xml = xmlroot
         pass
 
