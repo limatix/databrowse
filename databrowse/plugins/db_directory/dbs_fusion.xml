@@ -39,6 +39,9 @@
 						result = result.getElementById("searchcontent");
 						currentresult = document.getElementById("searchcontent");
 						currentresult.innerHTML = result.innerHTML;
+						$.each(result.getElementsByTagName("script"), function( index, value ) {
+							eval(value.innerHTML);
+						});
 					}});
 			    }
 			}
@@ -46,6 +49,7 @@
 			function expand(el){
 			    content = $(el).parent().children('[name="_"]')[0];
 				content.style.display = "";
+				content.style.visibility = "";
                 el.src = resurl + "/icons/list-remove.png";
                 el.setAttribute( "onclick", "shrink(this);" );
 			}
@@ -53,6 +57,7 @@
 			function shrink(el) {
                 content = $(el).parent().children('[name="_"]')[0];
                 content.style.display = "none";
+                content.style.visibility = "hidden";
                 el.src = resurl + "/icons/list-add.png";
                 el.setAttribute( "onclick", "expand(this);" );
             }
@@ -86,7 +91,7 @@
 			<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
 		</img>
 		<h3><xsl:value-of select="@title"/></h3>
-		<div name="_" style="display:none">
+		<div name="_" style="display: none">
 			<xsl:attribute name="id"><xsl:value-of select="@title"/></xsl:attribute>
 			<xsl:apply-templates mode="secondary"/>
 		</div>
@@ -94,10 +99,25 @@
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:fusion" mode="secondary">
 	<h3>3D Fusion - <xsl:value-of select="dc:specimen"/> </h3>
-	<X3DCanvas style="width: 700px; height: 432px;">
-		<xsl:attribute name="src"><xsl:value-of select="dc:greensinversion_3d/@url"/></xsl:attribute>
-		<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>
-	</X3DCanvas>
+	<div>
+		<xsl:attribute name="id"><xsl:value-of select="dc:specimen"/></xsl:attribute>
+	</div>
+	<script type="text/javascript">
+		var specimen = '<xsl:value-of select="dc:specimen"/>';
+		var url = '<xsl:value-of select="dc:greensinversion_3d/@url"/>';
+		<![CDATA[
+			x3dcanvas = X3D.createBrowser();
+			x3dcanvas.setAttribute("src", url);
+			x3dcanvas.style.width = '700px';
+			x3dcanvas.style.height = '432px';
+			element = document.getElementById(specimen);
+			element.appendChild(x3dcanvas);
+
+			eleparent = $(element).parent()[0];
+			eleparent.style.display = "";
+			eleparent.style.visibility = "hidden";
+		]]>
+	</script>
 </xsl:template>
 <xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:measurement" mode="secondary">
 	<table class="cream full-width">

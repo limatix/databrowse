@@ -296,11 +296,11 @@ class db_directory(renderer_class):
                                     path = os.path.join(self._fullpath, xlink)
                                     if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
                                         relpath = path.replace(self._web_support.dataroot, '')
-                                        url = self.getURL(relpath, content_mode="raw", model="true")
+                                        url = self.getURL(relpath, content_mode="raw", model="true").replace("\\", "/")
                                         model.attrib['url'] = url
                             except Exception:
                                 pass
-                    print(etree.tostring(xmlroot, pretty_print=True))
+                    # print(etree.tostring(xmlroot, pretty_print=True))
         self._xml = xmlroot
         pass
 
