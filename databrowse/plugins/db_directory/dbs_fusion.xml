@@ -34,10 +34,14 @@
 		    	    text = document.getElementById("searchterm").value;
 		    	}
 			    if (text) {
+		    	    eleloading = document.getElementById("eleloading");
+		    	    eleloading.style.display = "";
+
+		    	    currentresult = document.getElementById("searchcontent");
 			        ajaxurl = fullpath + "&nopagestyle&search="+text;
 			        $.ajax({url: ajaxurl, success: function(result){
 						result = result.getElementById("searchcontent");
-						currentresult = document.getElementById("searchcontent");
+						eleloading.style.display = "none";
 						currentresult.innerHTML = result.innerHTML;
 						$.each(result.getElementsByTagName("script"), function( index, value ) {
 							eval(value.innerHTML);
@@ -64,7 +68,12 @@
 		]]>
 	</script>
 	<div id="specimenwrapper">
-		<div style="float:right"><input type="text" id="searchterm"/><button id="searchbutton">Go</button></div>
+		<div style="float:right">
+			<img id="eleloading" style="margin-right: 5px; display: none">
+				<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/loading.gif</xsl:attribute>
+			</img>
+			<input type="text" id="searchterm"/><button id="searchbutton">Go</button>
+		</div>
 		<div id="searchcontent">
 			<xsl:apply-templates mode="initialize"/>
 		</div>
