@@ -300,7 +300,13 @@ class db_directory(renderer_class):
                                         model.attrib['url'] = url
                             except Exception:
                                 pass
-                    # print(etree.tostring(xmlroot, pretty_print=True))
+                    xlinks = xmlroot.xpath('//*[@xlink:href]', namespaces={'xlink': 'http://www.w3.org/1999/xlink'})
+                    for xlink in xlinks:
+                        path = os.path.join(self._fullpath, xlink.attrib['{http://www.w3.org/1999/xlink}href'])
+                        if path.startswith(os.path.normpath(self._web_support.dataroot)) and os.access(path, os.R_OK) and os.path.exists(path):
+                            relpath = path.replace(self._web_support.dataroot, '')
+                            url = self.getURL(relpath).replace("\\", "/")
+                            xlink.attrib['{http://www.w3.org/1999/xlink}href'] = url
         self._xml = xmlroot
         pass
 
