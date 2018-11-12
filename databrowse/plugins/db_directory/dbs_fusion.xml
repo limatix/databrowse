@@ -91,7 +91,7 @@
 				<br/>
 			</xsl:for-each>
 		</div>
-		<div style="display:inline-block; margin-left: 30px; margin-top: 0">
+		<div style="display:inline-block; margin-left: 30px; vertical-align: top">
 			<h3>Previous Searches</h3>
 			<xsl:for-each select="dir:prevsearches/dir:prevsearch">
 				<a>
