@@ -206,6 +206,36 @@ class db_directory(renderer_class):
                 except KeyError:
                     search_terms = None
 
+                if not self.CacheFileExists(tag='searches', extension='txt'):
+                    ft = self.getCacheFileHandler('wb', "searches", "txt")
+                    ft.close()
+
+                ft = self.getCacheFileHandler('rb', "searches", "txt")
+                prevsearches = ft.read().split(",")
+                ft.close()
+
+                if prevsearches == ['']:
+                    prevsearches = []
+
+                if search_terms:
+                    if search_terms in prevsearches:
+                        if prevsearches[-1] != search_terms:
+                            prevsearches.remove(search_terms)
+                            prevsearches.append(search_terms)
+                    else:
+                        if search_terms:
+                            prevsearches.append(search_terms)
+
+                if len(prevsearches) > 5:
+                    prevsearches = prevsearches[-5:]
+
+                ft = self.getCacheFileHandler('wb', "searches", "txt")
+                ft.write(",".join(prevsearches))
+                ft.close()
+
+                # import pdb
+                # pdb.set_trace()
+
                 p = etree.XMLParser(huge_tree=True, remove_blank_text=True)
                 specimen_file_types = ['.xlg', '.xlp']
 
@@ -230,6 +260,12 @@ class db_directory(renderer_class):
 
                     xmlsearchterm = etree.SubElement(xmlspecimens, '{%s}searchterm' % self._namespace_uri, nsmap=self.nsmap)
                     xmlsearchterm.text = search_terms
+
+                    if prevsearches:
+                        xmlprevsearchterms = etree.SubElement(xmlspecimens, '{%s}prevsearches' % self._namespace_uri, nsmap=self.nsmap)
+                        for searchterm in list(reversed(prevsearches)):
+                            xmlprevsearchterm = etree.SubElement(xmlprevsearchterms, '{%s}prevsearch' % self._namespace_uri, nsmap=self.nsmap)
+                            xmlprevsearchterm.text = searchterm
 
                     for specimen in specimens:
                         xmlspecimen = etree.SubElement(xmlspecimens, '{%s}specimen' % self._namespace_uri, nsmap=self.nsmap)
@@ -307,6 +343,7 @@ class db_directory(renderer_class):
                             relpath = path.replace(self._web_support.dataroot, '')
                             url = self.getURL(relpath).replace("\\", "/")
                             xlink.attrib['{http://www.w3.org/1999/xlink}href'] = url
+                # print(etree.tostring(xmlroot, pretty_print=True))
         self._xml = xmlroot
         pass
 
