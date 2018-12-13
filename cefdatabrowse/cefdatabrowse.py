@@ -196,7 +196,7 @@ except ImportError:
 # Fix for PyCharm hints warnings when using static methods
 WindowUtils = cef.WindowUtils()
 
-# Platforms-
+# Platforms
 WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
 MAC = (platform.system() == "Darwin")
@@ -542,7 +542,7 @@ def main():
 
 # Check graphical framework version and CEFPython version
 def check_versions():
-    # print("[qt.py] Databrowse {ver}".format(ver=pkg_resources.require("databrowse")[0].version))
+    print("[qt.py] Databrowse {ver}".format(ver=pkg_resources.require("databrowse")[0].version))
     print("[qt.py] CEF Python {ver}".format(ver=cef.__version__))
     print("[qt.py] Python {ver} {arch}".format(
             ver=platform.python_version(), arch=platform.architecture()[0]))
