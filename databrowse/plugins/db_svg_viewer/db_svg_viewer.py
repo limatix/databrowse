@@ -108,7 +108,10 @@ class db_svg_viewer(renderer_class):
 
                 # User and Group
                 if platform.system() == "Linux":
-                    username = pwd.getpwuid(st[ST_UID])[0]
+                    try:
+                        username = pwd.getpwuid(st[ST_UID])[0]
+                    except KeyError:
+                        username = ""
                     groupname = grp.getgrgid(st[ST_GID])[0]
                     xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                     xmlchild.text = "%s:%s" % (username, groupname)

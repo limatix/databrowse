@@ -44,21 +44,12 @@
 """ setup.py - Main Install Script """
 
 import os
-import requirements as r
-import platform
-from shutil import copyfile
-from setuptools import setup, find_packages, Distribution
-from setuptools.command.install import install
+from setuptools import setup, find_packages
 
 
 def readfile(filename):
     """ Utility Function to Read the Readme File """
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
-
-
-# Determine platform specific requirements
-with open(r.select_requirements_file(), 'r') as f:
-    reqs = f.read().splitlines()
 
 
 setup(
@@ -68,7 +59,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.8.2',
+    version='0.8.3',
     packages=find_packages(exclude=['tests', 'test_*']),
     package_data={'': ['*.conf', '*.xml']},
     include_package_data=True,
@@ -76,7 +67,6 @@ setup(
     long_description=readfile('README.md'),
     test_suite='nose.collector',
     zip_safe=False,
-    install_requires=reqs,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",

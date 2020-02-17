@@ -58,6 +58,7 @@ import numpy as np
 # from numpy.lib.recfunctions import repack_fields
 import collections
 import subprocess
+from functools import reduce
 
 from data_sets import SDTDataSets
 from databrowse.support.renderer_support import renderer_class
@@ -148,7 +149,7 @@ class db_sdt_viewer(renderer_class):
 
             if key.find('Second Axis') > 0:
                 if verbose:
-                    print "Found second axis header information"
+                    print("Found second axis header information")
 
                 ny = int(value['Number of Sample Points'])
 
@@ -163,13 +164,13 @@ class db_sdt_viewer(renderer_class):
         for key, value in paramdict.items():
             if key.find('Data Subset') > 0 and isinstance(value, dict):
                 if verbose:
-                    print "Starting data extraction for dataset {v}".format(v=value['Subset Label'])
+                    print("Starting data extraction for dataset {v}".format(v=value['Subset Label']))
 
                 element_size = int(value['Element Size (bytes)'])
                 nt = int(value['Number of Sample Points'])
 
                 if verbose:
-                    print "Number of sample points: {n}".format(n=nx*ny*nt)
+                    print("Number of sample points: {n}".format(n=nx*ny*nt))
 
                 minval, minunits = self.check_units(value['Minimum Sample Position'])
                 resval, resunits = self.check_units(value['Sample Resolution'])
@@ -184,7 +185,7 @@ class db_sdt_viewer(renderer_class):
                 data_range[1] = data_range[0]+data_range[1]
 
                 if verbose:
-                    print "Data type found to be {d}".format(d=data_type)
+                    print("Data type found to be {d}".format(d=data_type))
 
                 # data = np.fromfile(fstream, dtype=data_type, count=nx*ny*nt)
                 # data = np.reshape(data,(len(y),len(x),len(t)), order='C') # [index axis, scan axis, time axis]]
@@ -198,7 +199,7 @@ class db_sdt_viewer(renderer_class):
                     undef_value = None
 
                 if verbose:
-                    print "Reshaping and scaling data to match header information"
+                    print("Reshaping and scaling data to match header information")
 
                 scaled_data = self.scale_data(data, value['Element Representation'], data_range, undef_value)
                 datasets.update({value['Subset Label']: {'y': x, 'x': y, 't': t, 'v': scaled_data}})
@@ -357,7 +358,10 @@ class db_sdt_viewer(renderer_class):
 
                     # User and Group
                     if platform.system() == "Linux":
-                        username = pwd.getpwuid(st[ST_UID])[0]
+                        try:
+                            username = pwd.getpwuid(st[ST_UID])[0]
+                        except KeyError:
+                            username = ""
                         groupname = grp.getgrgid(st[ST_GID])[0]
                         xmlchild = etree.SubElement(xmlroot, "owner", nsmap=self.nsmap)
                         xmlchild.text = "%s:%s" % (username, groupname)

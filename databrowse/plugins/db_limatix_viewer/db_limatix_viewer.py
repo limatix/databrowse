@@ -163,7 +163,7 @@ class db_limatix_viewer(renderer_class):
                         if os.access(os.path.abspath(self._web_support.dataroot + "/" + relpath), os.R_OK) and os.path.exists(os.path.abspath(self._web_support.dataroot + "/" + relpath)):
                             url = self.getURL(relpath)
                             item.set('url', url)
-                return xmlroot            
+                return xmlroot
             elif self._content_mode == "full" and self._style_mode == "limatix_custom_view":
                 self._namespace_local = "dt"
                 self._namespace_uri = "http://limatix.org/databrowse/datatable"
@@ -426,7 +426,7 @@ class db_limatix_viewer(renderer_class):
             pass
 
         #print "Stylesheet Loaded Successfully:"
-        #print stylestring
+        #print(stylestring)
         stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
 
         # If we set the flag earlier, we need to change the namespace

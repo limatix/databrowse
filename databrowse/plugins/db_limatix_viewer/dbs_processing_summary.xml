@@ -1,0 +1,96 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="dc:experiment" mode="full">
+	<style>
+	table {
+		table-layout: fixed;
+	}
+	td {
+		word-wrap:break-word;
+	}
+	</style>
+	<script type="text/javascript">
+	var resurl = "<xsl:value-of select="$resdir"/>";
+	<![CDATA[
+            function expandrepo(el) {
+                level = $(el).parent().children("#procsteps")[0];
+				level.style.display = "";
+                el.src = resurl + "/icons/list-remove.png";
+                el.setAttribute( "onclick", "shrinkrepo(this);" );
+            }
+
+            function shrinkrepo(el) {
+                level = $(el).parent().children("#procsteps")[0];
+                level.style.display = "none";
+                el.src = resurl + "/icons/list-add.png";
+                el.setAttribute( "onclick", "expandrepo(this);" );
+            }
+	]]>
+	</script>
+	<h2>Processing Steps</h2>
+	<xsl:apply-templates select="lip:process"/>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="lip:process">
+	<table class="cream full-width">
+		<thead>
+	    		<tr><th colspan="1">Item</th><th colspan="4">Value</th></tr>
+		</thead>
+		<tbody>
+			<xsl:if test="lip:wascontrolledby">
+			<tr><th>Processing Script</th><td colspan="4"><a><xsl:attribute name="href"><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></a></td></tr>
+			</xsl:if>
+			<tr><th>Start Time</th><td colspan="4"><xsl:value-of select="lip:starttimestamp" /></td></tr>
+			<tr><th>Host</th><td colspan="4"><xsl:value-of select="lip:hostname/@username"/>@<xsl:value-of select="lip:hostname"/></td></tr>
+			<tr><th>Arguments</th><td colspan="4"><xsl:value-of select="lip:argv" /></td></tr>
+			<tr><th>Input File</th><td colspan="4"><a><xsl:attribute name="href"><xsl:value-of select="lip:inputfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:inputfile/@xlink:href" /></a></td></tr>
+			<xsl:if test="lip:log">
+				<tr><th>Log</th><td colspan="4"><xsl:value-of select="lip:log" /></td></tr>
+			</xsl:if>
+			<tr><th>Details</th><td colspan="4">
+				<div><span>Successes: <xsl:value-of select="count(.//lip:log[contains(@status, 'success')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span><span style="margin-left:30px">Exceptions: <xsl:value-of select="count(.//lip:log[contains(@status, 'exception')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span>
+					<img style="float: right" onclick="expandrepo(this)">
+				   		<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+					</img>
+					<ul id="procsteps" style="display:none;">
+						<xsl:for-each select="lip:process[lip:argv]">
+							<xsl:call-template name="subprocess"/>
+						</xsl:for-each>
+					</ul>
+				</div>
+			</td></tr>
+		</tbody>
+	</table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:lip="http://limatix.org/provenance" match="process" name="subprocess">
+	<table class="cream full-width">
+		<tbody>
+			<tr><th>Start Time</th><td colspan="4"><xsl:value-of select="lip:starttimestamp" /></td></tr>
+			<tr><th>Finish Time</th><td colspan="4"><xsl:value-of select="lip:finishtimestamp" /></td></tr>
+			<xsl:if test="lip:log">
+				<tr><th>Status</th><td colspan="4"><xsl:value-of select="lip:log/@status"/></td></tr>
+				<tr><th>Log</th><td colspan="4">
+					<xsl:call-template name="LFsToBRs">
+						<xsl:with-param name="input" select="lip:log"/>
+					</xsl:call-template>
+				</td></tr>
+			</xsl:if>
+		</tbody>
+	</table>
+	<ul>
+		<xsl:for-each select="lip:process[lip:argv]">
+			<xsl:call-template name="subprocess"/>
+		</xsl:for-each>
+	</ul>
+</xsl:template>
+<xsl:template name="LFsToBRs">
+    <xsl:param name="input" />
+    <xsl:choose>
+        <xsl:when test="contains($input, '&#10;')">
+            <xsl:value-of select="substring-before($input, '&#10;')" /><br />
+            <xsl:call-template name="LFsToBRs">
+                <xsl:with-param name="input" select="substring-after($input, '&#10;')" />
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="$input" />
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>

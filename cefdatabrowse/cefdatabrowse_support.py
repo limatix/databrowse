@@ -269,10 +269,10 @@ def application(filename, params):
     starttime = time()
     import databrowse.support.dummy_web_support as db_web_support_module
 
-    try:
-        # Set up web_support class with environment information
-        db_web_support = db_web_support_module.web_support(filename, params)
+    # Set up web_support class with environment information
+    db_web_support = db_web_support_module.web_support(filename, params)
 
+    try:
         # Determine Requested File/Folder Absolute Path and Path Relative to Dataroot
         if "path" not in db_web_support.req.form:
             fullpath = db_web_support.dataroot
@@ -316,11 +316,11 @@ def application(filename, params):
 
         # Get A Handle to The Rendering Plugin
         caller = "databrowse"
-        exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-        exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
+        exec("import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler))
+        exec("renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
-                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
+                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else ''))
 
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
@@ -487,7 +487,10 @@ def application(filename, params):
             # Now we can get a list of request variables
             inputstring = ""
             for key in db_web_support.req.form.keys():
-                inputstring = inputstring + "%s:  %s \n" % (key, repr(db_web_support.req.form[key].value))
+                try:
+                    inputstring = inputstring + "%s:  %s \n" % (key, repr(db_web_support.req.form[key].value))
+                except AttributeError:
+                    pass
                 pass
             inputstring = inputstring.replace('<', "&lt;").replace('>', "&gt;").replace('&', "&#160;")
 

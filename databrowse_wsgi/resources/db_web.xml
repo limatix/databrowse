@@ -49,7 +49,7 @@
 				  	<xsl:attribute name="media">all</xsl:attribute>
 				  	<xsl:attribute name="rel">stylesheet</xsl:attribute>
 			    </xsl:element>
-			    <script type="text/javascript" src="/dbres/jquery-3.3.1.min.js"/>
+			    <script type="text/javascript" src="/dbres/jquery-3.4.1.min.js"/>
 			    <script type="text/javascript">
 			    	<![CDATA[
 			    		var fullwidth = false;

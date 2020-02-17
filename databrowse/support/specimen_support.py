@@ -109,7 +109,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
             for groupname in groupnames[1:]:
                 _combine_element(groupxml, groups[groupname], groupname)
             if len(groupxml.xpath("//@override", namespaces=NS)) > 0:
-                print etree.tostring(groupxml, pretty_print=True)
+                print(etree.tostring(groupxml, pretty_print=True))
                 raise SpecimenException("Group File Conflict - Will Not Continue Until Conflict Is Resolved - Specimen " + specimen)
 
             # Combine Trees
@@ -117,7 +117,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
 
         # Output
         if output == OUTPUT_STRING:
-            print etree.tostring(specimenxml, pretty_print=True)
+            print(etree.tostring(specimenxml, pretty_print=True))
         elif output == OUTPUT_ELEMENT:
             return specimenxml
         elif output == OUTPUT_ETREE:
@@ -133,7 +133,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
         filename = os.path.join(specimendb, groupid + '.sdg')
         if not os.path.exists(filename):
             if output == OUTPUT_STRING:
-                print etree.tostring(specimenxml, pretty_print=True)
+                print(etree.tostring(specimenxml, pretty_print=True))
             elif output == OUTPUT_ELEMENT:
                 return specimenxml
             elif output == OUTPUT_ETREE:
@@ -156,7 +156,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
 
         # Output
         if output == OUTPUT_STRING:
-            print etree.tostring(specimenxml, pretty_print=True)
+            print(etree.tostring(specimenxml, pretty_print=True))
         elif output == OUTPUT_ELEMENT:
             return specimenxml
         elif output == OUTPUT_ETREE:
@@ -167,7 +167,7 @@ def GetSpecimen(specimen, output=OUTPUT_STRING, specimendb=_specimendb):
 
     elif len(groupidelem) == 0:
         if output == OUTPUT_STRING:
-            print etree.tostring(specimenxml, pretty_print=True)
+            print(etree.tostring(specimenxml, pretty_print=True))
         elif output == OUTPUT_ELEMENT:
             return specimenxml
         elif output == OUTPUT_ETREE:

@@ -76,13 +76,13 @@ class handler_support:
                 modulename = filename
                 functions = None
                 try:
-                    exec "import databrowse.plugins.%s.handlers" % modulename  # Added 8/6/13 - Transition to Installed Modules
-                    exec "functions = dir(databrowse.plugins.%s.handlers)" % modulename  # Added 8/6/13 - Transition to Installed Modules
+                    exec("import databrowse.plugins.%s.handlers" % modulename)  # Added 8/6/13 - Transition to Installed Modules
+                    exec("functions = dir(databrowse.plugins.%s.handlers)" % modulename)  # Added 8/6/13 - Transition to Installed Modules
                     for function in functions:
                         if not function.startswith("dbh_"):    # Ignore all functions not starting with dbh_
                             pass
                         else:
-                            exec "self._handlers['%s']=(databrowse.plugins.%s.handlers.%s)" % (function, modulename, function)  # Added 8/6/13 - Transition to Installed Modules
+                            exec("self._handlers['%s']=(databrowse.plugins.%s.handlers.%s)" % (function, modulename, function))  # Added 8/6/13 - Transition to Installed Modules
                             pass
                         pass
                     pass
@@ -202,6 +202,7 @@ class handler_support:
     def GetXMLRootAndNamespace(self, filename):
         """ Extract the root node name and namespace from an XML file without parsing the entire file """
         f = open(filename)
+        size = os.fstat(f.fileno()).st_size
         flag = True
         while flag:
             while True:
@@ -216,12 +217,16 @@ class handler_support:
                         while buf[-3:] != '-->':
                             c = f.read(1)
                             buf = buf + c
+                            if len(buf) > size:
+                                return '', ''
                             pass
                     elif c == '?':
                         # We Found a XML Declaration
                         while buf[-2:] != '?>':
                             c = f.read(1)
                             buf = buf + c
+                            if len(buf) > size:
+                                return '', ''
                             pass
                     else:
                         # We found the root tag... let's read in the rest
@@ -229,6 +234,8 @@ class handler_support:
                         while buf[-1] != '>':
                             c = f.read(1)
                             buf = buf + c
+                            if len(buf) > size:
+                                return '', ''
                             pass
                         flag = False
                         break

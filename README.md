@@ -48,6 +48,16 @@ Usage: databrowse [-h] [-s path] [-e] [-g [path]]
 ```
 ## Changelog ##
 
+### v0.8.3 ###
+ * Added find function (ctrl+f) in CEFDatabrowse
+ * Improved error reporting in CEFDatabrowse
+ * Switched from x3dom to x_ite (x_ite supports built in x3d scripts)
+ * Added v1 of no provenance mode to db_generic_XML_file (removes all lip:process tags)
+ * Added v1 of data fusion custom view to db_directory (Simple search function and render for any tag in .xlp or .xlg files in current directory)
+ * Added v1 of db_git plugin (displays relavant details of a git repository such as commit history, directory structure, modified files/untracked files, and current branch) Requires GITPython module.
+ * Added prompt during install to allow user to decide if they want to use pip to automatically install dependencies or not
+ * Many bug fixes
+
 ### v0.8 ###
  * Approval for Public release following work with TRI Austin
  * CEFDatabrowse, a server-less client, Implemented

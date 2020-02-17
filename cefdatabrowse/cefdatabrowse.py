@@ -212,9 +212,11 @@ if LINUX and (PYQT4 or PYSIDE):
 if WINDOWS:
     myappid = u'limatix.org.databrowse'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    scheme = "http://0.0.0.0/"
+    scheme = "http://0.0.0.0"
+    if not usr_path.startswith("/"):
+        usr_path = "/" + usr_path
 elif LINUX:
-    scheme = "http://databrowse/"
+    scheme = "http://cefdatabrowse"
 
 # Append external libraries to path
 for item in partydict.keys():
@@ -235,7 +237,10 @@ class ClientHandler:
         if parsedurl.netloc != urlparse(scheme).netloc:
             return None
 
-        fullpath = unquote(parsedurl.path[1:])
+        if WINDOWS:
+            fullpath = unquote(parsedurl.path[1:])
+        else:
+            fullpath = unquote(parsedurl.path)
 
         urlparams = {}
         if parsedurl.query != "":
@@ -316,6 +321,7 @@ class ClientHandler:
             databrowsepaths.update(configdict)
             params = databrowsepaths.copy()
             params.update(urlparams)
+            params.update(request.GetHeaderMap())
             html = dbp.application(fullpath, params)
             data = "".join(html[0])
             urlparams.update({'headers': html[1], "status": html[2]})
@@ -326,7 +332,7 @@ class ClientHandler:
                 html = open(unquote(fullpath), "rb")
             except IOError:
                 if not os.path.exists(unquote(fullpath)):
-                    raise IOError("Install location needs to be updated")
+                    raise IOError("Invalid path: %s" % unquote(fullpath))
                 else:
                     if os.path.isdir(unquote(fullpath)):
                         html = ""
@@ -335,6 +341,8 @@ class ClientHandler:
             mime = response.GetMimeType()
             urlparams.update({'headers': {'Content-Type': mime}, "status": 200})
             data = "".join(html)
+
+        del html
 
         return data
 
@@ -667,7 +675,10 @@ class MainWindow(QMainWindow):
             load_settings()
             for item in partydict.keys():
                 sys.path.insert(0, partydict[item])
-            self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
+            if not configdict['dataroot'].startswith("/"):
+                self.cef_widget.browser.LoadUrl(scheme + "/" + configdict['dataroot'])
+            else:
+                self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
 
 
 class CefWidget(CefWidgetParent):
@@ -705,6 +716,7 @@ class CefWidget(CefWidgetParent):
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
+        self.browser.SetClientHandler(KeyboardHandler(self))
 
     def getHandle(self):
         if self.hidden_window:
@@ -821,6 +833,22 @@ class FocusHandler(object):
             # print("[qt.py] FocusHandler.OnGotFocus:"
             #       " keyboard focus fix no. 1 (Issue #284)")
             browser.SetFocus(True)
+
+
+class KeyboardHandler(object):
+    def __init__(self, cef_widget):
+        self.cef_widget = cef_widget
+        self.text = None
+
+    def OnPreKeyEvent(self, **event):
+        if event['event']['modifiers'] == 4 and event['event']['character'] == 70:
+            if self.text is None:
+                self.text, ok = QInputDialog.getText(self.cef_widget, 'Find', '')
+            self.cef_widget.browser.Find(0, str(self.text), True, False, False)
+            self.cef_widget.browser.SetFocus(True)
+        elif event['event']['character'] == 27:
+            self.cef_widget.browser.StopFinding(True)
+            self.text = None
 
 
 class NavigationBar(QFrame):

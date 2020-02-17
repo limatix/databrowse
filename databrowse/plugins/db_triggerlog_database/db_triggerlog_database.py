@@ -69,7 +69,7 @@ class db_triggerlog_database(db_directory_module.db_directory):
         #print "getDirectoryList being called"
         reallist = os.listdir(fullpath)
         returnlist = [n for n in reallist if n.endswith('.tgl')]
-        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        exec("returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower"))
         return returnlist
 
     def getContent(self):

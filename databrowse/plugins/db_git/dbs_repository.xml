@@ -1,0 +1,241 @@
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:git="http://thermal.cnde.iastate.edu/databrowse/git" match="git:git" mode="full">
+    <style type="text/css">
+        .grid {
+            width: 100%;
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: repeat( 2, minmax(250px, 1fr) );
+            grid-auto-rows: auto;
+            background-color: #fff;
+        }
+        .repo-details {
+            grid-area: 1 / 1 / span 1 / span 1;
+        }
+        .changed {
+            grid-area: 2 / 1 / span 1 / span 1;
+        }
+        .untracked {
+            grid-area: 3 / 1 / span 1 / span 1;
+        }
+        .logs {
+            grid-area: 4 / 1 / span 1 / span 1;
+        }
+        .repo {
+            grid-area: 1 / 2 / span 4 / span 1;
+        }
+        .tree {
+            margin-left:-30px;
+            margin-top: 8px;
+        }
+        .repoitem {
+            padding: 3px;
+            margin-top: 5px;
+            border-left: solid;
+	    word-wrap: break-word;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var resurl = "<xsl:value-of select="@resurl"/>";
+        <![CDATA[
+            $(function(){
+              $('#branchoptions').on('change', function () {
+                  var url = $(this).val();
+                  if (url) {
+                      window.location = url;
+                  }
+                  return false;
+              });
+            });
+
+            function copytoclip() {
+                var range = document.createRange();
+                range.selectNode(document.getElementById("giturl"));
+                window.getSelection().addRange(range);
+                document.execCommand("copy");
+            }
+
+            function expandrepo(el) {
+                var level = $(el).parent().parent().children("#repofile");
+                $.each(level, function( index, value ) {
+                    value.style.display = "";
+                });
+                el.src = resurl + "/icons/list-remove.png";
+                el.setAttribute( "onclick", "shrinkrepo(this);" );
+            }
+
+            function shrinkrepo(el) {
+                var level = $(el).parent().parent().children("#repofile");
+                $.each(level, function( index, value ) {
+                    value.style.display = "none";
+                });
+                el.src = resurl + "/icons/list-add.png";
+                el.setAttribute( "onclick", "expandrepo(this);" );
+            }
+        ]]>
+    </script>
+
+    <div class="grid">
+        <div class="repo-details">
+            <h2>Repository Details</h2>
+            <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                <thead>
+                    <th colspan="4" style="word-wrap: break-word">
+                        <span style="display:inline-block">Active Branch: <xsl:value-of select="active_branch/text()"/></span>
+                        <xsl:if test="@downlink">
+                            <a style="float: right">
+                                <xsl:attribute name="href"><xsl:value-of select="@downlink"/></xsl:attribute>
+                                <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/save.png</xsl:attribute></img>
+                            </a>
+                        </xsl:if>
+                    </th>
+                </thead>
+                <xsl:choose>
+                    <xsl:when test="changed_files">
+                        <tr>
+                            <td colspan="4" style="text-align: center">
+                                There are uncommitted changes. Changing branches is not permitted until the changes have been committed.
+                            </td>
+                        </tr>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr>
+                            <td colspan="2">Checkout Branch: </td>
+                            <td colspan="2" style="text-align: center">
+                                <select id="branchoptions" style="padding: 5px; width:100%">
+                                    <xsl:for-each select="branches/branch">
+                                        <xsl:if test="name/text()=//active_branch/text()">
+                                            <option value="" selected="selected"><xsl:value-of select="name/text()"/></option>
+                                        </xsl:if>
+                                        <xsl:if test="name/text()!=//active_branch/text()">
+                                            <option>
+                                                <xsl:attribute name="value"><xsl:value-of select="@url"/></xsl:attribute>
+                                                <xsl:value-of select="name/text()"/>
+                                            </option>
+                                        </xsl:if>
+                                    </xsl:for-each>
+                                </select>
+                            </td>
+                        </tr>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <tr>
+                    <td>Clone url:</td>
+                    <td colspan="3">
+                        <div>
+                            <a onclick="copytoclip()" style="float: left; padding-right:5px;">
+                                <img><xsl:attribute name="src"><xsl:value-of select="@resurl"/>/icons/edit-copy.png</xsl:attribute></img>
+                            </a>
+                        </div>
+                        <div id="giturl" style="overflow-x: scroll; white-space: nowrap">
+                            <xsl:value-of select="giturl/text()"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <xsl:if test="changed_files">
+            <div class="changed">
+                <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                    <thead>
+                        <th colspan="2" style="word-wrap: break-word">
+                            <span style="width:370px;display:inline-block">Modified Files:</span>
+                        </th>
+                    </thead>
+                    <xsl:for-each select="changed_files/file">
+                        <tr>
+                            <td colspan="2"><xsl:value-of select="text()"/></td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
+            </div>
+        </xsl:if>
+        <xsl:if test="untracked_files">
+            <div class="untracked">
+                <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                    <thead>
+                        <th colspan="2" style="word-wrap: break-word">
+                            <span style="width:370px;display:inline-block">Untracked Files:</span>
+                        </th>
+                    </thead>
+                    <xsl:for-each select="untracked_files/file">
+                        <tr>
+                            <td colspan="2"><xsl:value-of select="text()"/></td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
+            </div>
+        </xsl:if>
+        <div class="logs">
+            <h2>Commit History</h2>
+            <xsl:for-each select="branches/branch">
+                <xsl:if test="name/text()=//active_branch/text()">
+                    <table class="cream" style="table-layout:fixed; width: 100%; word-break: break-all;">
+                        <thead>
+                            <th colspan="2" style="word-wrap: break-word">
+                                <span style="width:370px;display:inline-block">Branch: <xsl:value-of select="name/text()"/></span>
+                            </th>
+                        </thead>
+                        <xsl:for-each select="log/log_entry">
+                            <tr>
+                                <td colspan="2"><xsl:value-of select="text()"/></td>
+                            </tr>
+                        </xsl:for-each>
+                    </table>
+                </xsl:if>
+            </xsl:for-each>
+        </div>
+        <div class="repo">
+            <h2>Directory Structure</h2>
+            <div class="tree">
+                <xsl:apply-templates select="repo_contents"/>
+            </div>
+        </div>
+    </div>
+</xsl:template>
+
+<xsl:template match="*[*]">
+    <ul>
+        <xsl:if test="@name != ''">
+            <div id="repodir" class="repoitem">
+                <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/folder.png</xsl:attribute></img>
+                <span style="padding-left: 8px">
+                    <a style="color: black;">
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="@url"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="@name"/>
+                    </a>
+                </span>
+                <img style="float: right" onclick="expandrepo(this)">
+                    <xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/list-add.png</xsl:attribute>
+                </img>
+            </div>
+        </xsl:if>
+        <xsl:apply-templates/>
+    </ul>
+</xsl:template>
+
+<xsl:template match="*">
+    <div id="repofile" class="repoitem" style="display: none">
+        <img><xsl:attribute name="src"><xsl:value-of select="//@resurl"/>/icons/<xsl:value-of select="@icon"/></xsl:attribute></img>
+        <span style="padding-left: 8px;">
+            <a style="color: black;">
+                <xsl:if test="@untracked='True'">
+                    <xsl:attribute name="style">
+                        <xsl:value-of select="'color:red;'"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="@changed='True'">
+                    <xsl:attribute name="style">
+                        <xsl:value-of select="'color:green;'"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="@url"/>
+                </xsl:attribute>
+                <xsl:value-of select="text()"/>
+            </a>
+        </span>
+    </div>
+</xsl:template>
