@@ -28,11 +28,14 @@ Approved for public release by TRI Austin: distribution unlimited;
 ## CEFDatabrowse Install Instructions ##
 Dependencies are platform specific and can be found in [requirements](https://github.com/limatix/databrowse/blob/master/requirements).
 
-From PIP:<br>
-    `> pip install databrowse`<br>
-From source:<br>
-    `> cd databrowse_source_dir`<br>
-    `> python setup.py install`<br>
+From PIP:
+
+    `> pip install databrowse`
+
+From source:
+
+    `> cd databrowse_source_dir`
+    `> python setup.py install`
 
 
 ```
