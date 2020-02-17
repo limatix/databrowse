@@ -106,7 +106,7 @@ def select_requirements_file():
     Return the path to a requirements file based on some os/arch condition.
     """
 
-    answer = sanitised_input("Auto install dependencies with PIP? [y/N]: ", str, limit_=30, default_='N', range_=('y', 'Y', 'n', 'N'))
+    answer = sanitised_input("Auto install dependencies with PIP? [y/N]: ", type_=str, limit_=30, default_='N', range_=('y', 'Y', 'n', 'N'))
     if answer not in ['y', 'Y']:
         return 'requirements/null.txt'
 
