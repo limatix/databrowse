@@ -45,13 +45,19 @@
 
 import sys
 import os
+import time
+
+try: input = raw_input
+except NameError: pass
 
 
-def sanitised_input(prompt, type_=None, min_=None, max_=None, range_=None):
+def sanitised_input(prompt, limit_=-1, default_=None, type_=None, min_=None, max_=None, range_=None):
     """
     Generic input prompt
     https://stackoverflow.com/questions/23294658/asking-the-user-for-input-until-they-give-a-valid-response
     :param prompt: Input question to ask user
+    :param limit_: Seconds until default_ is return
+    :param default_: Default response after limit_
     :param type_: Variable type of the desired response
     :param min_: Minimum value of a valid response
     :param max_: Maximum value of a valid response
@@ -60,9 +66,10 @@ def sanitised_input(prompt, type_=None, min_=None, max_=None, range_=None):
     """
     if min_ is not None and max_ is not None and max_ < min_:
         raise ValueError("min_ must be less than or equal to max_.")
+    stime = time.time()
     while True:
         try:
-            ui = raw_input(prompt)
+            ui = input(prompt)
         except SyntaxError:
             print("Invalid input please try again.")
             continue
@@ -84,6 +91,12 @@ def sanitised_input(prompt, type_=None, min_=None, max_=None, range_=None):
                     print(template.format(*range_))
                 else:
                     print(template.format(" or ".join((", ".join(map(str, range_[:-1])), str(range_[-1])))))
+        elif (time.time() - stime) > limit_ > 0:
+            if default_ in range_:
+                return default_
+            else:
+                template = "Default is not a valid response."
+                print(template)
         else:
             return ui
 
@@ -93,7 +106,7 @@ def select_requirements_file():
     Return the path to a requirements file based on some os/arch condition.
     """
 
-    answer = sanitised_input("Auto install dependencies with PIP? [y/N]: ", str, range_=('y', 'Y', 'n', 'N'))
+    answer = sanitised_input("Auto install dependencies with PIP? [y/N]: ", str, limit_=30, default_='N', range_=('y', 'Y', 'n', 'N'))
     if answer not in ['y', 'Y']:
         return 'requirements/null.txt'
 
