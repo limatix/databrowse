@@ -211,11 +211,11 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
 
     # Get A Handle to The Rendering Plugin
     caller = "databrowse"
-    exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-    exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
+    exec("import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler))
+    exec("renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                 ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                 ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
-                ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
+                ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else ''))
 
     # Register Primary Namespace
     #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
@@ -229,7 +229,7 @@ def GetXML(filename, output=OUTPUT_ELEMENT, **params):
         return renderer.getContent()
     elif output == OUTPUT_STDOUT:
         xmltree = etree.ElementTree(renderer.getContent())
-        print etree.tostring(xmltree, pretty_print=True)
+        print(etree.tostring(xmltree, pretty_print=True))
     else:
         return etree.ElementTree(renderer.getContent())
 

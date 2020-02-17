@@ -841,7 +841,7 @@ class KeyboardHandler(object):
         self.text = None
 
     def OnPreKeyEvent(self, **event):
-        if event['event']['modifiers'] == 4L and event['event']['character'] == 70:
+        if event['event']['modifiers'] == 4 and event['event']['character'] == 70:
             if self.text is None:
                 self.text, ok = QInputDialog.getText(self.cef_widget, 'Find', '')
             self.cef_widget.browser.Find(0, str(self.text), True, False, False)

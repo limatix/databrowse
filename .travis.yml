@@ -1,9 +1,10 @@
 language: python
 python:
-- '2.6'
 - '2.7'
 - '3.7'
 cache: pip
+install:
+- python requirements.py
 script: nosetests
 before_deploy: 
 - "python setup.py sdist"

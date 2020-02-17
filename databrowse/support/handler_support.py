@@ -76,13 +76,13 @@ class handler_support:
                 modulename = filename
                 functions = None
                 try:
-                    exec "import databrowse.plugins.%s.handlers" % modulename  # Added 8/6/13 - Transition to Installed Modules
-                    exec "functions = dir(databrowse.plugins.%s.handlers)" % modulename  # Added 8/6/13 - Transition to Installed Modules
+                    exec("import databrowse.plugins.%s.handlers" % modulename)  # Added 8/6/13 - Transition to Installed Modules
+                    exec("functions = dir(databrowse.plugins.%s.handlers)" % modulename)  # Added 8/6/13 - Transition to Installed Modules
                     for function in functions:
                         if not function.startswith("dbh_"):    # Ignore all functions not starting with dbh_
                             pass
                         else:
-                            exec "self._handlers['%s']=(databrowse.plugins.%s.handlers.%s)" % (function, modulename, function)  # Added 8/6/13 - Transition to Installed Modules
+                            exec("self._handlers['%s']=(databrowse.plugins.%s.handlers.%s)" % (function, modulename, function))  # Added 8/6/13 - Transition to Installed Modules
                             pass
                         pass
                     pass

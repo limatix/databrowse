@@ -266,7 +266,7 @@ class web_support:
             conffile = file(os.path.join(os.path.dirname(self.reqfilename), "databrowse_wsgi.conf"))
             self.confstr = conffile.read()
             conffile.close()
-            exec self.confstr
+            exec(self.confstr)
         except:
             pass
 

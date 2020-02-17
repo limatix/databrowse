@@ -245,16 +245,16 @@ class renderer_class(object):
 
     def ConvertUserFriendlyPermissions(self, p):
         ts = {
-            0140000: 'ssocket',
-            0120000: 'llink',
-            0100000: '-file',
-            0060000: 'bblock',
-            0040000: 'ddir',
-            0020000: 'cchar',
-            0010000: 'pfifo'
+            0o0140000: 'ssocket',
+            0o0120000: 'llink',
+            0o0100000: '-file',
+            0o0060000: 'bblock',
+            0o0040000: 'ddir',
+            0o0020000: 'cchar',
+            0o0010000: 'pfifo'
         }
 
-        t = p & 0170000
+        t = p & 0o0170000
 
         permstr = ts[t][0] if t in ts else 'u'
         permstr += 'r' if p & 0x0100 else '-'
@@ -358,7 +358,7 @@ class renderer_class(object):
                 addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
                 pass
             returnlist = list(set(removelist + addlist))
-        exec "returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower")
+        exec("returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower"))
 
         returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
         returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
