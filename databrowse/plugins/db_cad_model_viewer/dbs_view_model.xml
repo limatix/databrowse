@@ -5,12 +5,12 @@
     </xsl:element>
     <xsl:element name="script">
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
-    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x3dom.js</xsl:attribute>
+    	<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
     </xsl:element>
     <xsl:element name="link">
         <xsl:attribute name="rel">stylesheet</xsl:attribute>
     	<xsl:attribute name="type">text/css</xsl:attribute>
-    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x3dom.css</xsl:attribute>
+    	<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
     </xsl:element>
     <xsl:element name="script">
     	<xsl:attribute name="type">text/javascript</xsl:attribute>
@@ -123,17 +123,9 @@
 				});
             } else if (modeltype = "x3d") {
                 loader = null;
-                $(content).append("<p class='case'>" +
-                "<X3D xmlns='http://www.web3d.org/specifications/x3d-namespace' id='inline' showStat='true' x='0px' y='0px' width='" + content.offsetWidth + "px' height='" + content.offsetWidth + "px'>" +
-                  "<Scene>" +
-                    "<Viewpoint position='0 0 1' orientation='0 0 0 1' />" +
-                    "<Background skyColor='1 1 1' />" +
-                    "<Transform translation='0 0 0' >" +
-                        "<Inline url='" + model.replace(/&/g, '&amp;amp;') + "'></Inline>" +
-                    "</Transform>" +
-                  "</Scene>" +
-                "</X3D>" +
-                "</p>");
+                $(content).append('<X3DCanvas style="width: 700px; height: 432px;" src="' + model.replace(/&/g, '&amp;amp;') + '"> ' +
+                 '<p>Your browser may not support all features required by X_ITE. For a better experience, keep your browser up to date.</p>' +
+                 '</X3DCanvas>');
                 loadingtr.hidden = true;
                 return;
             } else {
@@ -262,14 +254,14 @@
                </th>
             </tr>
             <tr>
-                <th colspan="3">
-                   <xsl:if test="@nditoolboxlink != ''">
-                        <button style="float:right;">
-                            <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
-                            NDITOOLBOX
-                        </button>
-                   </xsl:if>
-                </th>
+                <xsl:if test="@nditoolboxlink != ''">
+                    <th colspan="3">
+                            <button style="float:right;">
+                                <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                                NDITOOLBOX
+                            </button>
+                    </th>
+                </xsl:if>
             </tr>
         </thead>
 		<tbody>

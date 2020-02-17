@@ -1,0 +1,6 @@
+Edited x_ite.js line 81186:
+
+From:
+    this .image .attr ("src", this .URL);
+To:
+    this .image .attr ("src", this .URL + "?content_mode=raw");

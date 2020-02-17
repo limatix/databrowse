@@ -206,14 +206,14 @@
                </th>
             </tr>
             <tr>
-                <th colspan="3">
-                   <xsl:if test="@nditoolboxlink != ''">
-                        <button style="float:right;">
-                            <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
-                            NDITOOLBOX
-                        </button>
-                   </xsl:if>
-                </th>
+                <xsl:if test="@nditoolboxlink != ''">
+                    <th colspan="3">
+                            <button style="float:right;">
+                                <xsl:attribute name="onclick">nditoolbox('<xsl:value-of select="@nditoolboxlink"/>')</xsl:attribute>
+                                NDITOOLBOX
+                            </button>
+                    </th>
+                </xsl:if>
             </tr>
         </thead>
     </table>

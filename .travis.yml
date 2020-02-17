@@ -1,21 +1,23 @@
 language: python
 python:
-- '2.6'
 - '2.7'
+- '3.7'
 cache: pip
+install:
+- python requirements.py
 script: nosetests
 before_deploy: 
 - "python setup.py sdist"
-- "cd dist; md5sum databrowse-0.8.2.tar.gz > databrowse-0.8.2.tar.gz.md5; cd .."
-- "cd dist; sha512sum databrowse-0.8.2.tar.gz > databrowse-0.8.2.tar.gz.sha; cd .."
+- "cd dist; md5sum databrowse-0.8.3.tar.gz > databrowse-0.8.3.tar.gz.md5; cd .."
+- "cd dist; sha512sum databrowse-0.8.3.tar.gz > databrowse-0.8.3.tar.gz.sha; cd .."
 deploy:
   provider: releases
   api_key:
     secure: NvZ/2snnFOsc0l7PDfAj+DWYncUoAhcAK2p5hkDK4Vj4QPDAfMF3vnfQ59tEbxzgFeunPnY35Fr9HX+L8hHCxRlOAN9iRvstZYLBHbUxYi56UxLDeQn+OTED/lo+VOcv+ztludfrRuqOPWLzb9x/BoT4b/ygjNjgBzIKhLd+60O0X9a9dLUoTpyBZlKcbwwxGlAO2kc1g4AzrwQzzgV2lOjLX5KKkzYNt3RVU71tC63b9H5xhQgIRarpVfKFbkbAiE/z0jiba2cWY44t9Vb3Q0W/v2eIKPkHiuBEC4jPz71z74+LdbXoLPcr/h05HpyLp9gCqnfkmBYVlSE4+r8e4dXxuS/mc9jXnvIDmXNgy+O6FMFnjMBLf3sEYliBdcVQfOiEFsICUT6C+B4p0L6EiE0E30tP5b5+75RZhTQab4aj9fHw+/fjM7nWjRBwzBum1pO9CnZR8Ykbb0yJV7q9wufouIfqt07FfmMYe0rvLimwm5Arle8tyifQi0IHl5fRiL1HV3WFD51DqNp7VOm0M4kEpbnVtXNpoEoUcPypw96auPJe8Ql2tUHJdFYt7/UPRolDMVGLt53c/k22As2aeEn0IhO/4JM14hr+NWmoPf32/fN/g56mcMG9W/jufagt4pFGiwiqEIXZkhmy5tTnHGpANraMtArl21PJ7E08h0g=
   file: 
-    - dist/databrowse-0.8.2.tar.gz
-    - dist/databrowse-0.8.2.tar.gz.md5
-    - dist/databrowse-0.8.2.tar.gz.sha
+    - dist/databrowse-0.8.3.tar.gz
+    - dist/databrowse-0.8.3.tar.gz.md5
+    - dist/databrowse-0.8.3.tar.gz.sha
   skip_cleanup: true
   on:
     repo: limatix/databrowse

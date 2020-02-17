@@ -45,13 +45,13 @@
 
 import sys
 import os
+from pip._internal import main as pipmain
 
 
 def select_requirements_file():
     """
     Return the path to a requirements file based on some os/arch condition.
     """
-
     # operating system
     sys_platform = str(sys.platform).lower()
     linux = 'linux' in sys_platform
@@ -84,3 +84,8 @@ def select_requirements_file():
         return 'requirements/posix/posix%s.txt' % prefix
     else:
         raise Exception('Unsupported OS/platform')
+
+
+if __name__ == "__main__":
+    f = select_requirements_file()
+    pipmain(['install', '-r', f])

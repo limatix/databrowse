@@ -1,0 +1,207 @@
+<xi:include href="/usr/local/limatix-qautils/checklist/datacollect2.xsl" xpointer="xmlns(xsl=http://www.w3.org/1999/XSL/Transform) xpointer(/xsl:stylesheet/node())" />
+
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:dcv="http://limatix.org/dcvalue" xmlns:chx="http://limatix.org/checklist" xmlns:xlink="http://www.w3.org/1999/xlink" match="dir:search" mode="title">
+	<xsl:element name="script">
+		<xsl:attribute name="type">text/javascript</xsl:attribute>
+		<xsl:attribute name="src"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.js</xsl:attribute>
+	</xsl:element>
+	<xsl:element name="link">
+		<xsl:attribute name="rel">stylesheet</xsl:attribute>
+		<xsl:attribute name="type">text/css</xsl:attribute>
+		<xsl:attribute name="href"><xsl:value-of select="@resurl"/>/threejs/x_ite/x_ite.css</xsl:attribute>
+	</xsl:element>
+	<script type="text/javascript">
+		var resurl = "<xsl:value-of select="$resdir"/>";
+		var fullpath = "<xsl:value-of select="@path"/>";
+		<![CDATA[
+			$( document ).ready(function() {
+				$("#searchterm").keyup(function(event) {
+					if (event.keyCode === 13) {
+						$("#searchbutton").click();
+					}
+				});
+
+				$("#searchbutton").click(function() {
+					loadresults();
+				});
+			});
+
+			function loadresults(term) {
+			    var text;
+		    	if (term) {
+		    	    text = term;
+		    	} else {
+		    	    text = document.getElementById("searchterm").value;
+		    	}
+			    if (text) {
+		    	    eleloading = document.getElementById("eleloading");
+		    	    eleloading.style.display = "";
+
+		    	    currentresult = document.getElementById("searchcontent");
+			        ajaxurl = fullpath + "&nopagestyle&search="+text;
+			        $.ajax({url: ajaxurl, success: function(result){
+						result = result.getElementById("searchcontent");
+						eleloading.style.display = "none";
+						currentresult.innerHTML = result.innerHTML;
+						$.each(result.getElementsByTagName("script"), function( index, value ) {
+							eval(value.innerHTML);
+						});
+					}});
+			    }
+			}
+
+			function expand(el){
+			    content = $(el).parent().children('[name="_"]')[0];
+				content.style.display = "";
+				content.style.visibility = "";
+                el.src = resurl + "/icons/list-remove.png";
+                el.setAttribute( "onclick", "shrink(this);" );
+			}
+
+			function shrink(el) {
+                content = $(el).parent().children('[name="_"]')[0];
+                content.style.display = "none";
+                content.style.visibility = "hidden";
+                el.src = resurl + "/icons/list-add.png";
+                el.setAttribute( "onclick", "expand(this);" );
+            }
+		]]>
+	</script>
+	<div id="specimenwrapper">
+		<div style="float:right">
+			<img id="eleloading" style="margin-right: 5px; display: none">
+				<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/loading.gif</xsl:attribute>
+			</img>
+			<input type="text" id="searchterm"/><button id="searchbutton">Go</button>
+		</div>
+		<div id="searchcontent">
+			<xsl:apply-templates mode="initialize"/>
+		</div>
+	</div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:specimens" mode="initialize">
+	<section>
+		<div style="display:inline-block">
+			<h3>Detected Specimens</h3>
+			<xsl:for-each select="dir:specimen">
+				<a>
+					<xsl:attribute name="onclick">loadresults('<xsl:value-of select="text()"/>')</xsl:attribute>
+					<xsl:value-of select="text()"/>
+				</a>
+				<br/>
+			</xsl:for-each>
+		</div>
+		<div style="display:inline-block; margin-left: 30px; vertical-align: top">
+			<h3>Previous Searches</h3>
+			<xsl:for-each select="dir:prevsearches/dir:prevsearch">
+				<a>
+					<xsl:attribute name="onclick">loadresults('<xsl:value-of select="text()"/>')</xsl:attribute>
+					<xsl:value-of select="text()"/>
+				</a>
+				<br/>
+			</xsl:for-each>
+		</div>
+	</section>
+	<br/>
+	<xsl:if test="dir:searchterm/text() != ''">
+		<h3>Search Keyword - <xsl:value-of select="dir:searchterm"/></h3>
+		<br/>
+	</xsl:if>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" match="dir:_" mode="initialize">
+	<div>
+		<img style="float: right" onclick="expand(this)">
+			<xsl:attribute name="src"><xsl:value-of select="$resdir"/>/icons/list-add.png</xsl:attribute>
+		</img>
+		<h3><xsl:value-of select="@title"/></h3>
+		<div name="_" style="display: none">
+			<xsl:attribute name="id"><xsl:value-of select="@title"/></xsl:attribute>
+			<xsl:apply-templates mode="secondary"/>
+		</div>
+	</div>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:fusion" mode="secondary">
+	<h3>3D Fusion - <xsl:value-of select="dc:specimen"/> </h3>
+	<div>
+		<xsl:attribute name="id"><xsl:value-of select="dc:specimen"/></xsl:attribute>
+	</div>
+	<script type="text/javascript">
+		var specimen = '<xsl:value-of select="dc:specimen"/>';
+		var url = '<xsl:value-of select="dc:greensinversion_3d/@url"/>';
+		<![CDATA[
+			x3dcanvas = X3D.createBrowser();
+			x3dcanvas.setAttribute("src", url);
+			x3dcanvas.style.width = '700px';
+			x3dcanvas.style.height = '432px';
+			element = document.getElementById(specimen);
+			element.appendChild(x3dcanvas);
+
+			eleparent = $(element).parent()[0];
+			eleparent.style.display = "";
+			eleparent.style.visibility = "hidden";
+		]]>
+	</script>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" match="dc:measurement" mode="secondary">
+	<table class="cream full-width">
+			<thead>
+				<tr><th style="width:166px">Item</th><th>Value</th></tr>
+			</thead>
+			<tbody>
+				<xsl:apply-templates select="dc:*" />
+			</tbody>
+	</table>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dir="http://thermal.cnde.iastate.edu/databrowse/dir" xmlns:dc="http://limatix.org/datacollect" xmlns:xlink="http://www.w3.org/1999/xlink" match="dc:config/dc:configfile" mode="secondary">
+    <h3>Configuration</h3>
+	<xsl:choose>
+		<xsl:when test="@xlink:href and @url">
+			<a><xsl:attribute name="href"><xsl:value-of select="@url"/></xsl:attribute>
+			<tt><xsl:value-of select="@xlink:href"/></tt></a>
+		</xsl:when>
+		<xsl:otherwise>
+			<tt><xsl:value-of select="@xlink:href"/></tt>
+		</xsl:otherwise>
+	</xsl:choose>
+	<pre class="prettyprint" style="height:300px">
+		<xsl:value-of select="."/>
+	</pre>
+</xsl:template>
+<xsl:template xmlns="http://www.w3.org/1999/xhtml" xmlns:dc="http://limatix.org/datacollect" xmlns:lip="http://limatix.org/provenance" match="lip:process" mode="secondary">
+	<table class="cream full-width">
+		<thead>
+	    		<tr><th colspan="1">Item</th><th colspan="4">Value</th></tr>
+		</thead>
+		<tbody>
+			<xsl:if test="lip:wascontrolledby">
+			<tr><th>Processing Script</th><td colspan="4"><a><xsl:attribute name="href"><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:wascontrolledby/lip:prxfile/@xlink:href" /></a></td></tr>
+			</xsl:if>
+			<tr><th>Start Time</th><td colspan="4"><xsl:value-of select="lip:starttimestamp" /></td></tr>
+			<tr><th>Host</th><td colspan="4"><xsl:value-of select="lip:hostname/@username"/>@<xsl:value-of select="lip:hostname"/></td></tr>
+			<tr><th>Arguments</th><td colspan="4"><xsl:value-of select="lip:argv" /></td></tr>
+			<tr><th>Input File</th><td colspan="4"><a><xsl:attribute name="href"><xsl:value-of select="lip:inputfile/@xlink:href" /></xsl:attribute><xsl:value-of select="lip:inputfile/@xlink:href" /></a></td></tr>
+			<xsl:if test="lip:log">
+				<tr><th>Log</th><td colspan="4"><xsl:value-of select="lip:log" /></td></tr>
+			</xsl:if>
+			<tr><th>Details</th><td colspan="4">
+				<div><span>Successes: <xsl:value-of select="count(.//lip:log[contains(@status, 'success')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span><span style="margin-left:30px">Exceptions: <xsl:value-of select="count(.//lip:log[contains(@status, 'exception')])" />/<xsl:value-of select="count(.//lip:log[@status])" /></span></div>
+			</td></tr>
+		</tbody>
+	</table>
+</xsl:template>
+<xsl:template match="*" mode="secondary">
+		<table class="cream full-width">
+		<thead>
+	    		<tr><th colspan="2">No matching template found</th></tr>
+		</thead>
+		<tbody>
+			<tr><th>Tag</th><td><xsl:value-of select="name()"/></td></tr>
+			<tr><th>Attributes</th><td>
+				<tr><td>Name:</td><td>Value</td></tr>
+				<xsl:for-each select="@*">
+					<tr><td><xsl:value-of select="name()"/></td><td><xsl:value-of select="."/></td></tr>
+				</xsl:for-each>
+			</td></tr>
+		</tbody>
+	</table>
+</xsl:template>

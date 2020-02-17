@@ -232,12 +232,12 @@ def process_file(f, stop_tag='UNDEF', details=True, strict=False, debug=False):
                                 barcodelen=int(rmetadatastring[19:(19+lendigits)])
                                 barcode=rmetadatastring[(19+lendigits+1):(19+lendigits+1+barcodelen)]
                                 
-                                if debug: print "Got 2D barcode:", barcode
+                                if debug: print("Got 2D barcode:", barcode)
                                 RMETA_2D_Barcodes[memonum]=barcode.decode('utf-8')
                                 
                                 pass
                             else :
-                                print "Unknown RMETA type 0 segment"
+                                print("Unknown RMETA type 0 segment")
                             
                             pass
 
@@ -247,7 +247,7 @@ def process_file(f, stop_tag='UNDEF', details=True, strict=False, debug=False):
                         else : # pos==1:
                             rmetabase+=rmetalength+2
                             pass
-                        if debug: print pos, rmetabase-base, ord(data[base+2])*256+ord(data[base+3])
+                        if debug: print(pos, rmetabase-base, ord(data[base+2])*256+ord(data[base+3]))
 
                         pos+=1
                         pass
@@ -262,7 +262,7 @@ def process_file(f, stop_tag='UNDEF', details=True, strict=False, debug=False):
             else: 
                 try:
                     if debug: print("Unexpected/unhandled segment type or file content.")
-                    if debug: print base, len(data)
+                    if debug: print(base, len(data))
                     if debug: print("Got",hex(ord(data[base])), hex(ord(data[base+1])),"and", data[4+base:10+base], "instead.")
                     if debug: print("Increment base by",ord(data[base+2])*256+ord(data[base+3])+2)
                 except: 
@@ -352,4 +352,4 @@ if __name__ == '__main__':
         x=data.keys()
         x.sort()
         for i in x:
-            print "Barcode %d: %s" % (i,data[i])
+            print("Barcode %d: %s" % (i,data[i]))
