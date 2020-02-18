@@ -287,7 +287,10 @@ def application(filename, params):
                     relpath = '/'
                     pass
                 else:
-                    relpath = fullpath.replace(db_web_support.dataroot, '')
+                    if db_web_support.dataroot != "/":
+                        relpath = fullpath.replace(db_web_support.dataroot, '')
+                    else:
+                        relpath = fullpath[1:]
                     pass
                 pass
             elif not os.path.exists(fullpath):
@@ -329,7 +332,11 @@ def application(filename, params):
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
             linkstring = db_web_support.siteurl
-            itemslist = string.split(relpath, "/")[1:]
+            itemslist = string.split(relpath, "/")
+            if itemslist[0] != "":
+                itemslist.insert(0, "")
+            itemslist = itemslist[1:]
+
             count = 1
             if itemslist[0] != "":
                 topbarstring += '<a style="padding:0 5px;position:relative;top:3px;" href="%s"><img src="%s/icons/go-home.png"/></a><a class="button" href="%s">/</a>&gt;' % (db_web_support.siteurl, db_web_support.resurl, db_web_support.siteurl)
