@@ -75,28 +75,29 @@ class db_directory(renderer_class):
         return filelist
 
     def recursiveloop(self, dirname, chxlist):
-        chxdirlist = self.getDirectoryList(
-            os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname))
-        for item in chxdirlist:
-            if item.endswith(".chx"):
-                itemurl = self.getURL(
-                    os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item).replace("\\", "/"),
-                    handler=None)
-                etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
-                pass
-            if os.path.isdir(os.path.abspath(
-                    self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
-                if len([x for x in self.getDirectoryList(os.path.abspath(
-                        self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
-                                dirname + '/' + item))) if (x.endswith('.chx') or os.path.isdir(os.path.abspath(
-                        self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
-                                dirname + '/' + item + '/' + x))))]) > 0:
-                    subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap,
-                                                  url=self.getURL(os.path.normpath(
-                                                      self._web_support.checklistpath + '/' + dirname + '/' + item),
-                                                                  handler=None), name=item)
-                    self.recursiveloop(os.path.normpath(dirname + '/' + item), subchxlist)
-                pass
+        chxpath = os.path.abspath(self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname)
+        if os.path.exists(chxpath):
+            chxdirlist = self.getDirectoryList(chxpath)
+            for item in chxdirlist:
+                if item.endswith(".chx"):
+                    itemurl = self.getURL(
+                        os.path.normpath(self._web_support.checklistpath + '/' + dirname + '/' + item).replace("\\", "/"),
+                        handler=None)
+                    etree.SubElement(chxlist, '{%s}chxfile' % (self._namespace_uri), nsmap=self.nsmap, url=itemurl, name=item)
+                    pass
+                if os.path.isdir(os.path.abspath(
+                        self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + dirname + '/' + item)):
+                    if len([x for x in self.getDirectoryList(os.path.abspath(
+                            self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
+                                    dirname + '/' + item))) if (x.endswith('.chx') or os.path.isdir(os.path.abspath(
+                            self._web_support.dataroot + '/' + self._web_support.checklistpath + '/' + os.path.normpath(
+                                    dirname + '/' + item + '/' + x))))]) > 0:
+                        subchxlist = etree.SubElement(chxlist, '{%s}chxdir' % (self._namespace_uri), nsmap=self.nsmap,
+                                                      url=self.getURL(os.path.normpath(
+                                                          self._web_support.checklistpath + '/' + dirname + '/' + item),
+                                                                      handler=None), name=item)
+                        self.recursiveloop(os.path.normpath(dirname + '/' + item), subchxlist)
+                    pass
 
     def __init__(self, relpath, fullpath, web_support, handler_support, caller, handlers,
                  content_mode=_default_content_mode, style_mode=_default_style_mode,
