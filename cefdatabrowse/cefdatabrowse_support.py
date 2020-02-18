@@ -287,10 +287,7 @@ def application(filename, params):
                     relpath = '/'
                     pass
                 else:
-                    if db_web_support.dataroot != "/":
-                        relpath = fullpath.replace(db_web_support.dataroot, '')
-                    else:
-                        relpath = fullpath[1:]
+                    relpath = fullpath.replace(db_web_support.dataroot, '')
                     pass
                 pass
             elif not os.path.exists(fullpath):
@@ -310,6 +307,7 @@ def application(filename, params):
         import databrowse.support.handler_support as handler_support_module
         handler_support = handler_support_module.handler_support(db_web_support.icondbpath, db_web_support.hiddenfiledbpath, db_web_support.directorypluginpath)
         handlers = handler_support.GetHandler(fullpath)
+
         handler = handlers[-1]
 
         # Let's see if we want to override the default handler
@@ -332,10 +330,7 @@ def application(filename, params):
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
             linkstring = db_web_support.siteurl
-            itemslist = string.split(relpath, "/")
-            if itemslist[0] != "":
-                itemslist.insert(0, "")
-            itemslist = itemslist[1:]
+            itemslist = string.split(relpath, "/")[1:]
 
             count = 1
             if itemslist[0] != "":
