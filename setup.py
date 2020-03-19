@@ -59,7 +59,7 @@ setup(
     description="An Extensible Data Management Platform",
     keywords="databrowse data management",
     url="http://limatix.org",
-    version='0.8.3',
+    version='0.8.3.1',
     packages=find_packages(exclude=['tests', 'test_*']),
     package_data={'': ['*.conf', '*.xml']},
     include_package_data=True,
