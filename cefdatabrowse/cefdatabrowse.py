@@ -682,13 +682,13 @@ class CefWidget(CefWidgetParent):
                         self.winId(), None)
 
     def moveEvent(self, event):
-        x = 0
-        y = 0
+        self.x = 0
+        self.y = 0
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)
             elif LINUX:
-                self.browser.SetBounds(x, y, self.width(), self.height())
+                self.browser.SetBounds(self.x, self.y, self.width(), self.height())
             self.browser.NotifyMoveOrResizeStarted()
 
     def resizeEvent(self, event):
@@ -699,8 +699,7 @@ class CefWidget(CefWidgetParent):
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)
             elif LINUX:
-                self.browser.SetBounds(self.x, self.y,
-                                       size.width(), size.height())
+                self.browser.SetBounds(self.x, self.y, size.width(), size.height())
             self.browser.NotifyMoveOrResizeStarted()
 
 
