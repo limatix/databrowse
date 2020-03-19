@@ -38,7 +38,6 @@ From source:
     `> python setup.py install`
 
 
-```
 ## Changelog ##
 
 ### v0.8.3 ###
