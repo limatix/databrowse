@@ -35,22 +35,7 @@
 ## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ Main script for the standalone CEFPython based Databrowse Application"""
-
-'''
-Usage: cefdatabrowse.py [-h] [-s path] [-e] [-g [path]]
-
-    Databrowse: An Extensible Data Management Platform
-
-    optional arguments:
-      -h, --help                    show this help message and exit
-      -s path, --setdataroot path   path to set new dataroot
-      -e, --openconfig              open cefdatabrowse config file
-      -g [path], --go [path]        open cefdatabrowse in a directory
-'''
-
-configdict = {}
-partydict = {}
-
+import cefdatabrowse_support as dbp
 from cefpython3 import cefpython as cef
 from shutil import copyfile
 import pkg_resources
@@ -61,96 +46,16 @@ import sys
 import argparse
 import subprocess
 from re import search
-import ConfigParser
-from urlparse import urlparse
-from urlparse import unquote
-import cefdatabrowse_support as dbp
-
-
-# Load saved cef application settings
-def load_settings():
-    global configdict, partydict
-    config = ConfigParser.ConfigParser()
-    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")):
-        config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-        configdict.update(dict(config.items('databrowse')))
-        partydict.update(dict(config.items('3rdparty')))
-    else:
-        print("### Alert ###")
-        print("### Settings need to be set ###")
-        print("### %s ###" % os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-        copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse-example"),
-                 os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-        subprocess.call(["databrowse", "-e"])
-        load_settings()
-
-
-def save_settings():
-    global configdict
-    config = ConfigParser.ConfigParser()
-    config.read(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"))
-    config.set("databrowse", "WIDTH", configdict['width'])
-    config.set("databrowse", "HEIGHT", configdict['height'])
-    config.set("databrowse", "X", POS_X)
-    config.set("databrowse", "Y", POS_Y)
-    with open(os.path.join(configdict['install'], "cefdatabrowse/.databrowse"), 'wb') as configfile:
-        config.write(configfile)
-
-
-def update_dataroot(newdataroot):
-    global configdict
-    config = ConfigParser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-    config.set("databrowse", "dataroot", newdataroot)
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), 'wb') as configfile:
-        config.write(configfile)
-    configdict['dataroot'] = newdataroot
-
-
-load_settings()
-
-# Handle command line variables
-parser = argparse.ArgumentParser(description='Databrowse: An Extensible Data Management Platform')
-parser.add_argument('-s', '--setdataroot', metavar='path', help='path to set new dataroot')
-parser.add_argument('-e', '--openconfig', action='store_true', help='open cefdatabrowse config file')
-parser.add_argument('-g', '--go', metavar='path', const="here", nargs="?", help='open cefdatabrowse in a directory')
-args = parser.parse_args()
-
-usr_path = ""
-if args.setdataroot:
-    try:
-        if os.path.exists(args.setdataroot):
-            update_dataroot(args.setdataroot)
-            print("Updated dataroot to: %s" % configdict['dataroot'])
-            sys.exit(0)
-    except IndexError:
-        print("Dataroot is currently: %s" % configdict['dataroot'])
-        sys.exit(0)
-elif args.openconfig:
-    if platform.system() == "Linux":
-        status = os.system('%s %s' % (os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
-        if status != 0:
-            if status == 32512:
-                raise Exception("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
-            else:
-                raise Exception("%s: Could not open config file." % status)
-    elif platform.system() == "Windows":
-        status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)),  ".databrowse"))
-        if status != 0:
-            raise Exception("%s: Could not open config file." % status)
-    else:
-        print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
-    sys.exit(0)
-elif args.go:
-    if args.go != "here":
-        if os.path.exists(args.go):
-            usr_path = args.go
-        else:
-            raise argparse.ArgumentTypeError('Path does not exist.')
-    else:
-        usr_path = os.getcwd()
-else:
-    usr_path = configdict['dataroot']
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+try:
+    from urllib.parse import urlparse
+    from urllib.parse import unquote
+except ImportError:
+    from urlparse import urlparse
+    from urlparse import unquote
 
 # GLOBALS
 PYQT4 = False
@@ -162,7 +67,6 @@ try:
     from PyQt4.QtGui import *
     # noinspection PyUnresolvedReferences
     from PyQt4.QtCore import *
-
     PYQT4 = True
 except ImportError:
     try:
@@ -174,7 +78,6 @@ except ImportError:
         from PySide.QtGui import *
         # noinspection PyUnresolvedReferences
         from PySide.QtCore import *
-
         PYSIDE = True
     except ImportError:
         try:
@@ -184,7 +87,6 @@ except ImportError:
             from PyQt5.QtCore import *
             # noinspection PyUnresolvedReferences
             from PyQt5.QtWidgets import *
-
             PYQT5 = True
         except ImportError:
             print("You need to install one of the following:")
@@ -203,24 +105,16 @@ MAC = (platform.system() == "Darwin")
 
 # OS differences
 CefWidgetParent = QWidget
-configdict['install'] = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
-sys.path.insert(0, configdict['install'])
 if LINUX and (PYQT4 or PYSIDE):
     # noinspection PyUnresolvedReferences
     CefWidgetParent = QX11EmbedContainer
 
+APPID = u'limatix.org.databrowse'
 if WINDOWS:
-    myappid = u'limatix.org.databrowse'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APPID)
     scheme = "http://0.0.0.0"
-    if not usr_path.startswith("/"):
-        usr_path = "/" + usr_path
 elif LINUX:
     scheme = "http://cefdatabrowse"
-
-# Append external libraries to path
-for item in partydict.keys():
-    sys.path.insert(0, partydict[item])
 
 
 # Modified client handler from cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
@@ -249,9 +143,9 @@ class ClientHandler:
             for paramone in paramdata:
                 if '=' in paramone:
                     key, value = paramone.split('=')
-                    urlparams[key] = value
+                    urlparams[str(key)] = value
                 else:
-                    urlparams[paramone] = paramone
+                    urlparams[str(paramone)] = paramone
 
         fs = request.GetPostData()
         # Especially uploaded files because of this:
@@ -317,8 +211,10 @@ class ClientHandler:
 
         # Call the databrowse library and return the generated html
         if "databrowse_wsgi" not in fullpath:
-            databrowsepaths = {'install': configdict['install'], 'path': fullpath, 'scheme': scheme}
-            databrowsepaths.update(configdict)
+            config = browser.GetUserData('config')._sections
+            databrowsepaths = {'install': config['databrowse']['install'], 'path': fullpath, 'scheme': scheme}
+            for key, value in config.items():
+                databrowsepaths.update(value)
             params = databrowsepaths.copy()
             params.update(urlparams)
             params.update(request.GetHeaderMap())
@@ -367,7 +263,7 @@ class ClientHandler:
             print("_ReleaseStrongReference() FAILED: resource handler not found, id = %s" % (resHandler._resourceHandlerId))
 
 
-# Adapted resource handler to deal with the returned start resposne variables from databrowse
+# Adapted resource handler to deal with the returned start response variables from databrowse
 # Based on the resource handler in cefpython31/cefpython/cef3/linux/binaries_32bit/wxpython-response.py
 class DatabrowseHandler:
 
@@ -527,16 +423,10 @@ def main():
     commandlineargs = {'allow-file-access-from-files': '', 'disable-web-security': ''}
     cef.Initialize(None, commandlineargs)
     app = CefApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-    main_window.activateWindow()
-    main_window.raise_()
-    main_window.setAttribute(Qt.WA_DeleteOnClose, True)
     app.exec_()
     app.stopTimer()
-    del main_window  # Just to be safe, similarly to "del app"
     del app  # Must destroy app object before calling Shutdown
-    save_settings()
+    # save_settings()
     cef.Shutdown()
 
 
@@ -559,16 +449,25 @@ def check_versions():
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, config):
         super(MainWindow, self).__init__(None)
+        self.config = config
         self.cef_widget = None
         self.navigation_bar = None
+
+        self.fileMenu = None
+
+        # Initialize Databrowse Object
+        self.settingsfile = os.path.join(os.path.expanduser("~"), ".databrowse", ".databrowse")
+
+        self.editor = SettingsEditor(self)
+
         self.setWindowTitle("Databrowse")
         self.setFocusPolicy(Qt.StrongFocus)
         self.setupLayout()
 
     def setupLayout(self):
-        self.resize(int(configdict['width']), int(configdict['height']))
+        self.resize(int(self.config.get('cefdatabrowse', 'width')), int(self.config.get('cefdatabrowse', 'height')))
         self.cef_widget = CefWidget(self)
         self.navigation_bar = NavigationBar(self.cef_widget)
         layout = QGridLayout()
@@ -579,7 +478,7 @@ class MainWindow(QMainWindow):
 
         settingsAction = QAction("&Settings", self)
         settingsAction.setStatusTip('Open settings file')
-        settingsAction.triggered.connect(self.settings)
+        settingsAction.triggered.connect(self.opensettings)
 
         helpAction = QAction("&Help", self)
         helpAction.setStatusTip('Open Manual')
@@ -590,11 +489,11 @@ class MainWindow(QMainWindow):
         closeAction.triggered.connect(self.closeapp)
 
         mainMenu = self.menuBar()
-        fileMenu = mainMenu.addMenu('&File')
-        fileMenu.addAction(openAction)
-        fileMenu.addAction(settingsAction)
-        fileMenu.addAction(helpAction)
-        fileMenu.addAction(closeAction)
+        self.fileMenu = mainMenu.addMenu('&File')
+        self.fileMenu.addAction(openAction)
+        self.fileMenu.addAction(settingsAction)
+        self.fileMenu.addAction(helpAction)
+        self.fileMenu.addAction(closeAction)
 
         layout.addWidget(self.navigation_bar, 0, 0)
         layout.addWidget(self.cef_widget, 1, 0)
@@ -636,6 +535,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         # Close browser (force=True) and free CEF reference
+        self.savesettings()
         if self.cef_widget.browser:
             self.cef_widget.browser.CloseBrowser(True)
             self.clear_browser_references()
@@ -646,39 +546,68 @@ class MainWindow(QMainWindow):
         self.cef_widget.browser = None
 
     def opendoc(self):
-        subprocess.Popen(os.path.dirname(os.path.abspath(__file__)).replace("\\", "/") + '/resources/Manual.pdf', shell=True)
+        subprocess.Popen(os.path.join(self.config.get('cefdatabrowse', 'resources'), 'Manual.pdf'), shell=True)
 
     def openfile(self):
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", configdict['dataroot'],
-                                                  "All Files (*)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", self.config.get('databrowse', 'dataroot'), "All Files (*)", options=options)
         if fileName:
-            self.cef_widget.browser.LoadUrl(scheme + fileName)
+            self.cef_widget.browser.LoadUrl(os.path.join(scheme, fileName))
 
-    def settings(self):
-        status = -1
-        if platform.system() == "Linux":
-            status = os.system('%s %s' % (
-                os.getenv('EDITOR'), os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse")))
-            if status != 0:
-                if status == 32512:
-                    print("%s: EDITOR not set. You need to set the EDITOR environment variable." % status)
-                else:
-                    print("%s: Could not open config file." % status)
-        elif platform.system() == "Windows":
-            status = os.system(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"))
-            if status != 0:
-                print("%s: Could not open config file." % status)
-        else:
-            print(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".databrowse"), "rb").read())
-        if status == 0:
-            load_settings()
-            for item in partydict.keys():
-                sys.path.insert(0, partydict[item])
-            if not configdict['dataroot'].startswith("/"):
-                self.cef_widget.browser.LoadUrl(scheme + "/" + configdict['dataroot'])
-            else:
-                self.cef_widget.browser.LoadUrl(scheme + configdict['dataroot'])
+    def opensettings(self):
+        self.editor.show()
+
+    def savesettings(self):
+        with open(self.settingsfile, "w") as f:
+            self.config.write(f)
+
+    def updatesettings(self):
+        self.config.read(self.settingsfile)
+
+
+class SettingsEditor(QMainWindow):
+    def __init__(self, parent=None):
+        super(SettingsEditor, self).__init__(parent)
+        self.resize(500, 300)
+        self.setWindowTitle("Settings Editor")
+
+        self.parent = parent
+        self.edited = False
+
+        self.textEdit = QTextEdit()
+        self.textEdit.textChanged.connect(self.textchanged)
+
+        mainMenu = self.menuBar()
+        fileMenu = mainMenu.addMenu('&File')
+
+        saveFile = QAction("&Save File", self)
+        saveFile.setShortcut("Ctrl+S")
+        saveFile.setStatusTip('Save File')
+        saveFile.triggered.connect(self.file_save)
+        fileMenu.addAction(saveFile)
+
+        self.setCentralWidget(self.textEdit)
+
+    def textchanged(self):
+        self.edited = True
+
+    def file_save(self):
+        with open(self.parent.settingsfile, "w") as f:
+            f.write(self.textEdit.toPlainText())
+        self.edited = False
+        self.parent.updatesettings()
+
+    def showEvent(self, event):
+        with open(self.parent.settingsfile, "r") as f:
+            text = f.read()
+            self.textEdit.setText(text)
+        self.edited = False
+
+    def closeEvent(self, event):
+        if self.edited:
+            query = QMessageBox.question(self, 'Unsaved Changes', 'Would you like to save?', QMessageBox.Yes, QMessageBox.No)
+            if query == QMessageBox.Yes:
+                self.file_save()
 
 
 class CefWidget(CefWidgetParent):
@@ -712,11 +641,18 @@ class CefWidget(CefWidgetParent):
         window_info = cef.WindowInfo()
         rect = [0, 0, self.width(), self.height()]
         window_info.SetAsChild(self.getHandle(), rect)
-        self.browser = cef.CreateBrowserSync(window_info, url=scheme + usr_path)
+        # import pdb
+        # pdb.set_trace()
+        if not self.parent.config.get("databrowse", "dataroot").startswith("/"):
+            path = "/" + self.parent.config.get("databrowse", "dataroot")
+        else:
+            path = self.parent.config.get("databrowse", "dataroot")
+        self.browser = cef.CreateBrowserSync(window_info, url=scheme + path)
         self.browser.SetClientHandler(ClientHandler())
         self.browser.SetClientHandler(LoadHandler(self.parent.navigation_bar))
         self.browser.SetClientHandler(FocusHandler(self))
         self.browser.SetClientHandler(KeyboardHandler(self))
+        self.browser.SetUserData('config', self.parent.config)
 
     def getHandle(self):
         if self.hidden_window:
@@ -746,24 +682,19 @@ class CefWidget(CefWidgetParent):
                         self.winId(), None)
 
     def moveEvent(self, event):
-        global POS_X, POS_Y
-        self.x = 0
-        self.y = 0
-        POS_X = self.x
-        POS_Y = self.y
+        x = 0
+        y = 0
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)
             elif LINUX:
-                self.browser.SetBounds(self.x, self.y,
-                                       self.width(), self.height())
+                self.browser.SetBounds(x, y, self.width(), self.height())
             self.browser.NotifyMoveOrResizeStarted()
 
     def resizeEvent(self, event):
-        global configdict
         size = event.size()
-        configdict['width'] = self.window().size().width()
-        configdict['height'] = self.window().size().height()
+        self.parent.config.set('cefdatabrowse', 'width', str(self.window().size().width()))
+        self.parent.config.set('cefdatabrowse', 'height', str(self.window().size().height()))
         if self.browser:
             if WINDOWS:
                 WindowUtils.OnSize(self.getHandle(), 0, 0, 0)
@@ -777,7 +708,18 @@ class CefApplication(QApplication):
     def __init__(self, args):
         super(CefApplication, self).__init__(args)
         self.timer = self.createTimer()
+        self.resourcedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "resources")
         self.setupIcon()
+
+        self.configfile = None
+        self.configparser = configparser.ConfigParser()
+        self.load_config()
+
+        self.main_window = MainWindow(self.configparser)
+        self.main_window.show()
+        self.main_window.activateWindow()
+        self.main_window.raise_()
+        self.main_window.setAttribute(Qt.WA_DeleteOnClose, True)
 
     def createTimer(self):
         timer = QTimer()
@@ -794,9 +736,24 @@ class CefApplication(QApplication):
         self.timer.stop()
 
     def setupIcon(self):
-        icon_file = os.path.join(configdict['install'] + "/cefdatabrowse/resources/", "{0}.png".format("icon256"))
+        icon_file = os.path.join(self.resourcedir, "{0}.png".format("icon256"))
         if os.path.exists(icon_file):
             self.setWindowIcon(QIcon(icon_file))
+
+    def load_config(self):
+        self.configfile = os.path.join(os.path.expanduser("~"), ".databrowse", ".databrowse")
+        if not os.path.exists(os.path.dirname(self.configfile)):
+            os.mkdir(os.path.dirname(self.configfile))
+        if not os.path.exists(self.configfile):
+            copyfile(os.path.join(os.path.dirname(__file__), ".databrowse-example"), self.configfile)
+        self.configparser.read(self.configfile)
+        self.configparser.set('cefdatabrowse', 'resources', self.resourcedir)
+        # Append external libraries to path
+        installloc = os.path.split(os.path.dirname(os.path.realpath(__file__)))[0]
+        sys.path.insert(0, installloc)
+        self.configparser.set("databrowse", "install", installloc)
+        for item, value in dict(self.configparser.items('3rdparty')).items():
+            sys.path.insert(0, value)
 
 
 class LoadHandler(object):
@@ -924,8 +881,7 @@ class NavigationBar(QFrame):
         self.url.setText(unquote(browser.GetUrl().replace(scheme, "")))
 
     def createButton(self, name):
-        resources = configdict['install'] + "/cefdatabrowse/resources"
-        pixmap = QPixmap(os.path.join(resources, "{0}.png".format(name)))
+        pixmap = QPixmap(os.path.join(self.cef_widget.parent.config.get('cefdatabrowse', 'resources'), "{0}.png".format(name)))
         icon = QIcon(pixmap)
         button = QPushButton()
         button.setIcon(icon)
