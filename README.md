@@ -38,17 +38,6 @@ From source:
     `> python setup.py install`
 
 
-```
-Usage: databrowse [-h] [-s path] [-e] [-g [path]]
-
-    Databrowse: An Extensible Data Management Platform
-
-    optional arguments:
-      -h, --help                    show this help message and exit
-      -s path, --setdataroot path   path to set new dataroot
-      -e, --openconfig              open cefdatabrowse config file
-      -g [path], --go [path]        open cefdatabrowse in a directory
-```
 ## Changelog ##
 
 ### v0.8.3 ###
@@ -58,7 +47,8 @@ Usage: databrowse [-h] [-s path] [-e] [-g [path]]
  * Added v1 of no provenance mode to db_generic_XML_file (removes all lip:process tags)
  * Added v1 of data fusion custom view to db_directory (Simple search function and render for any tag in .xlp or .xlg files in current directory)
  * Added v1 of db_git plugin (displays relavant details of a git repository such as commit history, directory structure, modified files/untracked files, and current branch) Requires GITPython module.
- * Added prompt during install to allow user to decide if they want to use pip to automatically install dependencies or not
+ * ~~Added prompt during install to allow user to decide if they want to use pip to automatically install dependencies or not~~
+ * CEFDatabrowse now uses user directory based configuration files instead of system wide config files.
  * Many bug fixes
 
 ### v0.8 ###
