@@ -41,12 +41,13 @@ import os
 import string
 from lxml import etree
 from time import time
+from importlib import import_module
 
 # Enable cgitb to provide better error message output
 import cgitb
 cgitb.enable()
 
-serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+serverwrapper = r'''
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -116,7 +117,7 @@ serverwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+localwrapper = r'''
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -187,7 +188,7 @@ localwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
     %s
 </xsl:stylesheet>'''
 
-ajaxwrapper = r'''<?xml version="1.0" encoding="UTF-8"?>
+ajaxwrapper = r'''
 <!DOCTYPE doc [
 <!ENTITY agr    "&#x03B1;"> <!--  -->
 <!ENTITY Agr    "&#x0391;"> <!-- GREEK CAPITAL LETTER ALPHA -->
@@ -317,11 +318,26 @@ def application(filename, params):
 
         # Get A Handle to The Rendering Plugin
         caller = "databrowse"
-        exec("import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler))
-        exec("renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
-                    ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
-                    ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
-                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else ''))
+        render_args = dict()
+        if "content_mode" in db_web_support.req.form:
+            render_args["content_mode"] = db_web_support.req.form["content_mode"].value
+            pass
+        if "style_mode" in db_web_support.req.form:
+            render_args["style_mode"] = db_web_support.req.form["style_mode"].value
+            pass
+        if "recursion_depth" in db_web_support.req.form:
+            render_args["recursion_depth"] = int(db_web_support.req.form["recursion_depth"].value)
+            pass
+
+        renderer = getattr(import_module("databrowse.plugins.%s.%s" % (handler, handler)), handler)(
+            relpath, 
+            fullpath,
+            db_web_support, 
+            handler_support, 
+            caller, 
+            handlers,
+            **render_args
+        )
 
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
@@ -330,7 +346,7 @@ def application(filename, params):
             # Prepare Top Menu String
             topbarstring = '<div class="pathbar"><div style="float:left">'
             linkstring = db_web_support.siteurl
-            itemslist = string.split(relpath, "/")[1:]
+            itemslist = relpath.split("/")[1:]
 
             count = 1
             if itemslist[0] != "":
@@ -364,7 +380,7 @@ def application(filename, params):
                 style = serverwrapper % (db_web_support.resurl, db_web_support.dataroot.replace("\\", "/"), runtime, topbarstring, renderer.getContentMode(), db_web_support.style.GetStyle())
                 parser = etree.XMLParser()
                 parser.resolvers.add(FileResolver(os.path.dirname(fullpath)))
-                styletree = etree.ElementTree(etree.XML(style, parser))
+                styletree = etree.ElementTree(etree.XML(style.encode("utf-8"), parser))
                 styletree.xinclude()
                 db_web_support.req.response_headers['Content-Type'] = 'text/xml'
                 db_web_support.req.output = etree.tostring(styletree)
@@ -467,13 +483,17 @@ def application(filename, params):
 
         # Import Modules Needed For All Of This - No need to import these things otherwise
         import traceback
-        import StringIO
+        try:
+            from StringIO import StringIO ## for Python 2
+        except ImportError:
+            from io import StringIO ## for Python 3
+            pass
         import cgi
         import socket
         from time import gmtime, strftime
 
         # Get a Trace and Also Output a Copy of the Trace to the Server Log
-        trace = StringIO.StringIO()
+        trace = StringIO()
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=trace)
         traceback.print_exception(exc_type, exc_value, exc_traceback)

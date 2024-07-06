@@ -55,9 +55,13 @@ from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 import magic
 from PIL import Image
-import StringIO
 import databrowse.support.EXIF as EXIF
 import databrowse.support.RMETA as RMETA
+
+try:
+    from io import BytesIO
+except ImportError:
+    import BytesIO
 
 
 class db_image_viewer(renderer_class):
@@ -152,8 +156,7 @@ class db_image_viewer(renderer_class):
                 f.close()
 
                 xmlchild = etree.SubElement(xmlroot, "exiftags", nsmap=self.nsmap)
-                x = exiftags.keys()
-                x.sort()
+                x = sorted(exiftags.keys())
                 for tag in x:
                     if tag in ('JPEGThumbnail', 'TIFFThumbnail'):
                         continue
@@ -228,7 +231,7 @@ class db_image_viewer(renderer_class):
                     img = Image.open(self._fullpath)
                     format = img.format
                     img.thumbnail(newsize, Image.ANTIALIAS)
-                    output = StringIO.StringIO()
+                    output = BytesIO()
                     img.save(output, format=format)
                     f = self.getCacheFileHandler('wb', tagname, extension=ext)
                     img.save(f)

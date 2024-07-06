@@ -54,7 +54,11 @@ from stat import *
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 import magic
-import StringIO
+
+try:
+    from io import StringIO
+except ImportError:
+    import StringIO
 
 
 class db_svg_viewer(renderer_class):

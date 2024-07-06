@@ -255,7 +255,10 @@ class web_support:
     requireuser = None          # Require Username
 
     def __init__(self, environ, start_response):
-        self.req = wsgi_req(environ, start_response)
+        def start_response_wrapper(status, items):
+            return start_response(status, list(items))
+
+        self.req = wsgi_req(environ, start_response_wrapper)
         self.reqfilename = self.req.filename
         self.webdir = os.path.dirname(self.reqfilename)
         self.stderr = environ["wsgi.errors"]
@@ -263,10 +266,10 @@ class web_support:
 
         # Try to Load Optional Configuration File
         try:
-            conffile = file(os.path.join(os.path.dirname(self.reqfilename), "databrowse_wsgi.conf"))
-            self.confstr = conffile.read()
-            conffile.close()
-            exec(self.confstr)
+            with open(os.path.join(os.path.dirname(self.reqfilename), "databrowse_wsgi.conf"), "r") as f:
+                self.confstr = f.read()
+                exec(self.confstr)
+                pass
         except:
             pass
 

@@ -85,7 +85,7 @@ class db_dataguzzler_data_file(renderer_class):
 
         Chunk = dgf.nextchunk(dgfh)
         while Chunk:
-            newel = etree.Element("{%s}%s" % (self._namespace_uri, Chunk.Name), nsmap=self.nsmap)
+            newel = etree.Element("{%s}%s" % (self._namespace_uri, Chunk.Name.decode("utf-8")), nsmap=self.nsmap)
             if (Chunk.Name in dgf_nestedchunks):
                 if nestdepth > 0:
                     nestedchunks = self.dumpxmlchunk(dgfh, nestdepth-1)

@@ -35,7 +35,7 @@
 ## 01 June 2018; by Carl W. Magnuson (NDE Division Director).                ##
 ###############################################################################
 """ Main script for the standalone CEFPython based Databrowse Application"""
-import cefdatabrowse_support as dbp
+import cefdatabrowse.cefdatabrowse_support as dbp
 from cefpython3 import cefpython as cef
 from shutil import copyfile
 import pkg_resources
@@ -231,12 +231,12 @@ class ClientHandler:
                     raise IOError("Invalid path: %s" % unquote(fullpath))
                 else:
                     if os.path.isdir(unquote(fullpath)):
-                        html = ""
+                        html = b""
                     else:
                         raise IOError("Unknown problem")
             mime = response.GetMimeType()
             urlparams.update({'headers': {'Content-Type': mime}, "status": 200})
-            data = "".join(html)
+            data = b"".join(html)
 
         del html
 

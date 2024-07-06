@@ -43,10 +43,17 @@
 ###############################################################################
 """ support/dummy_web_support.py - Classes to encapsulate Web/WSGI functionality """
 
+import sys
 import os
 import os.path
 import cgi
-import urllib
+
+if sys.version_info >= (3, 0):
+    import urllib.request as urllib 
+else:
+    import urllib
+    pass
+
 from lxml import etree
 import databrowse.support
 

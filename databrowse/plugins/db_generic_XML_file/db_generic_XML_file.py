@@ -132,7 +132,7 @@ class db_generic_XML_file(renderer_class):
                         xmlchild.text = "%s:%s" % (username, groupname)
 
                     # Contents of File
-                    f = open(self._fullpath)
+                    f = open(self._fullpath, "rb")
                     xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
                     tree = etree.XML(f.read())
                     for bad in tree.xpath("//lip:*", namespaces={'lip': 'http://limatix.org/provenance'}):
@@ -214,11 +214,8 @@ class db_generic_XML_file(renderer_class):
                         xmlchild.text = "%s:%s" % (username, groupname)
 
                     # Contents of File
-                    f = open(self._fullpath)
                     xmlchild = etree.SubElement(xmlroot, "contents", nsmap=self.nsmap)
-                    xmlchild.append(etree.XML(f.read()))
-                    # xmlchild.text = f.read()
-                    f.close()
+                    xmlchild.append(etree.parse(self._fullpath).getroot())
 
                     return xmlroot
             elif self._content_mode == "raw":

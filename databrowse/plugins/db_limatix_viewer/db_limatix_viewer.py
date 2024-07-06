@@ -45,10 +45,16 @@
 
 import sys
 import os
+import string
+import random
 import glob
 import zipfile
 import tempfile
-from urllib import pathname2url
+if sys.version_info >= (3, 0):
+    import urllib.request as urllib 
+else:
+    import urllib
+    pass
 from lxml import etree
 from databrowse.support.renderer_support import renderer_class
 from databrowse.plugins.db_data_table.db_data_table import db_data_table
@@ -427,7 +433,7 @@ class db_limatix_viewer(renderer_class):
 
         #print "Stylesheet Loaded Successfully:"
         #print(stylestring)
-        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
+        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', urllib.pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
 
         # If we set the flag earlier, we need to change the namespace
         if override is True:

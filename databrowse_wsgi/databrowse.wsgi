@@ -325,11 +325,11 @@ def application(environ, start_response):
 
         # Get A Handle to The Rendering Plugin
         caller = "databrowse"
-        exec "import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler)
-        exec "renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
+        exec("import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler))
+        exec("renderer = %s_module.%s(relpath, fullpath, db_web_support, handler_support, caller, handlers%s%s%s)" % (handler, handler,\
                     ', content_mode="' + db_web_support.req.form["content_mode"].value + '"' if "content_mode" in db_web_support.req.form else '',\
                     ', style_mode="' + db_web_support.req.form['style_mode'].value + '"' if "style_mode" in db_web_support.req.form else '',\
-                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else '')
+                    ', recursion_depth=' + db_web_support.req.form['recursion_depth'].value + '' if "recursion_depth" in db_web_support.req.form else ''))
 
         # Register Primary Namespace
         #etree.register_namespace('db', 'http://thermal.cnde.iastate.edu/databrowse')
@@ -474,7 +474,11 @@ def application(environ, start_response):
 
         # Import Modules Needed For All Of This - No need to import these things otherwise
         import traceback
-        import StringIO
+        try:
+            from StringIO import StringIO ## for Python 2
+        except ImportError:
+            from io import StringIO ## for Python 3
+
         import cgi
         import socket
         from time import gmtime, strftime
@@ -489,7 +493,7 @@ def application(environ, start_response):
             pass
 
         # Get a Trace and Also Output a Copy of the Trace to the Server Log
-        trace = StringIO.StringIO()
+        trace = StringIO()
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=trace)
         traceback.print_exception(exc_type, exc_value, exc_traceback)
@@ -499,7 +503,7 @@ def application(environ, start_response):
 
         # Return Proper Error so AJAX Works
         if "ajax" in form:
-            start_response('500 Internal Server Error', {'Content-Type': 'text/html', 'Content-Length': '25'}.items())
+            start_response('500 Internal Server Error', list({'Content-Type': 'text/html', 'Content-Length': '25'}.items()))
             return ['500 Internal Server Error']
         else:
             # Now we can get a list of request variables
@@ -515,7 +519,7 @@ def application(environ, start_response):
             # Get A List of Everything in Environ
             keystring = ""
             keys = environ.keys()
-            keys.sort()
+            sorted(keys)
             for key in keys:
                 keystring = keystring + "%s:  %s \n" % (key, repr(environ[key]))
                 pass
@@ -530,8 +534,8 @@ def application(environ, start_response):
             # Output Error Message
             err = str(err).replace('&', "&#160;").replace('<', "&lt;").replace('>', "&gt;")
             errormessage = errormessage % (err, strftime("%Y-%m-%d %H:%M:%S", gmtime()), socket.getfqdn(), sys.platform, sys.version, os.getpid(), tracestring, keystring, inputstring, dirstring)
-            start_response('200 OK', {'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items())
-            return [errormessage]
+            start_response('200 OK', list({'Content-Type': 'text/xml', 'Content-Length': str(len(errormessage))}.items()))
+            return [errormessage.encode("utf-8")]
         pass
 
 

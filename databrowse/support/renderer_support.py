@@ -45,6 +45,7 @@ import string
 import random
 import copy
 import fnmatch
+import io
 
 
 class renderer_class(object):
@@ -358,7 +359,19 @@ class renderer_class(object):
                 addlist = [n for n in reallist if fnmatch.fnmatch(n, item[1])]
                 pass
             returnlist = list(set(removelist + addlist))
-        exec("returnlist.sort(%s%s)" % ("reverse=True" if order == "desc" else "reverse=False", ",key=%s" % sort if sort is not None else ",key=str.lower"))
+
+        sort_args = {
+            "reverse": False,
+            "key": str.lower
+        }
+
+        if order == "desc":
+            sort_args["reverse"] = True
+            pass
+        if sort is not None:
+            sort_args["key"] = sort
+
+        returnlist.sort(**sort_args)
 
         returndirlist = [f for f in returnlist if os.path.isdir(os.path.join(fullpath, f))]
         returnfilelist = [f for f in returnlist if os.path.isfile(os.path.join(fullpath, f))]
@@ -369,7 +382,7 @@ class renderer_class(object):
 
         pass
 
-    class CacheFileHandler(file):
+    class CacheFileHandler(io.FileIO):
         """ Overrride File Close Class to Reassign Timestamp """
 
         timestamp = None

@@ -46,8 +46,15 @@
 import sys
 import os
 import os.path
+import random
+import string
 from difflib import get_close_matches
-from urllib import pathname2url
+if sys.version_info >= (3, 0):
+    import urllib.request as urllib 
+else:
+    import urllib
+    pass
+from importlib import import_module
 from lxml import etree
 from lxml import objectify
 from databrowse.support.renderer_support import renderer_class
@@ -155,9 +162,17 @@ class db_directory(renderer_class):
                                               handlers, content_mode=content_mode, style_mode=style_mode,
                                               recursion_depth=recursion_depth - 1)
                 else:
-                    exec("import databrowse.plugins.%s.%s as %s_module" % (handler, handler, handler))
-                    exec("renderer = %s_module.%s(itemrelpath, itemfullpath, self._web_support, self._handler_support, caller, handlers, content_mode='%s', style_mode='%s', recursion_depth=%i)" % (
-                    handler, handler, content_mode, style_mode, recursion_depth - 1))
+                    renderer = getattr(import_module("databrowse.plugins.%s.%s" % (handler, handler)), handler)(
+                        itemrelpath, 
+                        itemfullpath,
+                        self._web_support, 
+                        self._handler_support, 
+                        caller, 
+                        handlers,
+                        content_mode=content_mode,
+                        style_mode=style_mode,
+                        recursion_depth=recursion_depth - 1
+                    )
                 content = renderer.getContent()
                 if os.path.islink(itemfullpath):
                     overlay = "link"
@@ -233,9 +248,6 @@ class db_directory(renderer_class):
                 ft = self.getCacheFileHandler('wb', "searches", "txt")
                 ft.write(",".join(prevsearches))
                 ft.close()
-
-                # import pdb
-                # pdb.set_trace()
 
                 p = etree.XMLParser(huge_tree=True, remove_blank_text=True)
                 specimen_file_types = ['.xlg', '.xlp']
@@ -411,7 +423,7 @@ class db_directory(renderer_class):
         #print "Stylesheet Loaded Successfully:"
         #print stylestring
 
-        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
+        stylestring = stylestring.replace('/usr/local/limatix-qautils/checklist/datacollect2.xsl', urllib.pathname2url(os.path.join(self._web_support.limatix_qautils, "checklist/datacollect2.xsl")).replace("///", ""))
 
         # If we set the flag earlier, we need to change the namespace
         if override is True:
